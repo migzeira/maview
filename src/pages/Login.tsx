@@ -100,11 +100,21 @@ const InfiniteRow = ({
 
 const isValidUsername = (val: string) => /^[a-z0-9-]{3,30}$/.test(val);
 
+const SIGNUP_NOTIFICATIONS = [
+  { name: "Gabriela M.", action: "acabou de criar sua vitrine", avatar: "https://i.pravatar.cc/64?img=23" },
+  { name: "Carlos R.",   action: "fez sua primeira venda",      avatar: "https://i.pravatar.cc/64?img=13" },
+  { name: "Beatriz S.",  action: "personalizou seu link bio",   avatar: "https://i.pravatar.cc/64?img=25" },
+  { name: "Felipe N.",   action: "acabou de criar sua vitrine", avatar: "https://i.pravatar.cc/64?img=16" },
+  { name: "Larissa T.",  action: "recebeu 200 cliques hoje",    avatar: "https://i.pravatar.cc/64?img=39" },
+];
+
 /* ─── Page ────────────────────────────────────────────────────── */
 
 const Login = () => {
   const navigate = useNavigate();
   const [mode, setMode] = useState<Mode>("login");
+  const [notification, setNotification] = useState<{ name: string; action: string; avatar: string } | null>(null);
+  const [onlineCount] = useState(() => Math.floor(Math.random() * 30) + 38);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -125,6 +135,19 @@ const Login = () => {
       if (session) navigate("/dashboard");
     });
   }, [navigate]);
+
+  // Signup notification pop-up
+  useEffect(() => {
+    let idx = 0;
+    const show = () => {
+      setNotification(SIGNUP_NOTIFICATIONS[idx % SIGNUP_NOTIFICATIONS.length]);
+      idx++;
+      setTimeout(() => setNotification(null), 4000);
+    };
+    const t = setTimeout(show, 3000);
+    const interval = setInterval(show, 9000);
+    return () => { clearTimeout(t); clearInterval(interval); };
+  }, []);
 
   const clearError = () => setError("");
 
@@ -247,6 +270,38 @@ const Login = () => {
           backgroundImage: "linear-gradient(rgba(139,92,246,1) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,1) 1px, transparent 1px)",
           backgroundSize: "60px 60px",
         }} />
+        {/* M logo gigante como marca d'água */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <svg width="700" height="700" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-[0.035]">
+            <defs>
+              <linearGradient id="bgGFront" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+                <stop offset="0%" stopColor="#8B5CF6"/>
+                <stop offset="100%" stopColor="#4C1D95"/>
+              </linearGradient>
+              <linearGradient id="bgGBack" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+                <stop offset="0%" stopColor="#5B21B6"/>
+                <stop offset="100%" stopColor="#1A0A35"/>
+              </linearGradient>
+              <clipPath id="bgIc"><rect width="100" height="100"/></clipPath>
+            </defs>
+            <g clipPath="url(#bgIc)">
+              <polygon points="18,92 38,8 63,46 88,8 108,92" fill="url(#bgGBack)" opacity="0.68"/>
+              <polygon points="4,92 26,12 50,52 74,12 96,92" fill="url(#bgGFront)"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      {/* ── Notification pop-up ── */}
+      <div className={`fixed bottom-6 left-6 z-50 transition-all duration-500 ${notification ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"}`}>
+        <div className="flex items-center gap-3 bg-[#1A1333]/95 backdrop-blur-xl border border-white/[0.1] rounded-2xl px-4 py-3 shadow-2xl shadow-black/40 max-w-[280px]">
+          <img src={notification?.avatar} alt="" className="w-9 h-9 rounded-full object-cover border-2 border-maview-purple/40 flex-shrink-0" />
+          <div className="min-w-0">
+            <p className="text-white text-xs font-semibold truncate">{notification?.name}</p>
+            <p className="text-maview-muted/80 text-xs truncate">{notification?.action}</p>
+          </div>
+          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
+        </div>
       </div>
 
       {/* ══════════════════════════════════════════
@@ -347,9 +402,27 @@ const Login = () => {
               <span className="text-white text-2xl font-bold tracking-tight">Maview</span>
             </div>
 
+            {/* Online counter */}
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-3 py-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-emerald-400 text-xs font-medium">{onlineCount} pessoas online agora</span>
+              </div>
+            </div>
+
             {/* Card */}
             <div className="relative bg-maview-card/70 backdrop-blur-2xl rounded-[24px] border border-white/[0.07] p-8 sm:p-10 shadow-2xl shadow-black/40">
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-maview-purple/60 to-transparent rounded-t-[24px]" />
+
+              {/* Beta scarcity banner */}
+              {mode === "signup" && (
+                <div className="flex items-center gap-2 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-xl px-4 py-2.5 mb-5">
+                  <Sparkles size={13} className="text-amber-400 flex-shrink-0" />
+                  <p className="text-amber-300 text-xs font-medium">
+                    <span className="font-bold">Beta gratuito</span> — vagas limitadas. Garanta a sua agora.
+                  </p>
+                </div>
+              )}
 
               {/* Header */}
               <div className="mb-7">
@@ -492,22 +565,35 @@ const Login = () => {
                   </div>
                 )}
 
-                <button
-                  type="submit"
-                  disabled={isLoading || (mode === "signup" && usernameStatus !== "available")}
-                  className="w-full h-12 rounded-xl bg-gradient-to-r from-violet-600 via-maview-purple to-purple-700 text-white text-sm font-semibold transition-all duration-200 hover:shadow-xl hover:shadow-maview-purple/35 hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] mt-1"
-                >
-                  {isLoading ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>{mode === "login" ? "Entrando..." : mode === "signup" ? "Criando conta..." : "Enviando..."}</span>
+                <div className="mt-1">
+                  <button
+                    type="submit"
+                    disabled={isLoading || (mode === "signup" && usernameStatus !== "available")}
+                    className="w-full h-12 rounded-xl bg-gradient-to-r from-violet-600 via-maview-purple to-purple-700 text-white text-sm font-semibold transition-all duration-200 hover:shadow-xl hover:shadow-maview-purple/35 hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span>{mode === "login" ? "Entrando..." : mode === "signup" ? "Criando conta..." : "Enviando..."}</span>
+                      </div>
+                    ) : (
+                      mode === "login"  ? "Entrar" :
+                      mode === "signup" ? "Criar minha vitrine →" :
+                      "Enviar link de recuperação"
+                    )}
+                  </button>
+                  {/* Trust badges */}
+                  {mode === "signup" && (
+                    <div className="flex items-center justify-center gap-4 mt-3">
+                      {["✓ Grátis", "✓ Sem cartão", "✓ Suporte em PT"].map((t) => (
+                        <span key={t} className="text-[11px] text-maview-muted/60 font-medium">{t}</span>
+                      ))}
                     </div>
-                  ) : (
-                    mode === "login"  ? "Entrar" :
-                    mode === "signup" ? "Criar minha vitrine →" :
-                    "Enviar link de recuperação"
                   )}
-                </button>
+                  {mode === "login" && (
+                    <p className="text-center text-[11px] text-maview-muted/50 mt-2">Acesso seguro · Seus dados protegidos</p>
+                  )}
+                </div>
               </form>
 
               {mode !== "forgot" && (
