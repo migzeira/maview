@@ -41,12 +41,12 @@ interface LinkItem {
 }
 
 const ICON_OPTIONS = [
-  { value: "globe",     icon: Globe,      label: "Website" },
-  { value: "instagram", icon: Instagram,  label: "Instagram" },
-  { value: "youtube",   icon: Youtube,    label: "YouTube" },
-  { value: "twitter",   icon: Twitter,    label: "Twitter / X" },
+  { value: "globe",     icon: Globe,       label: "Website" },
+  { value: "instagram", icon: Instagram,   label: "Instagram" },
+  { value: "youtube",   icon: Youtube,     label: "YouTube" },
+  { value: "twitter",   icon: Twitter,     label: "Twitter / X" },
   { value: "shop",      icon: ShoppingBag, label: "Loja" },
-  { value: "link",      icon: Link2,      label: "Outro" },
+  { value: "link",      icon: Link2,       label: "Outro" },
 ];
 
 const THEMES = [
@@ -62,6 +62,11 @@ const getLinkIcon = (iconValue: string) => {
   const found = ICON_OPTIONS.find((o) => o.value === iconValue);
   return found ? found.icon : Link2;
 };
+
+/* ─── Shared input class ──────────────────────────────────────── */
+
+const inputClass =
+  "w-full h-10 px-3 rounded-xl bg-maview-bg border border-maview-border text-maview-text text-sm placeholder:text-maview-muted/60 outline-none transition-all focus:border-maview-purple focus:ring-2 focus:ring-maview-purple/10 shadow-sm";
 
 /* ─── Dashboard ───────────────────────────────────────────────── */
 
@@ -139,34 +144,32 @@ const Dashboard = () => {
     <div className="min-h-screen bg-maview-bg flex flex-col">
 
       {/* ── Header ── */}
-      <header className="border-b border-white/[0.05] px-6 h-16 flex items-center justify-between flex-shrink-0">
+      <header className="bg-white border-b border-maview-border px-6 h-16 flex items-center justify-between flex-shrink-0 shadow-sm">
         <div className="flex items-center gap-2.5">
-          <div className="drop-shadow-[0_0_8px_rgba(109,40,217,0.4)]">
-            <MaviewLogo size={28} />
-          </div>
-          <span className="text-white text-lg font-bold tracking-tight">Maview</span>
+          <MaviewLogo size={28} />
+          <span className="text-maview-text text-lg font-bold tracking-tight">Maview</span>
         </div>
 
         {/* Profile link pill */}
         <button
           onClick={copyLink}
-          className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-maview-purple/10 border border-maview-purple/20 hover:bg-maview-purple/20 transition-all text-sm text-maview-purple-light font-medium"
+          className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-maview-purple-soft border border-maview-purple/20 hover:bg-maview-purple/10 transition-all text-sm text-maview-purple font-medium"
         >
           <Globe size={13} />
           {profileUrl}
-          {copied ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
+          {copied ? <Check size={13} className="text-emerald-500" /> : <Copy size={13} />}
         </button>
 
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/[0.06]">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-maview-purple to-maview-purple-dark flex items-center justify-center">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-maview-surface border border-maview-border">
+            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-maview-purple-light to-maview-purple-dark flex items-center justify-center">
               <UserIcon size={11} className="text-white" />
             </div>
-            <span className="text-sm text-white/70 hidden md:block">{displayName}</span>
+            <span className="text-sm text-maview-text-sub hidden md:block">{displayName}</span>
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-maview-muted hover:text-white hover:bg-white/[0.04] transition-all text-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-maview-muted hover:text-maview-text hover:bg-maview-surface transition-all text-sm"
           >
             <LogOut size={14} />
             <span className="hidden sm:block">Sair</span>
@@ -178,19 +181,19 @@ const Dashboard = () => {
       <div className="flex flex-1 overflow-hidden">
 
         {/* ── Sidebar nav ── */}
-        <aside className="hidden md:flex flex-col w-56 border-r border-white/[0.05] px-3 py-6 gap-1 flex-shrink-0">
+        <aside className="hidden md:flex flex-col w-56 bg-white border-r border-maview-border px-3 py-6 gap-1 flex-shrink-0">
           {([
-            { id: "links",     icon: Link2,      label: "Meus Links" },
-            { id: "aparencia", icon: Palette,     label: "Aparência" },
-            { id: "analytics", icon: BarChart3,   label: "Analytics" },
+            { id: "links",     icon: Link2,    label: "Meus Links" },
+            { id: "aparencia", icon: Palette,  label: "Aparência" },
+            { id: "analytics", icon: BarChart3, label: "Analytics" },
           ] as { id: Tab; icon: any; label: string }[]).map(({ id, icon: Icon, label }) => (
             <button
               key={id}
               onClick={() => setTab(id)}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 tab === id
-                  ? "bg-maview-purple/15 text-white border border-maview-purple/25"
-                  : "text-maview-muted hover:text-white hover:bg-white/[0.04]"
+                  ? "bg-maview-purple-soft text-maview-purple border border-maview-purple/20"
+                  : "text-maview-muted hover:text-maview-text hover:bg-maview-surface"
               }`}
             >
               <Icon size={16} />
@@ -207,9 +210,9 @@ const Dashboard = () => {
             <div className="flex-1 min-w-0">
 
               {/* Mobile tabs */}
-              <div className="flex md:hidden bg-white/[0.04] rounded-xl p-1 mb-6 border border-white/[0.05]">
+              <div className="flex md:hidden bg-maview-surface rounded-xl p-1 mb-6 border border-maview-border">
                 {([
-                  { id: "links", label: "Links" },
+                  { id: "links",     label: "Links" },
                   { id: "aparencia", label: "Aparência" },
                   { id: "analytics", label: "Analytics" },
                 ] as { id: Tab; label: string }[]).map(({ id, label }) => (
@@ -217,7 +220,7 @@ const Dashboard = () => {
                     key={id}
                     onClick={() => setTab(id)}
                     className={`flex-1 py-2 text-xs font-medium rounded-lg transition-all ${
-                      tab === id ? "bg-maview-purple text-white" : "text-maview-muted"
+                      tab === id ? "bg-maview-purple text-white shadow-sm" : "text-maview-muted"
                     }`}
                   >
                     {label}
@@ -230,12 +233,12 @@ const Dashboard = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between mb-6">
                     <div>
-                      <h2 className="text-white font-semibold text-lg">Meus Links</h2>
+                      <h2 className="text-maview-text font-semibold text-lg">Meus Links</h2>
                       <p className="text-maview-muted text-sm">Gerencie os links da sua vitrine</p>
                     </div>
                     <button
                       onClick={() => setAddingLink(true)}
-                      className="flex items-center gap-2 bg-maview-purple text-white text-sm font-medium px-4 py-2 rounded-xl hover:brightness-110 transition-all active:scale-[0.98]"
+                      className="flex items-center gap-2 bg-maview-purple text-white text-sm font-medium px-4 py-2 rounded-xl hover:brightness-110 transition-all active:scale-[0.98] shadow-sm shadow-maview-purple/20"
                     >
                       <Plus size={15} /> Adicionar link
                     </button>
@@ -243,17 +246,17 @@ const Dashboard = () => {
 
                   {/* Add link form */}
                   {addingLink && (
-                    <div className="bg-maview-card/60 border border-maview-purple/30 rounded-2xl p-5 space-y-3">
-                      <p className="text-white text-sm font-medium mb-2">Novo link</p>
+                    <div className="bg-white border border-maview-border rounded-2xl p-5 space-y-3 shadow-sm">
+                      <p className="text-maview-text text-sm font-medium mb-2">Novo link</p>
                       <input
                         type="text" placeholder="Título (ex: Meu Instagram)"
                         value={newTitle} onChange={(e) => setNewTitle(e.target.value)}
-                        className="w-full h-10 px-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white text-sm placeholder:text-maview-muted/50 outline-none focus:border-maview-purple transition-all"
+                        className={inputClass}
                       />
                       <input
                         type="url" placeholder="URL (ex: https://instagram.com/seunome)"
                         value={newUrl} onChange={(e) => setNewUrl(e.target.value)}
-                        className="w-full h-10 px-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white text-sm placeholder:text-maview-muted/50 outline-none focus:border-maview-purple transition-all"
+                        className={inputClass}
                       />
                       <div className="flex flex-wrap gap-2">
                         {ICON_OPTIONS.map(({ value, icon: Icon, label }) => (
@@ -263,8 +266,8 @@ const Dashboard = () => {
                             onClick={() => setNewIcon(value)}
                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all border ${
                               newIcon === value
-                                ? "bg-maview-purple/20 border-maview-purple/50 text-white"
-                                : "bg-white/[0.03] border-white/[0.07] text-maview-muted hover:text-white"
+                                ? "bg-maview-purple-soft border-maview-purple/40 text-maview-purple"
+                                : "bg-maview-surface border-maview-border text-maview-muted hover:text-maview-text hover:border-maview-purple/20"
                             }`}
                           >
                             <Icon size={12} /> {label}
@@ -274,13 +277,13 @@ const Dashboard = () => {
                       <div className="flex gap-2 pt-1">
                         <button
                           onClick={addLink}
-                          className="flex-1 h-9 rounded-xl bg-maview-purple text-white text-sm font-medium hover:brightness-110 transition-all"
+                          className="flex-1 h-9 rounded-xl bg-maview-purple text-white text-sm font-medium hover:brightness-110 transition-all shadow-sm shadow-maview-purple/20"
                         >
                           Salvar
                         </button>
                         <button
                           onClick={() => { setAddingLink(false); setNewTitle(""); setNewUrl(""); }}
-                          className="flex-1 h-9 rounded-xl bg-white/[0.04] border border-white/[0.08] text-maview-muted text-sm hover:text-white transition-all"
+                          className="flex-1 h-9 rounded-xl bg-maview-surface border border-maview-border text-maview-muted text-sm hover:text-maview-text transition-all"
                         >
                           Cancelar
                         </button>
@@ -288,7 +291,7 @@ const Dashboard = () => {
                     </div>
                   )}
 
-                  {/* Links list */}
+                  {/* Links list empty */}
                   {links.length === 0 && !addingLink && (
                     <div className="text-center py-16 text-maview-muted">
                       <Link2 size={32} className="mx-auto mb-3 opacity-30" />
@@ -296,36 +299,37 @@ const Dashboard = () => {
                     </div>
                   )}
 
+                  {/* Links list */}
                   {links.map((link) => {
                     const Icon = getLinkIcon(link.icon);
                     return (
                       <div
                         key={link.id}
-                        className={`flex items-center gap-3 bg-maview-card/50 border rounded-2xl px-4 py-3.5 transition-all ${
-                          link.active ? "border-white/[0.07]" : "border-white/[0.03] opacity-50"
+                        className={`flex items-center gap-3 bg-white border rounded-2xl px-4 py-3.5 transition-all shadow-sm ${
+                          link.active ? "border-maview-border" : "border-maview-border/40 opacity-50"
                         }`}
                       >
-                        <GripVertical size={16} className="text-maview-muted/40 cursor-grab flex-shrink-0" />
-                        <div className="w-9 h-9 rounded-xl bg-maview-purple/10 border border-maview-purple/20 flex items-center justify-center flex-shrink-0">
-                          <Icon size={16} className="text-maview-purple-light" />
+                        <GripVertical size={16} className="text-maview-border cursor-grab flex-shrink-0" />
+                        <div className="w-9 h-9 rounded-xl bg-maview-purple-soft border border-maview-purple/20 flex items-center justify-center flex-shrink-0">
+                          <Icon size={16} className="text-maview-purple" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-white text-sm font-medium truncate">{link.title}</p>
-                          <p className="text-maview-muted/60 text-xs truncate">{link.url}</p>
+                          <p className="text-maview-text text-sm font-medium truncate">{link.title}</p>
+                          <p className="text-maview-muted text-xs truncate">{link.url}</p>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
                           {/* Toggle */}
                           <button
                             onClick={() => toggleLink(link.id)}
                             className={`w-10 h-5 rounded-full transition-all relative ${
-                              link.active ? "bg-maview-purple" : "bg-white/[0.08]"
+                              link.active ? "bg-maview-purple" : "bg-maview-border"
                             }`}
                           >
                             <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${
                               link.active ? "left-[22px]" : "left-0.5"
                             }`} />
                           </button>
-                          <button onClick={() => deleteLink(link.id)} className="text-maview-muted/40 hover:text-red-400 transition-colors p-1">
+                          <button onClick={() => deleteLink(link.id)} className="text-maview-muted/60 hover:text-red-500 transition-colors p-1">
                             <Trash2 size={14} />
                           </button>
                         </div>
@@ -339,20 +343,20 @@ const Dashboard = () => {
               {tab === "aparencia" && (
                 <div className="space-y-8">
                   <div>
-                    <h2 className="text-white font-semibold text-lg mb-1">Aparência</h2>
+                    <h2 className="text-maview-text font-semibold text-lg mb-1">Aparência</h2>
                     <p className="text-maview-muted text-sm">Personalize sua vitrine</p>
                   </div>
 
                   {/* Bio info */}
                   <div className="space-y-4">
-                    <p className="text-white text-sm font-medium">Informações do perfil</p>
+                    <p className="text-maview-text text-sm font-medium">Informações do perfil</p>
                     <div className="space-y-3">
                       <div>
                         <label className="text-xs text-maview-muted block mb-1.5">Nome exibido</label>
                         <input
                           type="text" placeholder={displayName}
                           value={bioName} onChange={(e) => setBioName(e.target.value)}
-                          className="w-full h-10 px-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white text-sm placeholder:text-maview-muted/50 outline-none focus:border-maview-purple transition-all"
+                          className={inputClass}
                         />
                       </div>
                       <div>
@@ -361,7 +365,7 @@ const Dashboard = () => {
                           placeholder="Escreva algo sobre você..."
                           value={bioText} onChange={(e) => setBioText(e.target.value)}
                           rows={3}
-                          className="w-full px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white text-sm placeholder:text-maview-muted/50 outline-none focus:border-maview-purple transition-all resize-none"
+                          className="w-full px-3 py-2.5 rounded-xl bg-maview-bg border border-maview-border text-maview-text text-sm placeholder:text-maview-muted/60 outline-none focus:border-maview-purple focus:ring-2 focus:ring-maview-purple/10 transition-all resize-none shadow-sm"
                         />
                       </div>
                     </div>
@@ -369,7 +373,7 @@ const Dashboard = () => {
 
                   {/* Theme picker */}
                   <div>
-                    <p className="text-white text-sm font-medium mb-3">Tema da vitrine</p>
+                    <p className="text-maview-text text-sm font-medium mb-3">Tema da vitrine</p>
                     <div className="grid grid-cols-3 gap-3">
                       {THEMES.map((theme) => (
                         <button
@@ -377,8 +381,8 @@ const Dashboard = () => {
                           onClick={() => setSelectedTheme(theme.id)}
                           className={`relative rounded-2xl p-3 border transition-all ${
                             selectedTheme === theme.id
-                              ? "border-maview-purple shadow-lg shadow-maview-purple/20"
-                              : "border-white/[0.07] hover:border-white/[0.15]"
+                              ? "border-maview-purple shadow-md shadow-maview-purple/15 ring-1 ring-maview-purple/20"
+                              : "border-maview-border hover:border-maview-purple/30 shadow-sm"
                           }`}
                           style={{ background: theme.bg }}
                         >
@@ -388,7 +392,7 @@ const Dashboard = () => {
                             </div>
                           )}
                           <div className="flex gap-1 mb-2">
-                            {[1,2].map((i) => (
+                            {[1, 2].map((i) => (
                               <div key={i} className="h-2 rounded-full flex-1" style={{ background: i === 1 ? theme.accent : theme.card, opacity: i === 2 ? 0.5 : 1 }} />
                             ))}
                           </div>
@@ -400,7 +404,7 @@ const Dashboard = () => {
                     </div>
                   </div>
 
-                  <button className="w-full h-11 rounded-xl bg-gradient-to-r from-violet-600 to-maview-purple text-white text-sm font-semibold hover:brightness-110 transition-all active:scale-[0.98]">
+                  <button className="w-full h-11 rounded-xl bg-gradient-to-r from-violet-600 to-maview-purple text-white text-sm font-semibold hover:brightness-110 transition-all active:scale-[0.98] shadow-sm shadow-maview-purple/20">
                     Salvar alterações
                   </button>
                 </div>
@@ -410,30 +414,30 @@ const Dashboard = () => {
               {tab === "analytics" && (
                 <div className="space-y-6">
                   <div>
-                    <h2 className="text-white font-semibold text-lg mb-1">Analytics</h2>
+                    <h2 className="text-maview-text font-semibold text-lg mb-1">Analytics</h2>
                     <p className="text-maview-muted text-sm">Acompanhe o desempenho da sua vitrine</p>
                   </div>
 
                   {/* Stats cards */}
                   <div className="grid grid-cols-2 gap-4">
                     {[
-                      { label: "Visitas hoje",    value: "—", sub: "em breve" },
-                      { label: "Cliques totais",  value: "—", sub: "em breve" },
+                      { label: "Visitas hoje",      value: "—", sub: "em breve" },
+                      { label: "Cliques totais",    value: "—", sub: "em breve" },
                       { label: "Link mais clicado", value: "—", sub: "em breve" },
-                      { label: "Conversão",       value: "—", sub: "em breve" },
+                      { label: "Conversão",         value: "—", sub: "em breve" },
                     ].map((s) => (
-                      <div key={s.label} className="bg-maview-card/50 border border-white/[0.06] rounded-2xl p-5">
+                      <div key={s.label} className="bg-white border border-maview-border rounded-2xl p-5 shadow-sm">
                         <p className="text-maview-muted text-xs mb-2">{s.label}</p>
-                        <p className="text-white text-2xl font-bold">{s.value}</p>
-                        <p className="text-maview-muted/50 text-xs mt-1">{s.sub}</p>
+                        <p className="text-maview-text text-2xl font-bold">{s.value}</p>
+                        <p className="text-maview-muted/60 text-xs mt-1">{s.sub}</p>
                       </div>
                     ))}
                   </div>
 
-                  <div className="bg-maview-card/30 border border-white/[0.05] rounded-2xl p-8 text-center">
-                    <BarChart3 size={36} className="mx-auto mb-3 text-maview-purple/40" />
-                    <p className="text-white/60 text-sm font-medium">Analytics em desenvolvimento</p>
-                    <p className="text-maview-muted/50 text-xs mt-1">Em breve você verá seus dados aqui</p>
+                  <div className="bg-maview-surface border border-maview-border rounded-2xl p-8 text-center">
+                    <BarChart3 size={36} className="mx-auto mb-3 text-maview-purple/30" />
+                    <p className="text-maview-text-sub text-sm font-medium">Analytics em desenvolvimento</p>
+                    <p className="text-maview-muted text-xs mt-1">Em breve você verá seus dados aqui</p>
                   </div>
                 </div>
               )}
@@ -448,11 +452,17 @@ const Dashboard = () => {
                 </div>
 
                 {/* Phone mockup */}
-                <div className="rounded-[28px] border-4 border-white/10 overflow-hidden shadow-2xl shadow-black/50" style={{ background: currentTheme.bg }}>
+                <div
+                  className="rounded-[28px] border-4 overflow-hidden shadow-xl shadow-black/10"
+                  style={{ background: currentTheme.bg, borderColor: `${currentTheme.accent}33` }}
+                >
                   <div className="px-5 pt-8 pb-6">
                     {/* Avatar */}
                     <div className="flex flex-col items-center mb-4">
-                      <div className="w-16 h-16 rounded-full mb-3 flex items-center justify-center shadow-xl" style={{ background: `linear-gradient(135deg, ${currentTheme.accent}, ${currentTheme.accent}88)` }}>
+                      <div
+                        className="w-16 h-16 rounded-full mb-3 flex items-center justify-center shadow-xl"
+                        style={{ background: `linear-gradient(135deg, ${currentTheme.accent}, ${currentTheme.accent}88)` }}
+                      >
                         <span className="text-white text-xl font-bold">{(bioName || displayName).charAt(0).toUpperCase()}</span>
                       </div>
                       <p className="text-white text-sm font-bold text-center">{bioName || displayName}</p>
@@ -491,9 +501,9 @@ const Dashboard = () => {
                 {/* Copy link */}
                 <button
                   onClick={copyLink}
-                  className="w-full mt-4 flex items-center justify-center gap-2 h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] text-maview-muted hover:text-white hover:border-white/[0.15] transition-all text-sm"
+                  className="w-full mt-4 flex items-center justify-center gap-2 h-10 rounded-xl bg-white border border-maview-border text-maview-muted hover:text-maview-text hover:border-maview-purple/30 transition-all text-sm shadow-sm"
                 >
-                  {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                  {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
                   {copied ? "Copiado!" : "Copiar meu link"}
                 </button>
               </div>

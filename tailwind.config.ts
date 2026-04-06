@@ -58,16 +58,23 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
         maview: {
-          bg: "#0F0B1F",
-          card: "#1A1333",
+          bg: "#F8F5FF",
+          card: "#FFFFFF",
+          surface: "#F0EBFF",
+          border: "#E4DAFA",
           purple: {
             DEFAULT: "#6D28D9",
             dark: "#4C1D95",
-            light: "#A78BFA",
+            light: "#7C3AED",
+            soft: "#EDE9FE",
+          },
+          text: {
+            DEFAULT: "#0F0B1F",
+            sub: "#4B4469",
           },
           muted: {
-            DEFAULT: "hsl(260 10% 45%)",
-            light: "hsl(260 10% 65%)",
+            DEFAULT: "hsl(263 15% 55%)",
+            light: "hsl(263 15% 45%)",
           },
         },
       },

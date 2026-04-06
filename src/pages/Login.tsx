@@ -10,23 +10,45 @@ import { toast } from "sonner";
 
 type Mode = "login" | "signup" | "forgot";
 
+/* ─── Logo ────────────────────────────────────────────────────── */
+
+const MaviewLogo = ({ size = 36 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="lgFront" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+        <stop offset="0%" stopColor="#8B5CF6"/>
+        <stop offset="100%" stopColor="#4C1D95"/>
+      </linearGradient>
+      <linearGradient id="lgBack" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+        <stop offset="0%" stopColor="#7C3AED"/>
+        <stop offset="100%" stopColor="#2E1065"/>
+      </linearGradient>
+      <clipPath id="lgClip"><rect width="100" height="100"/></clipPath>
+    </defs>
+    <g clipPath="url(#lgClip)">
+      <polygon points="18,92 38,8 63,46 88,8 108,92" fill="url(#lgBack)" opacity="0.5"/>
+      <polygon points="4,92 26,12 50,52 74,12 96,92" fill="url(#lgFront)"/>
+    </g>
+  </svg>
+);
+
 /* ─── Static data ─────────────────────────────────────────────── */
 
 const FEATURES = [
-  { icon: Link2,      label: "Link in bio profissional", desc: "Uma URL para tudo que você cria" },
+  { icon: Link2,       label: "Link in bio profissional", desc: "Uma URL para tudo que você cria" },
   { icon: ShoppingBag, label: "Loja sem taxas abusivas",  desc: "Venda produtos digitais e físicos" },
-  { icon: BarChart3,  label: "Analytics em tempo real",  desc: "Veja cliques, visitas e vendas" },
+  { icon: BarChart3,   label: "Analytics em tempo real",  desc: "Veja cliques, visitas e vendas" },
 ];
 
 const STATS = [
-  { icon: Users,      value: "+2.000",  label: "criadores ativos" },
-  { icon: TrendingUp, value: "+340%",   label: "média de cliques a mais" },
-  { icon: DollarSign, value: "R$0",     label: "taxa por venda" },
-  { icon: Sparkles,   value: "∞",       label: "temas personalizáveis" },
+  { icon: Users,       value: "+2.000", label: "criadores ativos" },
+  { icon: TrendingUp,  value: "+340%",  label: "média de cliques a mais" },
+  { icon: DollarSign,  value: "R$0",    label: "taxa por venda" },
+  { icon: Sparkles,    value: "∞",      label: "temas personalizáveis" },
 ];
 
 const TESTIMONIALS_ROW1 = [
-  { name: "Ana Beatriz",    role: "Criadora de conteúdo", text: "Com o Maview vendo cursos e tenho meu link bio num lugar só. Triplicou minhas vendas!", badge: "+3x vendas",     avatar: "https://i.pravatar.cc/64?img=47" },
+  { name: "Ana Beatriz",    role: "Criadora de conteúdo", text: "Com o Maview vendo cursos e tenho meu link bio num lugar só. Triplicou minhas vendas!", badge: "+3x vendas",      avatar: "https://i.pravatar.cc/64?img=47" },
   { name: "Lucas Ferreira", role: "Designer freelancer",  text: "Personalizei meu tema em minutos. Nenhum concorrente oferece essa liberdade.",           badge: "100% meu estilo", avatar: "https://i.pravatar.cc/64?img=11" },
   { name: "Camila Torres",  role: "Influenciadora",       text: "Meus seguidores adoram a página. Parece profissional de verdade.",                        badge: "+40% cliques",    avatar: "https://i.pravatar.cc/64?img=45" },
   { name: "Rafael Costa",   role: "Coach digital",        text: "Vendo sessões de coaching direto pelo Maview. Zero complicação e zero taxa.",             badge: "Sem taxas",       avatar: "https://i.pravatar.cc/64?img=12" },
@@ -34,93 +56,12 @@ const TESTIMONIALS_ROW1 = [
 ];
 
 const TESTIMONIALS_ROW2 = [
-  { name: "Pedro Alves",    role: "Músico independente", text: "Vendo meus beats direto pelo link. O analytics me mostrou o que converte.",                 badge: "+60% insights",      avatar: "https://i.pravatar.cc/64?img=15" },
-  { name: "Marina Silva",   role: "Nutricionista",       text: "Antes usava 3 ferramentas separadas. Agora só o Maview. Economizei tempo e dinheiro.",      badge: "3 ferramentas → 1",  avatar: "https://i.pravatar.cc/64?img=48" },
-  { name: "Bruno Nunes",    role: "Empreendedor",        text: "O tema ficou exatamente com a identidade da minha marca. Incrível diferencial.",             badge: "Marca forte",        avatar: "https://i.pravatar.cc/64?img=17" },
-  { name: "Fernanda Lima",  role: "Professora online",   text: "Meus alunos me encontram fácil pelo link personalizado. Simples e eficiente.",               badge: "+80% acessos",       avatar: "https://i.pravatar.cc/64?img=44" },
-  { name: "Thiago Rocha",   role: "Streamer",            text: "Centralizo doações, produtos e redes sociais no meu Maview. Engajamento dobrou.",            badge: "+2x engajamento",    avatar: "https://i.pravatar.cc/64?img=20" },
+  { name: "Pedro Alves",   role: "Músico independente", text: "Vendo meus beats direto pelo link. O analytics me mostrou o que converte.",                 badge: "+60% insights",     avatar: "https://i.pravatar.cc/64?img=15" },
+  { name: "Marina Silva",  role: "Nutricionista",       text: "Antes usava 3 ferramentas separadas. Agora só o Maview. Economizei tempo e dinheiro.",      badge: "3 ferramentas → 1", avatar: "https://i.pravatar.cc/64?img=48" },
+  { name: "Bruno Nunes",   role: "Empreendedor",        text: "O tema ficou exatamente com a identidade da minha marca. Incrível diferencial.",             badge: "Marca forte",       avatar: "https://i.pravatar.cc/64?img=17" },
+  { name: "Fernanda Lima", role: "Professora online",   text: "Meus alunos me encontram fácil pelo link personalizado. Simples e eficiente.",               badge: "+80% acessos",      avatar: "https://i.pravatar.cc/64?img=44" },
+  { name: "Thiago Rocha",  role: "Streamer",            text: "Centralizo doações, produtos e redes sociais no meu Maview. Engajamento dobrou.",            badge: "+2x engajamento",   avatar: "https://i.pravatar.cc/64?img=20" },
 ];
-
-/* ─── Components ──────────────────────────────────────────────── */
-
-const TestimonialCard = ({
-  name, role, text, badge, avatar,
-}: {
-  name: string; role: string; text: string;
-  badge: string; avatar: string;
-}) => (
-  <div className="flex-shrink-0 w-[280px] bg-[#12102A] border border-white/[0.08] rounded-2xl p-5 mx-2 hover:border-maview-purple/30 transition-colors duration-300">
-    <div className="flex items-start justify-between mb-4">
-      <div className="flex items-center gap-0.5">
-        {[...Array(5)].map((_, i) => (
-          <Star key={i} size={12} className="text-amber-400 fill-amber-400" />
-        ))}
-      </div>
-      <span className="text-[10px] font-bold tracking-wide text-maview-purple-light bg-maview-purple/15 border border-maview-purple/25 px-2.5 py-0.5 rounded-full whitespace-nowrap">
-        {badge}
-      </span>
-    </div>
-    <p className="text-white/75 text-sm leading-relaxed mb-5">"{text}"</p>
-    <div className="flex items-center gap-2.5">
-      <img
-        src={avatar}
-        alt={name}
-        className="w-9 h-9 rounded-full object-cover border-2 border-maview-purple/30 flex-shrink-0"
-      />
-      <div>
-        <p className="text-white text-xs font-semibold">{name}</p>
-        <p className="text-maview-muted/70 text-xs">{role}</p>
-      </div>
-    </div>
-  </div>
-);
-
-const InfiniteRow = ({
-  items, reverse = false,
-}: {
-  items: typeof TESTIMONIALS_ROW1; reverse?: boolean;
-}) => {
-  const doubled = [...items, ...items];
-  return (
-    <div
-      className="overflow-hidden w-full"
-      style={{ maskImage: "linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%)" }}
-    >
-      <div
-        className={`flex ${reverse ? "animate-scroll-reverse" : "animate-scroll"}`}
-        style={{ width: "max-content" }}
-      >
-        {doubled.map((t, i) => <TestimonialCard key={i} {...t} />)}
-      </div>
-    </div>
-  );
-};
-
-/* ─── Logo component ──────────────────────────────────────────── */
-
-const MaviewLogo = ({ size = 40, className = "" }: { size?: number; className?: string }) => (
-  <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <defs>
-      <linearGradient id="lgFront" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
-        <stop offset="0%" stopColor="#8B5CF6"/>
-        <stop offset="100%" stopColor="#4C1D95"/>
-      </linearGradient>
-      <linearGradient id="lgBack" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
-        <stop offset="0%" stopColor="#5B21B6"/>
-        <stop offset="100%" stopColor="#1A0A35"/>
-      </linearGradient>
-      <clipPath id="lgClip"><rect width="100" height="100"/></clipPath>
-    </defs>
-    <g clipPath="url(#lgClip)">
-      <polygon points="18,92 38,8 63,46 88,8 108,92" fill="url(#lgBack)" opacity="0.68"/>
-      <polygon points="4,92 26,12 50,52 74,12 96,92" fill="url(#lgFront)"/>
-    </g>
-  </svg>
-);
-
-/* ─── Helpers ─────────────────────────────────────────────────── */
-
-const isValidUsername = (val: string) => /^[a-z0-9-]{3,30}$/.test(val);
 
 const SIGNUP_NOTIFICATIONS = [
   { name: "Gabriela M.", action: "acabou de criar sua vitrine", avatar: "https://i.pravatar.cc/64?img=23" },
@@ -130,27 +71,61 @@ const SIGNUP_NOTIFICATIONS = [
   { name: "Larissa T.",  action: "recebeu 200 cliques hoje",    avatar: "https://i.pravatar.cc/64?img=39" },
 ];
 
+/* ─── Testimonial card ────────────────────────────────────────── */
+
+const TestimonialCard = ({ name, role, text, badge, avatar }: {
+  name: string; role: string; text: string; badge: string; avatar: string;
+}) => (
+  <div className="flex-shrink-0 w-[280px] bg-white border border-maview-border rounded-2xl p-5 mx-2 shadow-sm hover:shadow-md hover:border-maview-purple/30 transition-all duration-300">
+    <div className="flex items-start justify-between mb-4">
+      <div className="flex items-center gap-0.5">
+        {[...Array(5)].map((_, i) => <Star key={i} size={12} className="text-amber-400 fill-amber-400" />)}
+      </div>
+      <span className="text-[10px] font-bold tracking-wide text-maview-purple bg-maview-purple-soft border border-maview-purple/20 px-2.5 py-0.5 rounded-full whitespace-nowrap">
+        {badge}
+      </span>
+    </div>
+    <p className="text-maview-text/70 text-sm leading-relaxed mb-5">"{text}"</p>
+    <div className="flex items-center gap-2.5">
+      <img src={avatar} alt={name} className="w-9 h-9 rounded-full object-cover border-2 border-maview-purple/20 flex-shrink-0" />
+      <div>
+        <p className="text-maview-text text-xs font-semibold">{name}</p>
+        <p className="text-maview-muted text-xs">{role}</p>
+      </div>
+    </div>
+  </div>
+);
+
+const InfiniteRow = ({ items, reverse = false }: { items: typeof TESTIMONIALS_ROW1; reverse?: boolean }) => {
+  const doubled = [...items, ...items];
+  return (
+    <div className="overflow-hidden w-full" style={{ maskImage: "linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%)" }}>
+      <div className={`flex ${reverse ? "animate-scroll-reverse" : "animate-scroll"}`} style={{ width: "max-content" }}>
+        {doubled.map((t, i) => <TestimonialCard key={i} {...t} />)}
+      </div>
+    </div>
+  );
+};
+
+const isValidUsername = (val: string) => /^[a-z0-9-]{3,30}$/.test(val);
+
 /* ─── Page ────────────────────────────────────────────────────── */
 
 const Login = () => {
   const navigate = useNavigate();
   const [mode, setMode] = useState<Mode>("login");
-  const [notification, setNotification] = useState<{ name: string; action: string; avatar: string } | null>(null);
-  const [onlineCount] = useState(() => Math.floor(Math.random() * 30) + 38);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [usernameStatus, setUsernameStatus] = useState<
-    "idle" | "checking" | "available" | "taken" | "invalid"
-  >("idle");
+  const [usernameStatus, setUsernameStatus] = useState<"idle"|"checking"|"available"|"taken"|"invalid">("idle");
+  const [notification, setNotification] = useState<{ name: string; action: string; avatar: string } | null>(null);
+  const [onlineCount] = useState(() => Math.floor(Math.random() * 30) + 38);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -158,7 +133,6 @@ const Login = () => {
     });
   }, [navigate]);
 
-  // Signup notification pop-up
   useEffect(() => {
     let idx = 0;
     const show = () => {
@@ -172,14 +146,7 @@ const Login = () => {
   }, []);
 
   const clearError = () => setError("");
-
-  const switchMode = (next: Mode) => {
-    clearError();
-    setPassword("");
-    setConfirmPassword("");
-    setUsernameStatus("idle");
-    setMode(next);
-  };
+  const switchMode = (next: Mode) => { clearError(); setPassword(""); setConfirmPassword(""); setUsernameStatus("idle"); setMode(next); };
 
   const checkUsername = useCallback(async (val: string) => {
     const clean = val.toLowerCase().replace(/[^a-z0-9-]/g, "");
@@ -198,117 +165,80 @@ const Login = () => {
   }, [username, mode, checkUsername]);
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    clearError();
+    e.preventDefault(); setIsLoading(true); clearError();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      setError(
-        error.message === "Invalid login credentials"
-          ? "Email ou senha incorretos."
-          : "Ocorreu um erro. Tente novamente."
-      );
-    } else {
-      navigate("/dashboard");
-    }
+    if (error) setError(error.message === "Invalid login credentials" ? "Email ou senha incorretos." : "Ocorreu um erro. Tente novamente.");
+    else navigate("/dashboard");
     setIsLoading(false);
   };
 
   const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    clearError();
+    e.preventDefault(); setIsLoading(true); clearError();
     if (password !== confirmPassword) { setError("As senhas não coincidem."); setIsLoading(false); return; }
-    if (password.length < 6)          { setError("Mínimo 6 caracteres.");     setIsLoading(false); return; }
-    if (!isValidUsername(username))   { setError("Link inválido.");            setIsLoading(false); return; }
-
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: name, username },
-        emailRedirectTo: `${window.location.origin}/dashboard`,
-      },
-    });
-    if (error) {
-      setError(
-        error.message === "User already registered"
-          ? "Este email já está cadastrado."
-          : error.message
-      );
-    } else {
-      toast.success("Conta criada! Verifique seu email para confirmar.");
-      switchMode("login");
-    }
+    if (password.length < 6) { setError("Mínimo 6 caracteres."); setIsLoading(false); return; }
+    if (!isValidUsername(username)) { setError("Link inválido."); setIsLoading(false); return; }
+    const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name, username }, emailRedirectTo: `${window.location.origin}/dashboard` } });
+    if (error) setError(error.message === "User already registered" ? "Este email já está cadastrado." : error.message);
+    else { toast.success("Conta criada! Verifique seu email para confirmar."); switchMode("login"); }
     setIsLoading(false);
   };
 
   const handleForgot = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    clearError();
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-    if (error) {
-      setError("Não foi possível enviar o email.");
-    } else {
-      toast.success("Email enviado! Verifique sua caixa de entrada.");
-      switchMode("login");
-    }
+    e.preventDefault(); setIsLoading(true); clearError();
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
+    if (error) setError("Não foi possível enviar o email.");
+    else { toast.success("Email enviado! Verifique sua caixa de entrada."); switchMode("login"); }
     setIsLoading(false);
   };
 
   const handleGoogle = async () => {
     clearError();
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/dashboard` },
-    });
+    const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${window.location.origin}/dashboard` } });
     if (error) toast.error("Erro ao entrar com Google.");
   };
 
-  const onSubmit =
-    mode === "login" ? handleLogin :
-    mode === "signup" ? handleSignup :
-    handleForgot;
+  const onSubmit = mode === "login" ? handleLogin : mode === "signup" ? handleSignup : handleForgot;
 
   const usernameHint = {
     idle:      null,
-    checking:  <span className="text-maview-muted/70 flex items-center gap-1"><span className="w-2.5 h-2.5 border border-maview-muted/40 border-t-maview-muted rounded-full animate-spin inline-block" /> Verificando...</span>,
-    available: <span className="text-emerald-400 flex items-center gap-1"><Check size={11} /> maview.app/<b>{username}</b> está disponível!</span>,
-    taken:     <span className="text-red-400 flex items-center gap-1"><X size={11} /> Já está em uso</span>,
-    invalid:   <span className="text-amber-400">Mín. 3 caracteres — letras, números e hífen</span>,
+    checking:  <span className="text-maview-muted flex items-center gap-1"><span className="w-2.5 h-2.5 border border-maview-muted/40 border-t-maview-purple rounded-full animate-spin inline-block" /> Verificando...</span>,
+    available: <span className="text-emerald-600 flex items-center gap-1"><Check size={11} /> maview.app/<b>{username}</b> está disponível!</span>,
+    taken:     <span className="text-red-500 flex items-center gap-1"><X size={11} /> Já está em uso</span>,
+    invalid:   <span className="text-amber-600">Mín. 3 caracteres — letras, números e hífen</span>,
   }[usernameStatus];
+
+  const inputClass = "w-full h-11 px-4 rounded-xl bg-white border border-maview-border text-maview-text text-sm placeholder:text-maview-muted/60 outline-none transition-all focus:border-maview-purple focus:ring-2 focus:ring-maview-purple/10 shadow-sm";
 
   return (
     <div className="min-h-screen flex flex-col bg-maview-bg relative overflow-hidden">
 
-      {/* ── Background ── */}
-      <div className="absolute inset-0 pointer-events-none select-none">
-        <div className="absolute top-[-15%] left-[-10%] w-[700px] h-[700px] rounded-full bg-maview-purple/[0.07] blur-[160px]" />
-        <div className="absolute bottom-[-10%] right-[-5%] w-[550px] h-[550px] rounded-full bg-violet-900/[0.09] blur-[130px]" />
-        <div className="absolute inset-0 opacity-[0.015]" style={{
-          backgroundImage: "linear-gradient(rgba(139,92,246,1) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,1) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
+      {/* ── Background decorations ── */}
+      <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
+        {/* Soft purple blobs */}
+        <div className="absolute top-[-8%] right-[-5%] w-[500px] h-[500px] rounded-full bg-maview-purple/[0.06] blur-[100px]" />
+        <div className="absolute bottom-[-5%] left-[-5%] w-[400px] h-[400px] rounded-full bg-violet-400/[0.07] blur-[90px]" />
+        {/* Dot grid */}
+        <div className="absolute inset-0 opacity-[0.35]" style={{
+          backgroundImage: "radial-gradient(circle, #C4B5FD 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
         }} />
-        {/* M logo gigante como marca d'água */}
+        {/* M watermark */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <svg width="700" height="700" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-[0.035]">
+          <svg width="650" height="650" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-[0.04]">
             <defs>
-              <linearGradient id="bgGFront" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
-                <stop offset="0%" stopColor="#8B5CF6"/>
+              <linearGradient id="wmF" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+                <stop offset="0%" stopColor="#6D28D9"/>
                 <stop offset="100%" stopColor="#4C1D95"/>
               </linearGradient>
-              <linearGradient id="bgGBack" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
-                <stop offset="0%" stopColor="#5B21B6"/>
-                <stop offset="100%" stopColor="#1A0A35"/>
+              <linearGradient id="wmB" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+                <stop offset="0%" stopColor="#7C3AED"/>
+                <stop offset="100%" stopColor="#2E1065"/>
               </linearGradient>
-              <clipPath id="bgIc"><rect width="100" height="100"/></clipPath>
+              <clipPath id="wmC"><rect width="100" height="100"/></clipPath>
             </defs>
-            <g clipPath="url(#bgIc)">
-              <polygon points="18,92 38,8 63,46 88,8 108,92" fill="url(#bgGBack)" opacity="0.68"/>
-              <polygon points="4,92 26,12 50,52 74,12 96,92" fill="url(#bgGFront)"/>
+            <g clipPath="url(#wmC)">
+              <polygon points="18,92 38,8 63,46 88,8 108,92" fill="url(#wmB)" opacity="0.6"/>
+              <polygon points="4,92 26,12 50,52 74,12 96,92" fill="url(#wmF)"/>
             </g>
           </svg>
         </div>
@@ -316,44 +246,40 @@ const Login = () => {
 
       {/* ── Notification pop-up ── */}
       <div className={`fixed bottom-6 left-6 z-50 transition-all duration-500 ${notification ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"}`}>
-        <div className="flex items-center gap-3 bg-[#1A1333]/95 backdrop-blur-xl border border-white/[0.1] rounded-2xl px-4 py-3 shadow-2xl shadow-black/40 max-w-[280px]">
-          <img src={notification?.avatar} alt="" className="w-9 h-9 rounded-full object-cover border-2 border-maview-purple/40 flex-shrink-0" />
+        <div className="flex items-center gap-3 bg-white border border-maview-border rounded-2xl px-4 py-3 shadow-xl shadow-maview-purple/10 max-w-[280px]">
+          <img src={notification?.avatar} alt="" className="w-9 h-9 rounded-full object-cover border-2 border-maview-purple/20 flex-shrink-0" />
           <div className="min-w-0">
-            <p className="text-white text-xs font-semibold truncate">{notification?.name}</p>
-            <p className="text-maview-muted/80 text-xs truncate">{notification?.action}</p>
+            <p className="text-maview-text text-xs font-semibold truncate">{notification?.name}</p>
+            <p className="text-maview-muted text-xs truncate">{notification?.action}</p>
           </div>
           <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
         </div>
       </div>
 
-      {/* ══════════════════════════════════════════
-          TOP SECTION — split: branding + form
-      ══════════════════════════════════════════ */}
+      {/* ══════════ SPLIT SECTION ══════════ */}
       <div className="flex flex-1 relative z-10">
 
-        {/* ── LEFT ── */}
+        {/* ── LEFT — Branding ── */}
         <div className="hidden lg:flex flex-1 flex-col justify-center px-16 xl:px-24">
-          <div className="max-w-[480px]">
+          <div className="max-w-[500px]">
 
             {/* Logo */}
             <div className="flex items-center gap-3 mb-14">
-              <div className="drop-shadow-[0_0_12px_rgba(109,40,217,0.5)]">
-                <MaviewLogo size={42} />
-              </div>
-              <span className="text-white text-2xl font-bold tracking-tight">Maview</span>
-              <span className="ml-1 text-[10px] font-semibold text-maview-purple-light bg-maview-purple/10 border border-maview-purple/25 px-2 py-0.5 rounded-full uppercase tracking-widest">Beta</span>
+              <MaviewLogo size={40} />
+              <span className="text-maview-text text-2xl font-extrabold tracking-tight">Maview</span>
+              <span className="ml-1 text-[10px] font-bold text-maview-purple bg-maview-purple-soft border border-maview-purple/20 px-2.5 py-0.5 rounded-full uppercase tracking-widest">Beta</span>
             </div>
 
             {/* Headline */}
-            <h1 className="text-5xl xl:text-[3.2rem] font-extrabold text-white leading-[1.1] mb-5 tracking-tight">
+            <h1 className="text-5xl xl:text-[3.4rem] font-extrabold text-maview-text leading-[1.1] mb-5 tracking-tight">
               Sua vitrine.<br />
               Seu link.<br />
-              <span className="bg-gradient-to-r from-maview-purple-light via-violet-400 to-maview-purple bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-maview-purple to-violet-500 bg-clip-text text-transparent">
                 Sua renda.
               </span>
             </h1>
 
-            <p className="text-maview-muted text-lg leading-relaxed mb-10">
+            <p className="text-maview-text-sub text-lg leading-relaxed mb-10">
               Combine link in bio + loja digital em um único lugar.
               Sem taxas absurdas. Sem engessamento de temas.
             </p>
@@ -362,11 +288,11 @@ const Login = () => {
             <div className="space-y-4 mb-12">
               {FEATURES.map(({ icon: Icon, label, desc }) => (
                 <div key={label} className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-maview-purple/10 border border-maview-purple/20 flex items-center justify-center flex-shrink-0">
-                    <Icon size={18} className="text-maview-purple-light" />
+                  <div className="w-10 h-10 rounded-xl bg-maview-purple-soft border border-maview-purple/15 flex items-center justify-center flex-shrink-0">
+                    <Icon size={18} className="text-maview-purple" />
                   </div>
                   <div>
-                    <p className="text-white text-sm font-medium">{label}</p>
+                    <p className="text-maview-text text-sm font-semibold">{label}</p>
                     <p className="text-maview-muted text-xs">{desc}</p>
                   </div>
                 </div>
@@ -374,37 +300,33 @@ const Login = () => {
             </div>
 
             {/* Social proof */}
-            <div className="flex items-center gap-4 pt-8 border-t border-white/[0.05]">
+            <div className="flex items-center gap-4 pt-8 border-t border-maview-border">
               <div className="flex -space-x-2.5">
                 {[11, 44, 15, 47, 20].map((img) => (
-                  <img
-                    key={img}
-                    src={`https://i.pravatar.cc/64?img=${img}`}
-                    alt="creator"
-                    className="w-9 h-9 rounded-full border-2 border-maview-bg object-cover"
-                  />
+                  <img key={img} src={`https://i.pravatar.cc/64?img=${img}`} alt="creator"
+                    className="w-9 h-9 rounded-full border-2 border-maview-bg object-cover" />
                 ))}
               </div>
               <div>
                 <div className="flex items-center gap-1 mb-0.5">
                   {[...Array(5)].map((_, i) => <Star key={i} size={11} className="text-amber-400 fill-amber-400" />)}
-                  <span className="text-amber-400 text-xs font-semibold ml-1">4.9</span>
+                  <span className="text-amber-500 text-xs font-bold ml-1">4.9</span>
                 </div>
                 <p className="text-sm text-maview-muted">
-                  <span className="text-white font-semibold">+2.000</span> criadores já usam
+                  <span className="text-maview-text font-bold">+2.000</span> criadores já usam
                 </p>
               </div>
             </div>
 
-            {/* Live preview */}
-            <div className="mt-8 bg-maview-card/40 border border-white/[0.06] rounded-2xl p-4 flex items-center gap-3 backdrop-blur-sm">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-700 flex-shrink-0" />
+            {/* Live preview pill */}
+            <div className="mt-8 bg-white border border-maview-border rounded-2xl p-4 flex items-center gap-3 shadow-sm">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-400 to-maview-purple flex-shrink-0" />
               <div className="flex-1 min-w-0">
-                <p className="text-white text-sm font-medium truncate">@seunome</p>
+                <p className="text-maview-text text-sm font-semibold truncate">@seunome</p>
                 <p className="text-maview-muted text-xs truncate">maview.app/seunome</p>
               </div>
-              <div className="flex items-center gap-1 text-emerald-400 text-xs font-medium">
-                <Zap size={12} className="fill-emerald-400" />
+              <div className="flex items-center gap-1 text-emerald-500 text-xs font-semibold">
+                <Zap size={12} className="fill-emerald-500" />
                 Ao vivo
               </div>
             </div>
@@ -418,60 +340,45 @@ const Login = () => {
 
             {/* Mobile logo */}
             <div className="flex lg:hidden items-center gap-2.5 mb-10 justify-center">
-              <div className="drop-shadow-[0_0_10px_rgba(109,40,217,0.45)]">
-                <MaviewLogo size={36} />
-              </div>
-              <span className="text-white text-2xl font-bold tracking-tight">Maview</span>
+              <MaviewLogo size={34} />
+              <span className="text-maview-text text-2xl font-extrabold tracking-tight">Maview</span>
             </div>
 
             {/* Online counter */}
             <div className="flex items-center justify-center gap-2 mb-4">
-              <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-3 py-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-emerald-400 text-xs font-medium">{onlineCount} pessoas online agora</span>
+              <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-emerald-700 text-xs font-semibold">{onlineCount} pessoas online agora</span>
               </div>
             </div>
 
             {/* Card */}
-            <div className="relative bg-maview-card/70 backdrop-blur-2xl rounded-[24px] border border-white/[0.07] p-8 sm:p-10 shadow-2xl shadow-black/40">
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-maview-purple/60 to-transparent rounded-t-[24px]" />
+            <div className="bg-white rounded-[24px] border border-maview-border p-8 sm:p-10 shadow-xl shadow-maview-purple/[0.07]">
+              {/* Top accent line */}
+              <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-transparent via-maview-purple to-transparent rounded-t-[24px] pointer-events-none" style={{ position: "relative", marginBottom: "-1rem", marginTop: "-2rem", marginLeft: "-2.5rem", marginRight: "-2.5rem", width: "calc(100% + 5rem)", borderRadius: "24px 24px 0 0", height: "3px" }} />
 
-              {/* Beta scarcity banner */}
-              {mode === "signup" && (
-                <div className="flex items-center gap-2 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-xl px-4 py-2.5 mb-5">
-                  <Sparkles size={13} className="text-amber-400 flex-shrink-0" />
-                  <p className="text-amber-300 text-xs font-medium">
-                    <span className="font-bold">Beta gratuito</span> — vagas limitadas. Garanta a sua agora.
-                  </p>
-                </div>
-              )}
-
-              {/* Header */}
-              <div className="mb-7">
-                {mode === "forgot" ? (
-                  <button type="button" onClick={() => switchMode("login")} className="flex items-center gap-1.5 text-xs text-maview-muted hover:text-white transition-colors mb-4">
-                    <ArrowLeft size={13} /> Voltar ao login
-                  </button>
-                ) : (
-                  <div className="flex bg-white/[0.04] rounded-xl p-1 mb-6 border border-white/[0.05]">
+              {/* Mode tabs */}
+              <div className="mb-6">
+                {mode !== "forgot" && (
+                  <div className="flex bg-maview-surface rounded-xl p-1 mb-6 border border-maview-border">
                     {(["login", "signup"] as Mode[]).map((m) => (
-                      <button
-                        key={m}
-                        type="button"
-                        onClick={() => switchMode(m)}
-                        className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                      <button key={m} type="button" onClick={() => switchMode(m)}
+                        className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
                           mode === m
-                            ? "bg-maview-purple text-white shadow-lg shadow-maview-purple/30"
-                            : "text-maview-muted hover:text-white"
-                        }`}
-                      >
+                            ? "bg-maview-purple text-white shadow-md shadow-maview-purple/25"
+                            : "text-maview-muted hover:text-maview-text"
+                        }`}>
                         {m === "login" ? "Entrar" : "Criar conta"}
                       </button>
                     ))}
                   </div>
                 )}
-
-                <h2 className="text-white text-lg font-semibold mb-1">
+                {mode === "forgot" && (
+                  <button type="button" onClick={() => switchMode("login")} className="flex items-center gap-1.5 text-xs text-maview-muted hover:text-maview-text transition-colors mb-4">
+                    <ArrowLeft size={13} /> Voltar ao login
+                  </button>
+                )}
+                <h2 className="text-maview-text text-xl font-bold mb-1">
                   {mode === "login"  && "Bem-vindo de volta"}
                   {mode === "signup" && "Crie sua conta grátis"}
                   {mode === "forgot" && "Recuperar senha"}
@@ -483,115 +390,117 @@ const Login = () => {
                 </p>
               </div>
 
+              {/* Scarcity banner */}
+              {mode === "signup" && (
+                <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 mb-5">
+                  <Sparkles size={13} className="text-amber-500 flex-shrink-0" />
+                  <p className="text-amber-700 text-xs font-medium">
+                    <span className="font-bold">Beta gratuito</span> — vagas limitadas. Garanta a sua agora.
+                  </p>
+                </div>
+              )}
+
               <form onSubmit={onSubmit} className="space-y-4">
 
+                {/* Name */}
                 {mode === "signup" && (
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-maview-muted-light block">Nome completo</label>
-                    <input
-                      type="text" placeholder="Seu nome" value={name}
+                    <label className="text-xs font-semibold text-maview-text-sub block">Nome completo</label>
+                    <input type="text" placeholder="Seu nome" value={name}
                       onChange={(e) => { setName(e.target.value); clearError(); }}
-                      className="w-full h-11 px-4 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white text-sm placeholder:text-maview-muted/50 outline-none transition-all focus:border-maview-purple focus:ring-1 focus:ring-maview-purple/40"
-                      required
-                    />
+                      className={inputClass} required />
                   </div>
                 )}
 
+                {/* Username */}
                 {mode === "signup" && (
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-maview-muted-light block">
+                    <label className="text-xs font-semibold text-maview-text-sub flex items-center gap-2">
                       Personalize seu link
-                      <span className="ml-2 text-[10px] text-maview-purple-light bg-maview-purple/10 border border-maview-purple/20 px-1.5 py-0.5 rounded-full">Exclusivo seu</span>
+                      <span className="text-[10px] font-bold text-maview-purple bg-maview-purple-soft border border-maview-purple/20 px-1.5 py-0.5 rounded-full">Exclusivo seu</span>
                     </label>
                     <div className="relative">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-maview-muted/80 text-sm font-medium select-none pointer-events-none">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-maview-muted text-sm font-semibold select-none pointer-events-none">
                         maview.app/
                       </div>
-                      <input
-                        type="text" placeholder="seunome" value={username}
+                      <input type="text" placeholder="seunome" value={username}
                         onChange={(e) => { setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "")); clearError(); }}
-                        className={`w-full h-11 pl-[104px] pr-10 rounded-xl bg-white/[0.04] border text-white text-sm placeholder:text-maview-muted/40 outline-none transition-all focus:ring-1 ${
+                        className={`w-full h-11 pl-[108px] pr-10 rounded-xl bg-white border text-maview-text text-sm placeholder:text-maview-muted/50 outline-none transition-all shadow-sm focus:ring-2 ${
                           usernameStatus === "available"
-                            ? "border-emerald-500/50 focus:border-emerald-400 focus:ring-emerald-400/30"
+                            ? "border-emerald-400 focus:ring-emerald-100"
                             : usernameStatus === "taken" || usernameStatus === "invalid"
-                            ? "border-red-500/40 focus:border-red-400 focus:ring-red-400/30"
-                            : "border-white/[0.08] focus:border-maview-purple focus:ring-maview-purple/40"
+                            ? "border-red-400 focus:ring-red-100"
+                            : "border-maview-border focus:border-maview-purple focus:ring-maview-purple/10"
                         }`}
-                        required maxLength={30}
-                      />
+                        required maxLength={30} />
                       <div className="absolute right-3.5 top-1/2 -translate-y-1/2">
-                        {usernameStatus === "checking"  && <div className="w-3.5 h-3.5 border-2 border-maview-muted/30 border-t-maview-muted rounded-full animate-spin" />}
-                        {usernameStatus === "available" && <Check size={14} className="text-emerald-400" />}
-                        {(usernameStatus === "taken" || usernameStatus === "invalid") && <X size={14} className="text-red-400" />}
+                        {usernameStatus === "checking"  && <div className="w-3.5 h-3.5 border-2 border-maview-border border-t-maview-purple rounded-full animate-spin" />}
+                        {usernameStatus === "available" && <Check size={14} className="text-emerald-500" />}
+                        {(usernameStatus === "taken" || usernameStatus === "invalid") && <X size={14} className="text-red-500" />}
                       </div>
                     </div>
                     {usernameHint && <p className="text-[11px] pl-1 mt-1">{usernameHint}</p>}
                   </div>
                 )}
 
+                {/* Email */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-maview-muted-light block">Email</label>
-                  <input
-                    type="email" placeholder="seu@email.com" value={email}
+                  <label className="text-xs font-semibold text-maview-text-sub block">Email</label>
+                  <input type="email" placeholder="seu@email.com" value={email}
                     onChange={(e) => { setEmail(e.target.value); clearError(); }}
-                    className="w-full h-11 px-4 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white text-sm placeholder:text-maview-muted/50 outline-none transition-all focus:border-maview-purple focus:ring-1 focus:ring-maview-purple/40"
-                    required
-                  />
+                    className={inputClass} required />
                 </div>
 
+                {/* Password */}
                 {mode !== "forgot" && (
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <label className="text-xs font-medium text-maview-muted-light block">Senha</label>
+                      <label className="text-xs font-semibold text-maview-text-sub block">Senha</label>
                       {mode === "login" && (
-                        <button type="button" onClick={() => switchMode("forgot")} className="text-xs text-maview-purple-light hover:text-white transition-colors">
+                        <button type="button" onClick={() => switchMode("forgot")} className="text-xs text-maview-purple hover:text-maview-purple-dark font-medium transition-colors">
                           Esqueceu?
                         </button>
                       )}
                     </div>
                     <div className="relative">
-                      <input
-                        type={showPassword ? "text" : "password"} placeholder="••••••••" value={password}
+                      <input type={showPassword ? "text" : "password"} placeholder="••••••••" value={password}
                         onChange={(e) => { setPassword(e.target.value); clearError(); }}
-                        className="w-full h-11 px-4 pr-11 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white text-sm placeholder:text-maview-muted/50 outline-none transition-all focus:border-maview-purple focus:ring-1 focus:ring-maview-purple/40"
-                        required minLength={mode === "signup" ? 6 : undefined}
-                      />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-maview-muted hover:text-white transition-colors">
+                        className={`${inputClass} pr-11`} required minLength={mode === "signup" ? 6 : undefined} />
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-maview-muted hover:text-maview-text transition-colors">
                         {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                       </button>
                     </div>
                   </div>
                 )}
 
+                {/* Confirm password */}
                 {mode === "signup" && (
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-maview-muted-light block">Confirmar senha</label>
+                    <label className="text-xs font-semibold text-maview-text-sub block">Confirmar senha</label>
                     <div className="relative">
-                      <input
-                        type={showConfirmPassword ? "text" : "password"} placeholder="••••••••" value={confirmPassword}
+                      <input type={showConfirmPassword ? "text" : "password"} placeholder="••••••••" value={confirmPassword}
                         onChange={(e) => { setConfirmPassword(e.target.value); clearError(); }}
-                        className="w-full h-11 px-4 pr-11 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white text-sm placeholder:text-maview-muted/50 outline-none transition-all focus:border-maview-purple focus:ring-1 focus:ring-maview-purple/40"
-                        required
-                      />
-                      <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-maview-muted hover:text-white transition-colors">
+                        className={`${inputClass} pr-11`} required />
+                      <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-maview-muted hover:text-maview-text transition-colors">
                         {showConfirmPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                       </button>
                     </div>
                   </div>
                 )}
 
+                {/* Error */}
                 {error && (
-                  <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 flex items-start gap-2">
-                    <X size={14} className="text-red-400 mt-0.5 flex-shrink-0" />
-                    <p className="text-red-400 text-sm">{error}</p>
+                  <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 flex items-start gap-2">
+                    <X size={14} className="text-red-500 mt-0.5 flex-shrink-0" />
+                    <p className="text-red-600 text-sm">{error}</p>
                   </div>
                 )}
 
+                {/* Submit */}
                 <div className="mt-1">
-                  <button
-                    type="submit"
+                  <button type="submit"
                     disabled={isLoading || (mode === "signup" && usernameStatus !== "available")}
-                    className="w-full h-12 rounded-xl bg-gradient-to-r from-violet-600 via-maview-purple to-purple-700 text-white text-sm font-semibold transition-all duration-200 hover:shadow-xl hover:shadow-maview-purple/35 hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+                    className="w-full h-12 rounded-xl bg-gradient-to-r from-maview-purple to-violet-600 text-white text-sm font-bold transition-all duration-200 hover:shadow-lg hover:shadow-maview-purple/30 hover:brightness-105 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
                   >
                     {isLoading ? (
                       <div className="flex items-center justify-center gap-2">
@@ -604,65 +513,62 @@ const Login = () => {
                       "Enviar link de recuperação"
                     )}
                   </button>
-                  {/* Trust badges */}
                   {mode === "signup" && (
                     <div className="flex items-center justify-center gap-4 mt-3">
-                      {["✓ Grátis", "✓ Sem cartão", "✓ Suporte em PT"].map((t) => (
-                        <span key={t} className="text-[11px] text-maview-muted/60 font-medium">{t}</span>
+                      {["✓ Grátis", "✓ Sem cartão", "✓ Suporte PT"].map((t) => (
+                        <span key={t} className="text-[11px] text-maview-muted font-medium">{t}</span>
                       ))}
                     </div>
                   )}
                   {mode === "login" && (
-                    <p className="text-center text-[11px] text-maview-muted/50 mt-2">Acesso seguro · Seus dados protegidos</p>
+                    <p className="text-center text-[11px] text-maview-muted mt-2">Acesso seguro · Seus dados protegidos</p>
                   )}
                 </div>
               </form>
 
+              {/* Google */}
               {mode !== "forgot" && (
                 <>
                   <div className="flex items-center gap-3 my-5">
-                    <div className="flex-1 h-px bg-white/[0.05]" />
-                    <span className="text-xs text-maview-muted/60">ou continue com</span>
-                    <div className="flex-1 h-px bg-white/[0.05]" />
+                    <div className="flex-1 h-px bg-maview-border" />
+                    <span className="text-xs text-maview-muted font-medium">ou continue com</span>
+                    <div className="flex-1 h-px bg-maview-border" />
                   </div>
-                  <button
-                    type="button" onClick={handleGoogle}
-                    className="w-full h-11 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white text-sm font-medium flex items-center justify-center gap-2.5 transition-all hover:bg-white/[0.07] hover:border-white/[0.14] active:scale-[0.98]"
+                  <button type="button" onClick={handleGoogle}
+                    className="w-full h-11 rounded-xl bg-white border border-maview-border text-maview-text text-sm font-semibold flex items-center justify-center gap-2.5 transition-all hover:bg-maview-surface hover:border-maview-purple/30 hover:shadow-sm active:scale-[0.98] shadow-sm"
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24">
-                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
-                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                     </svg>
-                    Google
+                    Continuar com Google
                   </button>
                 </>
               )}
             </div>
 
-            <p className="text-center text-xs text-maview-muted/40 mt-5">
+            <p className="text-center text-xs text-maview-muted mt-5">
               Ao continuar, você concorda com os{" "}
-              <span className="hover:text-maview-muted cursor-pointer transition-colors underline underline-offset-2">Termos de Uso</span>
+              <span className="hover:text-maview-purple cursor-pointer transition-colors underline underline-offset-2">Termos de Uso</span>
               {" "}e a{" "}
-              <span className="hover:text-maview-muted cursor-pointer transition-colors underline underline-offset-2">Política de Privacidade</span>.
+              <span className="hover:text-maview-purple cursor-pointer transition-colors underline underline-offset-2">Política de Privacidade</span>.
             </p>
           </div>
         </div>
       </div>
 
-      {/* ══════════════════════════════════════════
-          STATS BAR — full width
-      ══════════════════════════════════════════ */}
-      <div className="relative z-10 border-t border-white/[0.05] bg-white/[0.02] backdrop-blur-sm">
+      {/* ══════════ STATS BAR ══════════ */}
+      <div className="relative z-10 border-t border-maview-border bg-white">
         <div className="max-w-5xl mx-auto px-8 py-6 grid grid-cols-2 lg:grid-cols-4 gap-6">
           {STATS.map(({ icon: Icon, value, label }) => (
             <div key={label} className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-maview-purple/10 border border-maview-purple/20 flex items-center justify-center flex-shrink-0">
-                <Icon size={16} className="text-maview-purple-light" />
+              <div className="w-9 h-9 rounded-xl bg-maview-purple-soft border border-maview-purple/15 flex items-center justify-center flex-shrink-0">
+                <Icon size={16} className="text-maview-purple" />
               </div>
               <div>
-                <p className="text-white font-bold text-lg leading-none">{value}</p>
+                <p className="text-maview-text font-extrabold text-lg leading-none">{value}</p>
                 <p className="text-maview-muted text-xs mt-0.5">{label}</p>
               </div>
             </div>
@@ -670,42 +576,35 @@ const Login = () => {
         </div>
       </div>
 
-      {/* ══════════════════════════════════════════
-          TESTIMONIALS — full width below
-      ══════════════════════════════════════════ */}
-      <div className="relative z-10 py-14 border-t border-white/[0.04]">
+      {/* ══════════ TESTIMONIALS ══════════ */}
+      <div className="relative z-10 py-16 border-t border-maview-border bg-maview-surface">
 
-        {/* Section header */}
         <div className="text-center mb-10 px-6">
-          <div className="inline-flex items-center gap-2 bg-maview-purple/10 border border-maview-purple/20 rounded-full px-4 py-1.5 mb-4">
+          <div className="inline-flex items-center gap-2 bg-white border border-maview-border rounded-full px-4 py-1.5 mb-4 shadow-sm">
             <Star size={12} className="text-amber-400 fill-amber-400" />
-            <span className="text-xs font-semibold text-maview-purple-light tracking-wide uppercase">Histórias reais</span>
+            <span className="text-xs font-bold text-maview-purple tracking-wide uppercase">Histórias reais</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-maview-text mb-3 tracking-tight">
             Criadores que já transformaram{" "}
-            <span className="bg-gradient-to-r from-maview-purple-light to-violet-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-maview-purple to-violet-500 bg-clip-text text-transparent">
               sua renda
             </span>
           </h2>
-          <p className="text-maview-muted text-sm max-w-lg mx-auto">
-            Mais de <strong className="text-white">2.000 criadores</strong> usam o Maview para vender mais, aparecer mais e trabalhar menos.
+          <p className="text-maview-muted text-base max-w-lg mx-auto">
+            Mais de <strong className="text-maview-text">2.000 criadores</strong> usam o Maview para vender mais, aparecer mais e trabalhar menos.
           </p>
         </div>
 
-        {/* Carousels */}
         <div className="space-y-4">
           <InfiniteRow items={TESTIMONIALS_ROW1} />
           <InfiniteRow items={TESTIMONIALS_ROW2} reverse />
         </div>
 
-        {/* CTA below carousel */}
-        <div className="text-center mt-10 px-6">
-          <p className="text-maview-muted/60 text-sm mb-1">
-            Sua história pode ser a próxima.
-          </p>
+        <div className="text-center mt-12 px-6">
+          <p className="text-maview-muted text-sm mb-4">Sua história pode ser a próxima.</p>
           <button
             onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); switchMode("signup"); }}
-            className="mt-3 inline-flex items-center gap-2 bg-gradient-to-r from-violet-600 to-maview-purple text-white text-sm font-semibold px-6 py-3 rounded-xl hover:brightness-110 hover:shadow-xl hover:shadow-maview-purple/30 transition-all active:scale-[0.98]"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-maview-purple to-violet-600 text-white text-sm font-bold px-7 py-3.5 rounded-xl hover:brightness-105 hover:shadow-xl hover:shadow-maview-purple/25 transition-all active:scale-[0.98]"
           >
             <Zap size={15} className="fill-white" />
             Criar minha vitrine grátis
