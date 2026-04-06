@@ -4,6 +4,26 @@ import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { LogOut, User as UserIcon } from "lucide-react";
 
+const MaviewLogo = ({ size = 32 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="dFront" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+        <stop offset="0%" stopColor="#8B5CF6"/>
+        <stop offset="100%" stopColor="#4C1D95"/>
+      </linearGradient>
+      <linearGradient id="dBack" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+        <stop offset="0%" stopColor="#5B21B6"/>
+        <stop offset="100%" stopColor="#1A0A35"/>
+      </linearGradient>
+      <clipPath id="dClip"><rect width="100" height="100"/></clipPath>
+    </defs>
+    <g clipPath="url(#dClip)">
+      <polygon points="18,92 38,8 63,46 88,8 108,92" fill="url(#dBack)" opacity="0.68"/>
+      <polygon points="4,92 26,12 50,52 74,12 96,92" fill="url(#dFront)"/>
+    </g>
+  </svg>
+);
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
@@ -11,11 +31,8 @@ const Dashboard = () => {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        navigate("/login");
-      } else {
-        setUser(session.user);
-      }
+      if (!session) navigate("/login");
+      else setUser(session.user);
       setLoading(false);
     });
 
@@ -47,10 +64,10 @@ const Dashboard = () => {
       {/* Header */}
       <header className="border-b border-white/[0.05] px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-maview-purple to-maview-purple-dark flex items-center justify-center shadow-lg shadow-maview-purple/20">
-            <span className="text-white font-bold text-sm leading-none">M</span>
+          <div className="drop-shadow-[0_0_8px_rgba(109,40,217,0.4)]">
+            <MaviewLogo size={30} />
           </div>
-          <span className="text-white text-xl font-semibold tracking-tight">Maview</span>
+          <span className="text-white text-xl font-bold tracking-tight">Maview</span>
         </div>
 
         <div className="flex items-center gap-3">
@@ -72,8 +89,8 @@ const Dashboard = () => {
 
       {/* Content */}
       <main className="max-w-4xl mx-auto px-6 py-16 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-maview-purple to-maview-purple-dark flex items-center justify-center mx-auto mb-6 shadow-xl shadow-maview-purple/20">
-          <span className="text-white font-bold text-2xl leading-none">M</span>
+        <div className="drop-shadow-[0_0_24px_rgba(109,40,217,0.4)] inline-block mb-6">
+          <MaviewLogo size={64} />
         </div>
         <h1 className="text-3xl font-bold text-white mb-3">
           Olá, {displayName}! 👋

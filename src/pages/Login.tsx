@@ -96,6 +96,28 @@ const InfiniteRow = ({
   );
 };
 
+/* ─── Logo component ──────────────────────────────────────────── */
+
+const MaviewLogo = ({ size = 40, className = "" }: { size?: number; className?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <defs>
+      <linearGradient id="lgFront" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+        <stop offset="0%" stopColor="#8B5CF6"/>
+        <stop offset="100%" stopColor="#4C1D95"/>
+      </linearGradient>
+      <linearGradient id="lgBack" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+        <stop offset="0%" stopColor="#5B21B6"/>
+        <stop offset="100%" stopColor="#1A0A35"/>
+      </linearGradient>
+      <clipPath id="lgClip"><rect width="100" height="100"/></clipPath>
+    </defs>
+    <g clipPath="url(#lgClip)">
+      <polygon points="18,92 38,8 63,46 88,8 108,92" fill="url(#lgBack)" opacity="0.68"/>
+      <polygon points="4,92 26,12 50,52 74,12 96,92" fill="url(#lgFront)"/>
+    </g>
+  </svg>
+);
+
 /* ─── Helpers ─────────────────────────────────────────────────── */
 
 const isValidUsername = (val: string) => /^[a-z0-9-]{3,30}$/.test(val);
@@ -315,8 +337,8 @@ const Login = () => {
 
             {/* Logo */}
             <div className="flex items-center gap-3 mb-14">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-maview-purple to-maview-purple-dark flex items-center justify-center shadow-xl shadow-maview-purple/30">
-                <span className="text-white font-bold text-xl leading-none">M</span>
+              <div className="drop-shadow-[0_0_12px_rgba(109,40,217,0.5)]">
+                <MaviewLogo size={42} />
               </div>
               <span className="text-white text-2xl font-bold tracking-tight">Maview</span>
               <span className="ml-1 text-[10px] font-semibold text-maview-purple-light bg-maview-purple/10 border border-maview-purple/25 px-2 py-0.5 rounded-full uppercase tracking-widest">Beta</span>
@@ -396,8 +418,8 @@ const Login = () => {
 
             {/* Mobile logo */}
             <div className="flex lg:hidden items-center gap-2.5 mb-10 justify-center">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-maview-purple to-maview-purple-dark flex items-center justify-center shadow-lg shadow-maview-purple/20">
-                <span className="text-white font-bold text-lg leading-none">M</span>
+              <div className="drop-shadow-[0_0_10px_rgba(109,40,217,0.45)]">
+                <MaviewLogo size={36} />
               </div>
               <span className="text-white text-2xl font-bold tracking-tight">Maview</span>
             </div>
