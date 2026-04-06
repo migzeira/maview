@@ -57,6 +57,19 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        maview: {
+          bg: "#0F0B1F",
+          card: "#1A1333",
+          purple: {
+            DEFAULT: "#6D28D9",
+            dark: "#4C1D95",
+            light: "#A78BFA",
+          },
+          muted: {
+            DEFAULT: "hsl(260 10% 45%)",
+            light: "hsl(260 10% 65%)",
+          },
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
