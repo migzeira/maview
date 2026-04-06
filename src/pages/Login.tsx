@@ -12,6 +12,52 @@ const FEATURES = [
   { icon: BarChart3, label: "Analytics em tempo real", desc: "Veja cliques, visitas e vendas" },
 ];
 
+const TESTIMONIALS_ROW1 = [
+  { name: "Ana Beatriz", role: "Criadora de conteúdo", text: "Com o Maview eu vendo cursos e tenho meu link bio num lugar só. Simples demais!", badge: "+3x vendas" },
+  { name: "Lucas Ferreira", role: "Designer freelancer", text: "Personalizei meu tema em minutos. Nenhum concorrente oferece isso.", badge: "100% meu estilo" },
+  { name: "Camila Torres", role: "Influenciadora", text: "Meus seguidores adoram a página. Parece profissional de verdade.", badge: "+40% cliques" },
+  { name: "Rafael Costa", role: "Coach digital", text: "Vendo sessões de coaching direto pelo Maview. Zero complicação.", badge: "Sem taxas" },
+  { name: "Juliana Melo", role: "Fotógrafa", text: "Coloquei meu portfólio, loja e contato em um link só. Perfeito!", badge: "+5x alcance" },
+];
+
+const TESTIMONIALS_ROW2 = [
+  { name: "Pedro Alves", role: "Músico independente", text: "Vendo meus beats direto pelo link. O analytics me mostrou o que funciona.", badge: "+60% insights" },
+  { name: "Marina Silva", role: "Nutricionista", text: "Antes usava 3 ferramentas. Agora só o Maview. Economizei muito tempo.", badge: "0 ferramentas extras" },
+  { name: "Bruno Nunes", role: "Empreendedor", text: "O tema ficou exatamente com a identidade da minha marca. Incrível.", badge: "Marca forte" },
+  { name: "Fernanda Lima", role: "Professora online", text: "Meus alunos me encontram fácil pelo link personalizado. Adorei!", badge: "+80% acessos" },
+  { name: "Thiago Rocha", role: "Streamer", text: "Centralizo tudo no meu Maview: doações, produtos e redes sociais.", badge: "+2x engajamento" },
+];
+
+const TestimonialCard = ({ name, role, text, badge }: { name: string; role: string; text: string; badge: string }) => (
+  <div className="flex-shrink-0 w-[260px] bg-maview-card/60 border border-white/[0.07] rounded-2xl p-5 mx-2">
+    <div className="flex items-start justify-between mb-3">
+      <div className="flex items-center gap-1">
+        {[...Array(5)].map((_, i) => <Star key={i} size={11} className="text-amber-400 fill-amber-400" />)}
+      </div>
+      <span className="text-[10px] font-semibold text-maview-purple-light bg-maview-purple/10 border border-maview-purple/20 px-2 py-0.5 rounded-full whitespace-nowrap">{badge}</span>
+    </div>
+    <p className="text-white/80 text-sm leading-relaxed mb-4">"{text}"</p>
+    <div>
+      <p className="text-white text-xs font-semibold">{name}</p>
+      <p className="text-maview-muted text-xs">{role}</p>
+    </div>
+  </div>
+);
+
+const InfiniteRow = ({ items, reverse = false }: { items: typeof TESTIMONIALS_ROW1; reverse?: boolean }) => {
+  const doubled = [...items, ...items];
+  return (
+    <div className="overflow-hidden w-full" style={{ maskImage: "linear-gradient(90deg, transparent, black 10%, black 90%, transparent)" }}>
+      <div
+        className={`flex ${reverse ? "animate-scroll-reverse" : "animate-scroll"}`}
+        style={{ width: "max-content" }}
+      >
+        {doubled.map((t, i) => <TestimonialCard key={i} {...t} />)}
+      </div>
+    </div>
+  );
+};
+
 const isValidUsername = (val: string) => /^[a-z0-9-]{3,30}$/.test(val);
 
 const Login = () => {
@@ -247,7 +293,7 @@ const Login = () => {
           </div>
 
           {/* Mock profile preview */}
-          <div className="mt-10 bg-maview-card/40 border border-white/[0.06] rounded-2xl p-4 flex items-center gap-3 backdrop-blur-sm">
+          <div className="mt-8 bg-maview-card/40 border border-white/[0.06] rounded-2xl p-4 flex items-center gap-3 backdrop-blur-sm">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-700 flex-shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-white text-sm font-medium truncate">@seunome</p>
@@ -257,6 +303,13 @@ const Login = () => {
               <Zap size={12} className="fill-emerald-400" />
               Ao vivo
             </div>
+          </div>
+
+          {/* Testimonials carousel */}
+          <div className="mt-10 space-y-3">
+            <p className="text-xs text-maview-muted/60 mb-4">O que nossos criadores dizem</p>
+            <InfiniteRow items={TESTIMONIALS_ROW1} />
+            <InfiniteRow items={TESTIMONIALS_ROW2} reverse />
           </div>
 
         </div>
