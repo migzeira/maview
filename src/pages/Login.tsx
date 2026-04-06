@@ -26,28 +26,28 @@ const STATS = [
 ];
 
 const TESTIMONIALS_ROW1 = [
-  { name: "Ana Beatriz",  role: "Criadora de conteúdo", text: "Com o Maview vendo cursos e tenho meu link bio num lugar só. Triplicou minhas vendas!", badge: "+3x vendas",     initials: "AB", color: "#7C3AED" },
-  { name: "Lucas Ferreira", role: "Designer freelancer", text: "Personalizei meu tema em minutos. Nenhum concorrente oferece essa liberdade.", badge: "100% meu estilo", initials: "LF", color: "#6D28D9" },
-  { name: "Camila Torres", role: "Influenciadora",       text: "Meus seguidores adoram a página. Parece profissional de verdade.", badge: "+40% cliques",  initials: "CT", color: "#5B21B6" },
-  { name: "Rafael Costa",  role: "Coach digital",        text: "Vendo sessões de coaching direto pelo Maview. Zero complicação e zero taxa.", badge: "Sem taxas",      initials: "RC", color: "#4C1D95" },
-  { name: "Juliana Melo",  role: "Fotógrafa",            text: "Portfólio, loja e contato em um link só. Meus clientes chegam me perguntando como fiz.", badge: "+5x alcance",   initials: "JM", color: "#7C3AED" },
+  { name: "Ana Beatriz",    role: "Criadora de conteúdo", text: "Com o Maview vendo cursos e tenho meu link bio num lugar só. Triplicou minhas vendas!", badge: "+3x vendas",     avatar: "https://i.pravatar.cc/64?img=47" },
+  { name: "Lucas Ferreira", role: "Designer freelancer",  text: "Personalizei meu tema em minutos. Nenhum concorrente oferece essa liberdade.",           badge: "100% meu estilo", avatar: "https://i.pravatar.cc/64?img=11" },
+  { name: "Camila Torres",  role: "Influenciadora",       text: "Meus seguidores adoram a página. Parece profissional de verdade.",                        badge: "+40% cliques",    avatar: "https://i.pravatar.cc/64?img=45" },
+  { name: "Rafael Costa",   role: "Coach digital",        text: "Vendo sessões de coaching direto pelo Maview. Zero complicação e zero taxa.",             badge: "Sem taxas",       avatar: "https://i.pravatar.cc/64?img=12" },
+  { name: "Juliana Melo",   role: "Fotógrafa",            text: "Portfólio, loja e contato em um link só. Meus clientes chegam perguntando como fiz.",     badge: "+5x alcance",     avatar: "https://i.pravatar.cc/64?img=49" },
 ];
 
 const TESTIMONIALS_ROW2 = [
-  { name: "Pedro Alves",   role: "Músico independente", text: "Vendo meus beats direto pelo link. O analytics me mostrou o que converte.", badge: "+60% insights",      initials: "PA", color: "#6D28D9" },
-  { name: "Marina Silva",  role: "Nutricionista",       text: "Antes usava 3 ferramentas separadas. Agora só o Maview. Economizei tempo e dinheiro.", badge: "3 ferramentas → 1", initials: "MS", color: "#5B21B6" },
-  { name: "Bruno Nunes",   role: "Empreendedor",        text: "O tema ficou exatamente com a identidade da minha marca. Incrível diferencial.", badge: "Marca forte",        initials: "BN", color: "#4C1D95" },
-  { name: "Fernanda Lima", role: "Professora online",   text: "Meus alunos me encontram fácil pelo link personalizado. Simples e eficiente.", badge: "+80% acessos",       initials: "FL", color: "#7C3AED" },
-  { name: "Thiago Rocha",  role: "Streamer",            text: "Centralizo doações, produtos e redes sociais no meu Maview. Engajamento dobrou.", badge: "+2x engajamento",    initials: "TR", color: "#6D28D9" },
+  { name: "Pedro Alves",    role: "Músico independente", text: "Vendo meus beats direto pelo link. O analytics me mostrou o que converte.",                 badge: "+60% insights",      avatar: "https://i.pravatar.cc/64?img=15" },
+  { name: "Marina Silva",   role: "Nutricionista",       text: "Antes usava 3 ferramentas separadas. Agora só o Maview. Economizei tempo e dinheiro.",      badge: "3 ferramentas → 1",  avatar: "https://i.pravatar.cc/64?img=48" },
+  { name: "Bruno Nunes",    role: "Empreendedor",        text: "O tema ficou exatamente com a identidade da minha marca. Incrível diferencial.",             badge: "Marca forte",        avatar: "https://i.pravatar.cc/64?img=17" },
+  { name: "Fernanda Lima",  role: "Professora online",   text: "Meus alunos me encontram fácil pelo link personalizado. Simples e eficiente.",               badge: "+80% acessos",       avatar: "https://i.pravatar.cc/64?img=44" },
+  { name: "Thiago Rocha",   role: "Streamer",            text: "Centralizo doações, produtos e redes sociais no meu Maview. Engajamento dobrou.",            badge: "+2x engajamento",    avatar: "https://i.pravatar.cc/64?img=20" },
 ];
 
 /* ─── Components ──────────────────────────────────────────────── */
 
 const TestimonialCard = ({
-  name, role, text, badge, initials, color,
+  name, role, text, badge, avatar,
 }: {
   name: string; role: string; text: string;
-  badge: string; initials: string; color: string;
+  badge: string; avatar: string;
 }) => (
   <div className="flex-shrink-0 w-[280px] bg-[#12102A] border border-white/[0.08] rounded-2xl p-5 mx-2 hover:border-maview-purple/30 transition-colors duration-300">
     <div className="flex items-start justify-between mb-4">
@@ -62,12 +62,11 @@ const TestimonialCard = ({
     </div>
     <p className="text-white/75 text-sm leading-relaxed mb-5">"{text}"</p>
     <div className="flex items-center gap-2.5">
-      <div
-        className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-        style={{ background: `linear-gradient(135deg, ${color}, ${color}99)` }}
-      >
-        {initials}
-      </div>
+      <img
+        src={avatar}
+        alt={name}
+        className="w-9 h-9 rounded-full object-cover border-2 border-maview-purple/30 flex-shrink-0"
+      />
       <div>
         <p className="text-white text-xs font-semibold">{name}</p>
         <p className="text-maview-muted/70 text-xs">{role}</p>
@@ -300,10 +299,13 @@ const Login = () => {
             {/* Social proof */}
             <div className="flex items-center gap-4 pt-8 border-t border-white/[0.05]">
               <div className="flex -space-x-2.5">
-                {[0,1,2,3,4].map((i) => (
-                  <div key={i} className="w-9 h-9 rounded-full border-2 border-maview-bg" style={{
-                    background: `linear-gradient(135deg, hsl(${255+i*18} 65% ${28+i*7}%), hsl(${268+i*10} 45% ${18+i*5}%))`,
-                  }} />
+                {[11, 44, 15, 47, 20].map((img) => (
+                  <img
+                    key={img}
+                    src={`https://i.pravatar.cc/64?img=${img}`}
+                    alt="creator"
+                    className="w-9 h-9 rounded-full border-2 border-maview-bg object-cover"
+                  />
                 ))}
               </div>
               <div>
