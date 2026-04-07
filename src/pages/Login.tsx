@@ -353,9 +353,9 @@ const Login = () => {
             </div>
 
             {/* Card */}
-            <div className="bg-white rounded-[24px] border border-maview-border p-8 sm:p-10 shadow-xl shadow-maview-purple/[0.07]">
+            <div className="relative bg-white rounded-[24px] border border-maview-border p-8 sm:p-10 shadow-xl shadow-maview-purple/[0.07] overflow-hidden">
               {/* Top accent line */}
-              <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-transparent via-maview-purple to-transparent rounded-t-[24px] pointer-events-none" style={{ position: "relative", marginBottom: "-1rem", marginTop: "-2rem", marginLeft: "-2.5rem", marginRight: "-2.5rem", width: "calc(100% + 5rem)", borderRadius: "24px 24px 0 0", height: "3px" }} />
+              <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-transparent via-maview-purple to-transparent pointer-events-none" />
 
               {/* Mode tabs */}
               <div className="mb-6">
