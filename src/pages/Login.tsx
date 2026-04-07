@@ -11,27 +11,7 @@ import { toast } from "sonner";
 
 type Mode = "login" | "signup" | "forgot" | "verify";
 
-/* ─── Logo ────────────────────────────────────────────────────── */
-
-const MaviewLogo = ({ size = 36 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="lgFront" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
-        <stop offset="0%" stopColor="#8B5CF6"/>
-        <stop offset="100%" stopColor="#4C1D95"/>
-      </linearGradient>
-      <linearGradient id="lgBack" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
-        <stop offset="0%" stopColor="#7C3AED"/>
-        <stop offset="100%" stopColor="#2E1065"/>
-      </linearGradient>
-      <clipPath id="lgClip"><rect width="100" height="100"/></clipPath>
-    </defs>
-    <g clipPath="url(#lgClip)">
-      <polygon points="18,92 38,8 63,46 88,8 108,92" fill="url(#lgBack)" opacity="0.5"/>
-      <polygon points="4,92 26,12 50,52 74,12 96,92" fill="url(#lgFront)"/>
-    </g>
-  </svg>
-);
+import MaviewLogo from "@/components/MaviewLogo";
 
 /* ─── Static data ─────────────────────────────────────────────── */
 
