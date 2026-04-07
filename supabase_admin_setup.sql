@@ -22,7 +22,11 @@ alter table public.profiles enable row level security;
 -- 3. Política: somente o admin lê todos os registros
 create policy "admin_read_all" on public.profiles
   for select using (
-    auth.jwt() ->> 'email' = 'andrefernandesbalada@gmail.com'
+    auth.jwt() ->> 'email' in (
+      'andrefernandesbalada@gmail.com',
+      'migueldrops@gmail.com',
+      'maview.suporte@gmail.com'
+    )
   );
 
 -- 4. Política: cada usuário lê/edita apenas o próprio perfil

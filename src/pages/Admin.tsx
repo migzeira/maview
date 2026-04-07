@@ -9,9 +9,13 @@ import {
 } from "lucide-react";
 
 /* ─────────────────────────────────────────────────
-   COLOQUE O SEU EMAIL AQUI
+   EMAILS COM ACESSO ADMIN
 ───────────────────────────────────────────────── */
-const ADMIN_EMAIL = "andrefernandesbalada@gmail.com";
+const ADMIN_EMAILS = [
+  "andrefernandesbalada@gmail.com",
+  "migueldrops@gmail.com",
+  "maview.suporte@gmail.com",
+];
 
 /* ─── Logo ───────────────────────────────────────── */
 const MaviewLogo = ({ size = 28 }: { size?: number }) => (
@@ -84,7 +88,7 @@ const Admin = () => {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) { navigate("/login"); return; }
-      if (session.user.email !== ADMIN_EMAIL) { navigate("/dashboard"); return; }
+      if (!ADMIN_EMAILS.includes(session.user.email || "")) { navigate("/dashboard"); return; }
       setCurrentUser(session.user);
       setLoading(false);
     });
@@ -247,7 +251,7 @@ alter table public.profiles enable row level security;
 -- 3. Política: só o admin lê tudo
 create policy "admin_read_all" on public.profiles
   for select using (
-    auth.jwt() ->> 'email' = '${ADMIN_EMAIL}'
+    auth.jwt() ->> 'email' in ('andrefernandesbalada@gmail.com','migueldrops@gmail.com','maview.suporte@gmail.com')
   );
 
 -- 4. Política: usuário lê/edita o próprio
