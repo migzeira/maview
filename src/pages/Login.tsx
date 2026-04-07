@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-type Mode = "login" | "signup" | "forgot";
+type Mode = "login" | "signup" | "forgot" | "verify";
 
 /* ─── Logo ────────────────────────────────────────────────────── */
 
@@ -126,6 +126,7 @@ const Login = () => {
   const [usernameStatus, setUsernameStatus] = useState<"idle"|"checking"|"available"|"taken"|"invalid">("idle");
   const [notification, setNotification] = useState<{ name: string; action: string; avatar: string } | null>(null);
   const [onlineCount] = useState(() => Math.floor(Math.random() * 30) + 38);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -179,7 +180,7 @@ const Login = () => {
     if (!isValidUsername(username)) { setError("Link inválido."); setIsLoading(false); return; }
     const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name, username }, emailRedirectTo: `${window.location.origin}/dashboard` } });
     if (error) setError(error.message === "User already registered" ? "Este email já está cadastrado." : error.message);
-    else { toast.success("Conta criada! Verifique seu email para confirmar."); switchMode("login"); }
+    else { switchMode("verify"); }
     setIsLoading(false);
   };
 
@@ -195,6 +196,19 @@ const Login = () => {
     clearError();
     const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${window.location.origin}/dashboard` } });
     if (error) toast.error("Erro ao entrar com Google.");
+  };
+
+  const handleResend = async () => {
+    if (resendCooldown > 0) return;
+    const { error } = await supabase.auth.resend({ type: "signup", email });
+    if (error) toast.error("Erro ao reenviar. Tente novamente.");
+    else {
+      toast.success("Email reenviado!");
+      setResendCooldown(60);
+      const interval = setInterval(() => {
+        setResendCooldown((prev) => { if (prev <= 1) { clearInterval(interval); return 0; } return prev - 1; });
+      }, 1000);
+    }
   };
 
   const onSubmit = mode === "login" ? handleLogin : mode === "signup" ? handleSignup : handleForgot;
@@ -344,7 +358,61 @@ const Login = () => {
               <span className="text-maview-text text-2xl font-extrabold tracking-tight">Maview</span>
             </div>
 
-            {/* Online counter */}
+            {/* ══ VERIFY EMAIL SCREEN ══ */}
+            {mode === "verify" && (
+              <div className="bg-white rounded-[24px] border border-maview-border p-8 sm:p-10 shadow-xl shadow-maview-purple/[0.07] text-center relative overflow-hidden">
+                <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent pointer-events-none" />
+
+                {/* Icon */}
+                <div className="w-20 h-20 rounded-full bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center mx-auto mb-6">
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-emerald-500">
+                    <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+
+                <h2 className="text-maview-text text-xl font-bold mb-2">Verifique seu email</h2>
+                <p className="text-maview-muted text-sm leading-relaxed mb-1">
+                  Enviamos um link de confirmação para
+                </p>
+                <p className="text-maview-purple font-semibold text-sm mb-6 break-all">{email}</p>
+
+                <div className="bg-maview-surface border border-maview-border rounded-xl p-4 text-left space-y-2 mb-6">
+                  {[
+                    "Abra seu email",
+                    "Procure por um email do Maview",
+                    "Clique em \"Confirmar email\"",
+                    "Volte aqui e faça login",
+                  ].map((step, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="w-5 h-5 rounded-full bg-maview-purple flex items-center justify-center flex-shrink-0">
+                        <span className="text-white text-[10px] font-bold">{i + 1}</span>
+                      </div>
+                      <p className="text-maview-text-sub text-sm">{step}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="text-maview-muted text-xs mb-4">Não recebeu? Verifique a pasta de spam ou</p>
+
+                <button
+                  onClick={handleResend}
+                  disabled={resendCooldown > 0}
+                  className="w-full h-11 rounded-xl border border-maview-border text-maview-text text-sm font-semibold hover:bg-maview-surface transition-all disabled:opacity-50 disabled:cursor-not-allowed mb-4"
+                >
+                  {resendCooldown > 0 ? `Reenviar em ${resendCooldown}s` : "Reenviar email"}
+                </button>
+
+                <button
+                  onClick={() => switchMode("login")}
+                  className="flex items-center justify-center gap-1.5 w-full text-xs text-maview-muted hover:text-maview-text transition-colors"
+                >
+                  <ArrowLeft size={12} /> Voltar ao login
+                </button>
+              </div>
+            )}
+
+            {/* Online counter + form card + termos — só mostra fora do verify */}
+            {mode !== "verify" && <>
             <div className="flex items-center justify-center gap-2 mb-4">
               <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -555,6 +623,7 @@ const Login = () => {
               {" "}e a{" "}
               <span className="hover:text-maview-purple cursor-pointer transition-colors underline underline-offset-2">Política de Privacidade</span>.
             </p>
+            </>}
           </div>
         </div>
       </div>
