@@ -94,8 +94,8 @@ const Admin = () => {
   const fetchProfiles = async () => {
     setFetching(true);
     setTableError(false);
-    const { data, error } = await supabase
-      .from("profiles")
+    const { data, error } = await (supabase
+      .from("profiles") as any)
       .select("*")
       .order(sortField, { ascending: sortDir === "asc" });
 
