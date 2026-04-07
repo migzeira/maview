@@ -75,10 +75,10 @@ const DashboardLayout = ({ children }: Props) => {
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
-      <div className="flex items-center gap-2.5 px-5 h-16 flex-shrink-0">
-        <MaviewLogo size={26} />
+      <div className="flex items-center gap-3 px-5 h-16 flex-shrink-0">
+        <MaviewLogo size={36} />
         {!collapsed && (
-          <span className="text-[hsl(var(--dash-text))] text-[15px] font-bold tracking-tight">
+          <span className="text-[hsl(var(--dash-text))] text-[20px] font-extrabold tracking-tight">
             Maview
           </span>
         )}
