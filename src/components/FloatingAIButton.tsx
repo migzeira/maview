@@ -20,8 +20,7 @@ const FloatingAIButton = () => {
       <img
         src={robotImg}
         alt="Assistente IA Maview"
-        className="w-14 h-14 object-contain drop-shadow-lg animate-[bounce_3s_ease-in-out_infinite]"
-        style={{ animationDuration: "3s", animationTimingFunction: "ease-in-out" }}
+        className="w-14 h-14 object-contain drop-shadow-lg"
       />
     </button>
   );
