@@ -450,79 +450,90 @@ const Login = () => {
             </div>
 
             {/* Live profile preview card */}
-            <div className="mt-8 relative">
-              {/* Label above */}
-              <div className="flex items-center justify-between mb-2.5 px-1">
-                <span className="text-maview-muted text-xs font-medium">Sua vitrine fica assim:</span>
-                <div className="flex items-center gap-1.5 text-emerald-600 text-xs font-bold">
+            <div className="mt-8">
+              {/* Label row — sem sobreposição */}
+              <div className="flex items-center justify-between mb-3 px-1">
+                <span className="text-maview-muted text-xs font-medium">Prévia da sua vitrine:</span>
+                <div className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Ao vivo em minutos
+                  <span className="text-emerald-600 text-xs font-bold">Ao vivo em minutos</span>
                 </div>
               </div>
 
-              {/* Mini profile card */}
-              <div className="rounded-2xl overflow-hidden shadow-2xl shadow-maview-purple/25 border border-white/10"
-                style={{ background: "linear-gradient(160deg, #1e1040 0%, #0f0b1f 100%)" }}>
-                {/* Top gradient bar */}
-                <div className="h-[3px] w-full" style={{ background: "linear-gradient(90deg, #6D28D9, #A78BFA 50%, #6D28D9)" }} />
+              {/* Card */}
+              <div className="rounded-2xl overflow-hidden border border-violet-900/60"
+                style={{ background: "linear-gradient(160deg, #1a0e38 0%, #0d0a1e 100%)", boxShadow: "0 20px 60px rgba(109,40,217,0.22), 0 4px 20px rgba(0,0,0,0.4)" }}>
 
-                <div className="px-5 py-5">
+                {/* Top accent bar */}
+                <div className="h-[3px]" style={{ background: "linear-gradient(90deg, transparent, #8B5CF6 40%, #A78BFA 60%, transparent)" }} />
+
+                <div className="px-5 pt-5 pb-4">
+
                   {/* Profile header */}
                   <div className="flex items-center gap-3 mb-4">
-                    {/* Avatar — logo Maview com glow */}
+                    {/* Avatar — fundo preto com borda roxa */}
                     <div className="relative flex-shrink-0">
-                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
-                        style={{ background: "linear-gradient(135deg, #7C3AED, #4C1D95)", boxShadow: "0 0 18px rgba(124,58,237,0.55)" }}>
-                        <MaviewLogo size={26} />
+                      <div className="w-13 h-13 rounded-2xl flex items-center justify-center"
+                        style={{
+                          width: 52, height: 52,
+                          background: "#000000",
+                          border: "2px solid rgba(139,92,246,0.6)",
+                          boxShadow: "0 0 16px rgba(139,92,246,0.45), inset 0 0 12px rgba(109,40,217,0.15)",
+                        }}>
+                        <MaviewLogo size={28} />
                       </div>
-                      {/* Online dot */}
-                      <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-[#0f0b1f]" />
+                      <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-400 border-[2.5px] border-[#0d0a1e]" />
                     </div>
+
                     <div className="flex-1 min-w-0">
-                      <p className="text-white text-sm font-bold leading-tight">Seu Nome</p>
-                      <p className="text-violet-400 text-[11px] font-mono mt-0.5 truncate">
-                        maview.app/<span className="text-violet-300 font-semibold">seunome</span>
+                      <p className="text-white text-[13px] font-bold leading-tight">Seu Nome</p>
+                      <p className="text-violet-400/80 text-[10px] font-mono mt-0.5 truncate">
+                        maview.app/<span className="text-violet-300">seunome</span>
                       </p>
                     </div>
-                    <span className="text-[10px] font-extrabold text-emerald-400 bg-emerald-400/10 border border-emerald-400/25 px-2 py-0.5 rounded-full flex-shrink-0">
-                      ✓ Ativo
+
+                    <span className="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-500/25 px-2 py-0.5 rounded-full flex-shrink-0">
+                      ● Ativo
                     </span>
                   </div>
 
-                  {/* Fake links */}
-                  <div className="space-y-2">
+                  {/* Links */}
+                  <div className="space-y-1.5">
                     {[
-                      { icon: Instagram, label: "Instagram",  color: "#C084FC" },
-                      { icon: ShoppingBag, label: "Minha Loja · 0% taxa", color: "#34D399" },
-                      { icon: Globe, label: "Meu Website",   color: "#60A5FA" },
-                    ].map(({ icon: Icon, label, color }) => (
+                      { icon: Instagram,   label: "Instagram",           sub: "2.4k seguidores", color: "#C084FC" },
+                      { icon: ShoppingBag, label: "Minha Loja",          sub: "0% de taxa",       color: "#34D399" },
+                      { icon: Globe,       label: "Meu Website",         sub: "portfólio",        color: "#60A5FA" },
+                    ].map(({ icon: Icon, label, sub, color }) => (
                       <div key={label}
-                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all"
-                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                        <div className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
-                          style={{ background: `${color}18` }}>
-                          <Icon size={12} style={{ color }} />
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
+                        style={{ background: "rgba(255,255,255,0.035)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                        <div className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0"
+                          style={{ background: `${color}15`, border: `1px solid ${color}25` }}>
+                          <Icon size={13} style={{ color }} />
                         </div>
-                        <span className="text-white/75 text-xs font-medium">{label}</span>
-                        <div className="ml-auto w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: color, opacity: 0.6 }} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white/85 text-xs font-semibold leading-none">{label}</p>
+                          <p className="text-white/30 text-[10px] mt-0.5">{sub}</p>
+                        </div>
+                        <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ background: `${color}15` }}>
+                          <div className="w-1 h-1 rounded-full" style={{ background: color }} />
+                        </div>
                       </div>
                     ))}
                   </div>
 
                   {/* Footer */}
-                  <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
-                    <div className="flex items-center gap-1.5 opacity-30">
+                  <div className="mt-4 pt-3 border-t border-white/[0.05] flex items-center justify-between">
+                    <div className="flex items-center gap-1.5" style={{ opacity: 0.25 }}>
                       <MaviewLogo size={11} />
-                      <span className="text-white text-[10px] font-medium">maview.app</span>
+                      <span className="text-white text-[10px]">maview.app</span>
                     </div>
-                    <span className="text-white/25 text-[10px]">0% comissão · sempre grátis</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-emerald-400/60 text-[10px] font-semibold">✦ Grátis para sempre</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Floating GRÁTIS badge */}
-              <div className="absolute -top-3 -right-2 bg-gradient-to-r from-emerald-500 to-teal-400 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-lg shadow-emerald-500/40 tracking-wider uppercase">
-                Grátis
               </div>
             </div>
 
