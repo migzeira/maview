@@ -5,7 +5,7 @@ import {
   DollarSign, Eye, TrendingUp, ShoppingCart,
   CheckCircle2, Circle, Blocks, ShoppingBag, Layout,
   ArrowRight, Sparkles, Zap, Copy, Check, ExternalLink,
-  Lightbulb, Target, Star,
+  Lightbulb, Target, Star, AlertCircle, Flame,
 } from "lucide-react";
 
 const accentMap: Record<string, { icon: string; bg: string; ring: string }> = {
@@ -19,28 +19,36 @@ const STATS = [
   { label: "Receita total",  value: "R$ 0,00", icon: DollarSign,  accent: "emerald" },
   { label: "Visitantes",     value: "0",        icon: Eye,         accent: "blue"    },
   { label: "Conversão",      value: "0%",       icon: TrendingUp,  accent: "amber"   },
-  { label: "Vendas",         value: "0",        icon: ShoppingCart,accent: "purple"  },
+  { label: "Vendas",         value: "0",        icon: ShoppingCart, accent: "purple"  },
 ];
 
 const CHECKLIST = [
   { label: "Criar conta",           done: true  },
   { label: "Criar primeiro bloco",  done: false, path: "/dashboard/blocos"   },
   { label: "Adicionar produto",     done: false, path: "/dashboard/produtos" },
+  { label: "Personalizar aparência", done: false, path: "/dashboard/aparencia" },
   { label: "Publicar página",       done: false, path: "/dashboard/pagina"   },
 ];
 
 const QUICK_ACTIONS = [
-  { label: "Criar bloco",   icon: Blocks,    path: "/dashboard/blocos",   desc: "Links, vídeos, redes sociais" },
-  { label: "Criar produto", icon: ShoppingBag, path: "/dashboard/produtos", desc: "Venda com 0% de taxa"        },
-  { label: "Editar página", icon: Layout,    path: "/dashboard/pagina",   desc: "Temas, cores, personalização" },
+  { label: "Criar bloco",     icon: Blocks,      path: "/dashboard/blocos",    desc: "Links, vídeos, redes sociais" },
+  { label: "Criar produto",   icon: ShoppingBag, path: "/dashboard/produtos",  desc: "Venda com 0% de taxa"        },
+  { label: "Editar página",   icon: Layout,      path: "/dashboard/pagina",    desc: "Temas, cores, personalização" },
+  { label: "Nova automação",  icon: Zap,         path: "/dashboard/automacoes", desc: "Venda no piloto automático"  },
+];
+
+const INSIGHTS = [
+  { text: "Sua página pode converter mais com um botão de destaque", icon: Flame, type: "warning" as const },
+  { text: "Adicione um produto para começar a vender", icon: ShoppingBag, type: "action" as const },
+  { text: "Páginas com foto de perfil têm 40% mais cliques", icon: AlertCircle, type: "tip" as const },
 ];
 
 const TIPS = [
-  "Páginas com foto de perfil têm 40% mais cliques. Adicione uma em 'Minha Página'.",
   "Cole seu link Maview na bio do Instagram para multiplicar seus cliques.",
   "Produtos com descrição detalhada convertem até 3× mais. Capriche no texto!",
   "Adicione pelo menos 3 links para maximizar o engajamento da sua página.",
   "Compartilhe sua página no WhatsApp para acelerar suas primeiras vendas.",
+  "Configure uma automação pós-compra para entregar conteúdo automaticamente.",
 ];
 
 function getGreeting() {
@@ -80,17 +88,17 @@ const DashboardHome = () => {
   return (
     <div className="max-w-[1100px] mx-auto px-4 md:px-8 py-8 md:py-10 space-y-8">
 
-      {/* ── Greeting ── */}
+      {/* Greeting */}
       <div className="space-y-1">
         <h1 className="text-2xl md:text-[28px] font-bold text-[hsl(var(--dash-text))] tracking-tight">
           {getGreeting()}, {displayName} <span className="inline-block animate-[fadeInUp_0.4s_ease]">👋</span>
         </h1>
         <p className="text-[hsl(var(--dash-text-muted))] text-[15px]">
-          Aqui está o resumo da sua vitrine digital
+          Vamos construir sua vitrine digital e começar a vender
         </p>
       </div>
 
-      {/* ── Share banner ── */}
+      {/* Share banner */}
       {profileUrl && (
         <div className="glass-card rounded-2xl p-4 md:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
           <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -103,27 +111,18 @@ const DashboardHome = () => {
             </div>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
-            <button
-              onClick={copyLink}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 text-[13px] text-[hsl(var(--dash-text-secondary))] font-medium transition-all"
-            >
+            <button onClick={copyLink} className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 text-[13px] text-[hsl(var(--dash-text-secondary))] font-medium transition-all">
               {copied ? <Check size={13} className="text-emerald-500" /> : <Copy size={13} />}
               {copied ? "Copiado!" : "Copiar link"}
             </button>
-            <a
-              href={`https://${profileUrl}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl btn-primary-gradient text-[13px] font-medium"
-            >
-              <ExternalLink size={13} />
-              Ver página
+            <a href={`https://${profileUrl}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3.5 py-2 rounded-xl btn-primary-gradient text-[13px] font-medium">
+              <ExternalLink size={13} /> Ver página
             </a>
           </div>
         </div>
       )}
 
-      {/* ── Stats ── */}
+      {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {STATS.map(({ label, value, icon: Icon, accent }) => {
           const a = accentMap[accent];
@@ -139,9 +138,27 @@ const DashboardHome = () => {
         })}
       </div>
 
-      {/* ── Checklist + Quick actions ── */}
-      <div className="grid lg:grid-cols-2 gap-4 md:gap-6">
+      {/* Smart insights */}
+      <div className="space-y-2">
+        <h2 className="text-[hsl(var(--dash-text))] font-semibold text-[15px] flex items-center gap-2">
+          <Sparkles size={15} className="text-primary" /> Insights para você
+        </h2>
+        <div className="grid md:grid-cols-3 gap-3">
+          {INSIGHTS.map(({ text, icon: Icon, type }, i) => (
+            <div key={i} className={`glass-card rounded-xl p-4 flex items-start gap-3 border-l-4 ${
+              type === "warning" ? "border-l-amber-400" : type === "action" ? "border-l-primary" : "border-l-blue-400"
+            }`}>
+              <Icon size={16} className={
+                type === "warning" ? "text-amber-500" : type === "action" ? "text-primary" : "text-blue-500"
+              } />
+              <p className="text-[hsl(var(--dash-text-secondary))] text-[13px] leading-relaxed">{text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
 
+      {/* Checklist + Quick actions */}
+      <div className="grid lg:grid-cols-2 gap-4 md:gap-6">
         {/* Progress checklist */}
         <div className="glass-card rounded-2xl p-6 md:p-7">
           <div className="flex items-center justify-between mb-5">
@@ -176,10 +193,7 @@ const DashboardHome = () => {
                   {label}
                 </span>
                 {!done && path && (
-                  <Link
-                    to={path}
-                    className="text-xs text-primary/70 hover:text-primary transition-colors flex items-center gap-1 font-medium"
-                  >
+                  <Link to={path} className="text-xs text-primary/70 hover:text-primary transition-colors flex items-center gap-1 font-medium">
                     Fazer <ArrowRight size={11} />
                   </Link>
                 )}
@@ -193,10 +207,7 @@ const DashboardHome = () => {
               <p className="text-xs font-bold text-primary">{progressPct}%</p>
             </div>
             <div className="h-1.5 rounded-full bg-[hsl(var(--dash-surface-2))] overflow-hidden">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-primary to-secondary transition-all duration-500"
-                style={{ width: `${progressPct}%` }}
-              />
+              <div className="h-full rounded-full bg-gradient-to-r from-primary to-secondary transition-all duration-500" style={{ width: `${progressPct}%` }} />
             </div>
           </div>
         </div>
@@ -233,23 +244,18 @@ const DashboardHome = () => {
         </div>
       </div>
 
-      {/* ── Bottom row: Tip + Goal ── */}
+      {/* Bottom row */}
       <div className="grid md:grid-cols-2 gap-4">
-
-        {/* Dica do dia */}
         <div className="glass-card rounded-2xl p-5 md:p-6 flex gap-4 items-start">
           <div className="w-10 h-10 rounded-xl bg-amber-50 ring-1 ring-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5">
             <Lightbulb size={18} className="text-amber-500" />
           </div>
           <div>
             <p className="text-[hsl(var(--dash-text))] text-[13px] font-semibold mb-1">Dica do dia</p>
-            <p className="text-[hsl(var(--dash-text-secondary))] text-[13px] leading-relaxed">
-              {TIPS[tipIndex]}
-            </p>
+            <p className="text-[hsl(var(--dash-text-secondary))] text-[13px] leading-relaxed">{TIPS[tipIndex]}</p>
           </div>
         </div>
 
-        {/* First sale goal */}
         <div className="glass-card rounded-2xl p-5 md:p-6 flex gap-4 items-center">
           <div className="w-10 h-10 rounded-xl bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center flex-shrink-0">
             <Target size={18} className="text-primary" />
@@ -260,15 +266,11 @@ const DashboardHome = () => {
               Crie um produto e compartilhe sua página para começar
             </p>
           </div>
-          <Link
-            to="/dashboard/produtos"
-            className="text-xs font-semibold text-primary hover:underline flex items-center gap-1 whitespace-nowrap flex-shrink-0"
-          >
+          <Link to="/dashboard/produtos" className="text-xs font-semibold text-primary hover:underline flex items-center gap-1 whitespace-nowrap flex-shrink-0">
             Criar produto <ArrowRight size={11} />
           </Link>
         </div>
       </div>
-
     </div>
   );
 };

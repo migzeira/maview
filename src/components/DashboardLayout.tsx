@@ -6,6 +6,7 @@ import MaviewLogo from "./MaviewLogo";
 import {
   Home, Layout, Blocks, ShoppingBag, BarChart3, Users, Settings,
   LogOut, ExternalLink, Copy, Check, ChevronLeft, ChevronRight, Menu,
+  Zap, Palette, DollarSign,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -13,8 +14,10 @@ const NAV_ITEMS = [
   { path: "/dashboard/pagina", label: "Minha Página", icon: Layout },
   { path: "/dashboard/blocos", label: "Blocos", icon: Blocks },
   { path: "/dashboard/produtos", label: "Produtos", icon: ShoppingBag },
-  { path: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
-  { path: "/dashboard/clientes", label: "Clientes", icon: Users },
+  { path: "/dashboard/vendas", label: "Vendas", icon: DollarSign },
+  { path: "/dashboard/audiencia", label: "Audiência", icon: Users },
+  { path: "/dashboard/automacoes", label: "Automações", icon: Zap },
+  { path: "/dashboard/aparencia", label: "Aparência", icon: Palette },
   { path: "/dashboard/configuracoes", label: "Configurações", icon: Settings },
 ];
 
@@ -70,7 +73,6 @@ const DashboardLayout = ({ children }: Props) => {
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
-      {/* Logo */}
       <div className="flex items-center gap-2.5 px-5 h-16 flex-shrink-0">
         <MaviewLogo size={26} />
         {!collapsed && (
@@ -80,11 +82,9 @@ const DashboardLayout = ({ children }: Props) => {
         )}
       </div>
 
-      {/* Divider */}
       <div className="mx-4 dash-divider" />
 
-      {/* Nav */}
-      <nav className="flex-1 px-3 pt-4 space-y-0.5">
+      <nav className="flex-1 px-3 pt-4 space-y-0.5 overflow-y-auto">
         {NAV_ITEMS.map(({ path, label, icon: Icon }) => {
           const active = location.pathname === path;
           return (
@@ -115,7 +115,6 @@ const DashboardLayout = ({ children }: Props) => {
         })}
       </nav>
 
-      {/* Collapse toggle */}
       <div className="hidden md:block px-3 pb-4 pt-2">
         <div className="dash-divider mb-3" />
         <button
@@ -130,7 +129,6 @@ const DashboardLayout = ({ children }: Props) => {
 
   return (
     <div className="min-h-screen bg-[hsl(var(--dash-bg))] flex">
-      {/* Desktop sidebar */}
       <aside
         className={`
           hidden md:flex flex-col flex-shrink-0 
@@ -143,7 +141,6 @@ const DashboardLayout = ({ children }: Props) => {
         <SidebarContent />
       </aside>
 
-      {/* Mobile sidebar overlay */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
@@ -153,15 +150,12 @@ const DashboardLayout = ({ children }: Props) => {
         </div>
       )}
 
-      {/* Main area */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Topbar */}
         <header className="h-16 flex items-center justify-between px-4 md:px-6 border-b border-[hsl(var(--dash-border-subtle))] flex-shrink-0 bg-[hsl(var(--dash-surface))]/80 backdrop-blur-xl z-10">
           <div className="flex items-center gap-3">
             <button onClick={() => setMobileOpen(true)} className="md:hidden text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))]">
               <Menu size={20} />
             </button>
-            {/* Profile URL */}
             <button
               onClick={copyLink}
               className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 transition-all text-[13px] text-[hsl(var(--dash-text-muted))] font-mono"
@@ -199,7 +193,6 @@ const DashboardLayout = ({ children }: Props) => {
           </div>
         </header>
 
-        {/* Content */}
         <main className="flex-1 overflow-y-auto">
           {children}
         </main>
