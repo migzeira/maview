@@ -1,8 +1,7 @@
 import { useState } from "react";
 import {
   Plus, GripVertical, Pencil, Trash2, Copy, Link2, ShoppingBag,
-  Type, Image, Video, CreditCard, Mail, ToggleLeft, ToggleRight,
-  X, Smartphone,
+  Type, Image, Video, CreditCard, Mail, ToggleLeft, ToggleRight, X,
 } from "lucide-react";
 
 type BlockType = "link" | "produto" | "texto" | "imagem" | "video" | "pagamento" | "email";
@@ -25,9 +24,7 @@ const BLOCK_TYPES: { type: BlockType; label: string; icon: any; desc: string }[]
   { type: "email", label: "Captura de email", icon: Mail, desc: "Formulário de captura" },
 ];
 
-const getBlockIcon = (type: BlockType) => {
-  return BLOCK_TYPES.find(b => b.type === type)?.icon || Link2;
-};
+const getBlockIcon = (type: BlockType) => BLOCK_TYPES.find(b => b.type === type)?.icon || Link2;
 
 const SAMPLE_BLOCKS: Block[] = [
   { id: "1", type: "link", title: "Meu Instagram", description: "instagram.com/usuario", active: true },
@@ -43,13 +40,7 @@ const DashboardBlocos = () => {
 
   const addBlock = (type: BlockType) => {
     const info = BLOCK_TYPES.find(b => b.type === type)!;
-    setBlocks(prev => [...prev, {
-      id: Date.now().toString(),
-      type,
-      title: `Novo ${info.label}`,
-      description: info.desc,
-      active: true,
-    }]);
+    setBlocks(prev => [...prev, { id: Date.now().toString(), type, title: `Novo ${info.label}`, description: info.desc, active: true }]);
     setShowModal(false);
   };
 
@@ -73,30 +64,30 @@ const DashboardBlocos = () => {
   const handleDragEnd = () => setDragIdx(null);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+    <div className="max-w-[1100px] mx-auto px-4 md:px-8 py-8 md:py-10">
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Left: Block list */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-2xl font-bold text-white">Blocos</h1>
-              <p className="text-[#A78BFA]/50 text-sm mt-1">Construa sua página com blocos</p>
+          <div className="flex items-center justify-between mb-8">
+            <div className="space-y-1.5">
+              <h1 className="text-2xl md:text-[28px] font-bold text-[hsl(var(--dash-text))] tracking-tight">Blocos</h1>
+              <p className="text-[hsl(var(--dash-text-muted))] text-[15px]">Construa sua página com blocos</p>
             </div>
             <button
               onClick={() => setShowModal(true)}
-              className="flex items-center gap-2 bg-[#6D28D9] text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-[#7C3AED] transition-all active:scale-[0.98] shadow-lg shadow-[#6D28D9]/20"
+              className="flex items-center gap-2 bg-primary text-primary-foreground text-[13px] font-medium px-4 py-2.5 rounded-xl hover:bg-primary/90 transition-all active:scale-[0.98] glow-sm"
             >
-              <Plus size={16} /> Criar bloco
+              <Plus size={15} /> Criar bloco
             </button>
           </div>
 
           {blocks.length === 0 ? (
-            <div className="text-center py-20 text-[#A78BFA]/30">
-              <Plus size={40} className="mx-auto mb-3" />
+            <div className="text-center py-20 text-[hsl(var(--dash-text-subtle))]">
+              <Plus size={40} className="mx-auto mb-3 opacity-30" />
               <p className="text-sm">Nenhum bloco ainda. Crie o primeiro!</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {blocks.map((block, idx) => {
                 const Icon = getBlockIcon(block.type);
                 return (
@@ -107,29 +98,33 @@ const DashboardBlocos = () => {
                     onDragOver={(e) => handleDragOver(e, idx)}
                     onDragEnd={handleDragEnd}
                     onClick={() => setSelectedBlock(block.id)}
-                    className={`flex items-center gap-3 rounded-2xl border p-4 transition-all duration-200 cursor-pointer group ${
-                      selectedBlock === block.id
-                        ? "border-[#6D28D9]/50 bg-[#6D28D9]/10"
-                        : "border-white/[0.06] bg-[#1A1333] hover:border-white/[0.12]"
-                    } ${!block.active ? "opacity-50" : ""} ${dragIdx === idx ? "opacity-30" : ""}`}
+                    className={`
+                      flex items-center gap-3 rounded-2xl border p-4 transition-all duration-200 cursor-pointer group
+                      ${selectedBlock === block.id
+                        ? "border-primary/40 bg-primary/[0.06] ring-1 ring-primary/10"
+                        : "glass-card-hover"
+                      }
+                      ${!block.active ? "opacity-50" : ""}
+                      ${dragIdx === idx ? "opacity-30 scale-[0.98]" : ""}
+                    `}
                   >
-                    <GripVertical size={16} className="text-[#A78BFA]/20 cursor-grab flex-shrink-0" />
-                    <div className="w-10 h-10 rounded-xl bg-[#6D28D9]/10 flex items-center justify-center flex-shrink-0">
-                      <Icon size={18} className="text-[#A78BFA]" />
+                    <GripVertical size={15} className="text-[hsl(var(--dash-text-subtle))] cursor-grab flex-shrink-0 opacity-40 group-hover:opacity-70 transition-opacity" />
+                    <div className="w-10 h-10 rounded-xl bg-primary/[0.08] ring-1 ring-primary/20 flex items-center justify-center flex-shrink-0">
+                      <Icon size={17} className="text-[hsl(var(--dash-accent))]" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-white text-sm font-medium truncate">{block.title}</p>
-                      <p className="text-[#A78BFA]/40 text-xs truncate">{block.description}</p>
+                      <p className="text-[hsl(var(--dash-text))] text-[13px] font-medium truncate">{block.title}</p>
+                      <p className="text-[hsl(var(--dash-text-subtle))] text-xs truncate mt-0.5">{block.description}</p>
                     </div>
-                    <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={(e) => { e.stopPropagation(); duplicateBlock(block.id); }} className="p-1.5 rounded-lg text-[#A78BFA]/30 hover:text-[#A78BFA] hover:bg-white/5 transition-all">
-                        <Copy size={14} />
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button onClick={(e) => { e.stopPropagation(); duplicateBlock(block.id); }} className="p-1.5 rounded-lg text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-accent))] hover:bg-[hsl(var(--dash-surface-2))] transition-all">
+                        <Copy size={13} />
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); setSelectedBlock(block.id); }} className="p-1.5 rounded-lg text-[#A78BFA]/30 hover:text-[#A78BFA] hover:bg-white/5 transition-all">
-                        <Pencil size={14} />
+                      <button onClick={(e) => { e.stopPropagation(); setSelectedBlock(block.id); }} className="p-1.5 rounded-lg text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-accent))] hover:bg-[hsl(var(--dash-surface-2))] transition-all">
+                        <Pencil size={13} />
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); deleteBlock(block.id); }} className="p-1.5 rounded-lg text-[#A78BFA]/30 hover:text-red-400 hover:bg-red-500/10 transition-all">
-                        <Trash2 size={14} />
+                      <button onClick={(e) => { e.stopPropagation(); deleteBlock(block.id); }} className="p-1.5 rounded-lg text-[hsl(var(--dash-text-subtle))] hover:text-red-400 hover:bg-red-500/[0.08] transition-all">
+                        <Trash2 size={13} />
                       </button>
                     </div>
                     <button
@@ -137,9 +132,9 @@ const DashboardBlocos = () => {
                       className="flex-shrink-0 ml-1"
                     >
                       {block.active ? (
-                        <ToggleRight size={28} className="text-[#6D28D9]" />
+                        <ToggleRight size={26} className="text-primary" />
                       ) : (
-                        <ToggleLeft size={28} className="text-[#A78BFA]/20" />
+                        <ToggleLeft size={26} className="text-[hsl(var(--dash-text-subtle))]" />
                       )}
                     </button>
                   </div>
@@ -152,23 +147,18 @@ const DashboardBlocos = () => {
         {/* Right: Live preview */}
         <div className="hidden lg:block w-[340px] flex-shrink-0">
           <div className="sticky top-8">
-            <p className="text-[#A78BFA]/40 text-xs font-medium mb-3 uppercase tracking-wider">Pré-visualização</p>
+            <p className="text-[hsl(var(--dash-text-subtle))] text-xs font-medium mb-3 uppercase tracking-wider">Pré-visualização</p>
             <div className="relative">
-              {/* Phone frame */}
-              <div className="rounded-[2.5rem] border-[3px] border-white/[0.08] bg-[#0F0B1F] p-3 shadow-2xl shadow-[#6D28D9]/10">
-                {/* Notch */}
+              <div className="rounded-[2.5rem] border-[3px] border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-bg))] p-3 shadow-2xl glow-md">
                 <div className="flex justify-center mb-2">
-                  <div className="w-20 h-5 rounded-full bg-black/80" />
+                  <div className="w-20 h-5 rounded-full bg-black/60" />
                 </div>
-                {/* Screen */}
-                <div className="rounded-[1.8rem] bg-gradient-to-b from-[#1A1333] to-[#0F0B1F] min-h-[500px] p-5 space-y-3 overflow-hidden">
-                  {/* Avatar */}
-                  <div className="flex flex-col items-center mb-4">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#4C1D95] mb-2" />
-                    <p className="text-white text-sm font-semibold">@usuario</p>
-                    <p className="text-[#A78BFA]/40 text-xs">Minha vitrine digital</p>
+                <div className="rounded-[1.8rem] bg-gradient-to-b from-[hsl(var(--dash-surface))] to-[hsl(var(--dash-bg))] min-h-[500px] p-5 space-y-3 overflow-hidden">
+                  <div className="flex flex-col items-center mb-5">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-[hsl(263,76%,30%)] mb-2.5 ring-2 ring-primary/20" />
+                    <p className="text-[hsl(var(--dash-text))] text-sm font-semibold">@usuario</p>
+                    <p className="text-[hsl(var(--dash-text-subtle))] text-xs mt-0.5">Minha vitrine digital</p>
                   </div>
-                  {/* Blocks preview */}
                   {blocks.filter(b => b.active).map(block => {
                     const Icon = getBlockIcon(block.type);
                     return (
@@ -176,12 +166,12 @@ const DashboardBlocos = () => {
                         key={block.id}
                         className={`flex items-center gap-3 rounded-xl border p-3 transition-all ${
                           selectedBlock === block.id
-                            ? "border-[#6D28D9] bg-[#6D28D9]/20 ring-1 ring-[#6D28D9]/30"
-                            : "border-white/[0.06] bg-white/[0.03]"
+                            ? "border-primary bg-primary/[0.12] ring-1 ring-primary/20 glow-sm"
+                            : "border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface))]/50"
                         }`}
                       >
-                        <Icon size={14} className="text-[#A78BFA] flex-shrink-0" />
-                        <span className="text-white text-xs truncate">{block.title}</span>
+                        <Icon size={13} className="text-[hsl(var(--dash-accent))] flex-shrink-0" />
+                        <span className="text-[hsl(var(--dash-text))] text-xs truncate">{block.title}</span>
                       </div>
                     );
                   })}
@@ -195,27 +185,27 @@ const DashboardBlocos = () => {
       {/* Add block modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/70" onClick={() => setShowModal(false)} />
-          <div className="relative bg-[#1A1333] border border-white/[0.08] rounded-2xl p-6 w-full max-w-lg shadow-2xl">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-white font-semibold text-lg">Escolha o tipo de bloco</h3>
-              <button onClick={() => setShowModal(false)} className="text-[#A78BFA]/30 hover:text-white transition-colors">
-                <X size={20} />
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowModal(false)} />
+          <div className="relative glass-card rounded-2xl p-6 md:p-7 w-full max-w-lg shadow-2xl glow-md animate-scale-in">
+            <div className="flex items-center justify-between mb-7">
+              <h3 className="text-[hsl(var(--dash-text))] font-semibold text-lg">Escolha o tipo de bloco</h3>
+              <button onClick={() => setShowModal(false)} className="text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] transition-colors p-1">
+                <X size={18} />
               </button>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2.5">
               {BLOCK_TYPES.map(({ type, label, icon: Icon, desc }) => (
                 <button
                   key={type}
                   onClick={() => addBlock(type)}
-                  className="flex items-start gap-3 p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:border-[#6D28D9]/40 hover:bg-[#6D28D9]/10 transition-all text-left group"
+                  className="flex items-start gap-3 p-4 rounded-xl border border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface-2))]/50 hover:border-primary/30 hover:bg-primary/[0.06] transition-all text-left group"
                 >
-                  <div className="w-9 h-9 rounded-lg bg-[#6D28D9]/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[#6D28D9]/20 transition-colors">
-                    <Icon size={16} className="text-[#A78BFA]" />
+                  <div className="w-9 h-9 rounded-lg bg-primary/[0.08] ring-1 ring-primary/20 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/[0.15] transition-colors">
+                    <Icon size={15} className="text-[hsl(var(--dash-accent))]" />
                   </div>
                   <div>
-                    <p className="text-white text-sm font-medium">{label}</p>
-                    <p className="text-[#A78BFA]/40 text-xs mt-0.5">{desc}</p>
+                    <p className="text-[hsl(var(--dash-text))] text-[13px] font-medium">{label}</p>
+                    <p className="text-[hsl(var(--dash-text-subtle))] text-xs mt-0.5">{desc}</p>
                   </div>
                 </button>
               ))}

@@ -42,6 +42,19 @@
     --sidebar-accent-foreground: 263 60% 20%;
     --sidebar-border: 263 30% 90%;
     --sidebar-ring: 263 76% 50%;
+
+    /* Dashboard dark tokens */
+    --dash-bg: 258 56% 8%;
+    --dash-surface: 260 40% 12%;
+    --dash-surface-2: 260 35% 15%;
+    --dash-border: 260 30% 18%;
+    --dash-border-subtle: 260 20% 14%;
+    --dash-purple: 263 76% 50%;
+    --dash-purple-glow: 263 76% 50%;
+    --dash-accent: 263 52% 72%;
+    --dash-text: 0 0% 100%;
+    --dash-text-muted: 263 25% 55%;
+    --dash-text-subtle: 263 20% 40%;
   }
 }
 
@@ -51,6 +64,36 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* ── Utility classes for dashboard ── */
+@layer utilities {
+  .glass-card {
+    @apply bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))];
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300;
+  }
+  .glass-card-hover:hover {
+    border-color: hsl(var(--dash-border));
+    box-shadow: 0 0 0 1px hsl(var(--dash-border)),
+                0 8px 32px -8px hsla(var(--dash-purple), 0.08);
+  }
+  .glow-sm {
+    box-shadow: 0 0 20px -6px hsla(var(--dash-purple-glow), 0.15);
+  }
+  .glow-md {
+    box-shadow: 0 0 40px -8px hsla(var(--dash-purple-glow), 0.2);
+  }
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(var(--dash-accent)), hsl(var(--dash-purple)));
+  }
+  .dash-divider {
+    @apply border-t border-[hsl(var(--dash-border-subtle))];
   }
 }
 
@@ -71,9 +114,18 @@
   0%, 100% { transform: scale(1); }
   50%       { transform: scale(1.08); }
 }
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
 .wave-slow    { animation: waveDrift 48s linear infinite; }
 .wave-mid     { animation: waveDrift 34s linear infinite; }
 .wave-fast    { animation: waveDrift 22s linear infinite; }
 .wave-rev     { animation: waveDriftReverse 38s linear infinite; }
 .fade-in-up   { animation: fadeInUp 0.6s ease both; }
 .slot-pulse   { animation: countPulse 1.4s ease-in-out; }
+.shimmer {
+  background: linear-gradient(90deg, transparent, hsla(var(--dash-purple), 0.04), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
