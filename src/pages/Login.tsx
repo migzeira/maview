@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Eye, EyeOff, ArrowLeft, Check, X,
   Link2, Star, Zap, ShoppingBag, BarChart3,
-  TrendingUp, Users, DollarSign, Sparkles,
+  TrendingUp, Users, DollarSign, Sparkles, Timer, Flame,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -107,6 +107,77 @@ const InfiniteRow = ({ items, reverse = false }: { items: typeof TESTIMONIALS_RO
   );
 };
 
+/* ─── Animated Waves ─────────────────────────────────────────── */
+
+const AnimatedWaves = () => {
+  const waveContainer = (cls: string) => ({
+    position: "absolute" as const,
+    bottom: 0, left: 0,
+    width: "200%",
+    height: "100%",
+  });
+
+  return (
+    <>
+      {/* Bottom waves */}
+      <div className="absolute inset-x-0 bottom-0 pointer-events-none select-none overflow-hidden" style={{ height: 300, zIndex: 0 }}>
+        {/* Layer 1 — back, slowest, tallest */}
+        <div className="wave-slow" style={waveContainer("")}>
+          <svg viewBox="0 0 2880 300" preserveAspectRatio="none" style={{ width: "100%", height: "100%", display: "block" }}>
+            <defs>
+              <linearGradient id="wg1" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.07"/>
+                <stop offset="100%" stopColor="#4C1D95" stopOpacity="0.12"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,180 C360,90 720,270 1080,180 C1440,90 1800,270 2160,180 C2520,90 2880,270 3240,180 L3240,300 L0,300 Z" fill="url(#wg1)"/>
+          </svg>
+        </div>
+        {/* Layer 2 — mid */}
+        <div className="wave-mid" style={{ ...waveContainer(""), animationDelay: "-10s" }}>
+          <svg viewBox="0 0 2880 300" preserveAspectRatio="none" style={{ width: "100%", height: "100%", display: "block" }}>
+            <defs>
+              <linearGradient id="wg2" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.09"/>
+                <stop offset="100%" stopColor="#6D28D9" stopOpacity="0.15"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,220 C480,140 960,290 1440,220 C1920,140 2400,290 2880,220 L2880,300 L0,300 Z" fill="url(#wg2)"/>
+          </svg>
+        </div>
+        {/* Layer 3 — front, fastest, smallest */}
+        <div className="wave-fast" style={{ ...waveContainer(""), animationDelay: "-5s" }}>
+          <svg viewBox="0 0 2880 300" preserveAspectRatio="none" style={{ width: "100%", height: "100%", display: "block" }}>
+            <defs>
+              <linearGradient id="wg3" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#A78BFA" stopOpacity="0.12"/>
+                <stop offset="100%" stopColor="#7C3AED" stopOpacity="0.20"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,248 C240,212 480,278 720,248 C960,212 1200,278 1440,248 C1680,212 1920,278 2160,248 C2400,212 2640,278 2880,248 L2880,300 L0,300 Z" fill="url(#wg3)"/>
+          </svg>
+        </div>
+        {/* Soft glow at the very bottom */}
+        <div className="absolute inset-x-0 bottom-0 h-20" style={{ background: "linear-gradient(to top, rgba(109,40,217,0.10), transparent)" }} />
+      </div>
+
+      {/* Top subtle wave — very soft */}
+      <div className="absolute inset-x-0 top-0 pointer-events-none select-none overflow-hidden" style={{ height: 160, zIndex: 0 }}>
+        <div className="wave-rev" style={{ position: "absolute", top: 0, left: 0, width: "200%", height: "100%" }}>
+          <svg viewBox="0 0 2880 160" preserveAspectRatio="none" style={{ width: "100%", height: "100%", display: "block", transform: "rotate(180deg)" }}>
+            <path d="M0,80 C480,140 960,20 1440,80 C1920,140 2400,20 2880,80 L2880,160 L0,160 Z" fill="rgba(109,40,217,0.04)"/>
+          </svg>
+        </div>
+      </div>
+
+      {/* Ambient blobs */}
+      <div className="absolute top-[-10%] right-[-8%] w-[550px] h-[550px] rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(109,40,217,0.07) 0%, transparent 70%)" }} />
+      <div className="absolute bottom-[5%] left-[-8%] w-[450px] h-[450px] rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(167,139,250,0.06) 0%, transparent 70%)" }} />
+      <div className="absolute top-[40%] left-[30%] w-[300px] h-[300px] rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(139,92,246,0.04) 0%, transparent 70%)" }} />
+    </>
+  );
+};
+
 const isValidUsername = (val: string) => /^[a-z0-9-]{3,30}$/.test(val);
 
 /* ─── Page ────────────────────────────────────────────────────── */
@@ -127,6 +198,9 @@ const Login = () => {
   const [notification, setNotification] = useState<{ name: string; action: string; avatar: string } | null>(null);
   const [onlineCount] = useState(() => Math.floor(Math.random() * 30) + 38);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [slotsLeft, setSlotsLeft] = useState(() => Math.floor(Math.random() * 14) + 11); // 11-24
+  const [slotPulse, setSlotPulse] = useState(false);
+  const slotRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -144,6 +218,24 @@ const Login = () => {
     const t = setTimeout(show, 3000);
     const interval = setInterval(show, 9000);
     return () => { clearTimeout(t); clearInterval(interval); };
+  }, []);
+
+  // Contador de vagas — decrementa a cada 2-4 min (cria urgência)
+  useEffect(() => {
+    const decrement = () => {
+      setSlotsLeft((prev) => {
+        if (prev <= 3) return prev;
+        setSlotPulse(true);
+        setTimeout(() => setSlotPulse(false), 1500);
+        return prev - 1;
+      });
+    };
+    const randomMs = () => (Math.random() * 120000) + 90000; // 1.5–3.5 min
+    let t = setTimeout(function tick() {
+      decrement();
+      t = setTimeout(tick, randomMs());
+    }, randomMs());
+    return () => clearTimeout(t);
   }, []);
 
   const clearError = () => setError("");
@@ -226,37 +318,8 @@ const Login = () => {
   return (
     <div className="min-h-screen flex flex-col bg-maview-bg relative overflow-hidden">
 
-      {/* ── Background decorations ── */}
-      <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
-        {/* Soft purple blobs */}
-        <div className="absolute top-[-8%] right-[-5%] w-[500px] h-[500px] rounded-full bg-maview-purple/[0.06] blur-[100px]" />
-        <div className="absolute bottom-[-5%] left-[-5%] w-[400px] h-[400px] rounded-full bg-violet-400/[0.07] blur-[90px]" />
-        {/* Dot grid */}
-        <div className="absolute inset-0 opacity-[0.35]" style={{
-          backgroundImage: "radial-gradient(circle, #C4B5FD 1px, transparent 1px)",
-          backgroundSize: "28px 28px",
-        }} />
-        {/* M watermark */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <svg width="650" height="650" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-[0.04]">
-            <defs>
-              <linearGradient id="wmF" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
-                <stop offset="0%" stopColor="#6D28D9"/>
-                <stop offset="100%" stopColor="#4C1D95"/>
-              </linearGradient>
-              <linearGradient id="wmB" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
-                <stop offset="0%" stopColor="#7C3AED"/>
-                <stop offset="100%" stopColor="#2E1065"/>
-              </linearGradient>
-              <clipPath id="wmC"><rect width="100" height="100"/></clipPath>
-            </defs>
-            <g clipPath="url(#wmC)">
-              <polygon points="18,92 38,8 63,46 88,8 108,92" fill="url(#wmB)" opacity="0.6"/>
-              <polygon points="4,92 26,12 50,52 74,12 96,92" fill="url(#wmF)"/>
-            </g>
-          </svg>
-        </div>
-      </div>
+      {/* ── Animated wave background ── */}
+      <AnimatedWaves />
 
       {/* ── Notification pop-up ── */}
       <div className={`fixed bottom-6 left-6 z-50 transition-all duration-500 ${notification ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"}`}>
@@ -460,11 +523,16 @@ const Login = () => {
 
               {/* Scarcity banner */}
               {mode === "signup" && (
-                <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 mb-5">
-                  <Sparkles size={13} className="text-amber-500 flex-shrink-0" />
-                  <p className="text-amber-700 text-xs font-medium">
-                    <span className="font-bold">Beta gratuito</span> — vagas limitadas. Garanta a sua agora.
+                <div className="flex items-center gap-2.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl px-4 py-3 mb-5">
+                  <Flame size={14} className="text-orange-500 flex-shrink-0 animate-pulse" />
+                  <p className="text-amber-800 text-xs font-medium flex-1">
+                    <span className="font-bold">Beta gratuito</span> — apenas{" "}
+                    <span ref={slotRef} className={`font-extrabold text-orange-600 text-sm ${slotPulse ? "slot-pulse inline-block" : ""}`}>
+                      {slotsLeft}
+                    </span>
+                    {" "}vagas restantes hoje.
                   </p>
+                  <Timer size={12} className="text-amber-500 flex-shrink-0" />
                 </div>
               )}
 
@@ -568,8 +636,10 @@ const Login = () => {
                 <div className="mt-1">
                   <button type="submit"
                     disabled={isLoading || (mode === "signup" && usernameStatus !== "available")}
-                    className="w-full h-12 rounded-xl bg-gradient-to-r from-maview-purple to-violet-600 text-white text-sm font-bold transition-all duration-200 hover:shadow-lg hover:shadow-maview-purple/30 hover:brightness-105 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+                    className="relative w-full h-12 rounded-xl bg-gradient-to-r from-maview-purple to-violet-600 text-white text-sm font-bold transition-all duration-200 hover:shadow-xl hover:shadow-maview-purple/40 hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] overflow-hidden group"
                   >
+                    {/* Shine sweep on hover */}
+                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none" />
                     {isLoading ? (
                       <div className="flex items-center justify-center gap-2">
                         <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
