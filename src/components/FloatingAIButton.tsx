@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import robotImg from "@/assets/ai-robot.png";
+import MaviewLogo from "./MaviewLogo";
 
 const FloatingAIButton = () => {
   const navigate = useNavigate();
@@ -10,18 +10,10 @@ const FloatingAIButton = () => {
   return (
     <button
       onClick={() => navigate("/dashboard/ia")}
-      className="fixed bottom-5 right-5 z-50 w-[72px] h-[72px] rounded-full flex items-center justify-center hover:scale-110 transition-all duration-200 animate-[fadeInUp_0.4s_ease_both] group"
+      className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full btn-primary-gradient flex items-center justify-center hover:scale-105 transition-all duration-200 animate-[fadeInUp_0.4s_ease_both]"
       aria-label="Abrir IA Maview"
-      style={{
-        background: "linear-gradient(135deg, #7C5CFC 0%, #8B5CF6 50%, #6D28D9 100%)",
-        boxShadow: "0 8px 28px rgba(109, 40, 217, 0.4), 0 2px 8px rgba(139, 92, 246, 0.25)",
-      }}
     >
-      <img
-        src={robotImg}
-        alt="Assistente IA Maview"
-        className="w-14 h-14 object-contain drop-shadow-lg"
-      />
+      <MaviewLogo size={28} />
     </button>
   );
 };
