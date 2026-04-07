@@ -3,6 +3,7 @@ import {
   Eye, EyeOff, ArrowLeft, Check, X,
   Link2, Star, Zap, ShoppingBag, BarChart3,
   TrendingUp, Users, DollarSign, Sparkles, Timer, Flame,
+  Instagram, Palette, Globe,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,9 +36,36 @@ const MaviewLogo = ({ size = 36 }: { size?: number }) => (
 /* ─── Static data ─────────────────────────────────────────────── */
 
 const FEATURES = [
-  { icon: Link2,       label: "Link na bio profissional", desc: "Uma URL para tudo que você cria" },
-  { icon: ShoppingBag, label: "Loja sem taxas abusivas",  desc: "Venda produtos digitais e físicos" },
-  { icon: BarChart3,   label: "Analytics em tempo real",  desc: "Veja cliques, visitas e vendas" },
+  {
+    icon: Instagram,
+    label: "Todas as suas redes em 1 link",
+    desc: "Instagram, YouTube, TikTok, WhatsApp — tudo num só lugar",
+    badge: null,
+  },
+  {
+    icon: Globe,
+    label: "Link na bio profissional",
+    desc: "Seu link personalizado: maview.app/seunome",
+    badge: null,
+  },
+  {
+    icon: ShoppingBag,
+    label: "Loja sem taxa de venda",
+    desc: "Venda cursos, produtos digitais e físicos — 0% de comissão",
+    badge: "0%",
+  },
+  {
+    icon: Palette,
+    label: "Temas totalmente personalizáveis",
+    desc: "Escolha cores, fontes e layouts que combinam com você",
+    badge: null,
+  },
+  {
+    icon: BarChart3,
+    label: "Analytics em tempo real",
+    desc: "Veja cliques, visitas e de onde vêm seus seguidores",
+    badge: null,
+  },
 ];
 
 const STATS = [
@@ -369,20 +397,34 @@ const Login = () => {
             </h1>
 
             <p className="text-maview-text-sub text-lg leading-relaxed mb-10">
-              Combine link na bio + loja digital em um único lugar.
-              Sem taxas absurdas. Sem engessamento de temas.
+              Para quem quer centralizar redes sociais, vender online
+              ou simplesmente ter uma presença digital profissional —
+              <span className="text-maview-text font-semibold"> sem pagar taxa de venda.</span>
             </p>
 
             {/* Features */}
-            <div className="space-y-4 mb-12">
-              {FEATURES.map(({ icon: Icon, label, desc }) => (
-                <div key={label} className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-maview-purple-soft border border-maview-purple/15 flex items-center justify-center flex-shrink-0">
-                    <Icon size={18} className="text-maview-purple" />
+            <div className="space-y-3 mb-12">
+              {FEATURES.map(({ icon: Icon, label, desc, badge }) => (
+                <div key={label} className="flex items-center gap-3 group">
+                  {/* Icon box */}
+                  <div className="w-9 h-9 rounded-xl bg-maview-purple-soft border border-maview-purple/15 flex items-center justify-center flex-shrink-0 group-hover:bg-maview-purple group-hover:border-maview-purple transition-all duration-200">
+                    <Icon size={16} className="text-maview-purple group-hover:text-white transition-colors duration-200" />
                   </div>
-                  <div>
-                    <p className="text-maview-text text-sm font-semibold">{label}</p>
-                    <p className="text-maview-muted text-xs">{desc}</p>
+                  {/* Text */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-maview-text text-sm font-semibold leading-tight">{label}</p>
+                      {badge && (
+                        <span className="text-[10px] font-extrabold text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full flex-shrink-0">
+                          {badge} taxa
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-maview-muted text-xs mt-0.5">{desc}</p>
+                  </div>
+                  {/* Check */}
+                  <div className="w-4 h-4 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center flex-shrink-0">
+                    <Check size={9} className="text-emerald-600" strokeWidth={3} />
                   </div>
                 </div>
               ))}
