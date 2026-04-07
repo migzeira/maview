@@ -75,7 +75,7 @@ const DashboardBlocos = () => {
             </div>
             <button
               onClick={() => setShowModal(true)}
-              className="flex items-center gap-2 bg-primary text-primary-foreground text-[13px] font-medium px-4 py-2.5 rounded-xl hover:bg-primary/90 transition-all active:scale-[0.98] glow-sm"
+              className="flex items-center gap-2 btn-primary-gradient text-[13px] px-4 py-2.5 rounded-xl active:scale-[0.98]"
             >
               <Plus size={15} /> Criar bloco
             </button>
@@ -101,7 +101,7 @@ const DashboardBlocos = () => {
                     className={`
                       flex items-center gap-3 rounded-2xl border p-4 transition-all duration-200 cursor-pointer group
                       ${selectedBlock === block.id
-                        ? "border-primary/40 bg-primary/[0.06] ring-1 ring-primary/10"
+                        ? "border-primary/30 bg-[hsl(var(--dash-accent))]/50 ring-1 ring-primary/10"
                         : "glass-card-hover"
                       }
                       ${!block.active ? "opacity-50" : ""}
@@ -109,21 +109,21 @@ const DashboardBlocos = () => {
                     `}
                   >
                     <GripVertical size={15} className="text-[hsl(var(--dash-text-subtle))] cursor-grab flex-shrink-0 opacity-40 group-hover:opacity-70 transition-opacity" />
-                    <div className="w-10 h-10 rounded-xl bg-primary/[0.08] ring-1 ring-primary/20 flex items-center justify-center flex-shrink-0">
-                      <Icon size={17} className="text-[hsl(var(--dash-accent))]" />
+                    <div className="w-10 h-10 rounded-xl bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Icon size={17} className="text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[hsl(var(--dash-text))] text-[13px] font-medium truncate">{block.title}</p>
                       <p className="text-[hsl(var(--dash-text-subtle))] text-xs truncate mt-0.5">{block.description}</p>
                     </div>
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={(e) => { e.stopPropagation(); duplicateBlock(block.id); }} className="p-1.5 rounded-lg text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-accent))] hover:bg-[hsl(var(--dash-surface-2))] transition-all">
+                      <button onClick={(e) => { e.stopPropagation(); duplicateBlock(block.id); }} className="p-1.5 rounded-lg text-[hsl(var(--dash-text-subtle))] hover:text-primary hover:bg-[hsl(var(--dash-surface-2))] transition-all">
                         <Copy size={13} />
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); setSelectedBlock(block.id); }} className="p-1.5 rounded-lg text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-accent))] hover:bg-[hsl(var(--dash-surface-2))] transition-all">
+                      <button onClick={(e) => { e.stopPropagation(); setSelectedBlock(block.id); }} className="p-1.5 rounded-lg text-[hsl(var(--dash-text-subtle))] hover:text-primary hover:bg-[hsl(var(--dash-surface-2))] transition-all">
                         <Pencil size={13} />
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); deleteBlock(block.id); }} className="p-1.5 rounded-lg text-[hsl(var(--dash-text-subtle))] hover:text-red-400 hover:bg-red-500/[0.08] transition-all">
+                      <button onClick={(e) => { e.stopPropagation(); deleteBlock(block.id); }} className="p-1.5 rounded-lg text-[hsl(var(--dash-text-subtle))] hover:text-red-500 hover:bg-red-50 transition-all">
                         <Trash2 size={13} />
                       </button>
                     </div>
@@ -149,28 +149,28 @@ const DashboardBlocos = () => {
           <div className="sticky top-8">
             <p className="text-[hsl(var(--dash-text-subtle))] text-xs font-medium mb-3 uppercase tracking-wider">Pré-visualização</p>
             <div className="relative">
-              <div className="rounded-[2.5rem] border-[3px] border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-bg))] p-3 shadow-2xl glow-md">
+              <div className="rounded-[2.5rem] border-[3px] border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-surface))] p-3 shadow-xl">
                 <div className="flex justify-center mb-2">
-                  <div className="w-20 h-5 rounded-full bg-black/60" />
+                  <div className="w-20 h-5 rounded-full bg-[hsl(var(--dash-surface-2))]" />
                 </div>
-                <div className="rounded-[1.8rem] bg-gradient-to-b from-[hsl(var(--dash-surface))] to-[hsl(var(--dash-bg))] min-h-[500px] p-5 space-y-3 overflow-hidden">
+                <div className="rounded-[1.8rem] bg-gradient-to-b from-[hsl(var(--dash-bg))] to-[hsl(var(--dash-surface))] min-h-[500px] p-5 space-y-3 overflow-hidden">
                   <div className="flex flex-col items-center mb-5">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-[hsl(263,76%,30%)] mb-2.5 ring-2 ring-primary/20" />
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary mb-2.5 ring-2 ring-primary/10" />
                     <p className="text-[hsl(var(--dash-text))] text-sm font-semibold">@usuario</p>
                     <p className="text-[hsl(var(--dash-text-subtle))] text-xs mt-0.5">Minha vitrine digital</p>
                   </div>
                   {blocks.filter(b => b.active).map(block => {
-                    const Icon = getBlockIcon(block.type);
+                    const BlockIcon = getBlockIcon(block.type);
                     return (
                       <div
                         key={block.id}
                         className={`flex items-center gap-3 rounded-xl border p-3 transition-all ${
                           selectedBlock === block.id
-                            ? "border-primary bg-primary/[0.12] ring-1 ring-primary/20 glow-sm"
-                            : "border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface))]/50"
+                            ? "border-primary bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10"
+                            : "border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface))]"
                         }`}
                       >
-                        <Icon size={13} className="text-[hsl(var(--dash-accent))] flex-shrink-0" />
+                        <BlockIcon size={13} className="text-primary flex-shrink-0" />
                         <span className="text-[hsl(var(--dash-text))] text-xs truncate">{block.title}</span>
                       </div>
                     );
@@ -185,8 +185,8 @@ const DashboardBlocos = () => {
       {/* Add block modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowModal(false)} />
-          <div className="relative glass-card rounded-2xl p-6 md:p-7 w-full max-w-lg shadow-2xl glow-md animate-scale-in">
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setShowModal(false)} />
+          <div className="relative glass-card rounded-2xl p-6 md:p-7 w-full max-w-lg shadow-2xl animate-scale-in">
             <div className="flex items-center justify-between mb-7">
               <h3 className="text-[hsl(var(--dash-text))] font-semibold text-lg">Escolha o tipo de bloco</h3>
               <button onClick={() => setShowModal(false)} className="text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] transition-colors p-1">
@@ -198,10 +198,10 @@ const DashboardBlocos = () => {
                 <button
                   key={type}
                   onClick={() => addBlock(type)}
-                  className="flex items-start gap-3 p-4 rounded-xl border border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface-2))]/50 hover:border-primary/30 hover:bg-primary/[0.06] transition-all text-left group"
+                  className="flex items-start gap-3 p-4 rounded-xl border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 hover:bg-[hsl(var(--dash-accent))]/50 transition-all text-left group"
                 >
-                  <div className="w-9 h-9 rounded-lg bg-primary/[0.08] ring-1 ring-primary/20 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/[0.15] transition-colors">
-                    <Icon size={15} className="text-[hsl(var(--dash-accent))]" />
+                  <div className="w-9 h-9 rounded-lg bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center flex-shrink-0 group-hover:ring-primary/20 transition-all">
+                    <Icon size={15} className="text-primary" />
                   </div>
                   <div>
                     <p className="text-[hsl(var(--dash-text))] text-[13px] font-medium">{label}</p>

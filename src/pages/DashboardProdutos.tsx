@@ -25,7 +25,7 @@ const DashboardProdutos = () => {
           <h1 className="text-2xl md:text-[28px] font-bold text-[hsl(var(--dash-text))] tracking-tight">Produtos</h1>
           <p className="text-[hsl(var(--dash-text-muted))] text-[15px]">Gerencie seus produtos digitais</p>
         </div>
-        <button className="flex items-center gap-2 bg-primary text-primary-foreground text-[13px] font-medium px-4 py-2.5 rounded-xl hover:bg-primary/90 transition-all glow-sm">
+        <button className="flex items-center gap-2 btn-primary-gradient text-[13px] px-4 py-2.5 rounded-xl">
           <Plus size={15} /> Criar produto
         </button>
       </div>
@@ -42,8 +42,8 @@ const DashboardProdutos = () => {
               key={product.id}
               className="glass-card-hover flex items-center gap-4 rounded-2xl p-5 group"
             >
-              <div className="w-11 h-11 rounded-xl bg-primary/[0.08] ring-1 ring-primary/20 flex items-center justify-center flex-shrink-0">
-                <ShoppingBag size={18} className="text-[hsl(var(--dash-accent))]" />
+              <div className="w-11 h-11 rounded-xl bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center flex-shrink-0">
+                <ShoppingBag size={18} className="text-primary" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[hsl(var(--dash-text))] text-[13px] font-medium truncate">{product.name}</p>
@@ -52,7 +52,7 @@ const DashboardProdutos = () => {
               <p className="text-[hsl(var(--dash-text))] font-semibold text-sm tabular-nums">{product.price}</p>
               <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
                 product.status === "ativo"
-                  ? "bg-emerald-500/[0.08] text-emerald-400 ring-1 ring-emerald-500/20"
+                  ? "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100"
                   : "bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text-subtle))] ring-1 ring-[hsl(var(--dash-border-subtle))]"
               }`}>
                 {product.status === "ativo" ? "Ativo" : "Rascunho"}

@@ -7,10 +7,10 @@ const DashboardConfiguracoes = () => (
       <p className="text-[hsl(var(--dash-text-muted))] text-[15px]">Gerencie sua conta e preferências</p>
     </div>
     <div className="glass-card rounded-2xl text-center py-20">
-      <div className="w-14 h-14 rounded-2xl bg-primary/[0.08] ring-1 ring-primary/20 flex items-center justify-center mx-auto mb-4">
-        <Settings size={24} className="text-[hsl(var(--dash-text-subtle))]" />
+      <div className="w-14 h-14 rounded-2xl bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center mx-auto mb-4">
+        <Settings size={24} className="text-primary/40" />
       </div>
-      <p className="text-[hsl(var(--dash-text))]/60 text-sm mb-1">Em breve</p>
+      <p className="text-[hsl(var(--dash-text-secondary))] text-sm mb-1">Em breve</p>
       <p className="text-[hsl(var(--dash-text-subtle))] text-xs">As configurações da sua conta estarão disponíveis aqui</p>
     </div>
   </div>

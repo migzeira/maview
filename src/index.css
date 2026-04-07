@@ -4,57 +4,60 @@
 
 @layer base {
   :root {
-    --background: 250 100% 99%;
-    --foreground: 263 60% 8%;
+    --background: 250 33% 98%;
+    --foreground: 260 40% 14%;
 
     --card: 0 0% 100%;
-    --card-foreground: 263 60% 8%;
+    --card-foreground: 260 40% 14%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 263 60% 8%;
+    --popover-foreground: 260 40% 14%;
 
     --primary: 263 76% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 263 30% 96%;
-    --secondary-foreground: 263 60% 20%;
+    --secondary: 258 90% 66%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 263 20% 95%;
-    --muted-foreground: 263 15% 50%;
+    --muted: 260 40% 96%;
+    --muted-foreground: 260 15% 50%;
 
-    --accent: 263 76% 50%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 263 85% 96%;
+    --accent-foreground: 263 76% 50%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 263 30% 90%;
-    --input: 263 30% 92%;
+    --border: 260 20% 92%;
+    --input: 260 20% 93%;
     --ring: 263 76% 50%;
 
     --radius: 0.75rem;
 
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 263 15% 40%;
+    --sidebar-foreground: 260 20% 40%;
     --sidebar-primary: 263 76% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 263 30% 96%;
-    --sidebar-accent-foreground: 263 60% 20%;
-    --sidebar-border: 263 30% 90%;
+    --sidebar-accent: 263 85% 96%;
+    --sidebar-accent-foreground: 263 76% 50%;
+    --sidebar-border: 260 20% 92%;
     --sidebar-ring: 263 76% 50%;
 
-    /* Dashboard dark tokens */
-    --dash-bg: 258 56% 8%;
-    --dash-surface: 260 40% 12%;
-    --dash-surface-2: 260 35% 15%;
-    --dash-border: 260 30% 18%;
-    --dash-border-subtle: 260 20% 14%;
+    /* Dashboard light tokens */
+    --dash-bg: 250 33% 98%;
+    --dash-surface: 0 0% 100%;
+    --dash-surface-2: 260 30% 97%;
+    --dash-border: 260 20% 90%;
+    --dash-border-subtle: 260 15% 93%;
     --dash-purple: 263 76% 50%;
     --dash-purple-glow: 263 76% 50%;
-    --dash-accent: 263 52% 72%;
-    --dash-text: 0 0% 100%;
-    --dash-text-muted: 263 25% 55%;
-    --dash-text-subtle: 263 20% 40%;
+    --dash-purple-light: 258 90% 66%;
+    --dash-accent: 263 85% 96%;
+    --dash-accent-fg: 263 76% 50%;
+    --dash-text: 260 40% 14%;
+    --dash-text-secondary: 260 20% 35%;
+    --dash-text-muted: 260 15% 50%;
+    --dash-text-subtle: 260 10% 65%;
   }
 }
 
@@ -71,29 +74,38 @@
 @layer utilities {
   .glass-card {
     @apply bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))];
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 1px 3px 0 hsla(260, 30%, 20%, 0.04),
+                0 1px 2px -1px hsla(260, 30%, 20%, 0.03);
   }
   .glass-card-hover {
     @apply glass-card transition-all duration-300;
   }
   .glass-card-hover:hover {
     border-color: hsl(var(--dash-border));
-    box-shadow: 0 0 0 1px hsl(var(--dash-border)),
-                0 8px 32px -8px hsla(var(--dash-purple), 0.08);
+    box-shadow: 0 4px 16px -4px hsla(260, 30%, 20%, 0.08),
+                0 2px 4px -2px hsla(260, 30%, 20%, 0.04);
   }
   .glow-sm {
-    box-shadow: 0 0 20px -6px hsla(var(--dash-purple-glow), 0.15);
+    box-shadow: 0 2px 12px -3px hsla(var(--dash-purple-glow), 0.25);
   }
   .glow-md {
-    box-shadow: 0 0 40px -8px hsla(var(--dash-purple-glow), 0.2);
+    box-shadow: 0 4px 24px -4px hsla(var(--dash-purple-glow), 0.2);
   }
   .text-gradient {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(var(--dash-accent)), hsl(var(--dash-purple)));
+    background-image: linear-gradient(135deg, hsl(var(--dash-purple)), hsl(var(--dash-purple-light)));
   }
   .dash-divider {
     @apply border-t border-[hsl(var(--dash-border-subtle))];
+  }
+  .btn-primary-gradient {
+    background: linear-gradient(135deg, hsl(var(--dash-purple)), hsl(var(--dash-purple-light)));
+    @apply text-white font-medium transition-all duration-200;
+    box-shadow: 0 2px 12px -3px hsla(var(--dash-purple-glow), 0.3);
+  }
+  .btn-primary-gradient:hover {
+    box-shadow: 0 4px 20px -4px hsla(var(--dash-purple-glow), 0.45);
+    filter: brightness(1.05);
   }
 }
 
@@ -125,7 +137,7 @@
 .fade-in-up   { animation: fadeInUp 0.6s ease both; }
 .slot-pulse   { animation: countPulse 1.4s ease-in-out; }
 .shimmer {
-  background: linear-gradient(90deg, transparent, hsla(var(--dash-purple), 0.04), transparent);
+  background: linear-gradient(90deg, transparent, hsla(var(--dash-purple), 0.03), transparent);
   background-size: 200% 100%;
   animation: shimmer 3s ease-in-out infinite;
 }
