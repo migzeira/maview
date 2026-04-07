@@ -10,7 +10,7 @@ const FloatingAIButton = () => {
   return (
     <button
       onClick={() => navigate("/dashboard/ia")}
-      className="fixed bottom-6 right-6 z-50 hover:scale-110 transition-all duration-200 animate-bounce drop-shadow-lg"
+      className="fixed bottom-6 right-6 z-50 hover:scale-110 transition-all duration-200 drop-shadow-lg animate-[bounce_1.5s_ease-in-out_3]"
       aria-label="Abrir IA Maview"
     >
       <MaviewLogo size={44} />
