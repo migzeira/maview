@@ -277,13 +277,45 @@ const ProfilePage = () => {
   const [copied, setCopied]     = useState(false);
   const [heroVis, setHeroVis]   = useState(false);
 
-  const productStagger     = useStagger(3, 220, 80);
-  const linkStagger        = useStagger(5, 380, 55);
-  const testimonialStagger = useStagger(3, 520, 90);
+  const productStagger     = useStagger(10, 220, 80);
+  const linkStagger        = useStagger(10, 380, 55);
+  const testimonialStagger = useStagger(10, 520, 90);
 
   useEffect(() => {
     setTimeout(() => {
-      const found = MOCK_PROFILES[username?.toLowerCase() || ""];
+      const slug = username?.toLowerCase() || "";
+
+      // 1️⃣ Try localStorage config saved by DashboardPagina
+      try {
+        const stored = localStorage.getItem("maview_vitrine_config");
+        if (stored) {
+          const cfg = JSON.parse(stored);
+          // match by username OR show owner's own profile
+          if (cfg.username && (cfg.username.toLowerCase() === slug || slug === "demo")) {
+            const lsProfile: ProfileData = {
+              username: cfg.username,
+              displayName: cfg.displayName || cfg.username,
+              bio: cfg.bio || "",
+              avatar: cfg.avatarUrl || undefined,
+              theme: cfg.theme || "dark-purple",
+              whatsapp: cfg.whatsapp || undefined,
+              products: (cfg.products || []).filter((p: any) => p.active),
+              links: (cfg.links || []).filter((l: any) => l.active),
+              testimonials: cfg.testimonials || [],
+              stats: undefined,
+            };
+            setProfile(lsProfile);
+            setTimeout(() => setHeroVis(true), 80);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch {
+        // fallback to mock
+      }
+
+      // 2️⃣ Fallback: mock profiles (demo page)
+      const found = MOCK_PROFILES[slug];
       if (found) { setProfile(found); setTimeout(() => setHeroVis(true), 80); }
       else setNotFound(true);
       setLoading(false);
