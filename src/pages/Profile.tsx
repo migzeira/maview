@@ -7,22 +7,10 @@ import {
 
 /* ─── Logo ────────────────────────────────────────────────────── */
 
+import logoSrc from "@/assets/maview-logo.png";
+
 const MaviewLogo = ({ size = 16 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="pFront" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
-        <stop offset="0%" stopColor="#8B5CF6"/><stop offset="100%" stopColor="#4C1D95"/>
-      </linearGradient>
-      <linearGradient id="pBack" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
-        <stop offset="0%" stopColor="#5B21B6"/><stop offset="100%" stopColor="#1A0A35"/>
-      </linearGradient>
-      <clipPath id="pClip"><rect width="100" height="100"/></clipPath>
-    </defs>
-    <g clipPath="url(#pClip)">
-      <polygon points="18,92 38,8 63,46 88,8 108,92" fill="url(#pBack)" opacity="0.68"/>
-      <polygon points="4,92 26,12 50,52 74,12 96,92" fill="url(#pFront)"/>
-    </g>
-  </svg>
+  <img src={logoSrc} alt="Maview" width={size} height={size} className="object-contain" style={{ width: size, height: size }} />
 );
 
 /* ─── Types ───────────────────────────────────────────────────── */
