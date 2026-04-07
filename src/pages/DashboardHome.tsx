@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import {
   DollarSign, MousePointer, TrendingUp, ShoppingCart,
-  CheckCircle2, Circle, Plus, Blocks, ShoppingBag, Layout,
+  CheckCircle2, Circle, Blocks, ShoppingBag, Layout,
   ArrowRight, Sparkles, Zap,
 } from "lucide-react";
 
@@ -15,10 +15,10 @@ const STATS = [
 ];
 
 const accentMap: Record<string, { icon: string; bg: string; ring: string }> = {
-  emerald: { icon: "text-emerald-400", bg: "bg-emerald-500/[0.08]", ring: "ring-emerald-500/20" },
-  blue: { icon: "text-blue-400", bg: "bg-blue-500/[0.08]", ring: "ring-blue-500/20" },
-  amber: { icon: "text-amber-400", bg: "bg-amber-500/[0.08]", ring: "ring-amber-500/20" },
-  purple: { icon: "text-[hsl(var(--dash-accent))]", bg: "bg-primary/[0.08]", ring: "ring-primary/20" },
+  emerald: { icon: "text-emerald-600", bg: "bg-emerald-50", ring: "ring-emerald-100" },
+  blue: { icon: "text-blue-600", bg: "bg-blue-50", ring: "ring-blue-100" },
+  amber: { icon: "text-amber-600", bg: "bg-amber-50", ring: "ring-amber-100" },
+  purple: { icon: "text-primary", bg: "bg-[hsl(var(--dash-accent))]", ring: "ring-primary/10" },
 };
 
 const CHECKLIST = [
@@ -60,10 +60,7 @@ const DashboardHome = () => {
         {STATS.map(({ label, value, icon: Icon, accent }) => {
           const a = accentMap[accent];
           return (
-            <div
-              key={label}
-              className="glass-card-hover rounded-2xl p-5 md:p-6 group"
-            >
+            <div key={label} className="glass-card-hover rounded-2xl p-5 md:p-6 group">
               <div className={`w-10 h-10 rounded-xl ${a.bg} ring-1 ${a.ring} flex items-center justify-center mb-4`}>
                 <Icon size={18} className={a.icon} />
               </div>
@@ -78,8 +75,8 @@ const DashboardHome = () => {
         {/* Progress checklist */}
         <div className="glass-card rounded-2xl p-6 md:p-7">
           <div className="flex items-center gap-2.5 mb-6">
-            <div className="w-8 h-8 rounded-lg bg-primary/[0.08] ring-1 ring-primary/20 flex items-center justify-center">
-              <Sparkles size={15} className="text-[hsl(var(--dash-accent))]" />
+            <div className="w-8 h-8 rounded-lg bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center">
+              <Sparkles size={15} className="text-primary" />
             </div>
             <div>
               <h2 className="text-[hsl(var(--dash-text))] font-semibold text-[15px]">Primeiros passos</h2>
@@ -95,11 +92,11 @@ const DashboardHome = () => {
                 }`}
               >
                 {done ? (
-                  <CheckCircle2 size={18} className="text-emerald-400 flex-shrink-0" />
+                  <CheckCircle2 size={18} className="text-emerald-500 flex-shrink-0" />
                 ) : (
                   <Circle size={18} className="text-[hsl(var(--dash-text-subtle))] flex-shrink-0" strokeWidth={1.5} />
                 )}
-                <span className={`text-[13px] flex-1 ${done ? "text-[hsl(var(--dash-text-muted))] line-through" : "text-[hsl(var(--dash-text))]/80"}`}>
+                <span className={`text-[13px] flex-1 ${done ? "text-[hsl(var(--dash-text-muted))] line-through" : "text-[hsl(var(--dash-text-secondary))]"}`}>
                   {label}
                 </span>
                 {!done && path && (
@@ -115,7 +112,7 @@ const DashboardHome = () => {
           </div>
           <div className="mt-5 px-3">
             <div className="h-1.5 rounded-full bg-[hsl(var(--dash-surface-2))] overflow-hidden">
-              <div className="h-full w-1/4 rounded-full bg-gradient-to-r from-primary to-[hsl(var(--dash-accent))] transition-all duration-500" />
+              <div className="h-full w-1/4 rounded-full bg-gradient-to-r from-primary to-secondary transition-all duration-500" />
             </div>
             <p className="text-xs text-[hsl(var(--dash-text-subtle))] mt-2">1 de 4 concluído</p>
           </div>
@@ -124,8 +121,8 @@ const DashboardHome = () => {
         {/* Quick actions */}
         <div className="glass-card rounded-2xl p-6 md:p-7">
           <div className="flex items-center gap-2.5 mb-6">
-            <div className="w-8 h-8 rounded-lg bg-primary/[0.08] ring-1 ring-primary/20 flex items-center justify-center">
-              <Zap size={15} className="text-[hsl(var(--dash-accent))]" />
+            <div className="w-8 h-8 rounded-lg bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center">
+              <Zap size={15} className="text-primary" />
             </div>
             <div>
               <h2 className="text-[hsl(var(--dash-text))] font-semibold text-[15px]">Ações rápidas</h2>
@@ -137,16 +134,16 @@ const DashboardHome = () => {
               <Link
                 key={label}
                 to={path}
-                className="flex items-center gap-4 p-4 rounded-xl bg-[hsl(var(--dash-surface-2))]/50 border border-transparent hover:border-[hsl(var(--dash-border))] hover:bg-[hsl(var(--dash-surface-2))] transition-all duration-200 group"
+                className="flex items-center gap-4 p-4 rounded-xl border border-transparent hover:border-[hsl(var(--dash-border))] hover:bg-[hsl(var(--dash-surface-2))] transition-all duration-200 group"
               >
-                <div className="w-10 h-10 rounded-xl bg-primary/[0.08] ring-1 ring-primary/20 flex items-center justify-center group-hover:bg-primary/[0.12] transition-colors">
-                  <Icon size={18} className="text-[hsl(var(--dash-accent))]" />
+                <div className="w-10 h-10 rounded-xl bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center group-hover:ring-primary/20 transition-all">
+                  <Icon size={18} className="text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[hsl(var(--dash-text))] text-[13px] font-medium">{label}</p>
                   <p className="text-[hsl(var(--dash-text-subtle))] text-xs mt-0.5">{desc}</p>
                 </div>
-                <ArrowRight size={15} className="text-[hsl(var(--dash-text-subtle))] group-hover:text-[hsl(var(--dash-accent))] group-hover:translate-x-0.5 transition-all" />
+                <ArrowRight size={15} className="text-[hsl(var(--dash-text-subtle))] group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
               </Link>
             ))}
           </div>

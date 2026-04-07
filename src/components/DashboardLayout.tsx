@@ -96,8 +96,8 @@ const DashboardLayout = ({ children }: Props) => {
                 flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium
                 transition-all duration-200 group relative
                 ${active
-                  ? "bg-primary/[0.12] text-[hsl(var(--dash-text))]"
-                  : "text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))]"
+                  ? "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-accent-fg))]"
+                  : "text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text-secondary))] hover:bg-[hsl(var(--dash-surface-2))]"
                 }
               `}
             >
@@ -107,7 +107,7 @@ const DashboardLayout = ({ children }: Props) => {
               <Icon
                 size={17}
                 strokeWidth={active ? 2.2 : 1.8}
-                className={`transition-colors ${active ? "text-[hsl(var(--dash-accent))]" : "text-[hsl(var(--dash-text-subtle))] group-hover:text-[hsl(var(--dash-accent))]"}`}
+                className={`transition-colors ${active ? "text-primary" : "text-[hsl(var(--dash-text-subtle))] group-hover:text-primary/60"}`}
               />
               {!collapsed && <span>{label}</span>}
             </Link>
@@ -120,7 +120,7 @@ const DashboardLayout = ({ children }: Props) => {
         <div className="dash-divider mb-3" />
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="flex items-center justify-center w-full py-2 rounded-xl text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-accent))] hover:bg-[hsl(var(--dash-surface-2))] transition-all"
+          className="flex items-center justify-center w-full py-2 rounded-xl text-[hsl(var(--dash-text-subtle))] hover:text-primary hover:bg-[hsl(var(--dash-surface-2))] transition-all"
         >
           {collapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
         </button>
@@ -135,7 +135,7 @@ const DashboardLayout = ({ children }: Props) => {
         className={`
           hidden md:flex flex-col flex-shrink-0 
           border-r border-[hsl(var(--dash-border-subtle))]
-          bg-[hsl(var(--dash-bg))]
+          bg-[hsl(var(--dash-surface))]
           transition-all duration-300
           ${collapsed ? "w-[68px]" : "w-[240px]"}
         `}
@@ -146,8 +146,8 @@ const DashboardLayout = ({ children }: Props) => {
       {/* Mobile sidebar overlay */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <aside className="absolute left-0 top-0 bottom-0 w-[260px] bg-[hsl(var(--dash-bg))] border-r border-[hsl(var(--dash-border-subtle))] shadow-2xl">
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+          <aside className="absolute left-0 top-0 bottom-0 w-[260px] bg-[hsl(var(--dash-surface))] border-r border-[hsl(var(--dash-border-subtle))] shadow-2xl">
             <SidebarContent />
           </aside>
         </div>
@@ -156,7 +156,7 @@ const DashboardLayout = ({ children }: Props) => {
       {/* Main area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Topbar */}
-        <header className="h-16 flex items-center justify-between px-4 md:px-6 border-b border-[hsl(var(--dash-border-subtle))] flex-shrink-0 bg-[hsl(var(--dash-bg))]/80 backdrop-blur-xl z-10">
+        <header className="h-16 flex items-center justify-between px-4 md:px-6 border-b border-[hsl(var(--dash-border-subtle))] flex-shrink-0 bg-[hsl(var(--dash-surface))]/80 backdrop-blur-xl z-10">
           <div className="flex items-center gap-3">
             <button onClick={() => setMobileOpen(true)} className="md:hidden text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))]">
               <Menu size={20} />
@@ -164,10 +164,10 @@ const DashboardLayout = ({ children }: Props) => {
             {/* Profile URL */}
             <button
               onClick={copyLink}
-              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 transition-all text-[13px] text-[hsl(var(--dash-text-muted))] font-mono"
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 transition-all text-[13px] text-[hsl(var(--dash-text-muted))] font-mono"
             >
               {profileUrl}
-              {copied ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} className="opacity-50" />}
+              {copied ? <Check size={13} className="text-emerald-500" /> : <Copy size={13} className="opacity-40" />}
             </button>
           </div>
 
@@ -176,17 +176,17 @@ const DashboardLayout = ({ children }: Props) => {
               href={`https://${profileUrl}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-primary text-primary-foreground text-[13px] font-medium hover:bg-primary/90 transition-all glow-sm"
+              className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg btn-primary-gradient text-[13px]"
             >
               <ExternalLink size={13} />
               <span className="hidden sm:inline">Ver minha página</span>
             </a>
 
-            <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))]">
-              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-[hsl(263,76%,30%)] flex items-center justify-center text-primary-foreground text-xs font-bold ring-2 ring-primary/20">
+            <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))]">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-primary-foreground text-xs font-bold ring-2 ring-primary/10">
                 {displayName.charAt(0).toUpperCase()}
               </div>
-              <span className="text-[13px] text-[hsl(var(--dash-text))]/70 hidden md:block">{displayName}</span>
+              <span className="text-[13px] text-[hsl(var(--dash-text-secondary))] hidden md:block">{displayName}</span>
             </div>
 
             <button
