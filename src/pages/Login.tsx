@@ -449,25 +449,80 @@ const Login = () => {
               </div>
             </div>
 
-            {/* Live preview pill */}
-            <div className="mt-8 bg-white border border-maview-border rounded-2xl p-4 flex items-center gap-3 shadow-md shadow-maview-purple/[0.06] hover:shadow-lg hover:shadow-maview-purple/[0.10] hover:border-maview-purple/30 transition-all duration-300">
-              {/* Avatar com logo Maview */}
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-maview-purple-light to-maview-purple-dark flex items-center justify-center flex-shrink-0 shadow-sm shadow-maview-purple/30">
-                <MaviewLogo size={26} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <p className="text-maview-text text-sm font-bold truncate">Sua vitrine pronta</p>
-                  <span className="text-[10px] font-bold text-maview-purple bg-maview-purple-soft border border-maview-purple/20 px-1.5 py-0.5 rounded-full flex-shrink-0">Grátis</span>
-                </div>
-                <p className="text-maview-muted text-xs truncate font-mono">maview.app/<span className="text-maview-purple font-semibold">seunome</span></p>
-              </div>
-              <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                <div className="flex items-center gap-1 text-emerald-600 text-xs font-bold">
+            {/* Live profile preview card */}
+            <div className="mt-8 relative">
+              {/* Label above */}
+              <div className="flex items-center justify-between mb-2.5 px-1">
+                <span className="text-maview-muted text-xs font-medium">Sua vitrine fica assim:</span>
+                <div className="flex items-center gap-1.5 text-emerald-600 text-xs font-bold">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Ao vivo
+                  Ao vivo em minutos
                 </div>
-                <p className="text-maview-muted/60 text-[10px]">em 2 min</p>
+              </div>
+
+              {/* Mini profile card */}
+              <div className="rounded-2xl overflow-hidden shadow-2xl shadow-maview-purple/25 border border-white/10"
+                style={{ background: "linear-gradient(160deg, #1e1040 0%, #0f0b1f 100%)" }}>
+                {/* Top gradient bar */}
+                <div className="h-[3px] w-full" style={{ background: "linear-gradient(90deg, #6D28D9, #A78BFA 50%, #6D28D9)" }} />
+
+                <div className="px-5 py-5">
+                  {/* Profile header */}
+                  <div className="flex items-center gap-3 mb-4">
+                    {/* Avatar — logo Maview com glow */}
+                    <div className="relative flex-shrink-0">
+                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
+                        style={{ background: "linear-gradient(135deg, #7C3AED, #4C1D95)", boxShadow: "0 0 18px rgba(124,58,237,0.55)" }}>
+                        <MaviewLogo size={26} />
+                      </div>
+                      {/* Online dot */}
+                      <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-[#0f0b1f]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white text-sm font-bold leading-tight">Seu Nome</p>
+                      <p className="text-violet-400 text-[11px] font-mono mt-0.5 truncate">
+                        maview.app/<span className="text-violet-300 font-semibold">seunome</span>
+                      </p>
+                    </div>
+                    <span className="text-[10px] font-extrabold text-emerald-400 bg-emerald-400/10 border border-emerald-400/25 px-2 py-0.5 rounded-full flex-shrink-0">
+                      ✓ Ativo
+                    </span>
+                  </div>
+
+                  {/* Fake links */}
+                  <div className="space-y-2">
+                    {[
+                      { icon: Instagram, label: "Instagram",  color: "#C084FC" },
+                      { icon: ShoppingBag, label: "Minha Loja · 0% taxa", color: "#34D399" },
+                      { icon: Globe, label: "Meu Website",   color: "#60A5FA" },
+                    ].map(({ icon: Icon, label, color }) => (
+                      <div key={label}
+                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all"
+                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                        <div className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
+                          style={{ background: `${color}18` }}>
+                          <Icon size={12} style={{ color }} />
+                        </div>
+                        <span className="text-white/75 text-xs font-medium">{label}</span>
+                        <div className="ml-auto w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: color, opacity: 0.6 }} />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 opacity-30">
+                      <MaviewLogo size={11} />
+                      <span className="text-white text-[10px] font-medium">maview.app</span>
+                    </div>
+                    <span className="text-white/25 text-[10px]">0% comissão · sempre grátis</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Floating GRÁTIS badge */}
+              <div className="absolute -top-3 -right-2 bg-gradient-to-r from-emerald-500 to-teal-400 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-lg shadow-emerald-500/40 tracking-wider uppercase">
+                Grátis
               </div>
             </div>
 
