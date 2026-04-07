@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Palette, Type, Layout, Sun, Moon, Check } from "lucide-react";
 
 const COLORS = [
@@ -23,17 +23,195 @@ const LAYOUTS = [
   { name: "Lista", desc: "Blocos em lista simples" },
 ];
 
+const THEMES = [
+  {
+    id: "dark-purple" as const,
+    name: "Roxo Escuro",
+    accent: "#a855f7",
+    bg: "#1a0a2e",
+    surface: "#2d1a4a",
+    swatches: ["#a855f7", "#c084fc", "#7c3aed"],
+  },
+  {
+    id: "midnight" as const,
+    name: "Meia Noite",
+    accent: "#60a5fa",
+    bg: "#0a0f1e",
+    surface: "#1a2340",
+    swatches: ["#60a5fa", "#93c5fd", "#3b82f6"],
+  },
+  {
+    id: "forest" as const,
+    name: "Floresta",
+    accent: "#4ade80",
+    bg: "#071a0f",
+    surface: "#0f2d1a",
+    swatches: ["#4ade80", "#86efac", "#16a34a"],
+  },
+  {
+    id: "rose" as const,
+    name: "Rosa",
+    accent: "#f43f5e",
+    bg: "#1a0610",
+    surface: "#2d0f1e",
+    swatches: ["#f43f5e", "#fb7185", "#e11d48"],
+  },
+  {
+    id: "amber" as const,
+    name: "Âmbar",
+    accent: "#f59e0b",
+    bg: "#1a1000",
+    surface: "#2d1f00",
+    swatches: ["#f59e0b", "#fbbf24", "#d97706"],
+  },
+  {
+    id: "ocean" as const,
+    name: "Oceano",
+    accent: "#06b6d4",
+    bg: "#001a1f",
+    surface: "#002d35",
+    swatches: ["#06b6d4", "#22d3ee", "#0891b2"],
+  },
+] as const;
+
+type ThemeId = typeof THEMES[number]["id"];
+
+const LS_KEY = "maview_vitrine_config";
+
+const readThemeFromLS = (): ThemeId => {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      const valid = THEMES.find(t => t.id === parsed.theme);
+      if (valid) return valid.id;
+    }
+  } catch {
+    // ignore
+  }
+  return "dark-purple";
+};
+
+const saveThemeToLS = (theme: ThemeId) => {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    const config = raw ? JSON.parse(raw) : {};
+    config.theme = theme;
+    localStorage.setItem(LS_KEY, JSON.stringify(config));
+  } catch {
+    // ignore
+  }
+};
+
 const DashboardAparencia = () => {
+  const [selectedTheme, setSelectedTheme] = useState<ThemeId>("dark-purple");
+  const [savedToast, setSavedToast] = useState(false);
   const [selectedColor, setSelectedColor] = useState("#6D28D9");
   const [selectedFont, setSelectedFont] = useState("Inter");
   const [selectedLayout, setSelectedLayout] = useState("Centralizado");
   const [darkMode, setDarkMode] = useState(false);
 
+  // On mount: read stored theme
+  useEffect(() => {
+    setSelectedTheme(readThemeFromLS());
+  }, []);
+
+  const handleSelectTheme = (themeId: ThemeId) => {
+    setSelectedTheme(themeId);
+    saveThemeToLS(themeId);
+    setSavedToast(true);
+    setTimeout(() => setSavedToast(false), 2000);
+  };
+
+  const activeTheme = THEMES.find(t => t.id === selectedTheme) ?? THEMES[0];
+
   return (
     <div className="max-w-[1100px] mx-auto px-4 md:px-8 py-8 md:py-10 space-y-8">
+      {/* Toast */}
+      {savedToast && (
+        <div className="fixed top-5 right-5 z-50 flex items-center gap-2 bg-emerald-500 text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg animate-fade-in">
+          <Check size={15} />
+          Tema salvo!
+        </div>
+      )}
+
       <div className="space-y-1.5">
         <h1 className="text-2xl md:text-[28px] font-bold text-[hsl(var(--dash-text))] tracking-tight">Aparência</h1>
         <p className="text-[hsl(var(--dash-text-muted))] text-[15px]">Personalize o visual da sua página</p>
+      </div>
+
+      {/* ── Tema da Vitrine ── */}
+      <div className="glass-card rounded-2xl p-6">
+        <div className="flex items-center gap-2.5 mb-5">
+          <div className="w-8 h-8 rounded-lg bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center">
+            <Palette size={15} className="text-primary" />
+          </div>
+          <div>
+            <h2 className="text-[hsl(var(--dash-text))] font-semibold text-[15px]">Tema da Vitrine</h2>
+            <p className="text-[hsl(var(--dash-text-subtle))] text-xs mt-0.5">Aparência escura aplicada na sua página pública</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-3">
+          {THEMES.map(theme => {
+            const isSelected = selectedTheme === theme.id;
+            return (
+              <button
+                key={theme.id}
+                onClick={() => handleSelectTheme(theme.id)}
+                className={`relative rounded-xl p-3 text-left transition-all duration-200 border-2 ${
+                  isSelected
+                    ? "border-violet-500 ring-2 ring-violet-500/30 scale-[1.02]"
+                    : "border-transparent hover:border-white/10 hover:scale-[1.01]"
+                }`}
+                style={{ backgroundColor: theme.bg }}
+              >
+                {isSelected && (
+                  <div
+                    className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: theme.accent }}
+                  >
+                    <Check size={11} className="text-white" />
+                  </div>
+                )}
+                {/* Mini preview bar */}
+                <div
+                  className="w-full h-1.5 rounded-full mb-2.5 opacity-80"
+                  style={{ backgroundColor: theme.accent }}
+                />
+                {/* Swatches */}
+                <div className="flex gap-1 mb-2.5">
+                  {theme.swatches.map((s, i) => (
+                    <div
+                      key={i}
+                      className="w-4 h-4 rounded-full"
+                      style={{ backgroundColor: s }}
+                    />
+                  ))}
+                </div>
+                <p
+                  className="text-[11px] font-semibold"
+                  style={{ color: theme.accent }}
+                >
+                  {theme.name}
+                </p>
+                {/* Mini card preview */}
+                <div
+                  className="mt-2 rounded-lg p-1.5 border border-white/5"
+                  style={{ backgroundColor: theme.surface }}
+                >
+                  <div className="flex items-center gap-1.5">
+                    <div
+                      className="w-3 h-3 rounded-full flex-shrink-0"
+                      style={{ backgroundColor: theme.accent }}
+                    />
+                    <div className="flex-1 h-1 rounded-full bg-white/20" />
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
