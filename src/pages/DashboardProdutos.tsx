@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, ShoppingBag, MoreVertical, Eye, EyeOff } from "lucide-react";
+import { Plus, ShoppingBag } from "lucide-react";
 
 interface Product {
   id: string;
@@ -19,41 +19,41 @@ const DashboardProdutos = () => {
   const [products] = useState<Product[]>(SAMPLE);
 
   return (
-    <div className="max-w-5xl mx-auto px-4 md:px-8 py-8">
+    <div className="max-w-[1100px] mx-auto px-4 md:px-8 py-8 md:py-10">
       <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Produtos</h1>
-          <p className="text-[#A78BFA]/50 text-sm mt-1">Gerencie seus produtos digitais</p>
+        <div className="space-y-1.5">
+          <h1 className="text-2xl md:text-[28px] font-bold text-[hsl(var(--dash-text))] tracking-tight">Produtos</h1>
+          <p className="text-[hsl(var(--dash-text-muted))] text-[15px]">Gerencie seus produtos digitais</p>
         </div>
-        <button className="flex items-center gap-2 bg-[#6D28D9] text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-[#7C3AED] transition-all shadow-lg shadow-[#6D28D9]/20">
-          <Plus size={16} /> Criar produto
+        <button className="flex items-center gap-2 bg-primary text-primary-foreground text-[13px] font-medium px-4 py-2.5 rounded-xl hover:bg-primary/90 transition-all glow-sm">
+          <Plus size={15} /> Criar produto
         </button>
       </div>
 
       {products.length === 0 ? (
-        <div className="text-center py-20 text-[#A78BFA]/30">
-          <ShoppingBag size={40} className="mx-auto mb-3" />
+        <div className="text-center py-20 text-[hsl(var(--dash-text-subtle))]">
+          <ShoppingBag size={40} className="mx-auto mb-3 opacity-30" />
           <p className="text-sm">Nenhum produto ainda.</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {products.map(product => (
             <div
               key={product.id}
-              className="flex items-center gap-4 rounded-2xl border border-white/[0.06] bg-[#1A1333] p-5 hover:border-white/[0.12] transition-all group"
+              className="glass-card-hover flex items-center gap-4 rounded-2xl p-5 group"
             >
-              <div className="w-12 h-12 rounded-xl bg-[#6D28D9]/10 flex items-center justify-center flex-shrink-0">
-                <ShoppingBag size={20} className="text-[#A78BFA]" />
+              <div className="w-11 h-11 rounded-xl bg-primary/[0.08] ring-1 ring-primary/20 flex items-center justify-center flex-shrink-0">
+                <ShoppingBag size={18} className="text-[hsl(var(--dash-accent))]" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-white text-sm font-medium truncate">{product.name}</p>
-                <p className="text-[#A78BFA]/40 text-xs mt-0.5">{product.sales} vendas</p>
+                <p className="text-[hsl(var(--dash-text))] text-[13px] font-medium truncate">{product.name}</p>
+                <p className="text-[hsl(var(--dash-text-subtle))] text-xs mt-0.5">{product.sales} vendas</p>
               </div>
-              <p className="text-white font-semibold text-sm">{product.price}</p>
+              <p className="text-[hsl(var(--dash-text))] font-semibold text-sm tabular-nums">{product.price}</p>
               <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
                 product.status === "ativo"
-                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                  : "bg-white/[0.04] text-[#A78BFA]/40 border border-white/[0.06]"
+                  ? "bg-emerald-500/[0.08] text-emerald-400 ring-1 ring-emerald-500/20"
+                  : "bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text-subtle))] ring-1 ring-[hsl(var(--dash-border-subtle))]"
               }`}>
                 {product.status === "ativo" ? "Ativo" : "Rascunho"}
               </span>

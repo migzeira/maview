@@ -1,4 +1,4 @@
-import { BarChart3, TrendingUp, MousePointer, DollarSign, Eye } from "lucide-react";
+import { Eye, MousePointer, TrendingUp, DollarSign } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
 const CHART_DATA = [
@@ -29,10 +29,10 @@ const TOP_BLOCKS = [
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload) return null;
   return (
-    <div className="bg-[#1A1333] border border-white/[0.08] rounded-xl px-4 py-3 shadow-xl">
-      <p className="text-[#A78BFA]/50 text-xs mb-1">{label}</p>
+    <div className="glass-card rounded-xl px-4 py-3 shadow-xl glow-sm">
+      <p className="text-[hsl(var(--dash-text-subtle))] text-xs mb-1.5 font-medium">{label}</p>
       {payload.map((p: any) => (
-        <p key={p.dataKey} className="text-white text-sm font-medium">
+        <p key={p.dataKey} className="text-[hsl(var(--dash-text))] text-sm font-semibold">
           {p.dataKey === "receita" ? `R$ ${p.value}` : `${p.value} cliques`}
         </p>
       ))}
@@ -41,69 +41,72 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 const DashboardAnalytics = () => (
-  <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 space-y-8">
-    <div>
-      <h1 className="text-2xl font-bold text-white">Analytics</h1>
-      <p className="text-[#A78BFA]/50 text-sm mt-1">Acompanhe o desempenho da sua página</p>
+  <div className="max-w-[1100px] mx-auto px-4 md:px-8 py-8 md:py-10 space-y-10">
+    <div className="space-y-1.5">
+      <h1 className="text-2xl md:text-[28px] font-bold text-[hsl(var(--dash-text))] tracking-tight">Analytics</h1>
+      <p className="text-[hsl(var(--dash-text-muted))] text-[15px]">Acompanhe o desempenho da sua página</p>
     </div>
 
     {/* Stats */}
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
       {STATS.map(({ label, value, icon: Icon, change }) => (
-        <div key={label} className="rounded-2xl border border-white/[0.06] bg-[#1A1333] p-5">
-          <div className="flex items-center justify-between mb-3">
-            <div className="w-9 h-9 rounded-xl bg-white/[0.04] flex items-center justify-center text-[#A78BFA]">
-              <Icon size={18} />
+        <div key={label} className="glass-card-hover rounded-2xl p-5 md:p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-10 h-10 rounded-xl bg-primary/[0.08] ring-1 ring-primary/20 flex items-center justify-center text-[hsl(var(--dash-accent))]">
+              <Icon size={17} />
             </div>
-            <span className="text-xs text-emerald-400 font-medium">{change}</span>
+            <span className="text-xs text-emerald-400 font-semibold bg-emerald-500/[0.08] px-2 py-0.5 rounded-full">{change}</span>
           </div>
-          <p className="text-2xl font-bold text-white">{value}</p>
-          <p className="text-xs text-[#A78BFA]/40 mt-0.5">{label}</p>
+          <p className="text-[26px] font-bold text-[hsl(var(--dash-text))] tracking-tight leading-none">{value}</p>
+          <p className="text-[13px] text-[hsl(var(--dash-text-muted))] mt-1.5">{label}</p>
         </div>
       ))}
     </div>
 
-    <div className="grid lg:grid-cols-5 gap-6">
+    <div className="grid lg:grid-cols-5 gap-4 md:gap-6">
       {/* Chart */}
-      <div className="lg:col-span-3 rounded-2xl border border-white/[0.06] bg-[#1A1333] p-6">
-        <h3 className="text-white font-semibold mb-6">Receita e cliques</h3>
-        <div className="h-[280px]">
+      <div className="lg:col-span-3 glass-card rounded-2xl p-6 md:p-7">
+        <h3 className="text-[hsl(var(--dash-text))] font-semibold text-[15px] mb-7">Receita e cliques</h3>
+        <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={CHART_DATA}>
               <defs>
                 <linearGradient id="gReceita" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#6D28D9" stopOpacity={0.3} />
-                  <stop offset="100%" stopColor="#6D28D9" stopOpacity={0} />
+                  <stop offset="0%" stopColor="hsl(263, 76%, 50%)" stopOpacity={0.25} />
+                  <stop offset="100%" stopColor="hsl(263, 76%, 50%)" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="gCliques" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#A78BFA" stopOpacity={0.2} />
-                  <stop offset="100%" stopColor="#A78BFA" stopOpacity={0} />
+                  <stop offset="0%" stopColor="hsl(263, 52%, 72%)" stopOpacity={0.15} />
+                  <stop offset="100%" stopColor="hsl(263, 52%, 72%)" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(167,139,250,0.06)" />
-              <XAxis dataKey="name" stroke="rgba(167,139,250,0.3)" tick={{ fontSize: 12 }} />
-              <YAxis stroke="rgba(167,139,250,0.3)" tick={{ fontSize: 12 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(260, 20%, 14%)" />
+              <XAxis dataKey="name" stroke="hsl(263, 25%, 35%)" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
+              <YAxis stroke="hsl(263, 25%, 35%)" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
-              <Area type="monotone" dataKey="receita" stroke="#6D28D9" fill="url(#gReceita)" strokeWidth={2} />
-              <Area type="monotone" dataKey="cliques" stroke="#A78BFA" fill="url(#gCliques)" strokeWidth={2} />
+              <Area type="monotone" dataKey="receita" stroke="hsl(263, 76%, 50%)" fill="url(#gReceita)" strokeWidth={2} />
+              <Area type="monotone" dataKey="cliques" stroke="hsl(263, 52%, 72%)" fill="url(#gCliques)" strokeWidth={2} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
       </div>
 
       {/* Top blocks */}
-      <div className="lg:col-span-2 rounded-2xl border border-white/[0.06] bg-[#1A1333] p-6">
-        <h3 className="text-white font-semibold mb-5">Blocos mais clicados</h3>
-        <div className="space-y-4">
-          {TOP_BLOCKS.map(({ name, clicks, pct }) => (
+      <div className="lg:col-span-2 glass-card rounded-2xl p-6 md:p-7">
+        <h3 className="text-[hsl(var(--dash-text))] font-semibold text-[15px] mb-6">Blocos mais clicados</h3>
+        <div className="space-y-5">
+          {TOP_BLOCKS.map(({ name, clicks, pct }, i) => (
             <div key={name}>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-white text-sm truncate">{name}</span>
-                <span className="text-[#A78BFA]/50 text-xs">{clicks} cliques</span>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xs text-[hsl(var(--dash-text-subtle))] font-mono w-4">{i + 1}.</span>
+                  <span className="text-[hsl(var(--dash-text))] text-[13px] font-medium truncate">{name}</span>
+                </div>
+                <span className="text-[hsl(var(--dash-text-muted))] text-xs tabular-nums">{clicks}</span>
               </div>
-              <div className="h-1.5 rounded-full bg-white/[0.04] overflow-hidden">
+              <div className="h-1 rounded-full bg-[hsl(var(--dash-surface-2))] overflow-hidden ml-6">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-[#6D28D9] to-[#A78BFA]"
+                  className="h-full rounded-full bg-gradient-to-r from-primary to-[hsl(var(--dash-accent))] transition-all duration-700"
                   style={{ width: `${pct}%` }}
                 />
               </div>
