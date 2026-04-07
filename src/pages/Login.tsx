@@ -316,7 +316,19 @@ const Login = () => {
   const inputClass = "w-full h-11 px-4 rounded-xl bg-white border border-maview-border text-maview-text text-sm placeholder:text-maview-muted/60 outline-none transition-all focus:border-maview-purple focus:ring-2 focus:ring-maview-purple/10 shadow-sm";
 
   return (
-    <div className="min-h-screen flex flex-col bg-maview-bg relative overflow-hidden">
+    <div className="min-h-screen flex flex-col relative overflow-hidden" style={{
+      background: "radial-gradient(ellipse at 70% 0%, #ede9fe 0%, #f3f0ff 30%, #f8f5ff 60%, #faf8ff 100%)",
+    }}>
+
+      {/* ── Grid overlay ── */}
+      <div className="absolute inset-0 pointer-events-none select-none" style={{
+        backgroundImage: `
+          linear-gradient(rgba(109,40,217,0.045) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(109,40,217,0.045) 1px, transparent 1px)
+        `,
+        backgroundSize: "48px 48px",
+        maskImage: "radial-gradient(ellipse at 60% 40%, black 20%, transparent 80%)",
+      }} />
 
       {/* ── Animated wave background ── */}
       <AnimatedWaves />
@@ -396,15 +408,24 @@ const Login = () => {
             </div>
 
             {/* Live preview pill */}
-            <div className="mt-8 bg-white border border-maview-border rounded-2xl p-4 flex items-center gap-3 shadow-sm">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-400 to-maview-purple flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-maview-text text-sm font-semibold truncate">@seunome</p>
-                <p className="text-maview-muted text-xs truncate">maview.app/seunome</p>
+            <div className="mt-8 bg-white border border-maview-border rounded-2xl p-4 flex items-center gap-3 shadow-md shadow-maview-purple/[0.06] hover:shadow-lg hover:shadow-maview-purple/[0.10] hover:border-maview-purple/30 transition-all duration-300">
+              {/* Avatar com logo Maview */}
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-maview-purple-light to-maview-purple-dark flex items-center justify-center flex-shrink-0 shadow-sm shadow-maview-purple/30">
+                <MaviewLogo size={26} />
               </div>
-              <div className="flex items-center gap-1 text-emerald-500 text-xs font-semibold">
-                <Zap size={12} className="fill-emerald-500" />
-                Ao vivo
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <p className="text-maview-text text-sm font-bold truncate">Sua vitrine pronta</p>
+                  <span className="text-[10px] font-bold text-maview-purple bg-maview-purple-soft border border-maview-purple/20 px-1.5 py-0.5 rounded-full flex-shrink-0">Grátis</span>
+                </div>
+                <p className="text-maview-muted text-xs truncate font-mono">maview.app/<span className="text-maview-purple font-semibold">seunome</span></p>
+              </div>
+              <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                <div className="flex items-center gap-1 text-emerald-600 text-xs font-bold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Ao vivo
+                </div>
+                <p className="text-maview-muted/60 text-[10px]">em 2 min</p>
               </div>
             </div>
 
