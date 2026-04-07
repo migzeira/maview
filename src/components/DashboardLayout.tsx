@@ -3,6 +3,7 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import MaviewLogo from "./MaviewLogo";
+import FloatingAIButton from "./FloatingAIButton";
 import {
   Home, Layout, Blocks, ShoppingBag, Users, Settings,
   LogOut, ExternalLink, Copy, Check, ChevronLeft, ChevronRight, Menu,
@@ -206,6 +207,7 @@ const DashboardLayout = ({ children }: Props) => {
         <main className="flex-1 overflow-y-auto">
           {children}
         </main>
+        <FloatingAIButton />
       </div>
     </div>
   );
