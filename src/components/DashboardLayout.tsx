@@ -4,21 +4,22 @@ import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import MaviewLogo from "./MaviewLogo";
 import {
-  Home, Layout, Blocks, ShoppingBag, BarChart3, Users, Settings,
+  Home, Layout, Blocks, ShoppingBag, Users, Settings,
   LogOut, ExternalLink, Copy, Check, ChevronLeft, ChevronRight, Menu,
-  Zap, Palette, DollarSign,
+  Zap, Palette, DollarSign, Bot,
 } from "lucide-react";
 
 const NAV_ITEMS = [
-  { path: "/dashboard", label: "Home", icon: Home },
-  { path: "/dashboard/pagina", label: "Minha Página", icon: Layout },
-  { path: "/dashboard/blocos", label: "Blocos", icon: Blocks },
-  { path: "/dashboard/produtos", label: "Produtos", icon: ShoppingBag },
-  { path: "/dashboard/vendas", label: "Vendas", icon: DollarSign },
-  { path: "/dashboard/audiencia", label: "Audiência", icon: Users },
-  { path: "/dashboard/automacoes", label: "Automações", icon: Zap },
-  { path: "/dashboard/aparencia", label: "Aparência", icon: Palette },
-  { path: "/dashboard/configuracoes", label: "Configurações", icon: Settings },
+  { path: "/dashboard",              label: "Home",          icon: Home,       badge: null },
+  { path: "/dashboard/pagina",       label: "Minha Página",  icon: Layout,     badge: null },
+  { path: "/dashboard/blocos",       label: "Blocos",        icon: Blocks,     badge: null },
+  { path: "/dashboard/produtos",     label: "Produtos",      icon: ShoppingBag,badge: null },
+  { path: "/dashboard/vendas",       label: "Vendas",        icon: DollarSign, badge: null },
+  { path: "/dashboard/audiencia",    label: "Audiência",     icon: Users,      badge: null },
+  { path: "/dashboard/automacoes",   label: "Automações",    icon: Zap,        badge: null },
+  { path: "/dashboard/aparencia",    label: "Aparência",     icon: Palette,    badge: null },
+  { path: "/dashboard/ia",           label: "IA Maview",     icon: Bot,        badge: "Novo" },
+  { path: "/dashboard/configuracoes",label: "Configurações", icon: Settings,   badge: null },
 ];
 
 interface Props {
@@ -85,7 +86,7 @@ const DashboardLayout = ({ children }: Props) => {
       <div className="mx-4 dash-divider" />
 
       <nav className="flex-1 px-3 pt-4 space-y-0.5 overflow-y-auto">
-        {NAV_ITEMS.map(({ path, label, icon: Icon }) => {
+        {NAV_ITEMS.map(({ path, label, icon: Icon, badge }) => {
           const active = location.pathname === path;
           return (
             <Link
@@ -107,9 +108,18 @@ const DashboardLayout = ({ children }: Props) => {
               <Icon
                 size={17}
                 strokeWidth={active ? 2.2 : 1.8}
-                className={`transition-colors ${active ? "text-primary" : "text-[hsl(var(--dash-text-subtle))] group-hover:text-primary/60"}`}
+                className={`transition-colors flex-shrink-0 ${active ? "text-primary" : "text-[hsl(var(--dash-text-subtle))] group-hover:text-primary/60"}`}
               />
-              {!collapsed && <span>{label}</span>}
+              {!collapsed && (
+                <>
+                  <span className="flex-1">{label}</span>
+                  {badge && (
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-fuchsia-100 text-fuchsia-600 leading-none">
+                      {badge}
+                    </span>
+                  )}
+                </>
+              )}
             </Link>
           );
         })}
