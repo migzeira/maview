@@ -78,7 +78,7 @@ const DashboardLayout = ({ children }: Props) => {
       <div className="flex items-center gap-3 px-5 h-16 flex-shrink-0">
         <MaviewLogo size={36} />
         {!collapsed && (
-          <span className="text-[hsl(var(--dash-text))] text-[20px] font-extrabold tracking-tight">
+          <span className="text-[20px] font-extrabold tracking-tight bg-gradient-to-r from-[#6D28D9] via-[#8B5CF6] to-[#60A5FA] bg-clip-text text-transparent">
             Maview
           </span>
         )}
