@@ -156,7 +156,7 @@ const DashboardAparencia = () => {
                 <div className="flex flex-col items-center mb-6">
                   <div
                     className="w-16 h-16 rounded-full mb-2.5 ring-2"
-                    style={{ background: `linear-gradient(135deg, ${selectedColor}, ${selectedColor}cc)`, ringColor: `${selectedColor}20` }}
+                    style={{ background: `linear-gradient(135deg, ${selectedColor}, ${selectedColor}cc)`, boxShadow: `0 0 0 2px ${selectedColor}20` }}
                   />
                   <p className={`text-sm font-semibold ${darkMode ? "text-white" : "text-gray-900"}`} style={{ fontFamily: selectedFont }}>@usuario</p>
                   <p className={`text-xs mt-0.5 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Minha vitrine digital</p>
