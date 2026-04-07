@@ -77,7 +77,7 @@ serve(async (req) => {
   } catch (error) {
     console.error("maview-ai error:", error);
     return new Response(
-      JSON.stringify({ text: `Erro ao processar: ${error.message}` }),
+      JSON.stringify({ text: `Erro ao processar: ${error instanceof Error ? error.message : "Erro desconhecido"}` }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
