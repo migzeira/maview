@@ -13,8 +13,10 @@ import DashboardLayout from "./components/DashboardLayout.tsx";
 import DashboardHome from "./pages/DashboardHome.tsx";
 import DashboardBlocos from "./pages/DashboardBlocos.tsx";
 import DashboardProdutos from "./pages/DashboardProdutos.tsx";
-import DashboardAnalytics from "./pages/DashboardAnalytics.tsx";
-import DashboardClientes from "./pages/DashboardClientes.tsx";
+import DashboardVendas from "./pages/DashboardVendas.tsx";
+import DashboardAudiencia from "./pages/DashboardAudiencia.tsx";
+import DashboardAutomacoes from "./pages/DashboardAutomacoes.tsx";
+import DashboardAparencia from "./pages/DashboardAparencia.tsx";
 import DashboardConfiguracoes from "./pages/DashboardConfiguracoes.tsx";
 import DashboardPagina from "./pages/DashboardPagina.tsx";
 
@@ -38,8 +40,10 @@ const App = () => (
           <Route path="/dashboard/pagina" element={<DashboardPage><DashboardPagina /></DashboardPage>} />
           <Route path="/dashboard/blocos" element={<DashboardPage><DashboardBlocos /></DashboardPage>} />
           <Route path="/dashboard/produtos" element={<DashboardPage><DashboardProdutos /></DashboardPage>} />
-          <Route path="/dashboard/analytics" element={<DashboardPage><DashboardAnalytics /></DashboardPage>} />
-          <Route path="/dashboard/clientes" element={<DashboardPage><DashboardClientes /></DashboardPage>} />
+          <Route path="/dashboard/vendas" element={<DashboardPage><DashboardVendas /></DashboardPage>} />
+          <Route path="/dashboard/audiencia" element={<DashboardPage><DashboardAudiencia /></DashboardPage>} />
+          <Route path="/dashboard/automacoes" element={<DashboardPage><DashboardAutomacoes /></DashboardPage>} />
+          <Route path="/dashboard/aparencia" element={<DashboardPage><DashboardAparencia /></DashboardPage>} />
           <Route path="/dashboard/configuracoes" element={<DashboardPage><DashboardConfiguracoes /></DashboardPage>} />
           <Route path="/:username" element={<ProfilePage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
