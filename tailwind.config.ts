@@ -110,7 +110,7 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
         "scroll": "scroll 35s linear infinite",
         "scroll-reverse": "scroll-reverse 38s linear infinite",
-        "slowBounce": "slowBounce 2.5s ease-in-out infinite",
+        "slowPulse": "slowPulse 3s ease-in-out infinite",
       },
     },
   },
