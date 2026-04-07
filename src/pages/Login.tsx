@@ -412,7 +412,7 @@ const Login = () => {
         </div>
 
         {/* ── RIGHT — Form ── */}
-        <div className="flex-1 flex items-center justify-center px-6 sm:px-12 py-14">
+        <div className="flex-1 flex items-center justify-center px-4 sm:px-8 lg:px-12 py-10 sm:py-14">
           <div className="w-full max-w-[420px]">
 
             {/* Mobile logo */}
@@ -484,17 +484,17 @@ const Login = () => {
             </div>
 
             {/* Card */}
-            <div className="relative bg-white rounded-[24px] border border-maview-border p-8 sm:p-10 shadow-xl shadow-maview-purple/[0.07] overflow-hidden">
+            <div className="relative bg-white rounded-[24px] border border-maview-border p-6 sm:p-10 shadow-xl shadow-maview-purple/[0.07] overflow-hidden">
               {/* Top accent line */}
               <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-transparent via-maview-purple to-transparent pointer-events-none" />
 
               {/* Mode tabs */}
               <div className="mb-6">
                 {mode !== "forgot" && (
-                  <div className="flex bg-maview-surface rounded-xl p-1 mb-6 border border-maview-border">
+                  <div className="flex bg-maview-surface rounded-2xl p-1 mb-6 border border-maview-border w-full">
                     {(["login", "signup"] as Mode[]).map((m) => (
                       <button key={m} type="button" onClick={() => switchMode(m)}
-                        className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
+                        className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 whitespace-nowrap min-w-0 ${
                           mode === m
                             ? "bg-maview-purple text-white shadow-md shadow-maview-purple/25"
                             : "text-maview-muted hover:text-maview-text"
