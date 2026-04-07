@@ -100,12 +100,17 @@ export default {
           from: { transform: "translateX(-50%)" },
           to: { transform: "translateX(0)" },
         },
+        "slowBounce": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "scroll": "scroll 35s linear infinite",
         "scroll-reverse": "scroll-reverse 38s linear infinite",
+        "slowBounce": "slowBounce 2.5s ease-in-out infinite",
       },
     },
   },
