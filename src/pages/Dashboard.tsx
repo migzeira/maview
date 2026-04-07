@@ -460,10 +460,10 @@ const Dashboard = () => {
                     {/* Avatar */}
                     <div className="flex flex-col items-center mb-4">
                       <div
-                        className="w-16 h-16 rounded-full mb-3 flex items-center justify-center shadow-xl"
+                        className="w-16 h-16 rounded-full mb-3 flex items-center justify-center shadow-xl relative"
                         style={{ background: `linear-gradient(135deg, ${currentTheme.accent}, ${currentTheme.accent}88)` }}
                       >
-                        <span className="text-white text-xl font-bold">{(bioName || displayName).charAt(0).toUpperCase()}</span>
+                        <MaviewLogo size={30} />
                       </div>
                       <p className="text-white text-sm font-bold text-center">{bioName || displayName}</p>
                       {bioText && <p className="text-white/50 text-xs text-center mt-1 leading-relaxed">{bioText}</p>}

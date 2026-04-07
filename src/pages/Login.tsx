@@ -35,7 +35,7 @@ const MaviewLogo = ({ size = 36 }: { size?: number }) => (
 /* ─── Static data ─────────────────────────────────────────────── */
 
 const FEATURES = [
-  { icon: Link2,       label: "Link in bio profissional", desc: "Uma URL para tudo que você cria" },
+  { icon: Link2,       label: "Link na bio profissional", desc: "Uma URL para tudo que você cria" },
   { icon: ShoppingBag, label: "Loja sem taxas abusivas",  desc: "Venda produtos digitais e físicos" },
   { icon: BarChart3,   label: "Analytics em tempo real",  desc: "Veja cliques, visitas e vendas" },
 ];
@@ -357,7 +357,7 @@ const Login = () => {
             </h1>
 
             <p className="text-maview-text-sub text-lg leading-relaxed mb-10">
-              Combine link in bio + loja digital em um único lugar.
+              Combine link na bio + loja digital em um único lugar.
               Sem taxas absurdas. Sem engessamento de temas.
             </p>
 
