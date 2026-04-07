@@ -5,12 +5,24 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 import Login from "./pages/Login.tsx";
-import Dashboard from "./pages/Dashboard.tsx";
-import ProfilePage from "./pages/Profile.tsx";
-import Admin from "./pages/Admin.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import Admin from "./pages/Admin.tsx";
+import ProfilePage from "./pages/Profile.tsx";
+
+import DashboardLayout from "./components/DashboardLayout.tsx";
+import DashboardHome from "./pages/DashboardHome.tsx";
+import DashboardBlocos from "./pages/DashboardBlocos.tsx";
+import DashboardProdutos from "./pages/DashboardProdutos.tsx";
+import DashboardAnalytics from "./pages/DashboardAnalytics.tsx";
+import DashboardClientes from "./pages/DashboardClientes.tsx";
+import DashboardConfiguracoes from "./pages/DashboardConfiguracoes.tsx";
+import DashboardPagina from "./pages/DashboardPagina.tsx";
 
 const queryClient = new QueryClient();
+
+const DashboardPage = ({ children }: { children: React.ReactNode }) => (
+  <DashboardLayout>{children}</DashboardLayout>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -21,8 +33,14 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/dashboard" element={<DashboardPage><DashboardHome /></DashboardPage>} />
+          <Route path="/dashboard/pagina" element={<DashboardPage><DashboardPagina /></DashboardPage>} />
+          <Route path="/dashboard/blocos" element={<DashboardPage><DashboardBlocos /></DashboardPage>} />
+          <Route path="/dashboard/produtos" element={<DashboardPage><DashboardProdutos /></DashboardPage>} />
+          <Route path="/dashboard/analytics" element={<DashboardPage><DashboardAnalytics /></DashboardPage>} />
+          <Route path="/dashboard/clientes" element={<DashboardPage><DashboardClientes /></DashboardPage>} />
+          <Route path="/dashboard/configuracoes" element={<DashboardPage><DashboardConfiguracoes /></DashboardPage>} />
           <Route path="/:username" element={<ProfilePage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
