@@ -10,13 +10,14 @@ const FloatingAIButton = () => {
   return (
     <button
       onClick={() => navigate("/dashboard/ia")}
-      className="fixed bottom-6 right-6 z-50 w-20 h-20 rounded-full animate-slowPulse hover:scale-110 transition-transform duration-200 flex items-center justify-center"
+      className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-[#6D28D9] to-[#8B5CF6] shadow-[0_4px_20px_rgba(109,40,217,0.35)] hover:shadow-[0_4px_24px_rgba(109,40,217,0.5)] hover:scale-[1.05] transition-all duration-200 ease-in-out animate-gentleFloat flex items-center justify-center overflow-hidden"
       aria-label="Abrir IA Maview"
     >
       <img
         src={robotImg}
         alt="Maview AI"
-        className="w-[90%] h-[90%] object-contain drop-shadow-lg"
+        className="w-[75%] h-[75%] object-contain drop-shadow-sm"
+        style={{ mixBlendMode: "screen" }}
       />
     </button>
   );
