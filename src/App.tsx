@@ -14,6 +14,7 @@ import DashboardHome from "./pages/DashboardHome.tsx";
 
 import DashboardProdutos from "./pages/DashboardProdutos.tsx";
 import DashboardVendas from "./pages/DashboardVendas.tsx";
+import DashboardMonetizacao from "./pages/DashboardMonetizacao.tsx";
 import DashboardAudiencia from "./pages/DashboardAudiencia.tsx";
 import DashboardAutomacoes from "./pages/DashboardAutomacoes.tsx";
 import DashboardAparencia from "./pages/DashboardAparencia.tsx";
