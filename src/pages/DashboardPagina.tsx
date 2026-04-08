@@ -301,8 +301,8 @@ const DashboardPagina = () => {
       {/* Header */}
       <div className="flex items-start justify-between mb-8 gap-4">
         <div className="space-y-1">
-          <h1 className="text-2xl md:text-[28px] font-bold text-[hsl(var(--dash-text))] tracking-tight">Minha Página</h1>
-          <p className="text-[hsl(var(--dash-text-muted))] text-[15px]">Personalize sua vitrine digital</p>
+          <h1 className="text-2xl md:text-[28px] font-bold text-[hsl(var(--dash-text))] tracking-tight">Minha Vitrine</h1>
+          <p className="text-[hsl(var(--dash-text-muted))] text-[15px]">Construa sua vitrine digital com blocos</p>
         </div>
         <button
           onClick={handleSave}
@@ -841,7 +841,7 @@ const DashboardPagina = () => {
                 >
                   {/* Profile section */}
                   <div className="flex flex-col items-center mb-5">
-                    <div className="w-16 h-16 rounded-full mb-2.5 ring-2 overflow-hidden" style={{ ringColor: currentTheme.accent + "40" }}>
+                    <div className="w-16 h-16 rounded-full mb-2.5 overflow-hidden" style={{ boxShadow: `0 0 0 2px ${currentTheme.accent}40` }}>
                       {config.avatarUrl ? (
                         <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
                       ) : (

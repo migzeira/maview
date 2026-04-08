@@ -5,15 +5,14 @@ import type { User } from "@supabase/supabase-js";
 import MaviewLogo from "./MaviewLogo";
 import FloatingAIButton from "./FloatingAIButton";
 import {
-  Home, Layout, Blocks, ShoppingBag, Users, Settings,
+  Home, Layout, ShoppingBag, Users, Settings,
   LogOut, ExternalLink, Copy, Check, ChevronLeft, ChevronRight, Menu,
   Zap, Palette, DollarSign, Bot,
 } from "lucide-react";
 
 const NAV_ITEMS = [
   { path: "/dashboard",              label: "Home",          icon: Home,       badge: null },
-  { path: "/dashboard/pagina",       label: "Minha Página",  icon: Layout,     badge: null },
-  { path: "/dashboard/blocos",       label: "Blocos",        icon: Blocks,     badge: null },
+  { path: "/dashboard/pagina",       label: "Minha Vitrine", icon: Layout,     badge: null },
   { path: "/dashboard/produtos",     label: "Produtos",      icon: ShoppingBag,badge: null },
   { path: "/dashboard/vendas",       label: "Vendas",        icon: DollarSign, badge: null },
   { path: "/dashboard/audiencia",    label: "Audiência",     icon: Users,      badge: null },
