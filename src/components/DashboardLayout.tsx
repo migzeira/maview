@@ -256,7 +256,7 @@ const DashboardLayout = ({ children }: Props) => {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto bg-white">
           {children}
         </main>
         <FloatingAIButton />
