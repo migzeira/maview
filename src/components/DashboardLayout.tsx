@@ -5,21 +5,62 @@ import type { User } from "@supabase/supabase-js";
 import MaviewLogo from "./MaviewLogo";
 import FloatingAIButton from "./FloatingAIButton";
 import {
-  Home, Layout, ShoppingBag, Users, Settings,
+  Home, Layout, Users, Settings,
   LogOut, ExternalLink, Copy, Check, ChevronLeft, ChevronRight, Menu,
-  Zap, Palette, DollarSign, Bot,
+  Zap, Palette, Bot, Wallet,
 } from "lucide-react";
 
-const NAV_ITEMS = [
-  { path: "/dashboard",              label: "Home",          icon: Home,       badge: null },
-  { path: "/dashboard/pagina",       label: "Minha Vitrine", icon: Layout,     badge: null },
-  { path: "/dashboard/produtos",     label: "Produtos",      icon: ShoppingBag,badge: null },
-  { path: "/dashboard/vendas",       label: "Vendas",        icon: DollarSign, badge: null },
-  { path: "/dashboard/audiencia",    label: "Audiência",     icon: Users,      badge: null },
-  { path: "/dashboard/automacoes",   label: "Automações",    icon: Zap,        badge: null },
-  { path: "/dashboard/aparencia",    label: "Aparência",     icon: Palette,    badge: null },
-  { path: "/dashboard/ia",           label: "IA Maview",     icon: Bot,        badge: "Novo" },
-  { path: "/dashboard/configuracoes",label: "Configurações", icon: Settings,   badge: null },
+interface NavItem {
+  path: string;
+  label: string;
+  icon: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
+  badge: string | null;
+}
+
+interface NavGroup {
+  label: string | null;
+  items: NavItem[];
+}
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    label: null,
+    items: [
+      { path: "/dashboard", label: "Home", icon: Home, badge: null },
+    ],
+  },
+  {
+    label: "CRIAÇÃO",
+    items: [
+      { path: "/dashboard/pagina", label: "Minha Vitrine", icon: Layout, badge: null },
+      { path: "/dashboard/aparencia", label: "Aparência", icon: Palette, badge: null },
+    ],
+  },
+  {
+    label: "MONETIZAÇÃO",
+    items: [
+      { path: "/dashboard/monetizacao", label: "Monetização", icon: Wallet, badge: null },
+    ],
+  },
+  {
+    label: "AUDIÊNCIA",
+    items: [
+      { path: "/dashboard/audiencia", label: "Audiência", icon: Users, badge: null },
+    ],
+  },
+  {
+    label: "CRESCIMENTO",
+    items: [
+      { path: "/dashboard/automacoes", label: "Automações", icon: Zap, badge: null },
+      { path: "/dashboard/ia", label: "IA Maview", icon: Bot, badge: "Novo" },
+    ],
+  },
+  {
+    label: "SISTEMA",
+    items: [
+      { path: "/dashboard/configuracoes", label: "Configurações", icon: Settings, badge: null },
+    ],
+  },
 ];
 
 interface Props {
