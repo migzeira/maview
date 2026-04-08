@@ -13,51 +13,51 @@
     --popover: 0 0% 100%;
     --popover-foreground: 260 40% 14%;
 
-    --primary: 263 76% 50%;
+    --primary: 263 90% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 258 90% 66%;
+    --secondary: 263 90% 58%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 260 40% 96%;
-    --muted-foreground: 260 15% 50%;
+    --muted: 263 30% 96%;
+    --muted-foreground: 263 15% 50%;
 
-    --accent: 263 85% 96%;
-    --accent-foreground: 263 76% 50%;
+    --accent: 263 80% 96%;
+    --accent-foreground: 263 90% 58%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 260 20% 92%;
-    --input: 260 20% 93%;
-    --ring: 263 76% 50%;
+    --border: 263 20% 92%;
+    --input: 263 20% 93%;
+    --ring: 263 90% 58%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 260 20% 40%;
-    --sidebar-primary: 263 76% 50%;
+    --sidebar-background: 263 60% 97%;
+    --sidebar-foreground: 263 20% 40%;
+    --sidebar-primary: 263 90% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 263 85% 96%;
-    --sidebar-accent-foreground: 263 76% 50%;
-    --sidebar-border: 260 20% 92%;
-    --sidebar-ring: 263 76% 50%;
+    --sidebar-accent: 263 80% 94%;
+    --sidebar-accent-foreground: 263 90% 58%;
+    --sidebar-border: 263 25% 91%;
+    --sidebar-ring: 263 90% 58%;
 
     /* Dashboard light tokens */
-    --dash-bg: 250 33% 98%;
-    --dash-surface: 253 50% 97%;
-    --dash-surface-2: 260 30% 97%;
-    --dash-border: 260 20% 90%;
-    --dash-border-subtle: 260 15% 93%;
-    --dash-purple: 263 76% 50%;
-    --dash-purple-glow: 263 76% 50%;
-    --dash-purple-light: 258 90% 66%;
-    --dash-accent: 263 85% 96%;
-    --dash-accent-fg: 263 76% 50%;
-    --dash-text: 260 40% 14%;
-    --dash-text-secondary: 260 20% 35%;
-    --dash-text-muted: 260 15% 50%;
-    --dash-text-subtle: 260 10% 65%;
+    --dash-bg: 263 30% 98%;
+    --dash-surface: 263 60% 97%;
+    --dash-surface-2: 263 40% 96%;
+    --dash-border: 263 25% 90%;
+    --dash-border-subtle: 263 20% 93%;
+    --dash-purple: 263 90% 58%;
+    --dash-purple-glow: 263 90% 58%;
+    --dash-purple-light: 263 80% 65%;
+    --dash-accent: 263 80% 96%;
+    --dash-accent-fg: 263 90% 58%;
+    --dash-text: 263 40% 14%;
+    --dash-text-secondary: 263 20% 35%;
+    --dash-text-muted: 263 15% 50%;
+    --dash-text-subtle: 263 10% 65%;
   }
 }
 
