@@ -14,6 +14,7 @@ import DashboardHome from "./pages/DashboardHome.tsx";
 
 import DashboardProdutos from "./pages/DashboardProdutos.tsx";
 import DashboardVendas from "./pages/DashboardVendas.tsx";
+import DashboardMonetizacao from "./pages/DashboardMonetizacao.tsx";
 import DashboardAudiencia from "./pages/DashboardAudiencia.tsx";
 import DashboardAutomacoes from "./pages/DashboardAutomacoes.tsx";
 import DashboardAparencia from "./pages/DashboardAparencia.tsx";
@@ -39,7 +40,7 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/dashboard" element={<DashboardPage><DashboardHome /></DashboardPage>} />
           <Route path="/dashboard/pagina" element={<DashboardPage><DashboardPagina /></DashboardPage>} />
-          
+          <Route path="/dashboard/monetizacao" element={<DashboardPage><DashboardMonetizacao /></DashboardPage>} />
           <Route path="/dashboard/produtos" element={<DashboardPage><DashboardProdutos /></DashboardPage>} />
           <Route path="/dashboard/vendas" element={<DashboardPage><DashboardVendas /></DashboardPage>} />
           <Route path="/dashboard/audiencia" element={<DashboardPage><DashboardAudiencia /></DashboardPage>} />

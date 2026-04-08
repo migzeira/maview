@@ -5,21 +5,62 @@ import type { User } from "@supabase/supabase-js";
 import MaviewLogo from "./MaviewLogo";
 import FloatingAIButton from "./FloatingAIButton";
 import {
-  Home, Layout, ShoppingBag, Users, Settings,
+  Home, Layout, Users, Settings,
   LogOut, ExternalLink, Copy, Check, ChevronLeft, ChevronRight, Menu,
-  Zap, Palette, DollarSign, Bot,
+  Zap, Palette, Bot, Wallet,
 } from "lucide-react";
 
-const NAV_ITEMS = [
-  { path: "/dashboard",              label: "Home",          icon: Home,       badge: null },
-  { path: "/dashboard/pagina",       label: "Minha Vitrine", icon: Layout,     badge: null },
-  { path: "/dashboard/produtos",     label: "Produtos",      icon: ShoppingBag,badge: null },
-  { path: "/dashboard/vendas",       label: "Vendas",        icon: DollarSign, badge: null },
-  { path: "/dashboard/audiencia",    label: "Audiência",     icon: Users,      badge: null },
-  { path: "/dashboard/automacoes",   label: "Automações",    icon: Zap,        badge: null },
-  { path: "/dashboard/aparencia",    label: "Aparência",     icon: Palette,    badge: null },
-  { path: "/dashboard/ia",           label: "IA Maview",     icon: Bot,        badge: "Novo" },
-  { path: "/dashboard/configuracoes",label: "Configurações", icon: Settings,   badge: null },
+interface NavItem {
+  path: string;
+  label: string;
+  icon: typeof Home;
+  badge: string | null;
+}
+
+interface NavGroup {
+  label: string | null;
+  items: NavItem[];
+}
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    label: null,
+    items: [
+      { path: "/dashboard", label: "Home", icon: Home, badge: null },
+    ],
+  },
+  {
+    label: "CRIAÇÃO",
+    items: [
+      { path: "/dashboard/pagina", label: "Minha Vitrine", icon: Layout, badge: null },
+      { path: "/dashboard/aparencia", label: "Aparência", icon: Palette, badge: null },
+    ],
+  },
+  {
+    label: "MONETIZAÇÃO",
+    items: [
+      { path: "/dashboard/monetizacao", label: "Monetização", icon: Wallet, badge: null },
+    ],
+  },
+  {
+    label: "AUDIÊNCIA",
+    items: [
+      { path: "/dashboard/audiencia", label: "Audiência", icon: Users, badge: null },
+    ],
+  },
+  {
+    label: "CRESCIMENTO",
+    items: [
+      { path: "/dashboard/automacoes", label: "Automações", icon: Zap, badge: null },
+      { path: "/dashboard/ia", label: "IA Maview", icon: Bot, badge: "Novo" },
+    ],
+  },
+  {
+    label: "SISTEMA",
+    items: [
+      { path: "/dashboard/configuracoes", label: "Configurações", icon: Settings, badge: null },
+    ],
+  },
 ];
 
 interface Props {
@@ -85,44 +126,56 @@ const DashboardLayout = ({ children }: Props) => {
 
       <div className="mx-4 dash-divider" />
 
-      <nav className="flex-1 px-3 pt-4 space-y-0.5 overflow-y-auto">
-        {NAV_ITEMS.map(({ path, label, icon: Icon, badge }) => {
-          const active = location.pathname === path;
-          return (
-            <Link
-              key={path}
-              to={path}
-              onClick={() => setMobileOpen(false)}
-              className={`
-                flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium
-                transition-all duration-200 group relative
-                ${active
-                  ? "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-accent-fg))]"
-                  : "text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text-secondary))] hover:bg-[hsl(var(--dash-surface-2))]"
-                }
-              `}
-            >
-              {active && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-primary" />
-              )}
-              <Icon
-                size={17}
-                strokeWidth={active ? 2.2 : 1.8}
-                className={`transition-colors flex-shrink-0 ${active ? "text-primary" : "text-[hsl(var(--dash-text-subtle))] group-hover:text-primary/60"}`}
-              />
-              {!collapsed && (
-                <>
-                  <span className="flex-1">{label}</span>
-                  {badge && (
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-fuchsia-100 text-fuchsia-600 leading-none">
-                      {badge}
-                    </span>
-                  )}
-                </>
-              )}
-            </Link>
-          );
-        })}
+      <nav className="flex-1 px-3 pt-4 space-y-4 overflow-y-auto">
+        {NAV_GROUPS.map((group, gi) => (
+          <div key={gi}>
+            {group.label && !collapsed && (
+              <p className="text-[10px] font-semibold tracking-widest text-[hsl(var(--dash-text-subtle))] uppercase px-3 mb-2">
+                {group.label}
+              </p>
+            )}
+            {group.label && collapsed && <div className="dash-divider mx-1 mb-2" />}
+            <div className="space-y-0.5">
+              {group.items.map(({ path, label, icon: Icon, badge }) => {
+                const active = location.pathname === path;
+                return (
+                  <Link
+                    key={path}
+                    to={path}
+                    onClick={() => setMobileOpen(false)}
+                    className={`
+                      flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium
+                      transition-all duration-200 group relative
+                      ${active
+                        ? "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-accent-fg))]"
+                        : "text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text-secondary))] hover:bg-[hsl(var(--dash-surface-2))]"
+                      }
+                    `}
+                  >
+                    {active && (
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-primary" />
+                    )}
+                    <Icon
+                      size={17}
+                      strokeWidth={active ? 2.2 : 1.8}
+                      className={`transition-colors flex-shrink-0 ${active ? "text-primary" : "text-[hsl(var(--dash-text-subtle))] group-hover:text-primary/60"}`}
+                    />
+                    {!collapsed && (
+                      <>
+                        <span className="flex-1">{label}</span>
+                        {badge && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-fuchsia-100 text-fuchsia-600 leading-none">
+                            {badge}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
       <div className="hidden md:block px-3 pb-4 pt-2">
