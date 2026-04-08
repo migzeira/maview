@@ -34,19 +34,19 @@
 
     --radius: 0.75rem;
 
-    --sidebar-background: 263 60% 97%;
+    --sidebar-background: 263 65% 94%;
     --sidebar-foreground: 263 20% 40%;
     --sidebar-primary: 263 90% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 263 80% 94%;
+    --sidebar-accent: 263 70% 91%;
     --sidebar-accent-foreground: 263 90% 58%;
-    --sidebar-border: 263 25% 91%;
+    --sidebar-border: 263 30% 88%;
     --sidebar-ring: 263 90% 58%;
 
     /* Dashboard light tokens */
     --dash-bg: 263 30% 98%;
-    --dash-surface: 263 60% 97%;
-    --dash-surface-2: 263 40% 96%;
+    --dash-surface: 263 65% 94%;
+    --dash-surface-2: 263 55% 93%;
     --dash-border: 263 25% 90%;
     --dash-border-subtle: 263 20% 93%;
     --dash-purple: 263 90% 58%;
