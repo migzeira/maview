@@ -606,6 +606,11 @@ const DashboardPagina = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
 
+  // Health action highlight
+  const [highlightField, setHighlightField] = useState<HealthAction | null>(null);
+  const whatsappInputRef = useRef<HTMLInputElement>(null);
+  const themeGridRef = useRef<HTMLDivElement>(null);
+
   // ── Load ──────────────────────────────────────────────────────────────────
 
   useEffect(() => {
@@ -884,11 +889,21 @@ const DashboardPagina = () => {
     }, 80);
   };
 
+  // Auto-clear highlight after 3.5s
+  useEffect(() => {
+    if (!highlightField) return;
+    const t = setTimeout(() => setHighlightField(null), 3500);
+    return () => clearTimeout(t);
+  }, [highlightField]);
+
   const handleHealthAction = (action: HealthAction) => {
+    setHighlightField(action);
     switch (action) {
       case "theme":
         setActiveTab("design");
-        scrollToForm();
+        setTimeout(() => {
+          themeGridRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 120);
         break;
       case "products":
         setActiveTab("vitrine");
@@ -907,7 +922,10 @@ const DashboardPagina = () => {
         break;
       case "whatsapp":
         setActiveTab("perfil");
-        scrollToForm();
+        setTimeout(() => {
+          whatsappInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+          whatsappInputRef.current?.focus();
+        }, 120);
         break;
     }
   };
@@ -1337,9 +1355,16 @@ const DashboardPagina = () => {
 
                 {/* Product form */}
                 {activeForm === "product" && productForm && (
-                  <div className="rounded-2xl border border-primary/20 bg-[hsl(var(--dash-accent))]/30 p-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
-                    <h3 className="text-[hsl(var(--dash-text))] text-sm font-semibold">
+                  <div className={`rounded-2xl border bg-[hsl(var(--dash-accent))]/30 p-4 space-y-3 animate-in slide-in-from-top-2 duration-200 transition-all ${
+                    highlightField === "products"
+                      ? "border-primary/70 shadow-[0_0_22px_rgba(139,92,246,0.4)]"
+                      : "border-primary/20"
+                  }`}>
+                    <h3 className="text-[hsl(var(--dash-text))] text-sm font-semibold flex items-center gap-2">
                       {editingProductId ? "Editar Produto" : "Novo Produto"}
+                      {highlightField === "products" && !editingProductId && (
+                        <span className="text-[10px] font-bold text-primary animate-bounce">← preencha e salve</span>
+                      )}
                     </h3>
                     <div>
                       <label className={labelCls}>Emoji</label>
@@ -1450,9 +1475,16 @@ const DashboardPagina = () => {
 
                 {/* Link form */}
                 {activeForm === "link" && linkForm && (
-                  <div className="rounded-2xl border border-primary/20 bg-[hsl(var(--dash-accent))]/30 p-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
-                    <h3 className="text-[hsl(var(--dash-text))] text-sm font-semibold">
+                  <div className={`rounded-2xl border bg-[hsl(var(--dash-accent))]/30 p-4 space-y-3 animate-in slide-in-from-top-2 duration-200 transition-all ${
+                    highlightField === "links"
+                      ? "border-primary/70 shadow-[0_0_22px_rgba(139,92,246,0.4)]"
+                      : "border-primary/20"
+                  }`}>
+                    <h3 className="text-[hsl(var(--dash-text))] text-sm font-semibold flex items-center gap-2">
                       {editingLinkId ? "Editar Link" : "Novo Link"}
+                      {highlightField === "links" && !editingLinkId && (
+                        <span className="text-[10px] font-bold text-primary animate-bounce">← preencha e salve</span>
+                      )}
                     </h3>
                     <div>
                       <label className={labelCls}>Ícone</label>
@@ -1531,9 +1563,16 @@ const DashboardPagina = () => {
 
                 {/* Testimonial form */}
                 {activeForm === "testimonial" && (
-                  <div className="rounded-2xl border border-primary/20 bg-[hsl(var(--dash-accent))]/30 p-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
-                    <h3 className="text-[hsl(var(--dash-text))] text-sm font-semibold">
+                  <div className={`rounded-2xl border bg-[hsl(var(--dash-accent))]/30 p-4 space-y-3 animate-in slide-in-from-top-2 duration-200 transition-all ${
+                    highlightField === "testimonials"
+                      ? "border-primary/70 shadow-[0_0_22px_rgba(139,92,246,0.4)]"
+                      : "border-primary/20"
+                  }`}>
+                    <h3 className="text-[hsl(var(--dash-text))] text-sm font-semibold flex items-center gap-2">
                       {editingTestimonialId ? "Editar Depoimento" : "Novo Depoimento"}
+                      {highlightField === "testimonials" && !editingTestimonialId && (
+                        <span className="text-[10px] font-bold text-primary animate-bounce">← preencha e salve</span>
+                      )}
                     </h3>
                     <div>
                       <label className={labelCls}>Nome</label>
@@ -1888,10 +1927,21 @@ const DashboardPagina = () => {
                 </div>
 
                 <div>
-                  <label className={labelCls}>WhatsApp <span className="text-[hsl(var(--dash-text-subtle))] font-normal">(opcional)</span></label>
-                  <div className="flex items-center">
+                  <label className={labelCls}>
+                    WhatsApp <span className="text-[hsl(var(--dash-text-subtle))] font-normal">(opcional)</span>
+                    {highlightField === "whatsapp" && (
+                      <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-bold text-primary animate-bounce">
+                        ← adicione aqui
+                      </span>
+                    )}
+                  </label>
+                  <div className={`flex items-center rounded-xl transition-all duration-300 ${
+                    highlightField === "whatsapp"
+                      ? "ring-2 ring-primary shadow-[0_0_18px_rgba(139,92,246,0.45)]"
+                      : ""
+                  }`}>
                     <span className="flex-shrink-0 rounded-l-xl border border-r-0 border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] text-sm px-3 py-2.5 select-none">+55</span>
-                    <input type="tel" className={`${inputCls} rounded-l-none`} placeholder="11999999999"
+                    <input ref={whatsappInputRef} type="tel" className={`${inputCls} rounded-l-none`} placeholder="11999999999"
                       value={config.whatsapp}
                       onChange={e => updateConfig("whatsapp", e.target.value.replace(/\D/g, ""))} />
                   </div>
@@ -1914,8 +1964,17 @@ const DashboardPagina = () => {
 
                 {/* Theme selector grid */}
                 <div>
-                  <label className={labelCls}>Tema</label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <label className={labelCls}>
+                    Tema
+                    {highlightField === "theme" && (
+                      <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-bold text-primary animate-bounce">
+                        ← escolha um tema
+                      </span>
+                    )}
+                  </label>
+                  <div ref={themeGridRef} className={`grid grid-cols-3 gap-2 rounded-xl transition-all duration-300 ${
+                    highlightField === "theme" ? "ring-2 ring-primary p-1 shadow-[0_0_18px_rgba(139,92,246,0.45)]" : ""
+                  }`}>
                     {THEMES.map(theme => {
                       const isActive = config.theme === theme.id;
                       return (
