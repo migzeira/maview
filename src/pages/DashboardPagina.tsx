@@ -1374,11 +1374,81 @@ const DashboardPagina = () => {
 
   // ── Phone preview ─────────────────────────────────────────────────────────
 
+  /* ─── Resolved design for preview ─── */
+  const d = { ...DEFAULT_DESIGN, ...config.design };
+  const pAccent = d.accentColor || currentTheme.accent;
+  const pAccent2 = d.accentColor2 || currentTheme.accent2;
+  const pBg = d.bgColor || currentTheme.bg;
+  const pText = d.textColor || "#f8f5ff";
+  const pSub = d.subtextColor || "rgba(200,200,200,0.7)";
+  const pCard = d.cardBg || currentTheme.accent + "0a";
+  const pBorder = d.cardBorder || currentTheme.accent + "30";
+  const pFontH = d.fontHeading || "Inter";
+  const pFontB = d.fontBody || "Inter";
+  const pBtnRadius = d.buttonShape === "pill" ? "999px" : d.buttonShape === "square" ? "4px" : d.buttonShape === "soft" ? "12px" : `${d.buttonRadius}px`;
+  const pBtnShadow = d.buttonShadow === "glow" ? `0 0 12px ${pAccent}40` : d.buttonShadow === "md" ? "0 3px 8px rgba(0,0,0,0.3)" : d.buttonShadow === "sm" ? "0 1px 4px rgba(0,0,0,0.2)" : "none";
+  const pBtnStyle: React.CSSProperties = d.buttonFill === "outline"
+    ? { background: "transparent", border: `1.5px solid ${pBorder}`, borderRadius: pBtnRadius, boxShadow: pBtnShadow }
+    : d.buttonFill === "glass"
+    ? { background: `${pCard}aa`, backdropFilter: "blur(8px)", border: `1px solid ${pBorder}`, borderRadius: pBtnRadius, boxShadow: pBtnShadow }
+    : d.buttonFill === "ghost"
+    ? { background: "transparent", borderRadius: pBtnRadius, boxShadow: pBtnShadow }
+    : { background: pCard, border: `1px solid ${pBorder}`, borderRadius: pBtnRadius, boxShadow: pBtnShadow };
+  const pProfileRadius = d.profileShape === "circle" ? "9999px" : d.profileShape === "rounded" ? "20%" : d.profileShape === "square" ? "6px" : "0";
+  const pProfileClip = d.profileShape === "hexagon" ? "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" : undefined;
+  const pSize = Math.round((d.profileSize || 88) * 0.7); // scale down for mini preview
+
+  /* Background CSS for preview */
+  const previewBgStyle: React.CSSProperties = (() => {
+    switch (d.bgType) {
+      case "gradient": {
+        const dir = d.bgGradientDir === "radial" ? "" : (
+          { "to-b": "to bottom", "to-t": "to top", "to-r": "to right", "to-l": "to left", "to-br": "to bottom right", "to-bl": "to bottom left", "to-tr": "to top right", "to-tl": "to top left" } as any
+        )[d.bgGradientDir] || "to bottom";
+        return d.bgGradientDir === "radial"
+          ? { background: `radial-gradient(circle, ${d.bgGradient[0]}, ${d.bgGradient[1]})` }
+          : { background: `linear-gradient(${dir}, ${d.bgGradient[0]}, ${d.bgGradient[1]})` };
+      }
+      case "image": return d.bgImageUrl ? { backgroundImage: `url(${d.bgImageUrl})`, backgroundSize: "cover", backgroundPosition: "center" } : { background: pBg };
+      case "effect": return { background: pBg };
+      default: return { background: pBg };
+    }
+  })();
+
+  /* Effect overlay for phone preview — CSS-based mini effect */
+  const previewEffectOverlay: React.CSSProperties | null = (() => {
+    if (d.bgType !== "effect" || !d.bgEffect) return null;
+    const a = pAccent;
+    switch (d.bgEffect) {
+      case "aurora": return { background: `linear-gradient(135deg, ${a}30, transparent 40%, ${a}20 70%, transparent)` };
+      case "aurora-waves": return { background: `linear-gradient(180deg, transparent 10%, ${a}25 40%, transparent 60%, ${a}15 80%, transparent)` };
+      case "ambient-glow": return { background: `radial-gradient(circle at center, ${a}30, transparent 70%)` };
+      case "spotlight": return { background: `radial-gradient(ellipse at 50% 30%, ${a}35, transparent 60%)` };
+      case "radial-glow": return { background: `radial-gradient(circle, ${a}25, transparent 65%)` };
+      case "gradient-flow": return { background: `linear-gradient(45deg, ${a}30, #ec489920, ${a}30)` };
+      case "gradient-mesh": return { background: `radial-gradient(at 20% 30%, ${a}25 0%, transparent 50%), radial-gradient(at 80% 70%, #ec489920 0%, transparent 50%)` };
+      case "gradient-shift": return { background: `linear-gradient(90deg, ${a}20, #60a5fa20, ${a}20)` };
+      case "starfield": return { background: `radial-gradient(1px 1px at 20% 30%, white 50%, transparent), radial-gradient(1px 1px at 70% 60%, white 50%, transparent), radial-gradient(1px 1px at 40% 80%, white 50%, transparent)` };
+      case "floating-dots": return { background: `radial-gradient(2px 2px at 25% 25%, ${a}40, transparent), radial-gradient(2px 2px at 75% 45%, ${a}30, transparent), radial-gradient(2px 2px at 50% 75%, ${a}20, transparent)` };
+      case "sparkles": return { background: `radial-gradient(1px 1px at 30% 20%, ${a} 50%, transparent), radial-gradient(1px 1px at 60% 50%, #fcd34d 50%, transparent), radial-gradient(1px 1px at 80% 80%, ${a} 50%, transparent)` };
+      case "wave-layers": return { background: `linear-gradient(180deg, transparent 30%, ${a}15 50%, ${a}08 70%, transparent)` };
+      case "flow-field": return { background: `linear-gradient(135deg, transparent 20%, ${a}10 40%, transparent 60%, ${a}08 80%)` };
+      case "liquid": return { background: `radial-gradient(ellipse at 30% 50%, ${a}20 0%, transparent 60%), radial-gradient(ellipse at 70% 50%, #ec489915 0%, transparent 60%)` };
+      case "matrix-grid": return { backgroundImage: `linear-gradient(${a}15 1px, transparent 1px), linear-gradient(90deg, ${a}15 1px, transparent 1px)`, backgroundSize: "8px 8px" };
+      case "pulse-grid": return { backgroundImage: `radial-gradient(${a}30 1px, transparent 1px)`, backgroundSize: "10px 10px" };
+      case "scan-lines": return { backgroundImage: `repeating-linear-gradient(0deg, transparent 0px, transparent 2px, ${a}08 2px, ${a}08 4px)` };
+      case "fog": return { background: `linear-gradient(135deg, transparent, rgba(255,255,255,0.04) 40%, transparent 70%)` };
+      case "smoke": return { background: `radial-gradient(ellipse at 40% 60%, rgba(255,255,255,0.05), transparent 60%)` };
+      case "clouds": return { background: `radial-gradient(ellipse at 30% 40%, rgba(255,255,255,0.06) 0%, transparent 50%), radial-gradient(ellipse at 70% 60%, rgba(255,255,255,0.04) 0%, transparent 50%)` };
+      default: return null;
+    }
+  })();
+
   const phonePreview = (
     <div className="relative">
       <div className="rounded-[2.8rem] border-[3px] border-[hsl(var(--dash-text))] overflow-hidden shadow-2xl">
         {/* Status bar */}
-        <div className="flex items-center justify-between px-6 pt-3 pb-1" style={{ background: currentTheme.bg }}>
+        <div className="flex items-center justify-between px-6 pt-3 pb-1" style={{ background: pBg }}>
           <span className="text-[10px] font-semibold" style={{ color: "rgba(255,255,255,0.7)" }}>9:41</span>
           <div className="flex items-center gap-1">
             <div className="flex gap-[2px] items-end">
@@ -1393,32 +1463,41 @@ const DashboardPagina = () => {
         </div>
 
         {/* Dynamic Island */}
-        <div className="flex justify-center pb-3" style={{ background: currentTheme.bg }}>
+        <div className="flex justify-center pb-3" style={{ background: pBg }}>
           <div className="w-[88px] h-[26px] rounded-full bg-black" />
         </div>
 
         {/* Scrollable screen content */}
-        <div className="overflow-y-auto" style={{ background: `linear-gradient(160deg,${currentTheme.bg} 60%,${currentTheme.accent}18)`, maxHeight: 500 }}>
-          <div className="p-5">
+        <div className="overflow-y-auto relative" style={{ ...previewBgStyle, maxHeight: 500, fontFamily: `'${pFontB}', sans-serif` }}>
+          {/* Effect overlay */}
+          {previewEffectOverlay && <div className="absolute inset-0 pointer-events-none z-[1]" style={previewEffectOverlay} />}
+          {/* Ambient glow */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[200px] pointer-events-none" style={{ background: `radial-gradient(ellipse, ${pAccent}20, transparent 70%)` }} />
+          <div className="p-5 relative z-10">
             {/* Profile */}
             <div className="flex flex-col items-center mb-5">
-              <div className="w-16 h-16 rounded-full mb-2.5 overflow-hidden"
-                style={{ boxShadow: `0 0 0 2px ${currentTheme.accent}40` }}>
+              <div className="mb-2.5 overflow-hidden"
+                style={{
+                  width: pSize, height: pSize,
+                  borderRadius: pProfileRadius,
+                  clipPath: pProfileClip,
+                  boxShadow: d.profileBorder ? `0 0 0 2px ${d.profileBorderColor || pAccent}50` : "none",
+                }}>
                 {config.avatarUrl ? (
                   <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover"
                     onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center"
-                    style={{ background: `linear-gradient(135deg,${currentTheme.accent},${currentTheme.accent2})` }}>
+                    style={{ background: `linear-gradient(135deg,${pAccent},${pAccent2})` }}>
                     <span className="text-white text-xl font-bold">
                       {config.displayName ? config.displayName[0].toUpperCase() : "?"}
                     </span>
                   </div>
                 )}
               </div>
-              <p className="font-bold text-sm text-white">{config.displayName || "Seu Nome"}</p>
-              {config.username && <p className="text-xs mt-0.5" style={{ color: currentTheme.accent }}>@{config.username}</p>}
-              {config.bio && <p className="text-xs text-center mt-1.5 px-2 line-clamp-2" style={{ color: "rgba(200,200,200,0.7)" }}>{config.bio}</p>}
+              <p className="font-bold text-sm" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif` }}>{config.displayName || "Seu Nome"}</p>
+              {config.username && <p className="text-xs mt-0.5" style={{ color: pAccent }}>@{config.username}</p>}
+              {config.bio && <p className="text-xs text-center mt-1.5 px-2 line-clamp-2" style={{ color: pSub }}>{config.bio}</p>}
               {config.whatsapp && (
                 <div className="flex items-center gap-1 mt-2 px-2.5 py-1 rounded-full" style={{ background: "#25d36618" }}>
                   <MessageCircle size={10} style={{ color: "#25d366" }} />
@@ -1433,8 +1512,8 @@ const DashboardPagina = () => {
                 const p = config.products.find(pr => pr.id === block.refId);
                 if (!p || !p.active || !isScheduledActive(p)) return null;
                 return (
-                  <div key={block.id} className="flex items-center gap-2.5 rounded-xl border p-2.5 mb-2 transition-all hover:scale-[1.01]"
-                    style={{ borderColor: currentTheme.accent + "30", background: currentTheme.accent + "0a" }}>
+                  <div key={block.id} className="flex items-center gap-2.5 p-2.5 mb-2 transition-all hover:scale-[1.01]"
+                    style={{ ...pBtnStyle }}>
                     {(p.images?.length > 0) ? (
                       <div className="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0">
                         <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover" />
@@ -1443,20 +1522,20 @@ const DashboardPagina = () => {
                       <span className="text-base flex-shrink-0">{p.emoji}</span>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold truncate text-white">{p.title}</p>
+                      <p className="text-xs font-semibold truncate" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif` }}>{p.title}</p>
                       <div className="flex items-center gap-2">
                         {p.originalPrice && (
-                          <span className="text-[9px] line-through" style={{ color: "rgba(200,200,200,0.4)" }}>{p.originalPrice}</span>
+                          <span className="text-[9px] line-through" style={{ color: pSub }}>{p.originalPrice}</span>
                         )}
-                        {p.price && <p className="text-[10px] font-bold" style={{ color: currentTheme.accent }}>{p.price}</p>}
+                        {p.price && <p className="text-[10px] font-bold" style={{ color: pAccent }}>{p.price}</p>}
                       </div>
                     </div>
                     {p.badge && (
-                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: currentTheme.accent + "25", color: currentTheme.accent }}>
+                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: pAccent + "25", color: pAccent }}>
                         {p.badge}
                       </span>
                     )}
-                    {p.urgency && <Clock size={10} style={{ color: currentTheme.accent2 }} />}
+                    {p.urgency && <Clock size={10} style={{ color: pAccent2 }} />}
                   </div>
                 );
               }
@@ -1465,23 +1544,23 @@ const DashboardPagina = () => {
                 if (!l || !l.active || !isScheduledActive(l)) return null;
                 if (l.type === "header") return (
                   <div key={block.id} className="flex items-center gap-2 mb-2">
-                    <div className="flex-1 h-px" style={{ background: currentTheme.accent + "30" }} />
-                    <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: currentTheme.accent + "80" }}>{l.title}</span>
-                    <div className="flex-1 h-px" style={{ background: currentTheme.accent + "30" }} />
+                    <div className="flex-1 h-px" style={{ background: pAccent + "30" }} />
+                    <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: pAccent + "80" }}>{l.title}</span>
+                    <div className="flex-1 h-px" style={{ background: pAccent + "30" }} />
                   </div>
                 );
                 if (l.type === "spotlight") return (
-                  <div key={block.id} className="rounded-xl p-2.5 mb-2 flex items-center justify-center gap-2 transition-all hover:scale-[1.01]"
-                    style={{ background: `linear-gradient(135deg,${currentTheme.accent}25,${currentTheme.accent2}18)`, border: `1px solid ${currentTheme.accent}40` }}>
-                    <span style={{ color: currentTheme.accent }}>{LINK_ICON_MAP[l.icon]}</span>
-                    <span className="text-xs font-bold" style={{ color: currentTheme.accent }}>{l.title || l.url}</span>
+                  <div key={block.id} className="p-2.5 mb-2 flex items-center justify-center gap-2 transition-all hover:scale-[1.01]"
+                    style={{ background: `linear-gradient(135deg,${pAccent}25,${pAccent2}18)`, border: `1px solid ${pAccent}40`, borderRadius: pBtnRadius }}>
+                    <span style={{ color: pAccent }}>{LINK_ICON_MAP[l.icon]}</span>
+                    <span className="text-xs font-bold" style={{ color: pAccent }}>{l.title || l.url}</span>
                   </div>
                 );
                 return (
-                  <div key={block.id} className="flex items-center gap-2 rounded-xl border p-2.5 mb-2 transition-all hover:scale-[1.01]"
-                    style={{ borderColor: currentTheme.accent + "25", background: currentTheme.accent + "08" }}>
-                    <span style={{ color: currentTheme.accent }}>{LINK_ICON_MAP[l.icon]}</span>
-                    <span className="text-xs truncate" style={{ color: "rgba(200,200,200,0.8)" }}>{l.title || l.url}</span>
+                  <div key={block.id} className="flex items-center gap-2 p-2.5 mb-2 transition-all hover:scale-[1.01]"
+                    style={{ ...pBtnStyle }}>
+                    <span style={{ color: pAccent }}>{LINK_ICON_MAP[l.icon]}</span>
+                    <span className="text-xs truncate" style={{ color: pSub }}>{l.title || l.url}</span>
                   </div>
                 );
               }
@@ -1489,32 +1568,32 @@ const DashboardPagina = () => {
                 const t = config.testimonials.find(te => te.id === block.refId);
                 if (!t) return null;
                 return (
-                  <div key={block.id} className="rounded-xl border p-2.5 mb-2"
-                    style={{ borderColor: currentTheme.accent + "20", background: currentTheme.accent + "08" }}>
+                  <div key={block.id} className="p-2.5 mb-2"
+                    style={{ ...pBtnStyle }}>
                     <div className="flex items-center gap-2 mb-1.5">
                       {t.avatar ? (
                         <img src={t.avatar} alt={t.name} className="w-5 h-5 rounded-full object-cover" />
                       ) : (
                         <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white"
-                          style={{ background: `linear-gradient(135deg,${currentTheme.accent},${currentTheme.accent2})` }}>
+                          style={{ background: `linear-gradient(135deg,${pAccent},${pAccent2})` }}>
                           {t.name[0]?.toUpperCase()}
                         </div>
                       )}
-                      <p className="text-[9px] font-semibold" style={{ color: currentTheme.accent }}>
-                        {t.name} {t.role && <span style={{ color: "rgba(200,200,200,0.5)" }}>· {t.role}</span>}
+                      <p className="text-[9px] font-semibold" style={{ color: pAccent }}>
+                        {t.name} {t.role && <span style={{ color: pSub }}>· {t.role}</span>}
                       </p>
                     </div>
                     <div className="text-[10px] mb-1">{"⭐".repeat(t.stars)}</div>
-                    <p className="text-[9px] line-clamp-2 italic" style={{ color: "rgba(187,187,187,0.9)" }}>"{t.text}"</p>
+                    <p className="text-[9px] line-clamp-2 italic" style={{ color: pSub }}>"{t.text}"</p>
                   </div>
                 );
               }
               if (block.type === "header") {
                 return (
                   <div key={block.id} className="flex items-center gap-2 mb-2">
-                    <div className="flex-1 h-px" style={{ background: currentTheme.accent + "30" }} />
-                    <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: currentTheme.accent + "80" }}>{block.title}</span>
-                    <div className="flex-1 h-px" style={{ background: currentTheme.accent + "30" }} />
+                    <div className="flex-1 h-px" style={{ background: pAccent + "30" }} />
+                    <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: pAccent + "80" }}>{block.title}</span>
+                    <div className="flex-1 h-px" style={{ background: pAccent + "30" }} />
                   </div>
                 );
               }
@@ -2967,14 +3046,69 @@ const DashboardPagina = () => {
 
             {/* ═══════════════ TAB: DESIGN ═══════════════ */}
             {activeTab === "design" && (
-              <DesignTab
-                config={config}
-                themes={THEMES}
-                defaultDesign={DEFAULT_DESIGN}
-                updateConfig={updateConfig}
-                highlightField={highlightField}
-                themeGridRef={themeGridRef}
-              />
+              <div>
+                {/* Fixed mini preview — visible on mobile while scrolling Design tab */}
+                <div className="lg:hidden fixed top-0 left-0 right-0 z-40 px-4 py-3 border-b border-[hsl(var(--dash-border-subtle))]"
+                  style={{ background: "hsl(var(--dash-surface) / 0.97)", backdropFilter: "blur(16px)" }}>
+                  <div className="flex items-center gap-3">
+                    {/* Mini phone mockup */}
+                    <div className="flex-shrink-0 w-[140px] rounded-2xl overflow-hidden border-2 border-[hsl(var(--dash-text))]/30 shadow-lg">
+                      <div className="overflow-hidden relative" style={{ ...previewBgStyle, height: 180, fontFamily: `'${pFontB}', sans-serif` }}>
+                        {previewEffectOverlay && <div className="absolute inset-0 pointer-events-none z-[1]" style={previewEffectOverlay} />}
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[80px] pointer-events-none" style={{ background: `radial-gradient(ellipse, ${pAccent}20, transparent 70%)` }} />
+                        <div className="p-2.5 relative z-10">
+                          <div className="flex flex-col items-center mb-2">
+                            <div className="mb-1 overflow-hidden"
+                              style={{
+                                width: 28, height: 28,
+                                borderRadius: pProfileRadius,
+                                clipPath: pProfileClip,
+                                boxShadow: d.profileBorder ? `0 0 0 1px ${d.profileBorderColor || pAccent}50` : "none",
+                              }}>
+                              {config.avatarUrl ? (
+                                <img src={config.avatarUrl} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-[8px] font-bold text-white"
+                                  style={{ background: `linear-gradient(135deg,${pAccent},${pAccent2})` }}>
+                                  {(config.displayName || "?")[0]}
+                                </div>
+                              )}
+                            </div>
+                            <p className="text-[7px] font-bold" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif` }}>{config.displayName || "Nome"}</p>
+                          </div>
+                          {/* Mini product/link placeholders */}
+                          {blocks.slice(0, 3).map(block => (
+                            <div key={block.id} className="h-[16px] mb-1 flex items-center gap-1 px-1.5"
+                              style={{ ...pBtnStyle, padding: "2px 4px" }}>
+                              <div className="w-2.5 h-2.5 rounded flex-shrink-0" style={{ background: pAccent + "30" }} />
+                              <div className="flex-1 h-1 rounded" style={{ background: pText + "30" }} />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[hsl(var(--dash-text))] text-xs font-semibold">Preview ao vivo</p>
+                      <p className="text-[hsl(var(--dash-text-subtle))] text-[10px] mt-0.5">As mudanças aparecem aqui em tempo real</p>
+                      <button onClick={() => setShowMobilePreview(true)}
+                        className="mt-2 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-semibold text-primary bg-primary/10 border border-primary/20 hover:bg-primary/15 transition-all">
+                        <Eye size={10} /> Ver tela cheia
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="lg:pt-0 pt-[140px]">
+                  <DesignTab
+                    config={config}
+                    themes={THEMES}
+                    defaultDesign={DEFAULT_DESIGN}
+                    updateConfig={updateConfig}
+                    highlightField={highlightField}
+                    themeGridRef={themeGridRef}
+                  />
+                </div>
+              </div>
             )}
 
             {/* Auto-save toast */}

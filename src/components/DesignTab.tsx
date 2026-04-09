@@ -357,53 +357,60 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   const accent = d.accentColor || currentTheme.accent;
 
   return (
-    <div className="space-y-5 pb-24">
+    <div className="space-y-4 pb-24">
 
       {/* ═══════════ HEADER ═══════════ */}
       <div className="flex items-center justify-between">
-        <h2 className="text-[hsl(var(--dash-text))] font-semibold text-base">Visual da Vitrine</h2>
+        <div>
+          <h2 className="text-[hsl(var(--dash-text))] font-semibold text-base">Personalizar</h2>
+          <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Ajuste cores, fundo e estilo — tudo reflete ao vivo</p>
+        </div>
         {config.avatarUrl && (
-          <Tooltip text="Cria um tema automático baseado nas cores da sua foto de perfil">
+          <Tooltip text="Gera cores automaticamente a partir da sua foto de perfil">
             <button onClick={autoThemeFromAvatar}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-semibold text-fuchsia-500 bg-fuchsia-500/10 border border-fuchsia-500/20 hover:bg-fuchsia-500/15 transition-all">
-              <Wand2 size={11} /> Auto-tema da foto
+              <Wand2 size={11} /> Auto-cores
             </button>
           </Tooltip>
         )}
       </div>
 
-      {/* ═══════════ SECTION 1: Theme Presets ═══════════ */}
-      <SectionCard title="Temas prontos" icon={<Palette size={14} />} desc="Escolha um tema base — depois personalize tudo abaixo">
-        <div ref={themeGridRef} className={`grid grid-cols-3 gap-2 pt-2 rounded-xl transition-all duration-300 ${
-          highlightField === "theme" ? "ring-2 ring-primary p-1 shadow-[0_0_18px_rgba(139,92,246,0.45)]" : ""
-        }`}>
-          {themes.filter(t => t.id !== "custom").map(theme => {
-            const isActive = config.theme === theme.id;
-            return (
-              <Tooltip key={theme.id} text={`Tema ${theme.label} — clique para aplicar`}>
-                <button onClick={() => updateConfig("theme", theme.id)}
-                  className={`relative rounded-xl overflow-hidden border-2 transition-all w-full ${
-                    isActive ? "border-primary shadow-lg scale-[1.02]" : "border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 hover:scale-[1.01]"
-                  }`}>
-                  <div className="h-[60px] p-2 flex flex-col items-center justify-center gap-1"
-                    style={{ background: `linear-gradient(160deg, ${theme.bg} 60%, ${theme.accent}20)` }}>
-                    <div className="w-5 h-5 rounded-full" style={{ background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` }} />
-                    <div className="w-10 h-1 rounded" style={{ background: theme.accent + "30" }} />
-                  </div>
-                  <div className={`px-1.5 py-1 text-center ${isActive ? "bg-primary/10" : "bg-[hsl(var(--dash-surface-2))]"}`}>
-                    <p className={`text-[9px] font-medium truncate ${isActive ? "text-primary" : "text-[hsl(var(--dash-text-secondary))]"}`}>
-                      {theme.label}
-                    </p>
-                  </div>
-                  {isActive && (
-                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
-                      <Check size={8} className="text-white" />
-                    </div>
-                  )}
-                </button>
-              </Tooltip>
-            );
-          })}
+      {/* ═══════════ SECTION 1: Colors (most impactful) ═══════════ */}
+      <SectionCard title="Cores" icon={<Palette size={14} />} desc="As cores definem a identidade visual — comece por aqui">
+        <div className="space-y-3 pt-2">
+          <div className="grid grid-cols-2 gap-3">
+            <ColorPicker value={d.accentColor || currentTheme.accent} onChange={v => { setDesign("accentColor", v); updateConfig("theme", "custom"); }} label="Cor principal" />
+            <ColorPicker value={d.accentColor2 || currentTheme.accent2} onChange={v => { setDesign("accentColor2", v); updateConfig("theme", "custom"); }} label="Cor secundária" />
+          </div>
+          <div>
+            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Paleta rápida</p>
+            <div className="grid grid-cols-8 gap-1.5">
+              {ACCENT_COLORS.map(c => (
+                <Tooltip key={c} text={c.toUpperCase()}>
+                  <button onClick={() => { setDesign("accentColor", c); updateConfig("theme", "custom"); }}
+                    className={`w-full aspect-square rounded-lg transition-all hover:scale-110 ${
+                      (d.accentColor || currentTheme.accent) === c ? "ring-2 ring-white scale-110" : "ring-1 ring-white/10"
+                    }`} style={{ background: c }} />
+                </Tooltip>
+              ))}
+            </div>
+          </div>
+          <details className="group">
+            <summary className="text-[10px] text-[hsl(var(--dash-text-subtle))] cursor-pointer hover:text-[hsl(var(--dash-text-muted))] transition-colors select-none flex items-center gap-1">
+              <ChevronDown size={10} className="group-open:rotate-180 transition-transform" />
+              Cores avançadas (textos, cards)
+            </summary>
+            <div className="mt-2 space-y-2">
+              <div className="grid grid-cols-2 gap-3">
+                <ColorPicker value={d.textColor || "#f8f5ff"} onChange={v => setDesign("textColor", v)} label="Texto" />
+                <ColorPicker value={d.subtextColor || "rgba(248,245,255,0.5)"} onChange={v => setDesign("subtextColor", v)} label="Subtexto" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <ColorPicker value={d.cardBg || "#13102a"} onChange={v => setDesign("cardBg", v)} label="Fundo card" />
+                <ColorPicker value={d.cardBorder || "rgba(168,85,247,0.18)"} onChange={v => setDesign("cardBorder", v)} label="Borda card" />
+              </div>
+            </div>
+          </details>
         </div>
       </SectionCard>
 
@@ -631,10 +638,10 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
               {BG_EFFECTS
                 .filter(e => effectFilter === "all" || e.category === effectFilter)
                 .map(effect => {
-                  const isActive = (d as any).bgEffect === effect.id;
+                  const isActive = d.bgEffect === effect.id;
                   return (
                     <button key={effect.id}
-                      onClick={() => { setDesign("bgEffect" as any, effect.id); updateConfig("theme", "custom"); }}
+                      onClick={() => { setDesign("bgEffect", effect.id); updateConfig("theme", "custom"); }}
                       className={`relative rounded-xl overflow-hidden text-left transition-all ${
                         isActive ? "ring-2 ring-primary scale-[1.02]" : "ring-1 ring-white/10 hover:ring-primary/30 hover:scale-[1.01]"
                       }`}>
@@ -674,39 +681,177 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         )}
       </SectionCard>
 
-      {/* ═══════════ SECTION 3: Colors ═══════════ */}
-      <SectionCard title="Cores" icon={<Palette size={14} />} desc="Ajuste as cores principais, textos, cards e acentos">
-        <div className="space-y-3 pt-2">
-          <div className="grid grid-cols-2 gap-3">
-            <ColorPicker value={d.accentColor || currentTheme.accent} onChange={v => { setDesign("accentColor", v); updateConfig("theme", "custom"); }} label="Cor principal" />
-            <ColorPicker value={d.accentColor2 || currentTheme.accent2} onChange={v => { setDesign("accentColor2", v); updateConfig("theme", "custom"); }} label="Cor secundária" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <ColorPicker value={d.textColor || "#f8f5ff"} onChange={v => setDesign("textColor", v)} label="Texto" />
-            <ColorPicker value={d.subtextColor || "rgba(248,245,255,0.5)"} onChange={v => setDesign("subtextColor", v)} label="Subtexto" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <ColorPicker value={d.cardBg || "#13102a"} onChange={v => setDesign("cardBg", v)} label="Fundo card" />
-            <ColorPicker value={d.cardBorder || "rgba(168,85,247,0.18)"} onChange={v => setDesign("cardBorder", v)} label="Borda card" />
-          </div>
+      {/* ═══════════ SECTION 3: Button Styles ═══════════ */}
+      <SectionCard title="Estilo dos botões" icon={<Square size={14} />} desc="Formato, preenchimento e sombra — afeta todos os CTAs">
+        <div className="space-y-4 pt-2">
+          {/* Shape */}
           <div>
-            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Paleta rápida — clique para definir a cor principal</p>
-            <div className="grid grid-cols-8 gap-1.5">
-              {ACCENT_COLORS.map(c => (
-                <Tooltip key={c} text={c.toUpperCase()}>
-                  <button onClick={() => { setDesign("accentColor", c); updateConfig("theme", "custom"); }}
-                    className={`w-full aspect-square rounded-lg transition-all hover:scale-110 ${
-                      (d.accentColor || currentTheme.accent) === c ? "ring-2 ring-white scale-110" : "ring-1 ring-white/10"
-                    }`} style={{ background: c }} />
+            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Formato</p>
+            <div className="grid grid-cols-4 gap-1.5">
+              {([
+                { shape: "rounded" as ButtonShape, label: "Arredondado", radius: "12px", tip: "Cantos arredondados com raio customizável" },
+                { shape: "pill" as ButtonShape, label: "Pílula", radius: "999px", tip: "Totalmente arredondado como cápsula" },
+                { shape: "square" as ButtonShape, label: "Quadrado", radius: "4px", tip: "Cantos quase retos" },
+                { shape: "soft" as ButtonShape, label: "Suave", radius: "12px", tip: "Cantos levemente arredondados" },
+              ]).map(({ shape, label, radius, tip }) => (
+                <Tooltip key={shape} text={tip}>
+                  <button onClick={() => setDesign("buttonShape", shape)}
+                    className={`py-3 rounded-xl text-[10px] font-medium transition-all w-full ${
+                      d.buttonShape === shape ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/20"
+                    }`}>
+                    <div className="w-12 h-4 mx-auto mb-1.5 border border-current/40"
+                      style={{ borderRadius: radius, background: d.buttonShape === shape ? `${accent}20` : "transparent" }} />
+                    {label}
+                  </button>
                 </Tooltip>
               ))}
             </div>
           </div>
+
+          {/* Fill */}
+          <div>
+            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Preenchimento</p>
+            <div className="grid grid-cols-4 gap-1.5">
+              {([
+                { fill: "solid" as ButtonFill, label: "Sólido", tip: "Fundo sólido opaco" },
+                { fill: "outline" as ButtonFill, label: "Contorno", tip: "Apenas a borda, sem preenchimento" },
+                { fill: "glass" as ButtonFill, label: "Vidro", tip: "Efeito glassmorphism com desfoque" },
+                { fill: "ghost" as ButtonFill, label: "Fantasma", tip: "Transparente sem borda" },
+              ]).map(({ fill, label, tip }) => (
+                <Tooltip key={fill} text={tip}>
+                  <button onClick={() => setDesign("buttonFill", fill)}
+                    className={`py-3 rounded-xl text-[10px] font-medium transition-all w-full ${
+                      d.buttonFill === fill ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/20"
+                    }`}>
+                    {label}
+                  </button>
+                </Tooltip>
+              ))}
+            </div>
+          </div>
+
+          {/* Shadow + Radius in a row */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Sombra</p>
+              <div className="grid grid-cols-2 gap-1">
+                {([
+                  { shadow: "none" as ButtonShadow, label: "Sem", tip: "Sem sombra" },
+                  { shadow: "sm" as ButtonShadow, label: "Leve", tip: "Sombra sutil" },
+                  { shadow: "md" as ButtonShadow, label: "Média", tip: "Sombra mais evidente" },
+                  { shadow: "glow" as ButtonShadow, label: "Brilho", tip: "Brilho neon" },
+                ]).map(({ shadow, label, tip }) => (
+                  <Tooltip key={shadow} text={tip}>
+                    <button onClick={() => setDesign("buttonShadow", shadow)}
+                      className={`py-2 rounded-lg text-[9px] font-medium transition-all w-full ${
+                        d.buttonShadow === shadow ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent"
+                      }`}>
+                      {label}
+                    </button>
+                  </Tooltip>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Raio</p>
+                <span className="text-[10px] font-mono text-[hsl(var(--dash-text-muted))]">{d.buttonRadius}px</span>
+              </div>
+              <input type="range" min={0} max={24} value={d.buttonRadius} onChange={e => setDesign("buttonRadius", +e.target.value)}
+                className="w-full h-1.5 rounded-full appearance-none bg-[hsl(var(--dash-border))] accent-primary" />
+            </div>
+          </div>
+
+          {/* Compact button preview */}
+          <div className="p-3 rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))] space-y-2">
+            <p className="text-[9px] text-[hsl(var(--dash-text-subtle))]">Preview</p>
+            {(() => {
+              const radius = d.buttonShape === "pill" ? "999px" : d.buttonShape === "square" ? "4px" : d.buttonShape === "soft" ? "12px" : `${d.buttonRadius}px`;
+              const shadow = d.buttonShadow === "glow" ? `0 0 20px ${accent}40` : d.buttonShadow === "md" ? "0 4px 12px rgba(0,0,0,0.3)" : d.buttonShadow === "sm" ? "0 2px 6px rgba(0,0,0,0.2)" : "none";
+              const accent2 = d.accentColor2 || currentTheme.accent2;
+              const styles: Record<ButtonFill, React.CSSProperties> = {
+                solid: { background: accent, color: "#fff", borderRadius: radius, boxShadow: shadow },
+                outline: { background: "transparent", color: accent, border: `2px solid ${accent}`, borderRadius: radius, boxShadow: shadow },
+                glass: { background: `${accent}20`, color: accent, backdropFilter: "blur(10px)", border: `1px solid ${accent}30`, borderRadius: radius, boxShadow: shadow },
+                ghost: { background: "transparent", color: accent, borderRadius: radius, boxShadow: shadow },
+              };
+              return (
+                <div className="flex gap-2">
+                  <button className="flex-1 py-2 px-3 text-[11px] font-semibold transition-all" style={styles[d.buttonFill]}>
+                    {d.buttonFill === "solid" ? "Sólido" : d.buttonFill === "outline" ? "Contorno" : d.buttonFill === "glass" ? "Vidro" : "Fantasma"}
+                  </button>
+                  <button className="flex-1 py-2 px-3 text-[11px] font-semibold text-white transition-all"
+                    style={{ background: `linear-gradient(135deg, ${accent}, ${accent2})`, borderRadius: radius, boxShadow: shadow }}>
+                    CTA
+                  </button>
+                </div>
+              );
+            })()}
+          </div>
         </div>
       </SectionCard>
 
-      {/* ═══════════ SECTION 4: Fonts ═══════════ */}
-      <SectionCard title="Tipografia" icon={<Type size={14} />} defaultOpen={false} desc="Fontes do Google Fonts para títulos e corpo de texto">
+      {/* ═══════════ SECTION 4: Profile Photo ═══════════ */}
+      <SectionCard title="Foto de perfil" icon={<Circle size={14} />} defaultOpen={false} desc="Formato, tamanho e borda da foto">
+        <div className="space-y-3 pt-2">
+          <div className="grid grid-cols-4 gap-1.5">
+            {([
+              { shape: "circle" as ProfileShape, label: "Círculo", cls: "rounded-full", tip: "Formato redondo clássico" },
+              { shape: "rounded" as ProfileShape, label: "Arredondado", cls: "rounded-2xl", tip: "Quadrado com cantos arredondados" },
+              { shape: "square" as ProfileShape, label: "Quadrado", cls: "rounded-none", tip: "Sem arredondamento" },
+              { shape: "hexagon" as ProfileShape, label: "Hexágono", cls: "rounded-full", tip: "Formato hexagonal" },
+            ]).map(({ shape, label, cls, tip }) => (
+              <Tooltip key={shape} text={tip}>
+                <button onClick={() => setDesign("profileShape", shape)}
+                  className={`flex flex-col items-center gap-1 py-2.5 rounded-xl text-[9px] font-medium transition-all w-full ${
+                    d.profileShape === shape ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/20"
+                  }`}>
+                  <div className={`w-6 h-6 ${cls} bg-gradient-to-br from-primary/40 to-primary/20 border border-primary/30`}
+                    style={shape === "hexagon" ? { clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" } : {}} />
+                  {label}
+                </button>
+              </Tooltip>
+            ))}
+          </div>
+          <div className="grid grid-cols-2 gap-3 items-center">
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Tamanho</p>
+                <span className="text-[10px] font-mono text-[hsl(var(--dash-text-muted))]">{d.profileSize}px</span>
+              </div>
+              <input type="range" min={64} max={120} value={d.profileSize} onChange={e => setDesign("profileSize", +e.target.value)}
+                className="w-full h-1.5 rounded-full appearance-none bg-[hsl(var(--dash-border))] accent-primary" />
+            </div>
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Borda colorida</p>
+              <Tooltip text={d.profileBorder ? "Desativar borda" : "Ativar borda colorida"}>
+                <button onClick={() => setDesign("profileBorder", !d.profileBorder)}
+                  className={`relative w-9 h-5 rounded-full transition-colors ${d.profileBorder ? "bg-primary" : "bg-[hsl(var(--dash-border))]"}`}>
+                  <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${d.profileBorder ? "left-[18px]" : "left-0.5"}`} />
+                </button>
+              </Tooltip>
+            </div>
+          </div>
+          {d.profileBorder && (
+            <ColorPicker value={d.profileBorderColor || d.accentColor || currentTheme.accent}
+              onChange={v => setDesign("profileBorderColor", v)} label="Cor da borda" />
+          )}
+          {config.avatarUrl && (
+            <div className="flex justify-center p-3 rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))]">
+              <img src={config.avatarUrl} alt="preview" className="object-cover"
+                style={{
+                  width: d.profileSize, height: d.profileSize,
+                  borderRadius: d.profileShape === "circle" ? "9999px" : d.profileShape === "rounded" ? "20%" : d.profileShape === "square" ? "8px" : "0",
+                  clipPath: d.profileShape === "hexagon" ? "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" : undefined,
+                  border: d.profileBorder ? `2.5px solid ${d.profileBorderColor || accent}60` : "none",
+                }} />
+            </div>
+          )}
+        </div>
+      </SectionCard>
+
+      {/* ═══════════ SECTION 5: Typography ═══════════ */}
+      <SectionCard title="Tipografia" icon={<Type size={14} />} defaultOpen={false} desc="Fontes do Google Fonts para títulos e corpo">
         <div className="space-y-3 pt-2">
           <div className="flex gap-1 flex-wrap">
             {[
@@ -776,215 +921,54 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         </div>
       </SectionCard>
 
-      {/* ═══════════ SECTION 5: Button Styles ═══════════ */}
-      <SectionCard title="Estilo dos botões" icon={<Square size={14} />} defaultOpen={false} desc="Formato, preenchimento e sombra dos botões e cards">
-        <div className="space-y-4 pt-2">
-          {/* Shape */}
-          <div>
-            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Formato — como o botão é moldado</p>
-            <div className="grid grid-cols-4 gap-1.5">
-              {([
-                { shape: "rounded" as ButtonShape, label: "Arredondado", radius: "12px", tip: "Cantos arredondados com raio customizável" },
-                { shape: "pill" as ButtonShape, label: "Pílula", radius: "999px", tip: "Totalmente arredondado como cápsula" },
-                { shape: "square" as ButtonShape, label: "Quadrado", radius: "4px", tip: "Cantos quase retos" },
-                { shape: "soft" as ButtonShape, label: "Suave", radius: "12px", tip: "Cantos levemente arredondados" },
-              ]).map(({ shape, label, radius, tip }) => (
-                <Tooltip key={shape} text={tip}>
-                  <button onClick={() => setDesign("buttonShape", shape)}
-                    className={`py-3 rounded-xl text-[10px] font-medium transition-all w-full ${
-                      d.buttonShape === shape ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/20"
-                    }`}>
-                    <div className="w-12 h-4 mx-auto mb-1.5 border border-current/40"
-                      style={{ borderRadius: radius, background: d.buttonShape === shape ? `${accent}20` : "transparent" }} />
-                    {label}
-                  </button>
-                </Tooltip>
-              ))}
-            </div>
-          </div>
-
-          {/* Fill */}
-          <div>
-            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Preenchimento — como o botão é preenchido</p>
-            <div className="grid grid-cols-4 gap-1.5">
-              {([
-                { fill: "solid" as ButtonFill, label: "Sólido", tip: "Fundo sólido opaco" },
-                { fill: "outline" as ButtonFill, label: "Contorno", tip: "Apenas a borda, sem preenchimento" },
-                { fill: "glass" as ButtonFill, label: "Vidro", tip: "Efeito glassmorphism com desfoque" },
-                { fill: "ghost" as ButtonFill, label: "Fantasma", tip: "Transparente sem borda" },
-              ]).map(({ fill, label, tip }) => (
-                <Tooltip key={fill} text={tip}>
-                  <button onClick={() => setDesign("buttonFill", fill)}
-                    className={`py-3 rounded-xl text-[10px] font-medium transition-all w-full ${
-                      d.buttonFill === fill ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/20"
-                    }`}>
-                    {label}
-                  </button>
-                </Tooltip>
-              ))}
-            </div>
-          </div>
-
-          {/* Shadow */}
-          <div>
-            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Sombra — profundidade do botão</p>
-            <div className="grid grid-cols-4 gap-1.5">
-              {([
-                { shadow: "none" as ButtonShadow, label: "Nenhuma", tip: "Sem sombra" },
-                { shadow: "sm" as ButtonShadow, label: "Leve", tip: "Sombra sutil e delicada" },
-                { shadow: "md" as ButtonShadow, label: "Média", tip: "Sombra mais evidente" },
-                { shadow: "glow" as ButtonShadow, label: "Brilho", tip: "Brilho neon na cor do tema" },
-              ]).map(({ shadow, label, tip }) => (
-                <Tooltip key={shadow} text={tip}>
-                  <button onClick={() => setDesign("buttonShadow", shadow)}
-                    className={`py-3 rounded-xl text-[10px] font-medium transition-all w-full ${
-                      d.buttonShadow === shadow ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/20"
-                    }`}>
-                    {label}
-                  </button>
-                </Tooltip>
-              ))}
-            </div>
-          </div>
-
-          {/* Border Radius slider */}
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Arredondamento</p>
-              <span className="text-[10px] font-mono text-[hsl(var(--dash-text-muted))]">{d.buttonRadius}px</span>
-            </div>
-            <input type="range" min={0} max={24} value={d.buttonRadius} onChange={e => setDesign("buttonRadius", +e.target.value)}
-              className="w-full h-1.5 rounded-full appearance-none bg-[hsl(var(--dash-border))] accent-primary" />
-          </div>
-
-          {/* Button preview — all 4 fills shown simultaneously */}
-          <div className="p-3 rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))] space-y-2">
-            <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] mb-2">Preview ao vivo — como seus botões ficam</p>
-            {(() => {
-              const radius = d.buttonShape === "pill" ? "999px" : d.buttonShape === "square" ? "4px" : d.buttonShape === "soft" ? "12px" : `${d.buttonRadius}px`;
-              const shadow = d.buttonShadow === "glow" ? `0 0 20px ${accent}40` : d.buttonShadow === "md" ? "0 4px 12px rgba(0,0,0,0.3)" : d.buttonShadow === "sm" ? "0 2px 6px rgba(0,0,0,0.2)" : "none";
-              const accent2 = d.accentColor2 || currentTheme.accent2;
-
-              const styles: Record<ButtonFill, React.CSSProperties> = {
-                solid: { background: accent, color: "#fff", borderRadius: radius, boxShadow: shadow },
-                outline: { background: "transparent", color: accent, border: `2px solid ${accent}`, borderRadius: radius, boxShadow: shadow },
-                glass: { background: `${accent}20`, color: accent, backdropFilter: "blur(10px)", border: `1px solid ${accent}30`, borderRadius: radius, boxShadow: shadow },
-                ghost: { background: "transparent", color: accent, borderRadius: radius, boxShadow: shadow },
-              };
-
-              return (
-                <div className="space-y-2">
-                  {/* Main selected fill */}
-                  <button className="w-full py-2.5 px-4 text-[12px] font-semibold transition-all" style={styles[d.buttonFill]}>
-                    ← Estilo atual: {d.buttonFill === "solid" ? "Sólido" : d.buttonFill === "outline" ? "Contorno" : d.buttonFill === "glass" ? "Vidro" : "Fantasma"}
-                  </button>
-                  {/* CTA button preview */}
-                  <button className="w-full py-2.5 px-4 text-[12px] font-semibold text-white transition-all"
-                    style={{ background: `linear-gradient(135deg, ${accent}, ${accent2})`, borderRadius: radius, boxShadow: shadow }}>
-                    Botão CTA (Comprar / WhatsApp)
-                  </button>
-                </div>
-              );
-            })()}
-          </div>
+      {/* ═══════════ SECTION 6: Theme Presets (quick start) ═══════════ */}
+      <SectionCard title="Temas prontos" icon={<Sliders size={14} />} defaultOpen={false} desc="Atalho — aplique um tema base e personalize depois">
+        <div ref={themeGridRef} className={`grid grid-cols-4 gap-1.5 pt-2 rounded-xl transition-all duration-300 ${
+          highlightField === "theme" ? "ring-2 ring-primary p-1 shadow-[0_0_18px_rgba(139,92,246,0.45)]" : ""
+        }`}>
+          {themes.filter(t => t.id !== "custom").map(theme => {
+            const isActive = config.theme === theme.id;
+            return (
+              <Tooltip key={theme.id} text={`Tema ${theme.label}`}>
+                <button onClick={() => updateConfig("theme", theme.id)}
+                  className={`relative rounded-xl overflow-hidden border-2 transition-all w-full ${
+                    isActive ? "border-primary shadow-lg scale-[1.02]" : "border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 hover:scale-[1.01]"
+                  }`}>
+                  <div className="h-[44px] flex items-center justify-center"
+                    style={{ background: `linear-gradient(160deg, ${theme.bg} 60%, ${theme.accent}20)` }}>
+                    <div className="w-4 h-4 rounded-full" style={{ background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` }} />
+                  </div>
+                  <div className={`px-1 py-0.5 text-center ${isActive ? "bg-primary/10" : "bg-[hsl(var(--dash-surface-2))]"}`}>
+                    <p className={`text-[8px] font-medium truncate ${isActive ? "text-primary" : "text-[hsl(var(--dash-text-secondary))]"}`}>
+                      {theme.label}
+                    </p>
+                  </div>
+                  {isActive && (
+                    <div className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-primary flex items-center justify-center">
+                      <Check size={7} className="text-white" />
+                    </div>
+                  )}
+                </button>
+              </Tooltip>
+            );
+          })}
         </div>
       </SectionCard>
 
-      {/* ═══════════ SECTION 6: Profile Photo ═══════════ */}
-      <SectionCard title="Foto de perfil" icon={<Circle size={14} />} defaultOpen={false} desc="Formato, tamanho e borda da foto de perfil">
-        <div className="space-y-4 pt-2">
-          <div>
-            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Formato da foto</p>
-            <div className="grid grid-cols-4 gap-1.5">
-              {([
-                { shape: "circle" as ProfileShape, label: "Círculo", cls: "rounded-full", tip: "Formato redondo clássico" },
-                { shape: "rounded" as ProfileShape, label: "Arredondado", cls: "rounded-2xl", tip: "Quadrado com cantos arredondados" },
-                { shape: "square" as ProfileShape, label: "Quadrado", cls: "rounded-none", tip: "Formato quadrado sem arredondamento" },
-                { shape: "hexagon" as ProfileShape, label: "Hexágono", cls: "rounded-full", tip: "Formato hexagonal diferenciado" },
-              ]).map(({ shape, label, cls, tip }) => (
-                <Tooltip key={shape} text={tip}>
-                  <button onClick={() => setDesign("profileShape", shape)}
-                    className={`flex flex-col items-center gap-1.5 py-3 rounded-xl text-[10px] font-medium transition-all w-full ${
-                      d.profileShape === shape ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/20"
-                    }`}>
-                    <div className={`w-8 h-8 ${cls} bg-gradient-to-br from-primary/40 to-primary/20 border border-primary/30`}
-                      style={shape === "hexagon" ? { clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" } : {}} />
-                    {label}
-                  </button>
-                </Tooltip>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Tamanho</p>
-              <span className="text-[10px] font-mono text-[hsl(var(--dash-text-muted))]">{d.profileSize}px</span>
-            </div>
-            <input type="range" min={64} max={120} value={d.profileSize} onChange={e => setDesign("profileSize", +e.target.value)}
-              className="w-full h-1.5 rounded-full appearance-none bg-[hsl(var(--dash-border))] accent-primary" />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Borda colorida</p>
-            <Tooltip text={d.profileBorder ? "Desativar borda" : "Ativar borda colorida"}>
-              <button onClick={() => setDesign("profileBorder", !d.profileBorder)}
-                className={`relative w-9 h-5 rounded-full transition-colors ${d.profileBorder ? "bg-primary" : "bg-[hsl(var(--dash-border))]"}`}>
-                <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${d.profileBorder ? "left-[18px]" : "left-0.5"}`} />
-              </button>
-            </Tooltip>
-          </div>
-
-          {d.profileBorder && (
-            <ColorPicker value={d.profileBorderColor || d.accentColor || currentTheme.accent}
-              onChange={v => setDesign("profileBorderColor", v)} label="Cor da borda" />
-          )}
-
-          {/* Profile preview */}
-          {config.avatarUrl && (
-            <div className="flex justify-center p-3 rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))]">
-              <div className="relative">
-                <div className="absolute inset-[-3px] blur-[10px] opacity-40"
-                  style={{
-                    background: `radial-gradient(circle, ${accent}, ${d.accentColor2 || currentTheme.accent2})`,
-                    borderRadius: d.profileShape === "circle" ? "9999px" : d.profileShape === "rounded" ? "20%" : d.profileShape === "square" ? "8px" : "0",
-                    clipPath: d.profileShape === "hexagon" ? "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" : undefined,
-                  }} />
-                <img src={config.avatarUrl} alt="preview"
-                  className="relative object-cover"
-                  style={{
-                    width: d.profileSize, height: d.profileSize,
-                    borderRadius: d.profileShape === "circle" ? "9999px" : d.profileShape === "rounded" ? "20%" : d.profileShape === "square" ? "8px" : "0",
-                    clipPath: d.profileShape === "hexagon" ? "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" : undefined,
-                    border: d.profileBorder ? `2.5px solid ${d.profileBorderColor || accent}60` : "none",
-                  }} />
-              </div>
-            </div>
-          )}
-        </div>
-      </SectionCard>
-
-      {/* ═══════════ SECTION 7: Current theme summary ═══════════ */}
-      <div className="flex items-center gap-3 p-3 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))]">
-        <div className="flex gap-1.5">
-          {[
-            d.bgColor || currentTheme.bg,
-            d.accentColor || currentTheme.accent,
-            d.accentColor2 || currentTheme.accent2,
-          ].map((c, i) => (
-            <div key={i} className="w-6 h-6 rounded-full ring-1 ring-white/10" style={{ background: c }} />
+      {/* ═══════════ Summary bar ═══════════ */}
+      <div className="flex items-center gap-3 p-3 rounded-xl bg-[hsl(var(--dash-surface-2))]/60 border border-[hsl(var(--dash-border-subtle))]">
+        <div className="flex gap-1">
+          {[d.bgColor || currentTheme.bg, d.accentColor || currentTheme.accent, d.accentColor2 || currentTheme.accent2].map((c, i) => (
+            <div key={i} className="w-5 h-5 rounded-full ring-1 ring-white/10" style={{ background: c }} />
           ))}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-[hsl(var(--dash-text))] text-xs font-medium truncate">
-            {config.theme === "custom" ? "Tema Personalizado" : `Tema: ${currentTheme.label}`}
-          </p>
-          <p className="text-[hsl(var(--dash-text-subtle))] text-[10px]">
-            {d.fontHeading !== "Inter" ? d.fontHeading : ""}{d.fontHeading !== "Inter" && d.fontBody !== "Inter" ? " + " : ""}{d.fontBody !== "Inter" && d.fontBody !== d.fontHeading ? d.fontBody : ""}{d.fontHeading === "Inter" && d.fontBody === "Inter" ? "Fonte padrão" : ""}
-            {d.bgType !== "solid" ? ` · Fundo: ${d.bgType === "gradient" ? "degradê" : d.bgType === "effect" ? "efeito animado" : d.bgType}` : ""}
+          <p className="text-[hsl(var(--dash-text))] text-[11px] font-medium truncate">
+            {config.theme === "custom" ? "Personalizado" : currentTheme.label}
+            {d.fontHeading !== "Inter" ? ` · ${d.fontHeading}` : ""}
+            {d.bgType !== "solid" ? ` · ${d.bgType === "gradient" ? "Degradê" : d.bgType === "effect" ? "Efeito" : d.bgType}` : ""}
           </p>
         </div>
-        <Sparkles size={14} className="text-primary flex-shrink-0" />
       </div>
 
     </div>
