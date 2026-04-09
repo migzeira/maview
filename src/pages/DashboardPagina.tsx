@@ -18,7 +18,7 @@ type ThemeId = "dark-purple" | "midnight" | "forest" | "rose" | "amber" | "ocean
   | "gold" | "sage" | "coral" | "indigo" | "slate" | "wine"
   | "custom";
 
-type BgType = "solid" | "gradient" | "image" | "video" | "pattern";
+type BgType = "solid" | "gradient" | "image" | "video" | "pattern" | "effect";
 type GradientDir = "to-b" | "to-t" | "to-r" | "to-l" | "to-br" | "to-bl" | "to-tr" | "to-tl" | "radial";
 type ButtonShape = "rounded" | "pill" | "square" | "soft";
 type ButtonFill = "solid" | "outline" | "glass" | "ghost";
@@ -37,6 +37,7 @@ interface DesignConfig {
   bgPattern: string;
   bgOverlay: number;       // 0-100 overlay darkness
   bgBlur: number;          // 0-20 px blur
+  bgEffect: string;        // 21st.dev effect id
 
   // Colors
   textColor: string;
@@ -170,7 +171,7 @@ const THEMES: { id: ThemeId; label: string; bg: string; accent: string; accent2:
 const DEFAULT_DESIGN: DesignConfig = {
   bgType: "solid", bgColor: "", bgGradient: ["#080612", "#1a0a2e"],
   bgGradientDir: "to-b", bgImageUrl: "", bgVideoUrl: "",
-  bgPattern: "", bgOverlay: 40, bgBlur: 0,
+  bgPattern: "", bgOverlay: 40, bgBlur: 0, bgEffect: "",
   textColor: "", subtextColor: "", cardBg: "", cardBorder: "",
   accentColor: "", accentColor2: "",
   fontHeading: "Inter", fontBody: "Inter",

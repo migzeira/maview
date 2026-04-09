@@ -2,14 +2,14 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import {
   Check, ChevronDown, Palette, Image, Video, Type, Square, Circle,
   Sparkles, Eye, Sliders, Upload, X, Play, Globe, Zap, Hexagon,
-  PaintBucket, Droplets, Sun, Moon, Layers, Grid3X3, Wand2,
+  PaintBucket, Droplets, Sun, Moon, Layers, Grid3X3, Wand2, Info,
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════════════════
    Types — must match DashboardPagina.tsx exactly
    ═══════════════════════════════════════════════════════════════════ */
 type ThemeId = string;
-type BgType = "solid" | "gradient" | "image" | "video" | "pattern";
+type BgType = "solid" | "gradient" | "image" | "video" | "pattern" | "effect";
 type GradientDir = "to-b" | "to-t" | "to-r" | "to-l" | "to-br" | "to-bl" | "to-tr" | "to-tl" | "radial";
 type ButtonShape = "rounded" | "pill" | "square" | "soft";
 type ButtonFill = "solid" | "outline" | "glass" | "ghost";
@@ -26,6 +26,7 @@ interface DesignConfig {
   bgPattern: string;
   bgOverlay: number;
   bgBlur: number;
+  bgEffect: string;
   textColor: string;
   subtextColor: string;
   cardBg: string;
@@ -70,14 +71,54 @@ interface DesignTabProps {
 /* ═══════════════════════════════════════════════════════════════════
    Constants
    ═══════════════════════════════════════════════════════════════════ */
-const BG_PATTERNS: { id: string; label: string }[] = [
-  { id: "dots", label: "Pontos" },
-  { id: "grid", label: "Grade" },
-  { id: "diagonal", label: "Diagonal" },
-  { id: "waves", label: "Ondas" },
-  { id: "cross", label: "Cruz" },
-  { id: "hexagon", label: "Hexágono" },
-  { id: "noise", label: "Textura" },
+const BG_PATTERNS: { id: string; label: string; desc: string }[] = [
+  { id: "dots", label: "Pontos", desc: "Padrão de pontos delicados" },
+  { id: "grid", label: "Grade", desc: "Linhas cruzadas em grade" },
+  { id: "diagonal", label: "Diagonal", desc: "Linhas diagonais sutis" },
+  { id: "waves", label: "Ondas", desc: "Ondas suaves e orgânicas" },
+  { id: "cross", label: "Cruz", desc: "Padrão de cruzes minimalista" },
+  { id: "hexagon", label: "Hexágono", desc: "Hexágonos geométricos" },
+  { id: "noise", label: "Textura", desc: "Textura granulada sutil" },
+];
+
+/* ═══ 21st.dev Animated Background Effects (CSS-only) ═══ */
+const BG_EFFECTS: { id: string; label: string; desc: string; category: string }[] = [
+  // Aurora / Glow
+  { id: "aurora", label: "Aurora", desc: "Luzes do norte animadas", category: "glow" },
+  { id: "aurora-waves", label: "Aurora Ondas", desc: "Aurora com ondulação suave", category: "glow" },
+  { id: "ambient-glow", label: "Brilho Ambiente", desc: "Brilho radial pulsante", category: "glow" },
+  { id: "spotlight", label: "Holofote", desc: "Foco de luz centralizado", category: "glow" },
+  { id: "radial-glow", label: "Brilho Radial", desc: "Brilho que se expande do centro", category: "glow" },
+  // Gradient animated
+  { id: "gradient-flow", label: "Gradiente Fluido", desc: "Gradiente que se move suavemente", category: "gradient" },
+  { id: "gradient-mesh", label: "Malha Gradiente", desc: "Gradiente com malha de cores", category: "gradient" },
+  { id: "gradient-shift", label: "Gradiente Shift", desc: "Cores que mudam gradualmente", category: "gradient" },
+  // Particle / Space
+  { id: "starfield", label: "Campo Estelar", desc: "Estrelas piscando suavemente", category: "particle" },
+  { id: "floating-dots", label: "Pontos Flutuantes", desc: "Partículas flutuando lentamente", category: "particle" },
+  { id: "sparkles", label: "Brilhos", desc: "Brilhos aparecendo e sumindo", category: "particle" },
+  // Wave / Flow
+  { id: "wave-layers", label: "Camadas de Onda", desc: "Ondas em camadas animadas", category: "wave" },
+  { id: "flow-field", label: "Campo de Fluxo", desc: "Linhas fluindo suavemente", category: "wave" },
+  { id: "liquid", label: "Líquido", desc: "Efeito líquido orgânico", category: "wave" },
+  // Grid / Tech
+  { id: "matrix-grid", label: "Grade Matrix", desc: "Grade digital animada", category: "tech" },
+  { id: "pulse-grid", label: "Grade Pulsante", desc: "Grade com pulsos luminosos", category: "tech" },
+  { id: "scan-lines", label: "Scan Lines", desc: "Linhas de varredura retro", category: "tech" },
+  // Atmospheric
+  { id: "fog", label: "Névoa", desc: "Névoa suave em movimento", category: "atmosphere" },
+  { id: "smoke", label: "Fumaça", desc: "Fumaça lenta e atmosférica", category: "atmosphere" },
+  { id: "clouds", label: "Nuvens", desc: "Nuvens passando lentamente", category: "atmosphere" },
+];
+
+const EFFECT_CATEGORIES = [
+  { key: "all", label: "Todos" },
+  { key: "glow", label: "Brilho" },
+  { key: "gradient", label: "Gradiente" },
+  { key: "particle", label: "Partículas" },
+  { key: "wave", label: "Ondas" },
+  { key: "tech", label: "Tech" },
+  { key: "atmosphere", label: "Atmosfera" },
 ];
 
 const GOOGLE_FONTS = [
@@ -144,7 +185,6 @@ const ACCENT_COLORS: string[] = [
    Helpers
    ═══════════════════════════════════════════════════════════════════ */
 
-// Extract dominant color from image using canvas
 function extractColorsFromImage(imgSrc: string): Promise<{ dominant: string; accent: string }> {
   return new Promise((resolve) => {
     const img = new window.Image();
@@ -158,13 +198,12 @@ function extractColorsFromImage(imgSrc: string): Promise<{ dominant: string; acc
       ctx.drawImage(img, 0, 0, size, size);
       const data = ctx.getImageData(0, 0, size, size).data;
 
-      // Simple color quantization
       const colorCounts: Record<string, number> = {};
       for (let i = 0; i < data.length; i += 16) {
         const r = Math.round(data[i] / 32) * 32;
         const g = Math.round(data[i + 1] / 32) * 32;
         const b = Math.round(data[i + 2] / 32) * 32;
-        if (data[i + 3] < 128) continue; // skip transparent
+        if (data[i + 3] < 128) continue;
         const key = `${r},${g},${b}`;
         colorCounts[key] = (colorCounts[key] || 0) + 1;
       }
@@ -184,7 +223,6 @@ function extractColorsFromImage(imgSrc: string): Promise<{ dominant: string; acc
   });
 }
 
-// Load Google Font
 function loadFont(fontName: string) {
   const id = `gfont-${fontName.replace(/\s+/g, "-")}`;
   if (document.getElementById(id)) return;
@@ -193,6 +231,34 @@ function loadFont(fontName: string) {
   link.rel = "stylesheet";
   link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@400;500;600;700&display=swap`;
   document.head.appendChild(link);
+}
+
+/* Get CSS for an effect mini-preview */
+function getEffectPreviewStyle(effectId: string, accent: string): React.CSSProperties {
+  const a = accent || "#a855f7";
+  switch (effectId) {
+    case "aurora": return { background: `linear-gradient(135deg, ${a}30, transparent, ${a}20)` };
+    case "aurora-waves": return { background: `linear-gradient(180deg, transparent 20%, ${a}25 50%, transparent 80%)` };
+    case "ambient-glow": return { background: `radial-gradient(circle at center, ${a}30, transparent 70%)` };
+    case "spotlight": return { background: `radial-gradient(ellipse at 50% 30%, ${a}35, transparent 60%)` };
+    case "radial-glow": return { background: `radial-gradient(circle, ${a}25, transparent 65%)` };
+    case "gradient-flow": return { background: `linear-gradient(45deg, ${a}30, #ec489920, ${a}30)` };
+    case "gradient-mesh": return { background: `radial-gradient(at 20% 30%, ${a}25 0%, transparent 50%), radial-gradient(at 80% 70%, #ec489920 0%, transparent 50%)` };
+    case "gradient-shift": return { background: `linear-gradient(90deg, ${a}20, #60a5fa20, ${a}20)` };
+    case "starfield": return { background: `radial-gradient(1px 1px at 20% 30%, white 50%, transparent), radial-gradient(1px 1px at 70% 60%, white 50%, transparent), radial-gradient(1px 1px at 40% 80%, white 50%, transparent), #0a0a18` };
+    case "floating-dots": return { background: `radial-gradient(2px 2px at 25% 25%, ${a}40, transparent), radial-gradient(2px 2px at 75% 45%, ${a}30, transparent), radial-gradient(2px 2px at 50% 75%, ${a}20, transparent)` };
+    case "sparkles": return { background: `radial-gradient(1px 1px at 30% 20%, ${a} 50%, transparent), radial-gradient(1px 1px at 60% 50%, #fcd34d 50%, transparent), radial-gradient(1px 1px at 80% 80%, ${a} 50%, transparent)` };
+    case "wave-layers": return { background: `linear-gradient(180deg, transparent 40%, ${a}15 60%, ${a}08 80%, transparent)` };
+    case "flow-field": return { background: `linear-gradient(135deg, transparent 20%, ${a}10 40%, transparent 60%, ${a}08 80%)` };
+    case "liquid": return { background: `radial-gradient(ellipse at 30% 50%, ${a}20 0%, transparent 60%), radial-gradient(ellipse at 70% 50%, #ec489915 0%, transparent 60%)` };
+    case "matrix-grid": return { backgroundImage: `linear-gradient(${a}15 1px, transparent 1px), linear-gradient(90deg, ${a}15 1px, transparent 1px)`, backgroundSize: "8px 8px" };
+    case "pulse-grid": return { backgroundImage: `radial-gradient(${a}30 1px, transparent 1px)`, backgroundSize: "10px 10px" };
+    case "scan-lines": return { backgroundImage: `repeating-linear-gradient(0deg, transparent 0px, transparent 2px, ${a}08 2px, ${a}08 4px)` };
+    case "fog": return { background: `linear-gradient(135deg, transparent, rgba(255,255,255,0.04) 40%, transparent 70%)` };
+    case "smoke": return { background: `radial-gradient(ellipse at 40% 60%, rgba(255,255,255,0.05), transparent 60%)` };
+    case "clouds": return { background: `radial-gradient(ellipse at 30% 40%, rgba(255,255,255,0.06) 0%, transparent 50%), radial-gradient(ellipse at 70% 60%, rgba(255,255,255,0.04) 0%, transparent 50%)` };
+    default: return {};
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -217,14 +283,17 @@ function ColorPicker({ value, onChange, label }: { value: string; onChange: (c: 
   );
 }
 
-function SectionCard({ title, icon, children, defaultOpen = true }: {
-  title: string; icon: React.ReactNode; children: React.ReactNode; defaultOpen?: boolean;
+function SectionCard({ title, icon, children, defaultOpen = true, desc }: {
+  title: string; icon: React.ReactNode; children: React.ReactNode; defaultOpen?: boolean; desc?: string;
 }) {
   return (
     <details open={defaultOpen} className="group rounded-2xl border border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface-2))]/60 overflow-hidden shadow-sm">
       <summary className="flex items-center gap-2 p-4 cursor-pointer select-none hover:bg-[hsl(var(--dash-accent))]/30 transition-colors">
         <span className="text-primary">{icon}</span>
-        <span className="text-[hsl(var(--dash-text-secondary))] text-xs font-semibold flex-1">{title}</span>
+        <div className="flex-1 min-w-0">
+          <span className="text-[hsl(var(--dash-text-secondary))] text-xs font-semibold">{title}</span>
+          {desc && <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] leading-tight mt-0.5">{desc}</p>}
+        </div>
         <ChevronDown size={14} className="text-[hsl(var(--dash-text-subtle))] group-open:rotate-180 transition-transform" />
       </summary>
       <div className="px-4 pb-4 space-y-3 border-t border-[hsl(var(--dash-border-subtle))]">
@@ -234,35 +303,45 @@ function SectionCard({ title, icon, children, defaultOpen = true }: {
   );
 }
 
+/* Tooltip that appears on hover */
+function Tooltip({ text, children }: { text: string; children: React.ReactNode }) {
+  return (
+    <div className="relative group/tip">
+      {children}
+      <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1.5 rounded-lg bg-[#1a1a2e] text-white text-[9px] font-medium shadow-xl border border-white/10 opacity-0 group-hover/tip:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
+        {text}
+        <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-r-[4px] border-t-[4px] border-transparent border-t-[#1a1a2e]" />
+      </div>
+    </div>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    Main DesignTab component
    ═══════════════════════════════════════════════════════════════════ */
 export default function DesignTab({ config, themes, defaultDesign, updateConfig, highlightField, themeGridRef }: DesignTabProps) {
-  const d: DesignConfig = { ...defaultDesign, ...config.design };
+  const d: DesignConfig = { ...defaultDesign, ...config.design } as DesignConfig;
   const currentTheme = themes.find(t => t.id === config.theme) ?? themes[0];
   const [fontFilter, setFontFilter] = useState<string>("all");
+  const [effectFilter, setEffectFilter] = useState<string>("all");
   const bgImageInputRef = useRef<HTMLInputElement>(null);
   const bgVideoInputRef = useRef<HTMLInputElement>(null);
 
   const inputCls = "w-full rounded-xl border border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text))] text-sm px-3.5 py-2.5 placeholder:text-[hsl(var(--dash-text-subtle))] focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary/40 transition-all";
 
-  // Update design sub-config
   const setDesign = useCallback((key: keyof DesignConfig, value: any) => {
     const prev = config.design || {};
     updateConfig("design", { ...prev, [key]: value });
   }, [config.design, updateConfig]);
 
-  // Load fonts on mount/change
   useEffect(() => {
     if (d.fontHeading && d.fontHeading !== "Inter") loadFont(d.fontHeading);
     if (d.fontBody && d.fontBody !== "Inter") loadFont(d.fontBody);
   }, [d.fontHeading, d.fontBody]);
 
-  // Auto-theme from avatar
   const autoThemeFromAvatar = useCallback(async () => {
     if (!config.avatarUrl) return;
     const colors = await extractColorsFromImage(config.avatarUrl);
-    // Darken dominant for background
     const darken = (hex: string) => {
       const r = Math.max(0, parseInt(hex.slice(1, 3), 16) * 0.15) | 0;
       const g = Math.max(0, parseInt(hex.slice(3, 5), 16) * 0.15) | 0;
@@ -275,6 +354,8 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     setDesign("accentColor2", colors.accent);
   }, [config.avatarUrl, updateConfig, setDesign]);
 
+  const accent = d.accentColor || currentTheme.accent;
+
   return (
     <div className="space-y-5 pb-24">
 
@@ -282,69 +363,73 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
       <div className="flex items-center justify-between">
         <h2 className="text-[hsl(var(--dash-text))] font-semibold text-base">Visual da Vitrine</h2>
         {config.avatarUrl && (
-          <button onClick={autoThemeFromAvatar}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-semibold text-fuchsia-500 bg-fuchsia-500/10 border border-fuchsia-500/20 hover:bg-fuchsia-500/15 transition-all">
-            <Wand2 size={11} /> Auto-tema da foto
-          </button>
+          <Tooltip text="Cria um tema automático baseado nas cores da sua foto de perfil">
+            <button onClick={autoThemeFromAvatar}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-semibold text-fuchsia-500 bg-fuchsia-500/10 border border-fuchsia-500/20 hover:bg-fuchsia-500/15 transition-all">
+              <Wand2 size={11} /> Auto-tema da foto
+            </button>
+          </Tooltip>
         )}
       </div>
 
       {/* ═══════════ SECTION 1: Theme Presets ═══════════ */}
-      <SectionCard title="Temas prontos" icon={<Palette size={14} />}>
-        <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] pt-2 -mb-1">
-          Escolha um tema base — depois personalize cada detalhe abaixo
-        </p>
+      <SectionCard title="Temas prontos" icon={<Palette size={14} />} desc="Escolha um tema base — depois personalize tudo abaixo">
         <div ref={themeGridRef} className={`grid grid-cols-3 gap-2 pt-2 rounded-xl transition-all duration-300 ${
           highlightField === "theme" ? "ring-2 ring-primary p-1 shadow-[0_0_18px_rgba(139,92,246,0.45)]" : ""
         }`}>
           {themes.filter(t => t.id !== "custom").map(theme => {
             const isActive = config.theme === theme.id;
             return (
-              <button key={theme.id} onClick={() => updateConfig("theme", theme.id)}
-                className={`relative rounded-xl overflow-hidden border-2 transition-all ${
-                  isActive ? "border-primary shadow-lg scale-[1.02]" : "border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 hover:scale-[1.01]"
-                }`}>
-                <div className="h-[60px] p-2 flex flex-col items-center justify-center gap-1"
-                  style={{ background: `linear-gradient(160deg, ${theme.bg} 60%, ${theme.accent}20)` }}>
-                  <div className="w-5 h-5 rounded-full" style={{ background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` }} />
-                  <div className="w-10 h-1 rounded" style={{ background: theme.accent + "30" }} />
-                </div>
-                <div className={`px-1.5 py-1 text-center ${isActive ? "bg-primary/10" : "bg-[hsl(var(--dash-surface-2))]"}`}>
-                  <p className={`text-[9px] font-medium truncate ${isActive ? "text-primary" : "text-[hsl(var(--dash-text-secondary))]"}`}>
-                    {theme.label}
-                  </p>
-                </div>
-                {isActive && (
-                  <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
-                    <Check size={8} className="text-white" />
+              <Tooltip key={theme.id} text={`Tema ${theme.label} — clique para aplicar`}>
+                <button onClick={() => updateConfig("theme", theme.id)}
+                  className={`relative rounded-xl overflow-hidden border-2 transition-all w-full ${
+                    isActive ? "border-primary shadow-lg scale-[1.02]" : "border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 hover:scale-[1.01]"
+                  }`}>
+                  <div className="h-[60px] p-2 flex flex-col items-center justify-center gap-1"
+                    style={{ background: `linear-gradient(160deg, ${theme.bg} 60%, ${theme.accent}20)` }}>
+                    <div className="w-5 h-5 rounded-full" style={{ background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` }} />
+                    <div className="w-10 h-1 rounded" style={{ background: theme.accent + "30" }} />
                   </div>
-                )}
-              </button>
+                  <div className={`px-1.5 py-1 text-center ${isActive ? "bg-primary/10" : "bg-[hsl(var(--dash-surface-2))]"}`}>
+                    <p className={`text-[9px] font-medium truncate ${isActive ? "text-primary" : "text-[hsl(var(--dash-text-secondary))]"}`}>
+                      {theme.label}
+                    </p>
+                  </div>
+                  {isActive && (
+                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                      <Check size={8} className="text-white" />
+                    </div>
+                  )}
+                </button>
+              </Tooltip>
             );
           })}
         </div>
       </SectionCard>
 
       {/* ═══════════ SECTION 2: Background ═══════════ */}
-      <SectionCard title="Fundo" icon={<Layers size={14} />}>
+      <SectionCard title="Fundo" icon={<Layers size={14} />} desc="Cor sólida, degradê, imagem, vídeo, padrão ou efeito animado">
         {/* BG Type selector */}
-        <div className="flex gap-1.5 pt-2">
+        <div className="flex gap-1.5 pt-2 flex-wrap">
           {([
-            { type: "solid" as BgType, icon: <PaintBucket size={12} />, label: "Cor" },
-            { type: "gradient" as BgType, icon: <Droplets size={12} />, label: "Degradê" },
-            { type: "image" as BgType, icon: <Image size={12} />, label: "Imagem" },
-            { type: "video" as BgType, icon: <Video size={12} />, label: "Vídeo" },
-            { type: "pattern" as BgType, icon: <Grid3X3 size={12} />, label: "Padrão" },
-          ]).map(({ type, icon, label }) => (
-            <button key={type} onClick={() => setDesign("bgType", type)}
-              className={`flex-1 flex flex-col items-center gap-1 px-2 py-2 rounded-xl text-[10px] font-medium transition-all ${
-                d.bgType === type
-                  ? "bg-primary/15 text-primary border border-primary/30"
-                  : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/20"
-              }`}>
-              {icon}
-              {label}
-            </button>
+            { type: "solid" as BgType, icon: <PaintBucket size={12} />, label: "Cor", tip: "Uma cor sólida de fundo" },
+            { type: "gradient" as BgType, icon: <Droplets size={12} />, label: "Degradê", tip: "Duas cores em transição suave" },
+            { type: "image" as BgType, icon: <Image size={12} />, label: "Imagem", tip: "Sua imagem como fundo" },
+            { type: "video" as BgType, icon: <Video size={12} />, label: "Vídeo", tip: "Vídeo em loop como fundo" },
+            { type: "pattern" as BgType, icon: <Grid3X3 size={12} />, label: "Padrão", tip: "Padrões geométricos sutis" },
+            { type: "effect" as BgType, icon: <Sparkles size={12} />, label: "Efeito", tip: "Efeitos animados estilo 21st.dev" },
+          ]).map(({ type, icon, label, tip }) => (
+            <Tooltip key={type} text={tip}>
+              <button onClick={() => setDesign("bgType", type)}
+                className={`flex-1 min-w-[60px] flex flex-col items-center gap-1 px-2 py-2 rounded-xl text-[10px] font-medium transition-all ${
+                  d.bgType === type
+                    ? "bg-primary/15 text-primary border border-primary/30"
+                    : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/20"
+                }`}>
+                {icon}
+                {label}
+              </button>
+            </Tooltip>
           ))}
         </div>
 
@@ -354,10 +439,12 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
             <ColorPicker value={d.bgColor || currentTheme.bg} onChange={v => { setDesign("bgColor", v); updateConfig("theme", "custom"); }} label="Cor de fundo" />
             <div className="grid grid-cols-8 gap-1.5">
               {SOLID_COLORS.map(c => (
-                <button key={c} onClick={() => { setDesign("bgColor", c); updateConfig("theme", "custom"); }}
-                  className={`w-full aspect-square rounded-lg ring-1 transition-all hover:scale-110 ${
-                    (d.bgColor || currentTheme.bg) === c ? "ring-2 ring-primary scale-110" : "ring-white/10"
-                  }`} style={{ background: c }} />
+                <Tooltip key={c} text={c.toUpperCase()}>
+                  <button onClick={() => { setDesign("bgColor", c); updateConfig("theme", "custom"); }}
+                    className={`w-full aspect-square rounded-lg ring-1 transition-all hover:scale-110 ${
+                      (d.bgColor || currentTheme.bg) === c ? "ring-2 ring-primary scale-110" : "ring-white/10"
+                    }`} style={{ background: c }} />
+                </Tooltip>
               ))}
             </div>
           </div>
@@ -370,28 +457,36 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
               <ColorPicker value={d.bgGradient[0]} onChange={v => { setDesign("bgGradient", [v, d.bgGradient[1]]); updateConfig("theme", "custom"); }} label="Cor 1" />
               <ColorPicker value={d.bgGradient[1]} onChange={v => { setDesign("bgGradient", [d.bgGradient[0], v]); updateConfig("theme", "custom"); }} label="Cor 2" />
             </div>
-            {/* Direction */}
             <div>
               <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Direção</p>
               <div className="grid grid-cols-5 gap-1">
-                {(["to-b", "to-r", "to-br", "to-tl", "radial"] as GradientDir[]).map(dir => (
-                  <button key={dir} onClick={() => setDesign("bgGradientDir", dir)}
-                    className={`p-2 rounded-lg text-[9px] font-medium transition-all ${
-                      d.bgGradientDir === dir ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-subtle))] border border-transparent"
-                    }`}>
-                    {dir === "to-b" ? "↓" : dir === "to-r" ? "→" : dir === "to-br" ? "↘" : dir === "to-tl" ? "↖" : "◎"}
-                  </button>
+                {([
+                  { dir: "to-b" as GradientDir, icon: "↓", tip: "De cima para baixo" },
+                  { dir: "to-r" as GradientDir, icon: "→", tip: "Da esquerda para direita" },
+                  { dir: "to-br" as GradientDir, icon: "↘", tip: "Diagonal para baixo-direita" },
+                  { dir: "to-tl" as GradientDir, icon: "↖", tip: "Diagonal para cima-esquerda" },
+                  { dir: "radial" as GradientDir, icon: "◎", tip: "Do centro para as bordas" },
+                ]).map(({ dir, icon, tip }) => (
+                  <Tooltip key={dir} text={tip}>
+                    <button onClick={() => setDesign("bgGradientDir", dir)}
+                      className={`p-2 rounded-lg text-[12px] font-medium transition-all w-full ${
+                        d.bgGradientDir === dir ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-subtle))] border border-transparent"
+                      }`}>
+                      {icon}
+                    </button>
+                  </Tooltip>
                 ))}
               </div>
             </div>
-            {/* Gradient presets */}
             <div>
-              <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Presets</p>
+              <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Presets de degradê</p>
               <div className="grid grid-cols-4 gap-1.5">
                 {GRADIENT_PRESETS.map(([c1, c2], i) => (
-                  <button key={i} onClick={() => { setDesign("bgGradient", [c1, c2]); updateConfig("theme", "custom"); }}
-                    className="h-8 rounded-lg ring-1 ring-white/10 hover:ring-white/30 hover:scale-105 transition-all"
-                    style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }} />
+                  <Tooltip key={i} text={`${c1} → ${c2}`}>
+                    <button onClick={() => { setDesign("bgGradient", [c1, c2]); updateConfig("theme", "custom"); }}
+                      className="h-8 rounded-lg ring-1 ring-white/10 hover:ring-white/30 hover:scale-105 transition-all w-full"
+                      style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }} />
+                  </Tooltip>
                 ))}
               </div>
             </div>
@@ -429,8 +524,6 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
             <input type="url" className={inputCls} placeholder="Ou cole uma URL de imagem..."
               value={d.bgImageUrl.startsWith("data:") ? "" : d.bgImageUrl}
               onChange={e => setDesign("bgImageUrl", e.target.value)} />
-
-            {/* Overlay */}
             <div>
               <div className="flex items-center justify-between mb-1">
                 <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Escurecimento</p>
@@ -439,7 +532,6 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
               <input type="range" min={0} max={90} value={d.bgOverlay} onChange={e => setDesign("bgOverlay", +e.target.value)}
                 className="w-full h-1.5 rounded-full appearance-none bg-[hsl(var(--dash-border))] accent-primary" />
             </div>
-            {/* Blur */}
             <div>
               <div className="flex items-center justify-between mb-1">
                 <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Desfoque</p>
@@ -482,8 +574,6 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
             <input type="url" className={inputCls} placeholder="Ou cole uma URL de vídeo..."
               value={d.bgVideoUrl.startsWith("data:") ? "" : d.bgVideoUrl}
               onChange={e => setDesign("bgVideoUrl", e.target.value)} />
-
-            {/* Overlay + Blur (same as image) */}
             <div>
               <div className="flex items-center justify-between mb-1">
                 <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Escurecimento</p>
@@ -501,22 +591,91 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
             <ColorPicker value={d.bgColor || currentTheme.bg} onChange={v => { setDesign("bgColor", v); updateConfig("theme", "custom"); }} label="Cor base" />
             <div className="grid grid-cols-4 gap-1.5">
               {BG_PATTERNS.map(p => (
-                <button key={p.id} onClick={() => setDesign("bgPattern", p.id)}
-                  className={`py-3 rounded-xl text-[10px] font-medium transition-all ${
-                    d.bgPattern === p.id
-                      ? "bg-primary/15 text-primary border border-primary/30"
-                      : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/20"
+                <Tooltip key={p.id} text={p.desc}>
+                  <button onClick={() => setDesign("bgPattern", p.id)}
+                    className={`py-3 rounded-xl text-[10px] font-medium transition-all w-full ${
+                      d.bgPattern === p.id
+                        ? "bg-primary/15 text-primary border border-primary/30"
+                        : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/20"
+                    }`}>
+                    {p.label}
+                  </button>
+                </Tooltip>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* BG Type: Effect (21st.dev animated backgrounds) */}
+        {d.bgType === "effect" && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 pt-1">
+              <Sparkles size={12} className="text-primary" />
+              <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Efeitos animados inspirados em 21st.dev — escolha um efeito de fundo</p>
+            </div>
+
+            {/* Category filter */}
+            <div className="flex gap-1 flex-wrap">
+              {EFFECT_CATEGORIES.map(cat => (
+                <button key={cat.key} onClick={() => setEffectFilter(cat.key)}
+                  className={`px-2 py-1 rounded-lg text-[9px] font-medium transition-all ${
+                    effectFilter === cat.key ? "bg-primary/15 text-primary" : "text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))]"
                   }`}>
-                  {p.label}
+                  {cat.label}
                 </button>
               ))}
+            </div>
+
+            {/* Effect grid with mini previews */}
+            <div className="grid grid-cols-2 gap-2">
+              {BG_EFFECTS
+                .filter(e => effectFilter === "all" || e.category === effectFilter)
+                .map(effect => {
+                  const isActive = (d as any).bgEffect === effect.id;
+                  return (
+                    <button key={effect.id}
+                      onClick={() => { setDesign("bgEffect" as any, effect.id); updateConfig("theme", "custom"); }}
+                      className={`relative rounded-xl overflow-hidden text-left transition-all ${
+                        isActive ? "ring-2 ring-primary scale-[1.02]" : "ring-1 ring-white/10 hover:ring-primary/30 hover:scale-[1.01]"
+                      }`}>
+                      {/* Mini preview */}
+                      <div className="h-[50px] relative" style={{ background: currentTheme.bg }}>
+                        <div className="absolute inset-0" style={getEffectPreviewStyle(effect.id, accent)} />
+                        {isActive && (
+                          <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                            <Check size={8} className="text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="px-2.5 py-1.5 bg-[hsl(var(--dash-surface-2))]">
+                        <p className={`text-[10px] font-semibold ${isActive ? "text-primary" : "text-[hsl(var(--dash-text-secondary))]"}`}>
+                          {effect.label}
+                        </p>
+                        <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] leading-tight">{effect.desc}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+            </div>
+
+            {/* Color base for effects */}
+            <ColorPicker value={d.bgColor || currentTheme.bg} onChange={v => { setDesign("bgColor", v); updateConfig("theme", "custom"); }} label="Cor base do efeito" />
+
+            {/* Overlay for effects */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Escurecimento</p>
+                <span className="text-[10px] font-mono text-[hsl(var(--dash-text-muted))]">{d.bgOverlay}%</span>
+              </div>
+              <input type="range" min={0} max={90} value={d.bgOverlay} onChange={e => setDesign("bgOverlay", +e.target.value)}
+                className="w-full h-1.5 rounded-full appearance-none bg-[hsl(var(--dash-border))] accent-primary" />
             </div>
           </div>
         )}
       </SectionCard>
 
       {/* ═══════════ SECTION 3: Colors ═══════════ */}
-      <SectionCard title="Cores" icon={<Palette size={14} />}>
+      <SectionCard title="Cores" icon={<Palette size={14} />} desc="Ajuste as cores principais, textos, cards e acentos">
         <div className="space-y-3 pt-2">
           <div className="grid grid-cols-2 gap-3">
             <ColorPicker value={d.accentColor || currentTheme.accent} onChange={v => { setDesign("accentColor", v); updateConfig("theme", "custom"); }} label="Cor principal" />
@@ -530,15 +689,16 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
             <ColorPicker value={d.cardBg || "#13102a"} onChange={v => setDesign("cardBg", v)} label="Fundo card" />
             <ColorPicker value={d.cardBorder || "rgba(168,85,247,0.18)"} onChange={v => setDesign("cardBorder", v)} label="Borda card" />
           </div>
-          {/* Quick accent palette */}
           <div>
-            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Paleta rápida</p>
+            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Paleta rápida — clique para definir a cor principal</p>
             <div className="grid grid-cols-8 gap-1.5">
               {ACCENT_COLORS.map(c => (
-                <button key={c} onClick={() => { setDesign("accentColor", c); updateConfig("theme", "custom"); }}
-                  className={`w-full aspect-square rounded-lg transition-all hover:scale-110 ${
-                    (d.accentColor || currentTheme.accent) === c ? "ring-2 ring-white scale-110" : "ring-1 ring-white/10"
-                  }`} style={{ background: c }} />
+                <Tooltip key={c} text={c.toUpperCase()}>
+                  <button onClick={() => { setDesign("accentColor", c); updateConfig("theme", "custom"); }}
+                    className={`w-full aspect-square rounded-lg transition-all hover:scale-110 ${
+                      (d.accentColor || currentTheme.accent) === c ? "ring-2 ring-white scale-110" : "ring-1 ring-white/10"
+                    }`} style={{ background: c }} />
+                </Tooltip>
               ))}
             </div>
           </div>
@@ -546,10 +706,9 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
       </SectionCard>
 
       {/* ═══════════ SECTION 4: Fonts ═══════════ */}
-      <SectionCard title="Tipografia" icon={<Type size={14} />} defaultOpen={false}>
+      <SectionCard title="Tipografia" icon={<Type size={14} />} defaultOpen={false} desc="Fontes do Google Fonts para títulos e corpo de texto">
         <div className="space-y-3 pt-2">
-          {/* Font filter */}
-          <div className="flex gap-1">
+          <div className="flex gap-1 flex-wrap">
             {[
               { key: "all", label: "Todas" },
               { key: "sans", label: "Sans" },
@@ -567,44 +726,46 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
             ))}
           </div>
 
-          {/* Heading font */}
           <div>
             <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Fonte do título</p>
             <div className="grid grid-cols-2 gap-1.5 max-h-[160px] overflow-y-auto pr-1">
               {GOOGLE_FONTS.filter(f => fontFilter === "all" || f.category === fontFilter).map(f => {
                 const isActive = d.fontHeading === f.name;
                 return (
-                  <button key={f.name} onClick={() => { setDesign("fontHeading", f.name); loadFont(f.name); }}
-                    className={`px-3 py-2 rounded-xl text-left text-[12px] font-medium transition-all ${
-                      isActive ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text))] border border-transparent hover:border-primary/20"
-                    }`} style={{ fontFamily: `"${f.name}", sans-serif` }}>
-                    {f.name}
-                  </button>
+                  <Tooltip key={f.name} text={`Título: "${f.name}" — ${f.category}`}>
+                    <button onClick={() => { setDesign("fontHeading", f.name); loadFont(f.name); }}
+                      className={`px-3 py-2 rounded-xl text-left text-[12px] font-medium transition-all w-full ${
+                        isActive ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text))] border border-transparent hover:border-primary/20"
+                      }`} style={{ fontFamily: `"${f.name}", sans-serif` }}>
+                      {f.name}
+                    </button>
+                  </Tooltip>
                 );
               })}
             </div>
           </div>
 
-          {/* Body font */}
           <div>
             <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Fonte do corpo</p>
             <div className="grid grid-cols-2 gap-1.5 max-h-[160px] overflow-y-auto pr-1">
               {GOOGLE_FONTS.filter(f => fontFilter === "all" || f.category === fontFilter).map(f => {
                 const isActive = d.fontBody === f.name;
                 return (
-                  <button key={f.name} onClick={() => { setDesign("fontBody", f.name); loadFont(f.name); }}
-                    className={`px-3 py-2 rounded-xl text-left text-[12px] transition-all ${
-                      isActive ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text))] border border-transparent hover:border-primary/20"
-                    }`} style={{ fontFamily: `"${f.name}", sans-serif` }}>
-                    {f.name}
-                  </button>
+                  <Tooltip key={f.name} text={`Corpo: "${f.name}" — ${f.category}`}>
+                    <button onClick={() => { setDesign("fontBody", f.name); loadFont(f.name); }}
+                      className={`px-3 py-2 rounded-xl text-left text-[12px] transition-all w-full ${
+                        isActive ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text))] border border-transparent hover:border-primary/20"
+                      }`} style={{ fontFamily: `"${f.name}", sans-serif` }}>
+                      {f.name}
+                    </button>
+                  </Tooltip>
                 );
               })}
             </div>
           </div>
 
-          {/* Preview */}
           <div className="p-3 rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))]">
+            <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] mb-2">Preview ao vivo</p>
             <p className="text-[14px] font-bold text-[hsl(var(--dash-text))] mb-1" style={{ fontFamily: `"${d.fontHeading}", sans-serif` }}>
               {config.displayName || "Seu Nome"} — Título
             </p>
@@ -616,66 +777,72 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
       </SectionCard>
 
       {/* ═══════════ SECTION 5: Button Styles ═══════════ */}
-      <SectionCard title="Estilo dos botões" icon={<Square size={14} />} defaultOpen={false}>
+      <SectionCard title="Estilo dos botões" icon={<Square size={14} />} defaultOpen={false} desc="Formato, preenchimento e sombra dos botões e cards">
         <div className="space-y-4 pt-2">
           {/* Shape */}
           <div>
-            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Formato</p>
+            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Formato — como o botão é moldado</p>
             <div className="grid grid-cols-4 gap-1.5">
               {([
-                { shape: "rounded" as ButtonShape, label: "Arredondado", radius: "12px" },
-                { shape: "pill" as ButtonShape, label: "Pílula", radius: "999px" },
-                { shape: "square" as ButtonShape, label: "Quadrado", radius: "0px" },
-                { shape: "soft" as ButtonShape, label: "Suave", radius: "8px" },
-              ]).map(({ shape, label, radius }) => (
-                <button key={shape} onClick={() => setDesign("buttonShape", shape)}
-                  className={`py-3 rounded-xl text-[10px] font-medium transition-all ${
-                    d.buttonShape === shape ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent"
-                  }`}>
-                  <div className="w-12 h-4 mx-auto mb-1.5 bg-current/20 border border-current/30"
-                    style={{ borderRadius: radius }} />
-                  {label}
-                </button>
+                { shape: "rounded" as ButtonShape, label: "Arredondado", radius: "12px", tip: "Cantos arredondados com raio customizável" },
+                { shape: "pill" as ButtonShape, label: "Pílula", radius: "999px", tip: "Totalmente arredondado como cápsula" },
+                { shape: "square" as ButtonShape, label: "Quadrado", radius: "4px", tip: "Cantos quase retos" },
+                { shape: "soft" as ButtonShape, label: "Suave", radius: "12px", tip: "Cantos levemente arredondados" },
+              ]).map(({ shape, label, radius, tip }) => (
+                <Tooltip key={shape} text={tip}>
+                  <button onClick={() => setDesign("buttonShape", shape)}
+                    className={`py-3 rounded-xl text-[10px] font-medium transition-all w-full ${
+                      d.buttonShape === shape ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/20"
+                    }`}>
+                    <div className="w-12 h-4 mx-auto mb-1.5 border border-current/40"
+                      style={{ borderRadius: radius, background: d.buttonShape === shape ? `${accent}20` : "transparent" }} />
+                    {label}
+                  </button>
+                </Tooltip>
               ))}
             </div>
           </div>
 
           {/* Fill */}
           <div>
-            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Preenchimento</p>
+            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Preenchimento — como o botão é preenchido</p>
             <div className="grid grid-cols-4 gap-1.5">
               {([
-                { fill: "solid" as ButtonFill, label: "Sólido" },
-                { fill: "outline" as ButtonFill, label: "Contorno" },
-                { fill: "glass" as ButtonFill, label: "Vidro" },
-                { fill: "ghost" as ButtonFill, label: "Fantasma" },
-              ]).map(({ fill, label }) => (
-                <button key={fill} onClick={() => setDesign("buttonFill", fill)}
-                  className={`py-3 rounded-xl text-[10px] font-medium transition-all ${
-                    d.buttonFill === fill ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent"
-                  }`}>
-                  {label}
-                </button>
+                { fill: "solid" as ButtonFill, label: "Sólido", tip: "Fundo sólido opaco" },
+                { fill: "outline" as ButtonFill, label: "Contorno", tip: "Apenas a borda, sem preenchimento" },
+                { fill: "glass" as ButtonFill, label: "Vidro", tip: "Efeito glassmorphism com desfoque" },
+                { fill: "ghost" as ButtonFill, label: "Fantasma", tip: "Transparente sem borda" },
+              ]).map(({ fill, label, tip }) => (
+                <Tooltip key={fill} text={tip}>
+                  <button onClick={() => setDesign("buttonFill", fill)}
+                    className={`py-3 rounded-xl text-[10px] font-medium transition-all w-full ${
+                      d.buttonFill === fill ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/20"
+                    }`}>
+                    {label}
+                  </button>
+                </Tooltip>
               ))}
             </div>
           </div>
 
           {/* Shadow */}
           <div>
-            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Sombra</p>
+            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Sombra — profundidade do botão</p>
             <div className="grid grid-cols-4 gap-1.5">
               {([
-                { shadow: "none" as ButtonShadow, label: "Nenhuma" },
-                { shadow: "sm" as ButtonShadow, label: "Leve" },
-                { shadow: "md" as ButtonShadow, label: "Média" },
-                { shadow: "glow" as ButtonShadow, label: "Brilho" },
-              ]).map(({ shadow, label }) => (
-                <button key={shadow} onClick={() => setDesign("buttonShadow", shadow)}
-                  className={`py-3 rounded-xl text-[10px] font-medium transition-all ${
-                    d.buttonShadow === shadow ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent"
-                  }`}>
-                  {label}
-                </button>
+                { shadow: "none" as ButtonShadow, label: "Nenhuma", tip: "Sem sombra" },
+                { shadow: "sm" as ButtonShadow, label: "Leve", tip: "Sombra sutil e delicada" },
+                { shadow: "md" as ButtonShadow, label: "Média", tip: "Sombra mais evidente" },
+                { shadow: "glow" as ButtonShadow, label: "Brilho", tip: "Brilho neon na cor do tema" },
+              ]).map(({ shadow, label, tip }) => (
+                <Tooltip key={shadow} text={tip}>
+                  <button onClick={() => setDesign("buttonShadow", shadow)}
+                    className={`py-3 rounded-xl text-[10px] font-medium transition-all w-full ${
+                      d.buttonShadow === shadow ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/20"
+                    }`}>
+                    {label}
+                  </button>
+                </Tooltip>
               ))}
             </div>
           </div>
@@ -690,13 +857,13 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
               className="w-full h-1.5 rounded-full appearance-none bg-[hsl(var(--dash-border))] accent-primary" />
           </div>
 
-          {/* Button preview */}
+          {/* Button preview — all 4 fills shown simultaneously */}
           <div className="p-3 rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))] space-y-2">
-            <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] mb-2">Preview</p>
+            <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] mb-2">Preview ao vivo — como seus botões ficam</p>
             {(() => {
-              const accent = d.accentColor || currentTheme.accent;
-              const radius = d.buttonShape === "pill" ? "999px" : d.buttonShape === "square" ? "0px" : d.buttonShape === "soft" ? "8px" : `${d.buttonRadius}px`;
+              const radius = d.buttonShape === "pill" ? "999px" : d.buttonShape === "square" ? "4px" : d.buttonShape === "soft" ? "12px" : `${d.buttonRadius}px`;
               const shadow = d.buttonShadow === "glow" ? `0 0 20px ${accent}40` : d.buttonShadow === "md" ? "0 4px 12px rgba(0,0,0,0.3)" : d.buttonShadow === "sm" ? "0 2px 6px rgba(0,0,0,0.2)" : "none";
+              const accent2 = d.accentColor2 || currentTheme.accent2;
 
               const styles: Record<ButtonFill, React.CSSProperties> = {
                 solid: { background: accent, color: "#fff", borderRadius: radius, boxShadow: shadow },
@@ -706,9 +873,17 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
               };
 
               return (
-                <button className="w-full py-2.5 px-4 text-[12px] font-semibold transition-all" style={styles[d.buttonFill]}>
-                  Exemplo de Botão
-                </button>
+                <div className="space-y-2">
+                  {/* Main selected fill */}
+                  <button className="w-full py-2.5 px-4 text-[12px] font-semibold transition-all" style={styles[d.buttonFill]}>
+                    ← Estilo atual: {d.buttonFill === "solid" ? "Sólido" : d.buttonFill === "outline" ? "Contorno" : d.buttonFill === "glass" ? "Vidro" : "Fantasma"}
+                  </button>
+                  {/* CTA button preview */}
+                  <button className="w-full py-2.5 px-4 text-[12px] font-semibold text-white transition-all"
+                    style={{ background: `linear-gradient(135deg, ${accent}, ${accent2})`, borderRadius: radius, boxShadow: shadow }}>
+                    Botão CTA (Comprar / WhatsApp)
+                  </button>
+                </div>
               );
             })()}
           </div>
@@ -716,31 +891,31 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
       </SectionCard>
 
       {/* ═══════════ SECTION 6: Profile Photo ═══════════ */}
-      <SectionCard title="Foto de perfil" icon={<Circle size={14} />} defaultOpen={false}>
+      <SectionCard title="Foto de perfil" icon={<Circle size={14} />} defaultOpen={false} desc="Formato, tamanho e borda da foto de perfil">
         <div className="space-y-4 pt-2">
-          {/* Shape */}
           <div>
-            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Formato</p>
+            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Formato da foto</p>
             <div className="grid grid-cols-4 gap-1.5">
               {([
-                { shape: "circle" as ProfileShape, label: "Círculo", cls: "rounded-full" },
-                { shape: "rounded" as ProfileShape, label: "Arredondado", cls: "rounded-2xl" },
-                { shape: "square" as ProfileShape, label: "Quadrado", cls: "rounded-none" },
-                { shape: "hexagon" as ProfileShape, label: "Hexágono", cls: "rounded-full" },
-              ]).map(({ shape, label, cls }) => (
-                <button key={shape} onClick={() => setDesign("profileShape", shape)}
-                  className={`flex flex-col items-center gap-1.5 py-3 rounded-xl text-[10px] font-medium transition-all ${
-                    d.profileShape === shape ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent"
-                  }`}>
-                  <div className={`w-8 h-8 ${cls} bg-gradient-to-br from-primary/40 to-primary/20 border border-primary/30`}
-                    style={shape === "hexagon" ? { clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" } : {}} />
-                  {label}
-                </button>
+                { shape: "circle" as ProfileShape, label: "Círculo", cls: "rounded-full", tip: "Formato redondo clássico" },
+                { shape: "rounded" as ProfileShape, label: "Arredondado", cls: "rounded-2xl", tip: "Quadrado com cantos arredondados" },
+                { shape: "square" as ProfileShape, label: "Quadrado", cls: "rounded-none", tip: "Formato quadrado sem arredondamento" },
+                { shape: "hexagon" as ProfileShape, label: "Hexágono", cls: "rounded-full", tip: "Formato hexagonal diferenciado" },
+              ]).map(({ shape, label, cls, tip }) => (
+                <Tooltip key={shape} text={tip}>
+                  <button onClick={() => setDesign("profileShape", shape)}
+                    className={`flex flex-col items-center gap-1.5 py-3 rounded-xl text-[10px] font-medium transition-all w-full ${
+                      d.profileShape === shape ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/20"
+                    }`}>
+                    <div className={`w-8 h-8 ${cls} bg-gradient-to-br from-primary/40 to-primary/20 border border-primary/30`}
+                      style={shape === "hexagon" ? { clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" } : {}} />
+                    {label}
+                  </button>
+                </Tooltip>
               ))}
             </div>
           </div>
 
-          {/* Size slider */}
           <div>
             <div className="flex items-center justify-between mb-1">
               <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Tamanho</p>
@@ -750,18 +925,41 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
               className="w-full h-1.5 rounded-full appearance-none bg-[hsl(var(--dash-border))] accent-primary" />
           </div>
 
-          {/* Border */}
           <div className="flex items-center justify-between">
             <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Borda colorida</p>
-            <button onClick={() => setDesign("profileBorder", !d.profileBorder)}
-              className={`relative w-9 h-5 rounded-full transition-colors ${d.profileBorder ? "bg-primary" : "bg-[hsl(var(--dash-border))]"}`}>
-              <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${d.profileBorder ? "left-[18px]" : "left-0.5"}`} />
-            </button>
+            <Tooltip text={d.profileBorder ? "Desativar borda" : "Ativar borda colorida"}>
+              <button onClick={() => setDesign("profileBorder", !d.profileBorder)}
+                className={`relative w-9 h-5 rounded-full transition-colors ${d.profileBorder ? "bg-primary" : "bg-[hsl(var(--dash-border))]"}`}>
+                <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${d.profileBorder ? "left-[18px]" : "left-0.5"}`} />
+              </button>
+            </Tooltip>
           </div>
 
           {d.profileBorder && (
             <ColorPicker value={d.profileBorderColor || d.accentColor || currentTheme.accent}
               onChange={v => setDesign("profileBorderColor", v)} label="Cor da borda" />
+          )}
+
+          {/* Profile preview */}
+          {config.avatarUrl && (
+            <div className="flex justify-center p-3 rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))]">
+              <div className="relative">
+                <div className="absolute inset-[-3px] blur-[10px] opacity-40"
+                  style={{
+                    background: `radial-gradient(circle, ${accent}, ${d.accentColor2 || currentTheme.accent2})`,
+                    borderRadius: d.profileShape === "circle" ? "9999px" : d.profileShape === "rounded" ? "20%" : d.profileShape === "square" ? "8px" : "0",
+                    clipPath: d.profileShape === "hexagon" ? "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" : undefined,
+                  }} />
+                <img src={config.avatarUrl} alt="preview"
+                  className="relative object-cover"
+                  style={{
+                    width: d.profileSize, height: d.profileSize,
+                    borderRadius: d.profileShape === "circle" ? "9999px" : d.profileShape === "rounded" ? "20%" : d.profileShape === "square" ? "8px" : "0",
+                    clipPath: d.profileShape === "hexagon" ? "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" : undefined,
+                    border: d.profileBorder ? `2.5px solid ${d.profileBorderColor || accent}60` : "none",
+                  }} />
+              </div>
+            </div>
           )}
         </div>
       </SectionCard>
@@ -783,6 +981,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
           </p>
           <p className="text-[hsl(var(--dash-text-subtle))] text-[10px]">
             {d.fontHeading !== "Inter" ? d.fontHeading : ""}{d.fontHeading !== "Inter" && d.fontBody !== "Inter" ? " + " : ""}{d.fontBody !== "Inter" && d.fontBody !== d.fontHeading ? d.fontBody : ""}{d.fontHeading === "Inter" && d.fontBody === "Inter" ? "Fonte padrão" : ""}
+            {d.bgType !== "solid" ? ` · Fundo: ${d.bgType === "gradient" ? "degradê" : d.bgType === "effect" ? "efeito animado" : d.bgType}` : ""}
           </p>
         </div>
         <Sparkles size={14} className="text-primary flex-shrink-0" />

@@ -15,7 +15,7 @@ type ThemeId = "dark-purple" | "midnight" | "forest" | "rose" | "amber" | "ocean
   | "gold" | "sage" | "coral" | "indigo" | "slate" | "wine"
   | "custom" | string;
 
-type BgType = "solid" | "gradient" | "image" | "video" | "pattern";
+type BgType = "solid" | "gradient" | "image" | "video" | "pattern" | "effect";
 type GradientDir = "to-b" | "to-t" | "to-r" | "to-l" | "to-br" | "to-bl" | "to-tr" | "to-tl" | "radial";
 type ButtonShape = "rounded" | "pill" | "square" | "soft";
 type ButtonFill = "solid" | "outline" | "glass" | "ghost";
@@ -25,7 +25,7 @@ type ProfileShape = "circle" | "rounded" | "square" | "hexagon";
 interface DesignConfig {
   bgType: BgType; bgColor: string; bgGradient: [string, string];
   bgGradientDir: GradientDir; bgImageUrl: string; bgVideoUrl: string;
-  bgPattern: string; bgOverlay: number; bgBlur: number;
+  bgPattern: string; bgOverlay: number; bgBlur: number; bgEffect: string;
   textColor: string; subtextColor: string; cardBg: string; cardBorder: string;
   accentColor: string; accentColor2: string;
   fontHeading: string; fontBody: string;
@@ -153,6 +153,7 @@ function resolveDesign(theme: typeof THEMES["dark-purple"], design?: Partial<Des
     bgPattern: d.bgPattern || "",
     bgOverlay: d.bgOverlay ?? 40,
     bgBlur: d.bgBlur ?? 0,
+    bgEffect: d.bgEffect || "",
     buttonShape: d.buttonShape || "rounded",
     buttonFill: d.buttonFill || "solid",
     buttonShadow: d.buttonShadow || "none",
@@ -229,6 +230,192 @@ function buttonStyles(rd: ReturnType<typeof resolveDesign>, isAccent = false): R
     case "solid":
     default:
       return { background: rd.card, border: `1px solid ${rd.border}`, borderRadius: br, boxShadow: shadow };
+  }
+}
+
+/* ─── Effect CSS keyframes (injected once) ───────────────────── */
+function injectEffectStyles() {
+  if (document.getElementById("maview-effect-styles")) return;
+  const style = document.createElement("style");
+  style.id = "maview-effect-styles";
+  style.textContent = `
+    @keyframes mv-aurora { 0%,100% { transform: translateX(-20%) rotate(0deg); } 50% { transform: translateX(20%) rotate(3deg); } }
+    @keyframes mv-pulse { 0%,100% { opacity: 0.15; transform: scale(1); } 50% { opacity: 0.3; transform: scale(1.1); } }
+    @keyframes mv-float { 0%,100% { transform: translateY(0) translateX(0); } 33% { transform: translateY(-15px) translateX(8px); } 66% { transform: translateY(8px) translateX(-5px); } }
+    @keyframes mv-drift { 0% { transform: translate(0,0) scale(1); } 25% { transform: translate(10%,5%) scale(1.05); } 50% { transform: translate(-5%,10%) scale(0.95); } 75% { transform: translate(-10%,-5%) scale(1.02); } 100% { transform: translate(0,0) scale(1); } }
+    @keyframes mv-scan { 0% { transform: translateY(-100%); } 100% { transform: translateY(100vh); } }
+    @keyframes mv-shimmer { 0% { opacity: 0; } 50% { opacity: 0.6; } 100% { opacity: 0; } }
+    @keyframes mv-gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    @keyframes mv-wave { 0% { transform: translateX(0) scaleY(1); } 50% { transform: translateX(-25%) scaleY(1.2); } 100% { transform: translateX(-50%) scaleY(1); } }
+    @keyframes mv-fog { 0%,100% { transform: translateX(-10%) scale(1.1); opacity: 0.04; } 50% { transform: translateX(10%) scale(1); opacity: 0.07; } }
+    .mv-aurora { animation: mv-aurora 12s ease-in-out infinite; }
+    .mv-pulse { animation: mv-pulse 4s ease-in-out infinite; }
+    .mv-float { animation: mv-float 8s ease-in-out infinite; }
+    .mv-drift { animation: mv-drift 20s ease-in-out infinite; }
+    .mv-scan { animation: mv-scan 6s linear infinite; }
+    .mv-shimmer { animation: mv-shimmer 3s ease-in-out infinite; }
+    .mv-gradient-anim { background-size: 200% 200%; animation: mv-gradient 8s ease infinite; }
+    .mv-wave { animation: mv-wave 12s linear infinite; }
+    .mv-fog { animation: mv-fog 15s ease-in-out infinite; }
+  `;
+  document.head.appendChild(style);
+}
+
+/* ─── Render bg effect layers ────────────────────────────────── */
+function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: string; accent2: string }) {
+  useEffect(() => { injectEffectStyles(); }, []);
+
+  switch (effectId) {
+    case "aurora":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+          <div className="absolute w-[200%] h-[60%] top-[-10%] left-[-50%] mv-aurora" style={{ background: `linear-gradient(135deg, ${accent}25, transparent 40%, ${accent2}20, transparent 70%, ${accent}15)`, filter: "blur(60px)" }} />
+        </div>
+      );
+    case "aurora-waves":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+          <div className="absolute w-[200%] h-[40%] bottom-0 left-[-50%] mv-wave" style={{ background: `linear-gradient(90deg, transparent, ${accent}20, ${accent2}15, transparent)`, filter: "blur(40px)" }} />
+          <div className="absolute w-[200%] h-[30%] bottom-[10%] left-[-30%] mv-wave" style={{ background: `linear-gradient(90deg, transparent, ${accent2}15, ${accent}10, transparent)`, filter: "blur(50px)", animationDelay: "-4s" }} />
+        </div>
+      );
+    case "ambient-glow":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1]">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] rounded-full mv-pulse" style={{ background: `radial-gradient(circle, ${accent}20, transparent 60%)` }} />
+        </div>
+      );
+    case "spotlight":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1]">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[400px] mv-pulse" style={{ background: `radial-gradient(ellipse at 50% 0%, ${accent}30, transparent 70%)` }} />
+        </div>
+      );
+    case "radial-glow":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1]">
+          <div className="absolute inset-0 mv-pulse" style={{ background: `radial-gradient(circle at 50% 50%, ${accent}18, transparent 60%)` }} />
+        </div>
+      );
+    case "gradient-flow":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1]">
+          <div className="absolute inset-0 mv-gradient-anim" style={{ background: `linear-gradient(45deg, ${accent}20, ${accent2}15, ${accent}20, ${accent2}15)`, backgroundSize: "200% 200%" }} />
+        </div>
+      );
+    case "gradient-mesh":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1]">
+          <div className="absolute w-[50%] h-[50%] top-[10%] left-[10%] rounded-full mv-drift" style={{ background: `radial-gradient(circle, ${accent}20, transparent 60%)`, filter: "blur(40px)" }} />
+          <div className="absolute w-[50%] h-[50%] bottom-[10%] right-[10%] rounded-full mv-drift" style={{ background: `radial-gradient(circle, ${accent2}18, transparent 60%)`, filter: "blur(40px)", animationDelay: "-10s" }} />
+        </div>
+      );
+    case "gradient-shift":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1]">
+          <div className="absolute inset-0 mv-gradient-anim" style={{ background: `linear-gradient(90deg, ${accent}15, ${accent2}15, #60a5fa15, ${accent}15)`, backgroundSize: "200% 200%" }} />
+        </div>
+      );
+    case "starfield":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1]">
+          {Array.from({ length: 20 }).map((_, i) => (
+            <div key={i} className="absolute rounded-full mv-shimmer" style={{
+              width: Math.random() > 0.5 ? 2 : 1, height: Math.random() > 0.5 ? 2 : 1,
+              left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%`,
+              background: "white", animationDelay: `${Math.random() * 5}s`, animationDuration: `${2 + Math.random() * 4}s`,
+            }} />
+          ))}
+        </div>
+      );
+    case "floating-dots":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="absolute rounded-full mv-float" style={{
+              width: 4 + Math.random() * 4, height: 4 + Math.random() * 4,
+              left: `${10 + Math.random() * 80}%`, top: `${10 + Math.random() * 80}%`,
+              background: accent, opacity: 0.15 + Math.random() * 0.15,
+              animationDelay: `${Math.random() * 8}s`, animationDuration: `${6 + Math.random() * 6}s`,
+            }} />
+          ))}
+        </div>
+      );
+    case "sparkles":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1]">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} className="absolute rounded-full mv-shimmer" style={{
+              width: 3, height: 3, left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%`,
+              background: i % 3 === 0 ? "#fcd34d" : accent, animationDelay: `${Math.random() * 4}s`, animationDuration: `${1.5 + Math.random() * 3}s`,
+            }} />
+          ))}
+        </div>
+      );
+    case "wave-layers":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+          <div className="absolute w-[200%] h-[200px] bottom-0 left-0 mv-wave" style={{ background: `linear-gradient(180deg, transparent, ${accent}10)`, borderRadius: "40% 40% 0 0" }} />
+          <div className="absolute w-[200%] h-[150px] bottom-0 left-0 mv-wave" style={{ background: `linear-gradient(180deg, transparent, ${accent}06)`, borderRadius: "45% 45% 0 0", animationDelay: "-3s" }} />
+        </div>
+      );
+    case "flow-field":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="absolute h-px mv-drift" style={{
+              width: "60%", left: `${-10 + i * 25}%`, top: `${15 + i * 18}%`,
+              background: `linear-gradient(90deg, transparent, ${accent}15, transparent)`,
+              animationDelay: `${i * -4}s`,
+            }} />
+          ))}
+        </div>
+      );
+    case "liquid":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+          <div className="absolute w-[60%] h-[60%] top-[20%] left-[10%] rounded-full mv-drift" style={{ background: `radial-gradient(ellipse, ${accent}15, transparent 60%)`, filter: "blur(50px)" }} />
+          <div className="absolute w-[50%] h-[50%] bottom-[15%] right-[5%] rounded-full mv-drift" style={{ background: `radial-gradient(ellipse, ${accent2}12, transparent 60%)`, filter: "blur(50px)", animationDelay: "-8s" }} />
+        </div>
+      );
+    case "matrix-grid":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1]" style={{ backgroundImage: `linear-gradient(${accent}08 1px, transparent 1px), linear-gradient(90deg, ${accent}08 1px, transparent 1px)`, backgroundSize: "40px 40px" }} />
+      );
+    case "pulse-grid":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1]">
+          <div className="absolute inset-0 mv-pulse" style={{ backgroundImage: `radial-gradient(${accent}15 1px, transparent 1px)`, backgroundSize: "30px 30px" }} />
+        </div>
+      );
+    case "scan-lines":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1]" style={{ backgroundImage: `repeating-linear-gradient(0deg, transparent 0px, transparent 2px, ${accent}05 2px, ${accent}05 4px)` }}>
+          <div className="absolute w-full h-[2px] mv-scan" style={{ background: `linear-gradient(90deg, transparent, ${accent}20, transparent)` }} />
+        </div>
+      );
+    case "fog":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+          <div className="absolute w-[150%] h-[50%] top-[20%] left-[-25%] mv-fog" style={{ background: `radial-gradient(ellipse, rgba(255,255,255,0.04), transparent 60%)`, filter: "blur(30px)" }} />
+          <div className="absolute w-[150%] h-[40%] bottom-[10%] left-[-10%] mv-fog" style={{ background: `radial-gradient(ellipse, rgba(255,255,255,0.03), transparent 60%)`, filter: "blur(30px)", animationDelay: "-7s" }} />
+        </div>
+      );
+    case "smoke":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+          <div className="absolute w-[80%] h-[60%] top-[20%] left-[10%] mv-drift" style={{ background: `radial-gradient(ellipse, rgba(255,255,255,0.04), transparent 50%)`, filter: "blur(40px)" }} />
+        </div>
+      );
+    case "clouds":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+          <div className="absolute w-[120%] h-[30%] top-[10%] left-[-10%] mv-drift" style={{ background: `radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.05), transparent 50%), radial-gradient(ellipse at 70% 50%, rgba(255,255,255,0.04), transparent 50%)`, filter: "blur(20px)" }} />
+          <div className="absolute w-[100%] h-[25%] top-[50%] left-0 mv-drift" style={{ background: `radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.03), transparent 50%)`, filter: "blur(25px)", animationDelay: "-12s" }} />
+        </div>
+      );
+    default:
+      return null;
   }
 }
 
@@ -808,6 +995,16 @@ const ProfilePage = () => {
     }, 320);
   }, [username]);
 
+  /* Resolve design early (before returns) so hooks are stable */
+  const baseTheme = profile ? (THEMES[profile.theme] || THEMES["dark-purple"]) : THEMES["dark-purple"];
+  const rd = resolveDesign(baseTheme, profile?.design);
+
+  /* Load Google Fonts — must be before early returns */
+  useEffect(() => {
+    loadGoogleFont(rd.fontHeading);
+    loadGoogleFont(rd.fontBody);
+  }, [rd.fontHeading, rd.fontBody]);
+
   const handleShare = async () => {
     const url = window.location.href;
     if (navigator.share) { await navigator.share({ title: profile?.displayName, url }); }
@@ -837,22 +1034,12 @@ const ProfilePage = () => {
     </div>
   );
 
-  const baseTheme = THEMES[profile.theme] || THEMES["dark-purple"];
-  const rd = resolveDesign(baseTheme, profile.design);
-  // Build a backward-compatible `t` object from resolved design
+  // `rd` and `baseTheme` already computed above early returns
   const t = { bg: rd.bg, accent: rd.accent, accent2: rd.accent2, card: rd.card, text: rd.text, sub: rd.sub, border: rd.border };
   const socialLinks  = profile.links.filter(l => l.active && l.isSocial);
   const regularLinks = profile.links.filter(l => l.active && !l.isSocial);
 
-  /* Load Google Fonts */
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  useEffect(() => {
-    loadGoogleFont(rd.fontHeading);
-    loadGoogleFont(rd.fontBody);
-  }, [rd.fontHeading, rd.fontBody]);
-
   /* Hover helpers */
-  const btnStyle = buttonStyles(rd);
   const onHoverIn  = (el: HTMLElement) => { el.style.borderColor = `${t.accent}55`; el.style.boxShadow = `0 8px 32px ${t.accent}18`; };
   const onHoverOut = (el: HTMLElement) => { el.style.borderColor = t.border; el.style.boxShadow = "none"; };
 
@@ -871,8 +1058,12 @@ const ProfilePage = () => {
       {rd.bgType === "pattern" && rd.bgPattern && BG_PATTERNS[rd.bgPattern] && (
         <div className="fixed inset-0 pointer-events-none z-0" style={{ backgroundImage: BG_PATTERNS[rd.bgPattern], backgroundRepeat: "repeat" }} />
       )}
-      {/* Overlay (for image/video/pattern) */}
-      {(rd.bgType === "image" || rd.bgType === "video" || rd.bgType === "pattern") && rd.bgOverlay > 0 && (
+      {/* Effect layer (21st.dev animated backgrounds) */}
+      {rd.bgType === "effect" && rd.bgEffect && (
+        <EffectLayer effectId={rd.bgEffect} accent={rd.accent} accent2={rd.accent2} />
+      )}
+      {/* Overlay (for image/video/pattern/effect) */}
+      {(rd.bgType === "image" || rd.bgType === "video" || rd.bgType === "pattern" || rd.bgType === "effect") && rd.bgOverlay > 0 && (
         <div className="fixed inset-0 pointer-events-none z-[1]" style={{ background: `rgba(0,0,0,${rd.bgOverlay / 100})` }} />
       )}
 
