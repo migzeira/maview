@@ -32,6 +32,8 @@ interface ProductItem {
   bookingDays?: string[];
   bookingStart?: string;
   bookingEnd?: string;
+  bookingChannel?: "whatsapp" | "google" | "calendly" | "external";
+  bookingUrl?: string;
 }
 
 interface LinkItem {
@@ -361,9 +363,29 @@ const BookingModal = ({ product, whatsapp, accent, accent2, bg, card, text, sub,
     if (!selectedDate || !selectedTime) return;
     const dateStr = `${String(selectedDate.getDate()).padStart(2, "0")}/${String(selectedDate.getMonth() + 1).padStart(2, "0")}/${selectedDate.getFullYear()}`;
     const durationLabel = duration >= 60 ? `${Math.floor(duration / 60)}h${duration % 60 ? duration % 60 + "min" : ""}` : `${duration}min`;
-    const msg = `Olá! Gostaria de agendar:\n\n📋 *${product.title}*\n📅 ${dateStr} às ${selectedTime}\n⏱️ Duração: ${durationLabel}${product.price ? `\n💰 ${product.price}` : ""}\n\nPodemos confirmar?`;
-    const phone = whatsapp.replace(/\D/g, "");
-    window.open(`https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`, "_blank");
+    const channel = product.bookingChannel || "whatsapp";
+
+    if (channel === "google") {
+      // Create Google Calendar event URL
+      const [h, m] = selectedTime.split(":").map(Number);
+      const startDt = new Date(selectedDate);
+      startDt.setHours(h, m, 0);
+      const endDt = new Date(startDt.getTime() + duration * 60000);
+      const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+      const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(product.title)}&dates=${fmt(startDt)}/${fmt(endDt)}&details=${encodeURIComponent(`Agendado via Maview${product.price ? ` — ${product.price}` : ""}`)}`;
+      window.open(gcalUrl, "_blank");
+      // Also send WhatsApp if configured
+      if (whatsapp) {
+        const msg = `Olá! Agendei via Google Calendar:\n\n📋 *${product.title}*\n📅 ${dateStr} às ${selectedTime}\n⏱️ Duração: ${durationLabel}${product.price ? `\n💰 ${product.price}` : ""}\n\nConfirmado no calendário!`;
+        const phone = whatsapp.replace(/\D/g, "");
+        setTimeout(() => window.open(`https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`, "_blank"), 500);
+      }
+    } else {
+      // WhatsApp (default)
+      const msg = `Olá! Gostaria de agendar:\n\n📋 *${product.title}*\n📅 ${dateStr} às ${selectedTime}\n⏱️ Duração: ${durationLabel}${product.price ? `\n💰 ${product.price}` : ""}\n\nPodemos confirmar?`;
+      const phone = whatsapp.replace(/\D/g, "");
+      window.open(`https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`, "_blank");
+    }
     onClose();
   };
 
@@ -691,14 +713,23 @@ const ProfilePage = () => {
                   const coverImg = product.images?.[0] || product.imageUrl;
                   const hasVideo = !!product.video;
 
-                  // Booking: onClick opens modal; others: link or none
-                  const handleClick = isBooking
+                  // Booking: calendly/external → direct link; whatsapp/google → modal
+                  const bookingChannel = product.bookingChannel || "whatsapp";
+                  const bookingUsesModal = isBooking && (bookingChannel === "whatsapp" || bookingChannel === "google");
+                  const bookingDirectUrl = isBooking && (bookingChannel === "calendly" || bookingChannel === "external") ? product.bookingUrl : undefined;
+
+                  const handleClick = bookingUsesModal
                     ? (e: React.MouseEvent) => { e.preventDefault(); setBookingProduct(product); }
                     : undefined;
 
-                  const Wrapper = (isNone && !isBooking) ? "div" : isBooking ? "button" : "a";
-                  const wrapperProps = isBooking
+                  const Wrapper = (isNone && !isBooking) ? "div"
+                    : bookingUsesModal ? "button"
+                    : bookingDirectUrl ? "a"
+                    : isBooking ? "div" : "a";
+                  const wrapperProps = bookingUsesModal
                     ? { onClick: handleClick }
+                    : bookingDirectUrl
+                      ? { href: bookingDirectUrl, target: "_blank", rel: "noopener noreferrer" }
                     : isNone
                       ? {}
                       : { href: productHref, target: "_blank", rel: "noopener noreferrer" };

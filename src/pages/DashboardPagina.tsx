@@ -37,6 +37,8 @@ interface ProductItem {
   bookingDays?: string[];         // ["seg","ter","qua","qui","sex","sab","dom"]
   bookingStart?: string;          // "09:00"
   bookingEnd?: string;            // "18:00"
+  bookingChannel?: "whatsapp" | "google" | "calendly" | "external"; // integration
+  bookingUrl?: string;            // Calendly/Cal.com/custom URL
   // migration compat
   imageUrl?: string;
   videoUrl?: string;
@@ -193,6 +195,8 @@ const emptyProduct = (): ProductItem => ({
   bookingDays: ["seg", "ter", "qua", "qui", "sex"],
   bookingStart: "09:00",
   bookingEnd: "18:00",
+  bookingChannel: "whatsapp",
+  bookingUrl: "",
 });
 
 const emptyLink = (isSocial: boolean): LinkItem => ({
@@ -932,6 +936,12 @@ const DashboardPagina = () => {
     setProductForm(emptyProduct());
   };
 
+  const openAddBooking = () => {
+    closeAllForms();
+    setActiveForm("product");
+    setProductForm({ ...emptyProduct(), linkType: "booking" });
+  };
+
   const openEditProduct = (p: ProductItem) => {
     closeAllForms();
     setActiveForm("product");
@@ -1507,7 +1517,8 @@ const DashboardPagina = () => {
                       <div className="fixed inset-0 z-30" onClick={() => setShowAddMenu(false)} />
                       <div className="absolute top-full left-0 right-0 mt-2 z-40 glass-card rounded-xl shadow-xl border border-[hsl(var(--dash-border-subtle))] p-1.5 animate-in slide-in-from-top-2 duration-200">
                         {[
-                          { type: "product" as const, icon: <Package size={16} className="text-violet-500" />, label: "Produto", desc: "Venda algo" },
+                          { type: "product" as const, icon: <Package size={16} className="text-violet-500" />, label: "Produto", desc: "Venda produtos ou serviços" },
+                          { type: "booking" as const, icon: <Calendar size={16} className="text-emerald-500" />, label: "Agendamento", desc: "Receba marcações online" },
                           { type: "link" as const, icon: <Link2 size={16} className="text-blue-500" />, label: "Link", desc: "Direcione para qualquer URL" },
                           { type: "testimonial" as const, icon: <Star size={16} className="text-amber-500" />, label: "Depoimento", desc: "Prova social" },
                           { type: "header" as const, icon: <Type size={16} className="text-slate-400" />, label: "Separador", desc: "Organize seções" },
@@ -1516,6 +1527,7 @@ const DashboardPagina = () => {
                             onClick={() => {
                               setShowAddMenu(false);
                               if (opt.type === "product") openAddProduct();
+                              else if (opt.type === "booking") openAddBooking();
                               else if (opt.type === "link") openAddLink();
                               else if (opt.type === "testimonial") openAddTestimonial();
                               else openAddHeader();
@@ -1546,11 +1558,31 @@ const DashboardPagina = () => {
                       : "border-primary/20"
                   }`}>
                     <h3 className="text-[hsl(var(--dash-text))] text-sm font-semibold flex items-center gap-2">
-                      {editingProductId ? "Editar Produto" : "Novo Produto"}
+                      {editingProductId
+                        ? (productForm.linkType === "booking" ? "Editar Agendamento" : "Editar Produto")
+                        : (productForm.linkType === "booking" ? "Novo Agendamento" : "Novo Produto")
+                      }
                       {highlightField === "products" && !editingProductId && (
                         <span className="text-[10px] font-bold text-primary animate-bounce">← preencha e salve</span>
                       )}
+                      {productForm.linkType === "booking" && !editingProductId && (
+                        <span className="text-[9px] font-medium text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">Agenda online</span>
+                      )}
                     </h3>
+
+                    {/* Marketing tip */}
+                    {!editingProductId && (
+                      <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-xl bg-gradient-to-r from-amber-500/5 to-orange-500/5 border border-amber-500/15">
+                        <TrendingUp size={14} className="text-amber-500 mt-0.5 flex-shrink-0" />
+                        <p className="text-[10px] text-[hsl(var(--dash-text-muted))] leading-relaxed">
+                          <span className="font-semibold text-amber-600">Dica de conversão:</span>{" "}
+                          {productForm.linkType === "booking"
+                            ? "Agendamentos com foto do espaço ou profissional convertem 2x mais. Adicione mídia!"
+                            : "Produtos com foto vendem 73% mais. Adicione uma imagem e um preço com desconto para criar urgência."
+                          }
+                        </p>
+                      </div>
+                    )}
 
                     {/* ═══ MEDIA: photos + video ═══ */}
                     <input ref={productImageInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleProductImageUpload} />
@@ -1736,24 +1768,29 @@ const DashboardPagina = () => {
                       </div>
                     </div>
 
-                    {/* ═══ LINK ═══ */}
+                    {/* ═══ LINK / ACTION ═══ */}
                     <div>
-                      <label className={labelCls}>Ação do botão</label>
-                      <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-2 -mt-1">O que acontece quando o cliente clica no produto. Escolha abaixo:</p>
-                      <div className="flex gap-1 p-0.5 rounded-lg bg-[hsl(var(--dash-surface-2))] mb-2.5">
+                      <label className={labelCls}>
+                        <Zap size={10} className="inline mr-1 text-amber-500" />
+                        Ação do botão
+                      </label>
+                      <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-2 -mt-1">O que acontece quando o cliente clica</p>
+                      <div className="grid grid-cols-4 gap-1.5 mb-3">
                         {([
-                          { key: "url" as const, icon: <Link2 size={11} />, label: "Link" },
-                          { key: "whatsapp" as const, icon: <MessageCircle size={11} />, label: "WhatsApp" },
-                          { key: "booking" as const, icon: <Calendar size={11} />, label: "Agendar" },
-                          { key: "none" as const, icon: <Eye size={11} />, label: "Exibir" },
+                          { key: "url" as const, icon: <Link2 size={14} />, label: "Link", desc: "Hotmart, site..." },
+                          { key: "whatsapp" as const, icon: <MessageCircle size={14} />, label: "WhatsApp", desc: "Conversa direta" },
+                          { key: "booking" as const, icon: <Calendar size={14} />, label: "Agendar", desc: "Data e hora" },
+                          { key: "none" as const, icon: <Eye size={14} />, label: "Exibir", desc: "Sem ação" },
                         ]).map(opt => (
                           <button key={opt.key} onClick={() => setProductForm(f => f ? { ...f, linkType: opt.key } : f)}
-                            className={`flex-1 flex items-center justify-center gap-1 text-[11px] font-medium py-1.5 rounded-md transition-all ${
+                            className={`flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl border text-center transition-all ${
                               (productForm.linkType || "url") === opt.key
-                                ? "bg-[hsl(var(--dash-surface))] text-[hsl(var(--dash-text))] shadow-sm"
-                                : "text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))]"
+                                ? "border-primary/50 bg-primary/8 text-primary shadow-sm"
+                                : "border-[hsl(var(--dash-border-subtle))] text-[hsl(var(--dash-text-muted))] hover:border-primary/25 hover:bg-[hsl(var(--dash-surface-2))]"
                             }`}>
-                            {opt.icon} {opt.label}
+                            {opt.icon}
+                            <span className="text-[11px] font-semibold">{opt.label}</span>
+                            <span className="text-[8px] opacity-60 leading-tight">{opt.desc}</span>
                           </button>
                         ))}
                       </div>
@@ -1802,7 +1839,7 @@ const DashboardPagina = () => {
                             <span className="text-[12px] font-semibold text-[hsl(var(--dash-text))]">Configurar agendamento</span>
                           </div>
                           <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] -mt-1">
-                            Seus clientes escolhem data e horário, e a solicitação chega no seu WhatsApp automaticamente.
+                            Seus clientes escolhem data e horário direto na sua vitrine.
                           </p>
 
                           {/* Duration */}
@@ -1870,21 +1907,86 @@ const DashboardPagina = () => {
                             </div>
                           </div>
 
-                          {/* WhatsApp for confirmations */}
+                          {/* ═══ Integration channel ═══ */}
                           <div>
-                            <label className={labelCls}>WhatsApp para receber agendamentos</label>
-                            <div className="flex items-center">
-                              <span className="flex-shrink-0 rounded-l-xl border border-r-0 border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] text-sm px-3 py-2.5 select-none">+55</span>
-                              <input type="tel" className={`${inputCls} rounded-l-none`} placeholder="11999999999"
-                                value={productForm.url}
-                                onChange={e => setProductForm(f => f ? { ...f, url: e.target.value.replace(/\D/g, "") } : f)} />
+                            <label className={labelCls}>Onde receber os agendamentos</label>
+                            <div className="grid grid-cols-2 gap-1.5">
+                              {([
+                                { key: "whatsapp" as const, icon: <MessageCircle size={13} />, label: "WhatsApp", color: "text-green-500" },
+                                { key: "google" as const, icon: <Calendar size={13} />, label: "Google Calendar", color: "text-blue-500" },
+                                { key: "calendly" as const, icon: <ExternalLink size={13} />, label: "Calendly / Cal.com", color: "text-violet-500" },
+                                { key: "external" as const, icon: <Link2 size={13} />, label: "Link externo / CRM", color: "text-amber-500" },
+                              ]).map(ch => (
+                                <button key={ch.key}
+                                  onClick={() => setProductForm(f => f ? { ...f, bookingChannel: ch.key } : f)}
+                                  className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-[11px] font-medium transition-all text-left ${
+                                    (productForm.bookingChannel || "whatsapp") === ch.key
+                                      ? "border-primary/50 bg-primary/10 text-[hsl(var(--dash-text))]"
+                                      : "border-[hsl(var(--dash-border-subtle))] text-[hsl(var(--dash-text-muted))] hover:border-primary/30"
+                                  }`}>
+                                  <span className={ch.color}>{ch.icon}</span>
+                                  {ch.label}
+                                </button>
+                              ))}
                             </div>
-                            {productForm.url && (
-                              <p className="text-[10px] text-emerald-500 flex items-center gap-1 mt-1">
-                                <MessageCircle size={9} /> Agendamentos chegarão via wa.me/55{productForm.url}
-                              </p>
-                            )}
                           </div>
+
+                          {/* Channel-specific config */}
+                          {(productForm.bookingChannel || "whatsapp") === "whatsapp" && (
+                            <div>
+                              <label className={labelCls}>Número do WhatsApp</label>
+                              <div className="flex items-center">
+                                <span className="flex-shrink-0 rounded-l-xl border border-r-0 border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] text-sm px-3 py-2.5 select-none">+55</span>
+                                <input type="tel" className={`${inputCls} rounded-l-none`} placeholder="11999999999"
+                                  value={productForm.url}
+                                  onChange={e => setProductForm(f => f ? { ...f, url: e.target.value.replace(/\D/g, "") } : f)} />
+                              </div>
+                              {productForm.url && (
+                                <p className="text-[10px] text-emerald-500 flex items-center gap-1 mt-1">
+                                  <Check size={9} /> Cliente escolhe data/hora e a mensagem chega no seu WhatsApp
+                                </p>
+                              )}
+                            </div>
+                          )}
+
+                          {(productForm.bookingChannel || "whatsapp") === "google" && (
+                            <div>
+                              <label className={labelCls}>Número do WhatsApp <span className="text-[hsl(var(--dash-text-subtle))] font-normal">para confirmação</span></label>
+                              <div className="flex items-center">
+                                <span className="flex-shrink-0 rounded-l-xl border border-r-0 border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] text-sm px-3 py-2.5 select-none">+55</span>
+                                <input type="tel" className={`${inputCls} rounded-l-none`} placeholder="11999999999"
+                                  value={productForm.url}
+                                  onChange={e => setProductForm(f => f ? { ...f, url: e.target.value.replace(/\D/g, "") } : f)} />
+                              </div>
+                              <p className="text-[10px] text-blue-400 flex items-center gap-1 mt-1">
+                                <Calendar size={9} /> O evento é criado no Google Calendar do cliente + você recebe no WhatsApp
+                              </p>
+                            </div>
+                          )}
+
+                          {(productForm.bookingChannel || "whatsapp") === "calendly" && (
+                            <div>
+                              <label className={labelCls}>Link do Calendly / Cal.com</label>
+                              <input type="url" className={inputCls} placeholder="https://calendly.com/seu-nome/30min"
+                                value={productForm.bookingUrl || ""}
+                                onChange={e => setProductForm(f => f ? { ...f, bookingUrl: e.target.value } : f)} />
+                              <p className="text-[10px] text-violet-400 flex items-center gap-1 mt-1">
+                                <ExternalLink size={9} /> O cliente é redirecionado para sua página de agendamento
+                              </p>
+                            </div>
+                          )}
+
+                          {(productForm.bookingChannel || "whatsapp") === "external" && (
+                            <div>
+                              <label className={labelCls}>URL do seu sistema de agendamento</label>
+                              <input type="url" className={inputCls} placeholder="https://seu-crm.com/agendar"
+                                value={productForm.bookingUrl || ""}
+                                onChange={e => setProductForm(f => f ? { ...f, bookingUrl: e.target.value } : f)} />
+                              <p className="text-[10px] text-amber-400 flex items-center gap-1 mt-1">
+                                <Link2 size={9} /> Funciona com qualquer CRM: Kommo, RD Station, HubSpot, etc.
+                              </p>
+                            </div>
+                          )}
                         </div>
                       )}
 
