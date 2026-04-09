@@ -6,6 +6,7 @@ import {
   MessageCircle, Clock, ChevronDown, ChevronUp, Eye, X, Copy, ExternalLink,
   Sparkles, Calendar, Settings, Layout, GripVertical, AlertCircle,
   TrendingUp, Zap, ArrowRight, CheckCircle2, Circle, Image, Type, Video,
+  Play, Smile, Search,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -20,16 +21,20 @@ interface ProductItem {
   price: string;
   originalPrice: string;
   emoji: string;
-  imageUrl?: string;
-  videoUrl?: string;
+  images: string[];
+  video?: string;
   url: string;
-  linkType?: "url" | "whatsapp";
+  linkType?: "url" | "whatsapp" | "none";
   whatsappMsg?: string;
+  ctaText?: string;
   badge: string;
   urgency: boolean;
   active: boolean;
   startsAt?: string;
   endsAt?: string;
+  // migration compat
+  imageUrl?: string;
+  videoUrl?: string;
 }
 
 interface LinkItem {
@@ -101,10 +106,56 @@ const LINK_ICON_MAP: Record<LinkItem["icon"], React.ReactNode> = {
   link:      <Link2 size={14} />,
 };
 
-const PRODUCT_EMOJIS = [
-  "🎯", "📚", "🎨", "💡", "🚀", "🎤", "💎", "🔑", "⚡", "🛒",
-  "📱", "💻", "🎓", "🎁", "🏆", "💰", "📸", "🎵", "✨", "🏠",
-  "✈️", "🎮", "💪", "📦", "🎬", "💄", "🧠", "❤️", "🍕", "☕",
+// ── Full emoji picker data ─────────────────────────────────────────────────
+
+interface EmojiCategory {
+  name: string;
+  icon: string;
+  emojis: string[];
+}
+
+const EMOJI_CATEGORIES: EmojiCategory[] = [
+  { name: "Populares", icon: "⭐", emojis: [
+    "😀","😃","😄","😁","😆","😅","🤣","😂","🙂","😉","😊","😇","🥰","😍","🤩","😘","😗","😚","😋","😛",
+    "😜","🤪","😝","🤑","🤗","🤭","🤫","🤔","😐","😏","😒","🙄","😬","😌","😴","🤤","😷","🤒","🤕","🤢",
+    "🤮","🥵","🥶","😱","😨","😰","😥","😢","😭","😤","😡","🤬","😈","👿","💀","☠️","💩","🤡","👹","👺",
+  ]},
+  { name: "Negócios", icon: "💼", emojis: [
+    "💼","📊","📈","📉","💰","💵","💴","💶","💷","💳","🧾","📋","📌","📍","🗂","📁","📂","💡","🔑","🏆",
+    "🎯","✅","❌","⭐","🌟","💫","🔥","✨","💎","👑","🎖","🏅","🥇","🥈","🥉","📣","📢","🔔","🔒","🔓",
+  ]},
+  { name: "Produtos", icon: "🛒", emojis: [
+    "🛒","🛍","🎁","📦","🏷","💻","📱","⌚","📷","🎥","🎧","🎮","🕹","📚","📘","📕","📗","📙","📔","📒",
+    "🎨","🖌","✏️","📐","📏","🔧","🔨","⚙️","🔩","💊","🧴","👗","👠","👟","🧢","👜","💍","🕶","🧳","🎒",
+  ]},
+  { name: "Comida", icon: "🍔", emojis: [
+    "☕","🍵","🧋","🍰","🎂","🍫","🍬","🍭","🍿","🍩","🍪","🧁","🍕","🍔","🌮","🌯","🥗","🍜","🍝","🍣",
+    "🍱","🥘","🍲","🥩","🍗","🥐","🍞","🧀","🥚","🥞","🍎","🍊","🍋","🍇","🍓","🫐","🥑","🥕","🌽","🍺",
+  ]},
+  { name: "Natureza", icon: "🌿", emojis: [
+    "🌺","🌸","🌹","🌷","💐","🌻","🌼","🍀","☘","🌿","🍃","🍂","🍁","🌾","🌵","🎄","🌲","🌳","🌴","🪴",
+    "🌱","🌊","💧","🔥","⛈","🌈","☀️","🌤","⭐","🌙","🦋","🐝","🌎","🌍","🌏","❄️","⛄","🍄","🐚","🪨",
+  ]},
+  { name: "Coração", icon: "❤️", emojis: [
+    "❤️","🧡","💛","💚","💙","💜","🖤","🤍","🤎","💔","❣️","💕","💞","💓","💗","💖","💘","💝","♥️","💟",
+    "🫶","🤝","🙏","✌️","🤞","🤟","🤘","👊","✊","👏","🙌","👐","🤲","💪","🦾","👍","👎","☝️","👆","👇",
+  ]},
+  { name: "Viagem", icon: "✈️", emojis: [
+    "✈️","🛫","🛬","🚀","🛸","🚁","⛵","🚤","🛳","🚂","🚃","🚄","🚅","🏎","🚗","🚕","🚙","🚌","🏍","🛵",
+    "🚲","🛴","🏠","🏡","🏢","🏖","🏔","⛰","🗻","🗼","🗽","🎡","🎢","🎠","⛲","🌉","🏰","🛕","⛩","🕌",
+  ]},
+  { name: "Atividades", icon: "⚽", emojis: [
+    "⚽","🏀","🏈","⚾","🎾","🏐","🏉","🎱","🏓","🏸","🥊","🥋","🎽","🛹","⛸","🎿","🏋️","🤸","🧘","🚴",
+    "🎵","🎶","🎤","🎸","🥁","🎺","🎷","🎹","🎻","🎼","🎬","🎭","🎪","🎨","🎲","♟","🧩","🎰","🪄","🎩",
+  ]},
+  { name: "Animais", icon: "🐶", emojis: [
+    "🐶","🐱","🐭","🐹","🐰","🦊","🐻","🐼","🐨","🐯","🦁","🐮","🐷","🐸","🐵","🙈","🙉","🙊","🐔","🐧",
+    "🐦","🐤","🦆","🦅","🦉","🦇","🐺","🦄","🐴","🐝","🦋","🐛","🐞","🐢","🐍","🦎","🦖","🐙","🐬","🐳",
+  ]},
+  { name: "Símbolos", icon: "💯", emojis: [
+    "💯","💢","💥","💫","💦","💨","🕳","💬","💭","🗯","♨️","🔰","⚠️","🚫","❗","❓","‼️","⁉️","🔅","🔆",
+    "♻️","🔱","📛","🔰","⭕","✳️","❇️","✴️","💠","🔷","🔶","🔵","🔴","🟡","🟢","🟣","⚪","⚫","🟤","🔲",
+  ]},
 ];
 
 type TabId = "vitrine" | "perfil" | "design";
@@ -120,7 +171,7 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
 const emptyProduct = (): ProductItem => ({
   id: Date.now().toString(),
   title: "", description: "", price: "", originalPrice: "",
-  emoji: "🎯", imageUrl: "", videoUrl: "", url: "", linkType: "url", whatsappMsg: "",
+  emoji: "🎯", images: [], url: "", linkType: "url", whatsappMsg: "", ctaText: "",
   badge: "", urgency: false, active: true,
 });
 
@@ -621,8 +672,12 @@ const DashboardPagina = () => {
   const themeGridRef = useRef<HTMLDivElement>(null);
 
   // Product form extras
-  const [showEmojiGrid, setShowEmojiGrid] = useState(false);
-  const productFileInputRef = useRef<HTMLInputElement>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [emojiSearch, setEmojiSearch] = useState("");
+  const [activeEmojiCat, setActiveEmojiCat] = useState(0);
+  const productImageInputRef = useRef<HTMLInputElement>(null);
+  const productVideoInputRef = useRef<HTMLInputElement>(null);
+  const [videoError, setVideoError] = useState<string | null>(null);
 
   // ── Load ──────────────────────────────────────────────────────────────────
 
@@ -630,6 +685,18 @@ const DashboardPagina = () => {
     (async () => {
       const stored = localStorage.getItem(LS_KEY);
       const base: VitrineConfig = stored ? { ...DEFAULT_CONFIG, ...JSON.parse(stored) } : { ...DEFAULT_CONFIG };
+      // Migrate: imageUrl → images array
+      let migrated = false;
+      base.products = base.products.map(p => {
+        if (!p.images) p.images = [];
+        if ((p as ProductItem).imageUrl && p.images.length === 0) {
+          p.images = [(p as ProductItem).imageUrl!];
+          delete (p as ProductItem).imageUrl;
+          migrated = true;
+        }
+        return p;
+      });
+      if (migrated) localStorage.setItem(LS_KEY, JSON.stringify(base));
       // Migrate: generate blocks from existing data if missing
       if (!base.blocks || base.blocks.length === 0) {
         const hasData = base.products.length > 0 || base.links.length > 0 || base.testimonials.length > 0;
@@ -751,28 +818,75 @@ const DashboardPagina = () => {
 
   // ── Form open/close helpers ───────────────────────────────────────────────
 
-  // ── Product image upload ─────────────────────────────────────────────────
+  // ── Product image upload (multiple) ──────────────────────────────────────
 
   const handleProductImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new window.Image();
+        img.onload = () => {
+          const MAX = 500;
+          const ratio = Math.min(MAX / img.width, MAX / img.height, 1);
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.round(img.width * ratio);
+          canvas.height = Math.round(img.height * ratio);
+          const ctx = canvas.getContext("2d")!;
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.72);
+          setProductForm(f => f ? { ...f, images: [...(f.images || []), dataUrl] } : f);
+        };
+        img.src = ev.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = "";
+  };
+
+  const removeProductImage = (index: number) => {
+    setProductForm(f => f ? { ...f, images: (f.images || []).filter((_, i) => i !== index) } : f);
+  };
+
+  // ── Product video upload ────────────────────────────────────────────────
+
+  const handleProductVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const img = new window.Image();
-      img.onload = () => {
-        const MAX = 600;
-        const ratio = Math.min(MAX / img.width, MAX / img.height, 1);
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.round(img.width * ratio);
-        canvas.height = Math.round(img.height * ratio);
-        const ctx = canvas.getContext("2d")!;
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.80);
-        setProductForm(f => f ? { ...f, imageUrl: dataUrl } : f);
+    setVideoError(null);
+
+    // Check size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setVideoError("Vídeo muito grande (máx 5MB). Tente um vídeo mais curto ou de menor qualidade.");
+      e.target.value = "";
+      return;
+    }
+
+    // Check duration
+    const url = URL.createObjectURL(file);
+    const videoEl = document.createElement("video");
+    videoEl.preload = "metadata";
+    videoEl.onloadedmetadata = () => {
+      URL.revokeObjectURL(url);
+      if (videoEl.duration > 20) {
+        setVideoError(`Vídeo tem ${Math.round(videoEl.duration)}s (máx 20s). Grave um vídeo mais curto.`);
+        e.target.value = "";
+        return;
+      }
+      // Read as base64
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setProductForm(f => f ? { ...f, video: ev.target?.result as string } : f);
+        setVideoError(null);
       };
-      img.src = ev.target?.result as string;
+      reader.readAsDataURL(file);
     };
-    reader.readAsDataURL(file);
+    videoEl.onerror = () => {
+      URL.revokeObjectURL(url);
+      setVideoError("Formato de vídeo não suportado.");
+    };
+    videoEl.src = url;
     e.target.value = "";
   };
 
@@ -782,7 +896,9 @@ const DashboardPagina = () => {
     setEditingProductId(null);
     setLinkForm(null);
     setEditingLinkId(null);
-    setShowEmojiGrid(false);
+    setShowEmojiPicker(false);
+    setEmojiSearch("");
+    setVideoError(null);
     setTestimonialForm(emptyTestimonial());
     setEditingTestimonialId(null);
     setHeaderTitle("");
@@ -1028,8 +1144,8 @@ const DashboardPagina = () => {
     if (block.type === "product") {
       const p = config.products.find(pr => pr.id === block.refId);
       if (!p) return null;
-      const productIcon = p.imageUrl
-        ? <div className="w-6 h-6 rounded-md overflow-hidden"><img src={p.imageUrl} alt="" className="w-full h-full object-cover" /></div>
+      const productIcon = (p.images?.length > 0)
+        ? <div className="w-6 h-6 rounded-md overflow-hidden"><img src={p.images[0]} alt="" className="w-full h-full object-cover" /></div>
         : <span className="text-base">{p.emoji}</span>;
       return { icon: productIcon, title: p.title || "Sem título", subtitle: p.price, active: p.active, hasToggle: true, typeLabel: "Produto" };
     }
@@ -1113,9 +1229,9 @@ const DashboardPagina = () => {
                 return (
                   <div key={block.id} className="flex items-center gap-2.5 rounded-xl border p-2.5 mb-2 transition-all hover:scale-[1.01]"
                     style={{ borderColor: currentTheme.accent + "30", background: currentTheme.accent + "0a" }}>
-                    {p.imageUrl ? (
+                    {(p.images?.length > 0) ? (
                       <div className="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0">
-                        <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover" />
+                        <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover" />
                       </div>
                     ) : (
                       <span className="text-base flex-shrink-0">{p.emoji}</span>
@@ -1415,67 +1531,157 @@ const DashboardPagina = () => {
                       )}
                     </h3>
 
-                    {/* ── Product Image ── */}
-                    <input ref={productFileInputRef} type="file" accept="image/*" className="hidden" onChange={handleProductImageUpload} />
-                    {productForm.imageUrl ? (
-                      <div className="relative rounded-xl overflow-hidden h-[140px] bg-black/5 border border-[hsl(var(--dash-border-subtle))]">
-                        <img src={productForm.imageUrl} alt="Produto" className="w-full h-full object-cover" />
-                        <div className="absolute top-2 right-2 flex gap-1.5">
-                          <button onClick={() => productFileInputRef.current?.click()}
-                            className="px-2 py-1 rounded-lg bg-black/60 backdrop-blur-sm text-white text-[10px] font-medium hover:bg-black/80 transition-all">
-                            Trocar
-                          </button>
-                          <button onClick={() => setProductForm(f => f ? { ...f, imageUrl: "" } : f)}
-                            className="w-6 h-6 rounded-lg bg-black/60 backdrop-blur-sm text-white flex items-center justify-center hover:bg-red-500/80 transition-all">
-                            <X size={11} />
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <button onClick={() => productFileInputRef.current?.click()}
-                        className="w-full rounded-xl border-2 border-dashed border-[hsl(var(--dash-border))] hover:border-primary/40 bg-[hsl(var(--dash-surface-2))] hover:bg-primary/5 transition-all p-4 flex flex-col items-center gap-1.5 cursor-pointer">
-                        <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Image size={16} className="text-primary" />
-                        </div>
-                        <p className="text-[12px] font-semibold text-[hsl(var(--dash-text))]">Foto do produto</p>
-                        <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Câmera ou galeria · opcional</p>
-                      </button>
-                    )}
+                    {/* ═══ MEDIA: photos + video ═══ */}
+                    <input ref={productImageInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleProductImageUpload} />
+                    <input ref={productVideoInputRef} type="file" accept="video/*" className="hidden" onChange={handleProductVideoUpload} />
 
-                    {/* ── Emoji (shown when no image) ── */}
-                    {!productForm.imageUrl && (
-                      <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-xl">{productForm.emoji}</span>
-                          <button onClick={() => setShowEmojiGrid(!showEmojiGrid)}
-                            className="text-[11px] text-[hsl(var(--dash-text-muted))] hover:text-primary transition-colors font-medium flex items-center gap-1">
-                            Trocar emoji {showEmojiGrid ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
+                    <div>
+                      <label className={labelCls}>Mídia <span className="text-[hsl(var(--dash-text-subtle))] font-normal">fotos e vídeo</span></label>
+
+                      {/* Image gallery grid */}
+                      {(productForm.images?.length > 0 || productForm.video) && (
+                        <div className="flex gap-2 flex-wrap mb-2.5">
+                          {(productForm.images || []).map((img, i) => (
+                            <div key={i} className="relative w-[72px] h-[72px] rounded-xl overflow-hidden border border-[hsl(var(--dash-border-subtle))] group/img">
+                              <img src={img} alt="" className="w-full h-full object-cover" />
+                              <button onClick={() => removeProductImage(i)}
+                                className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity hover:bg-red-500/80">
+                                <X size={9} />
+                              </button>
+                              {i === 0 && (
+                                <span className="absolute bottom-1 left-1 text-[8px] font-bold px-1.5 py-0.5 rounded-md bg-black/60 text-white">Capa</span>
+                              )}
+                            </div>
+                          ))}
+                          {productForm.video && (
+                            <div className="relative w-[72px] h-[72px] rounded-xl overflow-hidden border border-[hsl(var(--dash-border-subtle))] group/vid">
+                              <video src={productForm.video} className="w-full h-full object-cover" muted />
+                              <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                                <Play size={16} className="text-white" />
+                              </div>
+                              <button onClick={() => setProductForm(f => f ? { ...f, video: undefined } : f)}
+                                className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover/vid:opacity-100 transition-opacity hover:bg-red-500/80">
+                                <X size={9} />
+                              </button>
+                            </div>
+                          )}
+                          {/* Add more button */}
+                          <button onClick={() => productImageInputRef.current?.click()}
+                            className="w-[72px] h-[72px] rounded-xl border-2 border-dashed border-[hsl(var(--dash-border))] hover:border-primary/40 flex items-center justify-center hover:bg-primary/5 transition-all">
+                            <Plus size={18} className="text-[hsl(var(--dash-text-subtle))]" />
                           </button>
                         </div>
-                        {showEmojiGrid && (
-                          <div className="animate-in slide-in-from-top-1 duration-150">
-                            <div className="flex gap-1.5 flex-wrap mb-2">
-                              {PRODUCT_EMOJIS.map(em => (
-                                <button key={em} onClick={() => { setProductForm(f => f ? { ...f, emoji: em } : f); setShowEmojiGrid(false); }}
-                                  className={`w-8 h-8 rounded-lg text-base flex items-center justify-center border transition-all ${
-                                    productForm.emoji === em
-                                      ? "border-primary/50 bg-[hsl(var(--dash-accent))] scale-110"
-                                      : "border-[hsl(var(--dash-border-subtle))] hover:border-primary/20 hover:scale-105"
-                                  }`}>{em}</button>
+                      )}
+
+                      {/* Empty state — add photos/video */}
+                      {(!productForm.images || productForm.images.length === 0) && !productForm.video && (
+                        <div className="flex gap-2 mb-2.5">
+                          <button onClick={() => productImageInputRef.current?.click()}
+                            className="flex-1 rounded-xl border-2 border-dashed border-[hsl(var(--dash-border))] hover:border-primary/40 bg-[hsl(var(--dash-surface-2))] hover:bg-primary/5 transition-all p-4 flex flex-col items-center gap-1.5 cursor-pointer">
+                            <Image size={18} className="text-primary" />
+                            <p className="text-[11px] font-semibold text-[hsl(var(--dash-text))]">Fotos</p>
+                            <p className="text-[9px] text-[hsl(var(--dash-text-subtle))]">Câmera ou galeria</p>
+                          </button>
+                          <button onClick={() => productVideoInputRef.current?.click()}
+                            className="flex-1 rounded-xl border-2 border-dashed border-[hsl(var(--dash-border))] hover:border-primary/40 bg-[hsl(var(--dash-surface-2))] hover:bg-primary/5 transition-all p-4 flex flex-col items-center gap-1.5 cursor-pointer">
+                            <Video size={18} className="text-fuchsia-500" />
+                            <p className="text-[11px] font-semibold text-[hsl(var(--dash-text))]">Vídeo</p>
+                            <p className="text-[9px] text-[hsl(var(--dash-text-subtle))]">Até 20s · máx 5MB</p>
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Add video button (when has images but no video) */}
+                      {(productForm.images?.length > 0) && !productForm.video && (
+                        <button onClick={() => productVideoInputRef.current?.click()}
+                          className="flex items-center gap-1.5 text-[11px] text-[hsl(var(--dash-text-muted))] hover:text-fuchsia-500 transition-colors font-medium mb-1">
+                          <Video size={12} /> Adicionar vídeo curto (até 20s)
+                        </button>
+                      )}
+
+                      {videoError && (
+                        <p className="text-[11px] text-red-400 flex items-center gap-1 mt-1">
+                          <AlertCircle size={11} /> {videoError}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* ═══ EMOJI (when no images) ═══ */}
+                    {(!productForm.images || productForm.images.length === 0) && (
+                      <div>
+                        <div className="flex items-center gap-2.5 mb-2">
+                          <span className="text-2xl">{productForm.emoji}</span>
+                          <button onClick={() => { setShowEmojiPicker(!showEmojiPicker); setEmojiSearch(""); }}
+                            className="flex items-center gap-1.5 text-[11px] text-[hsl(var(--dash-text-muted))] hover:text-primary transition-colors font-medium">
+                            <Smile size={12} /> Trocar emoji
+                          </button>
+                          <span className="text-[9px] text-[hsl(var(--dash-text-subtle))]">ou sem foto, aparece o emoji</span>
+                        </div>
+                        {showEmojiPicker && (
+                          <div className="rounded-xl border border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-surface))] shadow-lg p-3 animate-in slide-in-from-top-2 duration-150">
+                            {/* Search */}
+                            <div className="relative mb-2.5">
+                              <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[hsl(var(--dash-text-subtle))]" />
+                              <input type="text" className={`${inputCls} pl-8 text-[12px]`} placeholder="Buscar ou digitar emoji..."
+                                value={emojiSearch} onChange={e => setEmojiSearch(e.target.value)}
+                                autoFocus />
+                            </div>
+                            {/* Category tabs */}
+                            <div className="flex gap-0.5 mb-2.5 overflow-x-auto scrollbar-none pb-1">
+                              {EMOJI_CATEGORIES.map((cat, i) => (
+                                <button key={cat.name} onClick={() => { setActiveEmojiCat(i); setEmojiSearch(""); }}
+                                  className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-base transition-all ${
+                                    activeEmojiCat === i && !emojiSearch ? "bg-primary/15 ring-1 ring-primary/30" : "hover:bg-[hsl(var(--dash-surface-2))]"
+                                  }`} title={cat.name}>
+                                  {cat.icon}
+                                </button>
                               ))}
                             </div>
-                            <div className="flex items-center gap-2">
-                              <input type="text" className={`${inputCls} w-16 text-center text-lg`} placeholder="🎯" maxLength={2}
+                            {/* Emoji grid */}
+                            <div className="max-h-[200px] overflow-y-auto scrollbar-none">
+                              <div className="flex flex-wrap gap-0.5">
+                                {(() => {
+                                  const emojis = emojiSearch
+                                    ? EMOJI_CATEGORIES.flatMap(c => c.emojis).filter(e => e.includes(emojiSearch))
+                                    : EMOJI_CATEGORIES[activeEmojiCat].emojis;
+                                  if (emojis.length === 0 && emojiSearch) {
+                                    return (
+                                      <div className="w-full py-4 text-center">
+                                        <p className="text-[11px] text-[hsl(var(--dash-text-subtle))]">
+                                          Nenhum emoji encontrado. Cole ou digite diretamente:
+                                        </p>
+                                        <input type="text" className={`${inputCls} w-20 text-center text-xl mx-auto mt-2`}
+                                          placeholder="😀" maxLength={4}
+                                          onChange={e => { if (e.target.value) { setProductForm(f => f ? { ...f, emoji: e.target.value } : f); setShowEmojiPicker(false); } }} />
+                                      </div>
+                                    );
+                                  }
+                                  return emojis.map(em => (
+                                    <button key={em} onClick={() => { setProductForm(f => f ? { ...f, emoji: em } : f); setShowEmojiPicker(false); }}
+                                      className={`w-8 h-8 rounded-md text-lg flex items-center justify-center transition-all hover:bg-primary/10 hover:scale-110 ${
+                                        productForm.emoji === em ? "bg-primary/15 ring-1 ring-primary/30" : ""
+                                      }`}>{em}</button>
+                                  ));
+                                })()}
+                              </div>
+                            </div>
+                            {/* Custom input */}
+                            <div className="mt-2 pt-2 border-t border-[hsl(var(--dash-border-subtle))] flex items-center gap-2">
+                              <input type="text" className={`${inputCls} w-14 text-center text-lg`} placeholder="🎯" maxLength={4}
                                 value={productForm.emoji}
                                 onChange={e => setProductForm(f => f ? { ...f, emoji: e.target.value } : f)} />
-                              <span className="text-[10px] text-[hsl(var(--dash-text-subtle))]">ou digite qualquer emoji</span>
+                              <span className="text-[9px] text-[hsl(var(--dash-text-subtle))] flex-1">
+                                Cole qualquer emoji ou use o teclado (Win + . no Windows)
+                              </span>
+                              <button onClick={() => setShowEmojiPicker(false)}
+                                className="text-[10px] text-primary font-medium hover:underline">Fechar</button>
                             </div>
                           </div>
                         )}
                       </div>
                     )}
 
-                    {/* ── Title ── */}
+                    {/* ═══ TITLE ═══ */}
                     <div>
                       <label className={labelCls}>Título</label>
                       <input type="text" className={inputCls} placeholder="Ex: Curso de Design Digital"
@@ -1483,47 +1689,61 @@ const DashboardPagina = () => {
                         onChange={e => setProductForm(f => f ? { ...f, title: e.target.value } : f)} />
                     </div>
 
-                    {/* ── Price ── */}
+                    {/* ═══ DESCRIPTION ═══ */}
                     <div>
-                      <label className={labelCls}>Preço</label>
+                      <label className={labelCls}>Descrição <span className="text-[hsl(var(--dash-text-subtle))] font-normal">(opcional)</span></label>
+                      <input type="text" className={inputCls} placeholder="Uma frase sobre o que é"
+                        value={productForm.description}
+                        onChange={e => setProductForm(f => f ? { ...f, description: e.target.value } : f)} />
+                    </div>
+
+                    {/* ═══ PRICE (optional) ═══ */}
+                    <div>
+                      <label className={labelCls}>Preço <span className="text-[hsl(var(--dash-text-subtle))] font-normal">(opcional — deixe vazio se não é pra venda)</span></label>
                       <input type="text" className={inputCls} placeholder="R$ 97,00"
                         value={productForm.price}
                         onChange={e => setProductForm(f => f ? { ...f, price: e.target.value } : f)} />
                     </div>
 
-                    {/* ── Link type toggle + input ── */}
+                    {/* ═══ LINK ═══ */}
                     <div>
-                      <label className={labelCls}>Como o cliente compra?</label>
+                      <label className={labelCls}>Ação do botão</label>
                       <div className="flex gap-1 p-0.5 rounded-lg bg-[hsl(var(--dash-surface-2))] mb-2.5">
-                        <button onClick={() => setProductForm(f => f ? { ...f, linkType: "url" } : f)}
-                          className={`flex-1 flex items-center justify-center gap-1.5 text-[11px] font-medium py-1.5 rounded-md transition-all ${
-                            (productForm.linkType || "url") === "url"
-                              ? "bg-[hsl(var(--dash-surface))] text-[hsl(var(--dash-text))] shadow-sm"
-                              : "text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))]"
-                          }`}>
-                          <Link2 size={11} /> Link de compra
-                        </button>
-                        <button onClick={() => setProductForm(f => f ? { ...f, linkType: "whatsapp" } : f)}
-                          className={`flex-1 flex items-center justify-center gap-1.5 text-[11px] font-medium py-1.5 rounded-md transition-all ${
-                            productForm.linkType === "whatsapp"
-                              ? "bg-[hsl(var(--dash-surface))] text-[hsl(var(--dash-text))] shadow-sm"
-                              : "text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))]"
-                          }`}>
-                          <MessageCircle size={11} /> WhatsApp
-                        </button>
+                        {([
+                          { key: "url" as const, icon: <Link2 size={11} />, label: "Link" },
+                          { key: "whatsapp" as const, icon: <MessageCircle size={11} />, label: "WhatsApp" },
+                          { key: "none" as const, icon: <Eye size={11} />, label: "Só exibir" },
+                        ]).map(opt => (
+                          <button key={opt.key} onClick={() => setProductForm(f => f ? { ...f, linkType: opt.key } : f)}
+                            className={`flex-1 flex items-center justify-center gap-1 text-[11px] font-medium py-1.5 rounded-md transition-all ${
+                              (productForm.linkType || "url") === opt.key
+                                ? "bg-[hsl(var(--dash-surface))] text-[hsl(var(--dash-text))] shadow-sm"
+                                : "text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))]"
+                            }`}>
+                            {opt.icon} {opt.label}
+                          </button>
+                        ))}
                       </div>
-                      {(productForm.linkType || "url") === "url" ? (
-                        <div className="relative">
-                          <input type="url" className={inputCls} placeholder="https://hotmart.com/produto..."
-                            value={productForm.url}
-                            onChange={e => setProductForm(f => f ? { ...f, url: e.target.value } : f)} />
-                          {productForm.url && (
-                            <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold ${isValidUrl(productForm.url) ? "text-emerald-500" : "text-red-400"}`}>
-                              {isValidUrl(productForm.url) ? "✓" : "URL inválida"}
-                            </span>
-                          )}
+
+                      {(productForm.linkType || "url") === "url" && (
+                        <div className="space-y-2">
+                          <div className="relative">
+                            <input type="url" className={inputCls} placeholder="https://hotmart.com/produto..."
+                              value={productForm.url}
+                              onChange={e => setProductForm(f => f ? { ...f, url: e.target.value } : f)} />
+                            {productForm.url && (
+                              <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold ${isValidUrl(productForm.url) ? "text-emerald-500" : "text-red-400"}`}>
+                                {isValidUrl(productForm.url) ? "✓" : "URL inválida"}
+                              </span>
+                            )}
+                          </div>
+                          <input type="text" className={inputCls} placeholder="Texto do botão (ex: Comprar, Ver mais, Acessar)"
+                            value={productForm.ctaText || ""}
+                            onChange={e => setProductForm(f => f ? { ...f, ctaText: e.target.value } : f)} />
                         </div>
-                      ) : (
+                      )}
+
+                      {productForm.linkType === "whatsapp" && (
                         <div className="space-y-2">
                           <div className="flex items-center">
                             <span className="flex-shrink-0 rounded-l-xl border border-r-0 border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] text-sm px-3 py-2.5 select-none">+55</span>
@@ -1531,7 +1751,7 @@ const DashboardPagina = () => {
                               value={productForm.url}
                               onChange={e => setProductForm(f => f ? { ...f, url: e.target.value.replace(/\D/g, "") } : f)} />
                           </div>
-                          <input type="text" className={inputCls} placeholder="Mensagem pronta (opcional): Olá! Tenho interesse no..."
+                          <input type="text" className={inputCls} placeholder="Mensagem pronta: Olá! Tenho interesse no..."
                             value={productForm.whatsappMsg || ""}
                             onChange={e => setProductForm(f => f ? { ...f, whatsappMsg: e.target.value } : f)} />
                           {productForm.url && (
@@ -1541,9 +1761,15 @@ const DashboardPagina = () => {
                           )}
                         </div>
                       )}
+
+                      {productForm.linkType === "none" && (
+                        <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">
+                          O produto será exibido sem botão de ação — ideal para portfólio ou catálogo.
+                        </p>
+                      )}
                     </div>
 
-                    {/* ── Mais opções ── */}
+                    {/* ═══ MAIS OPÇÕES ═══ */}
                     <button onClick={() => setShowAdvanced(!showAdvanced)}
                       className="flex items-center gap-1.5 text-[hsl(var(--dash-text-subtle))] text-[11px] font-medium hover:text-primary transition-colors">
                       <Settings size={11} /> Mais opções
@@ -1551,12 +1777,6 @@ const DashboardPagina = () => {
                     </button>
                     {showAdvanced && (
                       <div className="space-y-3 pt-1 border-t border-[hsl(var(--dash-border-subtle))] animate-in slide-in-from-top-1 duration-150">
-                        <div>
-                          <label className={labelCls}>Descrição</label>
-                          <input type="text" className={inputCls} placeholder="Breve descrição do produto"
-                            value={productForm.description}
-                            onChange={e => setProductForm(f => f ? { ...f, description: e.target.value } : f)} />
-                        </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <label className={labelCls}>Preço original <span className="text-[hsl(var(--dash-text-subtle))] font-normal">(riscado)</span></label>
@@ -1570,12 +1790,6 @@ const DashboardPagina = () => {
                               value={productForm.badge}
                               onChange={e => setProductForm(f => f ? { ...f, badge: e.target.value } : f)} />
                           </div>
-                        </div>
-                        <div>
-                          <label className={labelCls}><Video size={11} className="inline mr-1" />Vídeo do produto <span className="text-[hsl(var(--dash-text-subtle))] font-normal">(opcional)</span></label>
-                          <input type="url" className={inputCls} placeholder="https://youtube.com/watch?v=..."
-                            value={productForm.videoUrl || ""}
-                            onChange={e => setProductForm(f => f ? { ...f, videoUrl: e.target.value } : f)} />
                         </div>
                         <label className="flex items-center gap-2 cursor-pointer select-none">
                           <button onClick={() => setProductForm(f => f ? { ...f, urgency: !f.urgency } : f)}>
@@ -1605,7 +1819,7 @@ const DashboardPagina = () => {
                       </div>
                     )}
 
-                    {/* ── Save / Cancel ── */}
+                    {/* ═══ SAVE / CANCEL ═══ */}
                     <div className="flex gap-2 pt-1">
                       <button onClick={saveProduct} className="flex-1 btn-primary-gradient text-xs py-2.5 rounded-xl transition-transform active:scale-[0.97] font-semibold">
                         <Check size={13} className="inline mr-1" /> Salvar

@@ -19,13 +19,14 @@ interface ProductItem {
   price: string;
   originalPrice?: string;
   emoji: string;
+  images?: string[];
+  video?: string;
   imageUrl?: string;
-  videoUrl?: string;
   url: string;
-  linkType?: "url" | "whatsapp";
+  linkType?: "url" | "whatsapp" | "none";
   whatsappMsg?: string;
+  ctaText?: string;
   badge?: string;
-  /** se true, mostra countdown de urgência */
   urgency?: boolean;
 }
 
@@ -436,12 +437,17 @@ const ProfilePage = () => {
               </div>
               <div className="space-y-2.5">
                 {profile.products.map((product, i) => {
-                  const productHref = product.linkType === "whatsapp" && product.url
-                    ? `https://wa.me/55${product.url}${product.whatsappMsg ? `?text=${encodeURIComponent(product.whatsappMsg)}` : ""}`
-                    : product.url;
                   const isWhatsApp = product.linkType === "whatsapp";
+                  const isNone = product.linkType === "none";
+                  const productHref = isWhatsApp && product.url
+                    ? `https://wa.me/55${product.url}${product.whatsappMsg ? `?text=${encodeURIComponent(product.whatsappMsg)}` : ""}`
+                    : isNone ? undefined : product.url;
+                  const ctaLabel = product.ctaText || (isWhatsApp ? "WhatsApp" : product.price ? "Comprar" : "Ver mais");
+                  const coverImg = product.images?.[0] || product.imageUrl;
+                  const Wrapper = isNone ? "div" : "a";
+                  const wrapperProps = isNone ? {} : { href: productHref, target: "_blank", rel: "noopener noreferrer" };
                   return (
-                  <a key={product.id} href={productHref} target="_blank" rel="noopener noreferrer"
+                  <Wrapper key={product.id} {...(wrapperProps as Record<string, string>)}
                     className="group flex items-center gap-4 w-full px-4 py-3.5 rounded-2xl transition-all duration-200 active:scale-[0.97]"
                     style={{
                       background: t.card, border: `1px solid ${t.border}`,
@@ -449,12 +455,12 @@ const ProfilePage = () => {
                       transform: productStagger[i] ? "translateY(0)" : "translateY(14px)",
                       transition: "opacity 0.45s ease, transform 0.45s ease, box-shadow 0.2s, border-color 0.2s",
                     }}
-                    onMouseEnter={e => onHoverIn(e.currentTarget as HTMLElement)}
-                    onMouseLeave={e => onHoverOut(e.currentTarget as HTMLElement)}
+                    onMouseEnter={(e: React.MouseEvent) => onHoverIn(e.currentTarget as HTMLElement)}
+                    onMouseLeave={(e: React.MouseEvent) => onHoverOut(e.currentTarget as HTMLElement)}
                   >
                     <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center text-2xl flex-shrink-0" style={{ background: `${t.accent}12` }}>
-                      {product.imageUrl
-                        ? <img src={product.imageUrl} alt={product.title} className="w-full h-full object-cover" />
+                      {coverImg
+                        ? <img src={coverImg} alt={product.title} className="w-full h-full object-cover" />
                         : product.emoji
                       }
                     </div>
@@ -468,17 +474,21 @@ const ProfilePage = () => {
                         )}
                         {product.urgency && <CountdownBadge accent={t.accent} />}
                       </div>
-                      <p className="text-[11.5px] truncate" style={{ color: t.sub }}>{product.description}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[14px] font-extrabold" style={{ color: t.accent }}>{product.price}</span>
-                        {product.originalPrice && <span className="text-[11px] line-through" style={{ color: t.sub }}>{product.originalPrice}</span>}
+                      {product.description && <p className="text-[11.5px] truncate" style={{ color: t.sub }}>{product.description}</p>}
+                      {product.price && (
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[14px] font-extrabold" style={{ color: t.accent }}>{product.price}</span>
+                          {product.originalPrice && <span className="text-[11px] line-through" style={{ color: t.sub }}>{product.originalPrice}</span>}
+                        </div>
+                      )}
+                    </div>
+                    {!isNone && (
+                      <div className="flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[11.5px] font-bold transition-all duration-200 group-hover:brightness-110"
+                        style={{ background: isWhatsApp ? "linear-gradient(135deg, #25d366, #128C7E)" : `linear-gradient(135deg, ${t.accent}, ${t.accent2})`, color: "#fff", boxShadow: isWhatsApp ? "0 4px 14px #25d36640" : `0 4px 14px ${t.accent}40` }}>
+                        {isWhatsApp ? <MessageCircle size={11} /> : <ShoppingCart size={11} />} {ctaLabel}
                       </div>
-                    </div>
-                    <div className="flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[11.5px] font-bold transition-all duration-200 group-hover:brightness-110"
-                      style={{ background: isWhatsApp ? "linear-gradient(135deg, #25d366, #128C7E)" : `linear-gradient(135deg, ${t.accent}, ${t.accent2})`, color: "#fff", boxShadow: isWhatsApp ? "0 4px 14px #25d36640" : `0 4px 14px ${t.accent}40` }}>
-                      {isWhatsApp ? <><MessageCircle size={11} /> WhatsApp</> : <><ShoppingCart size={11} /> Comprar</>}
-                    </div>
-                  </a>
+                    )}
+                  </Wrapper>
                   );
                 })}
               </div>
