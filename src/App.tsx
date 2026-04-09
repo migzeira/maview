@@ -20,6 +20,7 @@ import DashboardAutomacoes from "./pages/DashboardAutomacoes.tsx";
 import DashboardAparencia from "./pages/DashboardAparencia.tsx";
 import DashboardConfiguracoes from "./pages/DashboardConfiguracoes.tsx";
 import DashboardPagina from "./pages/DashboardPagina.tsx";
+import DashboardBlocos from "./pages/DashboardBlocos.tsx";
 import DashboardIA from "./pages/DashboardIA.tsx";
 
 const queryClient = new QueryClient();
@@ -47,6 +48,7 @@ const App = () => (
           <Route path="/dashboard/automacoes" element={<DashboardPage><DashboardAutomacoes /></DashboardPage>} />
           <Route path="/dashboard/aparencia" element={<DashboardPage><DashboardAparencia /></DashboardPage>} />
           <Route path="/dashboard/configuracoes" element={<DashboardPage><DashboardConfiguracoes /></DashboardPage>} />
+          <Route path="/dashboard/blocos" element={<DashboardPage><DashboardBlocos /></DashboardPage>} />
           <Route path="/dashboard/ia" element={<DashboardPage><DashboardIA /></DashboardPage>} />
           <Route path="/:username" element={<ProfilePage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
