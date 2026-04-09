@@ -77,7 +77,7 @@ const Dashboard = () => {
 
   const username = user?.user_metadata?.username || user?.email?.split("@")[0] || "seunome";
   const displayName = user?.user_metadata?.full_name || username;
-  const profileUrl = `maview.app/${username}`;
+  const profileUrl = `${window.location.origin}/${username}`;
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -98,7 +98,7 @@ const Dashboard = () => {
   };
 
   const copyLink = () => {
-    navigator.clipboard.writeText(`https://${profileUrl}`);
+    navigator.clipboard.writeText(profileUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

@@ -339,7 +339,7 @@ const ProfileHeroCard = ({ config, onUpdate, onEditProfile, onHealthAction }: Pr
   const avatarUrlInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const profileUrl = config.username ? `maview.app/@${config.username}` : null;
+  const profileUrl = config.username ? `${window.location.origin}/${config.username.replace(/^@/, "")}` : null;
   const currentTheme = THEMES.find(t => t.id === config.theme) ?? THEMES[0];
   const health = calcHealth(config);
   const socialLinks = config.links.filter(l => l.isSocial && l.active);
@@ -393,7 +393,7 @@ const ProfileHeroCard = ({ config, onUpdate, onEditProfile, onHealthAction }: Pr
 
   const copyLink = () => {
     if (!profileUrl) return;
-    navigator.clipboard.writeText(`https://${profileUrl}`);
+    navigator.clipboard.writeText(profileUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -571,7 +571,7 @@ const ProfileHeroCard = ({ config, onUpdate, onEditProfile, onHealthAction }: Pr
                 {copied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
                 {copied ? "Copiado!" : "Copiar"}
               </button>
-              <a href={`https://${profileUrl}`} target="_blank" rel="noopener noreferrer"
+              <a href={profileUrl} target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg btn-primary-gradient text-[12px] font-medium">
                 <ExternalLink size={12} /> Ver
               </a>
@@ -694,6 +694,19 @@ const DashboardPagina = () => {
   const [highlightField, setHighlightField] = useState<HealthAction | null>(null);
   const whatsappInputRef = useRef<HTMLInputElement>(null);
   const themeGridRef = useRef<HTMLDivElement>(null);
+
+  // Avatar upload (perfil tab)
+  const avatarFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Copy link (perfil tab)
+  const [copied, setCopied] = useState(false);
+  const profileUrl = config.username ? `${window.location.origin}/${config.username.replace(/^@/, "")}` : null;
+  const copyLink = () => {
+    if (!profileUrl) return;
+    navigator.clipboard.writeText(profileUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   // Product form extras
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -2482,58 +2495,151 @@ const DashboardPagina = () => {
             {/* ═══════════════ TAB: PERFIL ═══════════════ */}
             {activeTab === "perfil" && (
               <div className="space-y-5">
-                <h2 className="text-[hsl(var(--dash-text))] font-semibold text-base">Informações do Perfil</h2>
 
-                <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 rounded-2xl flex-shrink-0 overflow-hidden ring-2 ring-[hsl(var(--dash-border))]">
-                    {config.avatarUrl ? (
-                      <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover"
-                        onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-primary/80 to-secondary/80 flex items-center justify-center">
-                        <span className="text-white text-xl font-bold">
-                          {config.displayName ? config.displayName[0].toUpperCase() : "?"}
-                        </span>
+                {/* ── BLOCO 1: Preview visual ao vivo ── */}
+                <div className="rounded-2xl overflow-hidden border border-[hsl(var(--dash-border-subtle))]" style={{ background: currentTheme.bg }}>
+                  <div className="flex flex-col items-center py-6 px-4 relative">
+                    {/* Glow */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200px] h-[100px] rounded-full blur-[60px] opacity-30" style={{ background: currentTheme.accent }} />
+                    {/* Avatar */}
+                    <div className="relative mb-3 z-10">
+                      <div className="w-[72px] h-[72px] rounded-full overflow-hidden" style={{ border: `2.5px solid ${currentTheme.accent}60`, boxShadow: `0 0 0 4px ${currentTheme.accent}15` }}>
+                        {config.avatarUrl
+                          ? <img src={config.avatarUrl} alt="" className="w-full h-full object-cover" />
+                          : <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-white" style={{ background: `linear-gradient(135deg, ${currentTheme.accent}, ${currentTheme.accent2})` }}>
+                              {config.displayName?.[0]?.toUpperCase() || "?"}
+                            </div>
+                        }
                       </div>
-                    )}
+                    </div>
+                    <p className="text-[16px] font-bold mb-0.5 z-10" style={{ color: currentTheme.accent === "#a855f7" ? "#f8f5ff" : "#f0f6ff" }}>
+                      {config.displayName || "Seu nome"}
+                    </p>
+                    <p className="text-[12px] font-medium mb-1 z-10" style={{ color: currentTheme.accent }}>
+                      @{config.username || "username"}
+                    </p>
+                    {config.bio && <p className="text-[11px] text-center max-w-[250px] z-10" style={{ color: "rgba(255,255,255,0.45)" }}>{config.bio}</p>}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <label className={labelCls}>URL do Avatar</label>
-                    <input type="url" className={inputCls} placeholder="https://exemplo.com/foto.jpg"
+                  <div className="flex items-center justify-center gap-3 py-2.5 border-t" style={{ borderColor: `${currentTheme.accent}15`, background: `${currentTheme.accent}08` }}>
+                    <p className="text-[10px] font-medium" style={{ color: "rgba(255,255,255,0.35)" }}>
+                      Tema: {currentTheme.label}
+                    </p>
+                    <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.15)" }}>·</span>
+                    <p className="text-[10px] font-medium" style={{ color: "rgba(255,255,255,0.35)" }}>
+                      É assim que seus clientes veem
+                    </p>
+                  </div>
+                </div>
+
+                {/* ── BLOCO 2: Foto de perfil ── */}
+                <div className="rounded-xl border border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface-2))]/50 p-4">
+                  <label className="text-[hsl(var(--dash-text-secondary))] text-xs font-semibold flex items-center gap-1.5 mb-3">
+                    <Image size={12} className="text-primary" /> Foto de perfil
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="w-[64px] h-[64px] rounded-2xl overflow-hidden" style={{ boxShadow: `0 0 0 3px ${currentTheme.accent}30` }}>
+                        {config.avatarUrl
+                          ? <img src={config.avatarUrl} alt="" className="w-full h-full object-cover" />
+                          : <div className="w-full h-full flex items-center justify-center text-xl font-bold text-white" style={{ background: `linear-gradient(135deg, ${currentTheme.accent}, ${currentTheme.accent2})` }}>
+                              {config.displayName?.[0]?.toUpperCase() || "?"}
+                            </div>
+                        }
+                      </div>
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <div className="flex gap-2">
+                        <input type="file" accept="image/*" ref={avatarFileInputRef} className="hidden"
+                          onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                              const img = new window.Image();
+                              img.onload = () => {
+                                const canvas = document.createElement("canvas");
+                                const size = Math.min(img.width, img.height, 400);
+                                canvas.width = size; canvas.height = size;
+                                const ctx = canvas.getContext("2d")!;
+                                const sx = (img.width - size) / 2, sy = (img.height - size) / 2;
+                                ctx.drawImage(img, sx, sy, size, size, 0, 0, size, size);
+                                updateConfig("avatarUrl", canvas.toDataURL("image/jpeg", 0.82));
+                              };
+                              img.src = reader.result as string;
+                            };
+                            reader.readAsDataURL(file);
+                            e.target.value = "";
+                          }} />
+                        <button onClick={() => avatarFileInputRef.current?.click()}
+                          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl btn-primary-gradient text-[11px] font-semibold transition-transform active:scale-95">
+                          <Image size={12} /> Enviar foto
+                        </button>
+                        {config.avatarUrl && (
+                          <button onClick={() => updateConfig("avatarUrl", "")}
+                            className="flex items-center gap-1 px-3 py-2 rounded-xl border border-[hsl(var(--dash-border))] text-[11px] text-red-400 hover:bg-red-50 transition-all">
+                            <Trash2 size={11} /> Remover
+                          </button>
+                        )}
+                      </div>
+                      <p className="text-[9px] text-[hsl(var(--dash-text-subtle))]">JPG, PNG, WebP · Quadrada · Comprimida auto</p>
+                    </div>
+                  </div>
+                  {/* URL toggle */}
+                  <details className="mt-3">
+                    <summary className="text-[10px] text-[hsl(var(--dash-text-subtle))] cursor-pointer hover:text-primary transition-colors">
+                      Ou cole uma URL de imagem
+                    </summary>
+                    <input type="url" className={`${inputCls} mt-2 text-[12px]`} placeholder="https://exemplo.com/foto.jpg"
                       value={config.avatarUrl}
                       onChange={e => updateConfig("avatarUrl", e.target.value)} />
-                    <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mt-1">
-                      Dica: Use uma foto quadrada, mínimo 200x200px
-                    </p>
-                  </div>
+                  </details>
                 </div>
 
-                <div>
-                  <label className={labelCls}>Nome de Exibição</label>
-                  <input type="text" className={inputCls} placeholder="Seu nome"
-                    value={config.displayName}
-                    onChange={e => updateConfig("displayName", e.target.value)} />
-                </div>
+                {/* ── BLOCO 3: Informações básicas ── */}
+                <div className="rounded-xl border border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface-2))]/50 p-4 space-y-4">
+                  <label className="text-[hsl(var(--dash-text-secondary))] text-xs font-semibold flex items-center gap-1.5">
+                    <User size={12} className="text-primary" /> Informações básicas
+                  </label>
 
-                <div>
-                  <label className={labelCls}>Username</label>
-                  <div className="flex items-center">
-                    <span className="flex-shrink-0 rounded-l-xl border border-r-0 border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] text-sm px-3 py-2.5">@</span>
-                    <input type="text" className={`${inputCls} rounded-l-none`} placeholder="seunome"
-                      value={config.username}
-                      onChange={e => updateConfig("username", e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))} />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className={labelCls}>Nome de exibição</label>
+                      <input type="text" className={inputCls} placeholder="Seu nome"
+                        value={config.displayName}
+                        onChange={e => updateConfig("displayName", e.target.value)} />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Username</label>
+                      <div className="flex items-center">
+                        <span className="flex-shrink-0 rounded-l-xl border border-r-0 border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] text-sm px-3 py-2.5 select-none">@</span>
+                        <input type="text" className={`${inputCls} rounded-l-none`} placeholder="seunome"
+                          value={config.username}
+                          onChange={e => updateConfig("username", e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))} />
+                      </div>
+                    </div>
                   </div>
+
                   {config.username && (
-                    <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mt-1">
-                      Sua página: <span className="font-mono text-primary">maview.app/@{config.username}</span>
-                    </p>
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[hsl(var(--dash-accent))] border border-[hsl(var(--dash-border-subtle))]">
+                      <Link2 size={11} className="text-primary flex-shrink-0" />
+                      <a href={`${window.location.origin}/${config.username.replace(/^@/, "")}`} target="_blank" rel="noopener noreferrer"
+                        className="text-[11px] font-mono text-primary hover:underline truncate">
+                        {window.location.host}/{config.username.replace(/^@/, "")}
+                      </a>
+                      <button onClick={copyLink} className="ml-auto flex-shrink-0 text-[hsl(var(--dash-text-subtle))] hover:text-primary transition-colors">
+                        {copied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
+                      </button>
+                    </div>
                   )}
                 </div>
 
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className={`${labelCls} mb-0`}>Bio</label>
-                    <span className={`text-xs ${config.bio.length > 110 ? "text-amber-500" : "text-[hsl(var(--dash-text-subtle))]"}`}>
+                {/* ── BLOCO 4: Bio ── */}
+                <div className="rounded-xl border border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface-2))]/50 p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[hsl(var(--dash-text-secondary))] text-xs font-semibold flex items-center gap-1.5">
+                      <Pencil size={12} className="text-primary" /> Bio
+                    </label>
+                    <span className={`text-[11px] font-medium ${config.bio.length > 110 ? "text-amber-500" : "text-[hsl(var(--dash-text-subtle))]"}`}>
                       {config.bio.length}/120
                     </span>
                   </div>
@@ -2542,27 +2648,27 @@ const DashboardPagina = () => {
                     maxLength={120}
                     value={config.bio}
                     onChange={e => updateConfig("bio", e.target.value)} />
-                  <div className="flex items-center gap-2 mt-2">
+                  <div className="flex items-center gap-2">
                     <button onClick={suggestBio} disabled={aiLoading}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-fuchsia-50 border border-fuchsia-200 text-fuchsia-700 text-[11px] font-medium hover:bg-fuchsia-100 transition-all disabled:opacity-50">
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-fuchsia-500/10 to-violet-500/10 border border-fuchsia-300/30 text-fuchsia-600 text-[11px] font-medium hover:from-fuchsia-500/15 hover:to-violet-500/15 transition-all disabled:opacity-50">
                       <Sparkles size={11} className={aiLoading ? "animate-spin" : ""} />
                       {aiLoading ? "Gerando..." : "Sugerir com IA"}
                     </button>
-                    <p className="text-[hsl(var(--dash-text-subtle))] text-[11px]">
+                    <p className="text-[hsl(var(--dash-text-subtle))] text-[10px]">
                       Bios com emojis recebem mais cliques
                     </p>
                   </div>
                   {aiSuggestion && (
-                    <div className="mt-2 rounded-xl border border-fuchsia-200 bg-fuchsia-50 p-3 space-y-2 animate-in slide-in-from-top-2 duration-200">
-                      <p className="text-fuchsia-800 text-[12px] font-medium">Sugestão da IA:</p>
-                      <p className="text-fuchsia-900 text-[13px]">{aiSuggestion}</p>
+                    <div className="rounded-xl border border-fuchsia-200/50 bg-gradient-to-r from-fuchsia-500/5 to-violet-500/5 p-3 space-y-2 animate-in slide-in-from-top-2 duration-200">
+                      <p className="text-fuchsia-600 text-[12px] font-semibold flex items-center gap-1"><Sparkles size={10} /> Sugestão da IA:</p>
+                      <p className="text-[hsl(var(--dash-text))] text-[13px]">{aiSuggestion}</p>
                       <div className="flex gap-2">
                         <button onClick={() => { updateConfig("bio", aiSuggestion.slice(0, 120)); setAiSuggestion(null); }}
-                          className="text-[11px] px-3 py-1 rounded-lg btn-primary-gradient font-medium">
+                          className="text-[11px] px-3 py-1.5 rounded-lg btn-primary-gradient font-semibold">
                           Aplicar
                         </button>
                         <button onClick={() => setAiSuggestion(null)}
-                          className="text-[11px] px-3 py-1 rounded-lg border border-[hsl(var(--dash-border))] text-[hsl(var(--dash-text-muted))] hover:bg-[hsl(var(--dash-surface-2))] transition-all">
+                          className="text-[11px] px-3 py-1.5 rounded-lg border border-[hsl(var(--dash-border))] text-[hsl(var(--dash-text-muted))] hover:bg-[hsl(var(--dash-surface-2))] transition-all">
                           Descartar
                         </button>
                       </div>
@@ -2570,34 +2676,103 @@ const DashboardPagina = () => {
                   )}
                 </div>
 
-                <div>
-                  <label className={labelCls}>
-                    WhatsApp <span className="text-[hsl(var(--dash-text-subtle))] font-normal">(opcional)</span>
+                {/* ── BLOCO 5: Redes sociais ── */}
+                <div className="rounded-xl border border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface-2))]/50 p-4 space-y-3">
+                  <label className="text-[hsl(var(--dash-text-secondary))] text-xs font-semibold flex items-center gap-1.5">
+                    <Instagram size={12} className="text-pink-500" /> Redes sociais
+                  </label>
+                  <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] -mt-1">Aparecem como ícones no topo da sua vitrine</p>
+
+                  {([
+                    { icon: <Instagram size={14} className="text-pink-500" />, placeholder: "@seuinstagram", label: "Instagram", key: "instagram" as const },
+                    { icon: <Youtube size={14} className="text-red-500" />, placeholder: "@seucanal", label: "YouTube", key: "youtube" as const },
+                    { icon: <Twitter size={14} className="text-sky-500" />, placeholder: "@seutiktok", label: "TikTok / X", key: "twitter" as const },
+                  ]).map(social => {
+                    const existing = config.links.find(l => l.icon === social.key && l.isSocial);
+                    const val = existing?.url || existing?.title || "";
+                    return (
+                      <div key={social.key} className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-[hsl(var(--dash-accent))] flex items-center justify-center flex-shrink-0">
+                          {social.icon}
+                        </div>
+                        <input type="text" className={`${inputCls} text-[12px]`}
+                          placeholder={social.placeholder}
+                          value={val}
+                          onChange={e => {
+                            const newVal = e.target.value;
+                            const links = [...config.links];
+                            const idx = links.findIndex(l => l.icon === social.key && l.isSocial);
+                            if (idx >= 0) {
+                              links[idx] = { ...links[idx], url: newVal.startsWith("http") ? newVal : `https://${social.key === "youtube" ? "youtube.com/@" : social.key === "instagram" ? "instagram.com/" : "x.com/"}${newVal.replace(/^@/, "")}`, title: social.label, active: !!newVal };
+                            } else if (newVal) {
+                              links.push({ id: Date.now().toString(), title: social.label, url: newVal.startsWith("http") ? newVal : `https://${social.key === "youtube" ? "youtube.com/@" : social.key === "instagram" ? "instagram.com/" : "x.com/"}${newVal.replace(/^@/, "")}`, icon: social.key, active: true, isSocial: true, type: "normal" });
+                            }
+                            updateConfig("links", links);
+                          }}
+                        />
+                        {val && <Check size={14} className="text-emerald-500 flex-shrink-0" />}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* ── BLOCO 6: WhatsApp ── */}
+                <div className={`rounded-xl border bg-[hsl(var(--dash-surface-2))]/50 p-4 space-y-3 transition-all duration-300 ${
+                  highlightField === "whatsapp"
+                    ? "border-emerald-400/50 shadow-[0_0_18px_rgba(34,197,94,0.3)]"
+                    : "border-[hsl(var(--dash-border-subtle))]"
+                }`}>
+                  <label className="text-[hsl(var(--dash-text-secondary))] text-xs font-semibold flex items-center gap-1.5">
+                    <MessageCircle size={12} className="text-emerald-500" /> WhatsApp
+                    <span className="text-[hsl(var(--dash-text-subtle))] font-normal text-[10px]">opcional</span>
                     {highlightField === "whatsapp" && (
-                      <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-bold text-primary animate-bounce">
-                        ← adicione aqui
-                      </span>
+                      <span className="ml-1 text-[10px] font-bold text-primary animate-bounce">← adicione</span>
                     )}
                   </label>
-                  <div className={`flex items-center rounded-xl transition-all duration-300 ${
-                    highlightField === "whatsapp"
-                      ? "ring-2 ring-primary shadow-[0_0_18px_rgba(139,92,246,0.45)]"
-                      : ""
-                  }`}>
+                  <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] -mt-1">Botão flutuante de WhatsApp na sua vitrine — essencial no Brasil</p>
+                  <div className="flex items-center">
                     <span className="flex-shrink-0 rounded-l-xl border border-r-0 border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] text-sm px-3 py-2.5 select-none">+55</span>
                     <input ref={whatsappInputRef} type="tel" className={`${inputCls} rounded-l-none`} placeholder="11999999999"
                       value={config.whatsapp}
                       onChange={e => updateConfig("whatsapp", e.target.value.replace(/\D/g, ""))} />
                   </div>
                   {config.whatsapp ? (
-                    <p className="text-[11px] mt-1.5 flex items-center gap-1.5">
-                      <MessageCircle size={10} className="text-emerald-500" />
-                      <span className="text-[hsl(var(--dash-text-subtle))]">wa.me/55{config.whatsapp}</span>
-                    </p>
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/8 border border-emerald-500/15">
+                      <MessageCircle size={11} className="text-emerald-500" />
+                      <span className="text-[11px] text-emerald-600 font-medium">wa.me/55{config.whatsapp}</span>
+                      <Check size={11} className="text-emerald-500 ml-auto" />
+                    </div>
                   ) : (
-                    <p className="text-[hsl(var(--dash-text-subtle))] text-[11px] mt-1.5">Apenas números, com DDD. Ex: 11999999999</p>
+                    <p className="text-[hsl(var(--dash-text-subtle))] text-[10px]">Com DDD. Ex: 11999999999</p>
                   )}
                 </div>
+
+                {/* ── BLOCO 7: SEO & Compartilhamento ── */}
+                <details className="rounded-xl border border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface-2))]/50 overflow-hidden">
+                  <summary className="flex items-center gap-1.5 p-4 cursor-pointer text-[hsl(var(--dash-text-secondary))] text-xs font-semibold hover:text-primary transition-colors">
+                    <TrendingUp size={12} className="text-amber-500" /> SEO & Compartilhamento
+                    <span className="text-[hsl(var(--dash-text-subtle))] font-normal text-[10px] ml-1">avançado</span>
+                    <ChevronDown size={12} className="ml-auto text-[hsl(var(--dash-text-subtle))]" />
+                  </summary>
+                  <div className="px-4 pb-4 space-y-3 border-t border-[hsl(var(--dash-border-subtle))]">
+                    <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] pt-3">Como seu link aparece quando compartilhado no WhatsApp, Instagram, etc.</p>
+                    {/* Preview card */}
+                    <div className="rounded-lg border border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-surface))] p-3 flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-[hsl(var(--dash-accent))] flex items-center justify-center flex-shrink-0 text-primary text-sm font-bold">
+                        {config.displayName?.[0] || "M"}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[12px] font-semibold text-[hsl(var(--dash-text))] truncate">{config.displayName || "Seu Nome"} | Maview</p>
+                        <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] truncate">{config.bio || "Confira minha vitrine digital"}</p>
+                        <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] mt-0.5 font-mono">{window.location.host}/{config.username || "username"}</p>
+                      </div>
+                    </div>
+                    <p className="text-[9px] text-[hsl(var(--dash-text-subtle))]">
+                      O título e descrição são gerados automaticamente a partir do seu nome e bio.
+                    </p>
+                  </div>
+                </details>
+
               </div>
             )}
 
@@ -2694,7 +2869,7 @@ const DashboardPagina = () => {
                 Preview ao vivo
               </p>
               {config.username && (
-                <a href={`https://maview.app/@${config.username}`} target="_blank" rel="noopener noreferrer"
+                <a href={`${window.location.origin}/${config.username.replace(/^@/, "")}`} target="_blank" rel="noopener noreferrer"
                   className="text-[10px] text-primary font-medium flex items-center gap-1 hover:underline">
                   Abrir página <ExternalLink size={9} />
                 </a>

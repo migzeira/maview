@@ -67,7 +67,7 @@ const DashboardHome = () => {
   const [cfg, setCfg] = useState<Record<string, unknown>>({});
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
 
-  const profileUrl = username ? `maview.app/@${username}` : "";
+  const profileUrl = username ? `${window.location.origin}/${username.replace(/^@/, "")}` : "";
 
   /* ── Load ── */
   useEffect(() => {
@@ -93,7 +93,7 @@ const DashboardHome = () => {
   useEffect(() => {
     if (!showQR || !qrCanvasRef.current || !profileUrl) return;
     import("qrcode").then(QRCode => {
-      QRCode.toCanvas(qrCanvasRef.current!, `https://${profileUrl}`, {
+      QRCode.toCanvas(qrCanvasRef.current!, profileUrl, {
         width: 188, margin: 2, color: { dark: "#1a0533", light: "#ffffff" },
       });
     }).catch(() => {});
@@ -120,7 +120,7 @@ const DashboardHome = () => {
   const offset = circ - (health / 100) * circ;
 
   const copyLink = () => {
-    navigator.clipboard.writeText(`https://${profileUrl}`);
+    navigator.clipboard.writeText(profileUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2200);
   };
@@ -255,7 +255,7 @@ const DashboardHome = () => {
                   className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 text-[12px] text-[hsl(var(--dash-text-secondary))] font-medium transition-all">
                   <QrCode size={14} /> QR Code
                 </button>
-                <a href={`https://${profileUrl}`} target="_blank" rel="noopener noreferrer"
+                <a href={profileUrl} target="_blank" rel="noopener noreferrer"
                   className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl btn-primary-gradient text-[12px] font-medium transition-transform active:scale-95">
                   <ExternalLink size={14} /> Ver página
                 </a>

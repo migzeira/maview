@@ -127,7 +127,7 @@ const DashboardConfiguracoes = () => {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[hsl(var(--dash-text))] font-semibold text-[14px]">{displayName || "Seu nome"}</p>
-              <p className="text-[hsl(var(--dash-text-subtle))] text-xs mt-0.5">maview.app/@{username || "usuario"}</p>
+              <p className="text-[hsl(var(--dash-text-subtle))] text-xs mt-0.5">{window.location.host}/{username?.replace(/^@/, "") || "usuario"}</p>
               <div className="mt-2">
                 <label className="text-[hsl(var(--dash-text-subtle))] text-xs font-medium block mb-1">URL da foto</label>
                 <input

@@ -84,7 +84,7 @@ const DashboardLayout = ({ children }: Props) => {
   })();
   const username = vitrineUsername.replace(/^@/, "");
   const displayName = user?.user_metadata?.full_name || username;
-  const profileUrl = `maview.app/@${username}`;
+  const profileUrl = `${window.location.host}/${username}`;
   const initials = displayName.slice(0, 2).toUpperCase();
 
   // Auth
