@@ -232,13 +232,16 @@ const ONBOARDING_STEPS = [
 
 // ── Profile Hero Card ──────────────────────────────────────────────────────
 
+type HealthAction = "avatar" | "name-bio" | "theme" | "products" | "links" | "testimonials" | "whatsapp";
+
 interface ProfileHeroCardProps {
   config: VitrineConfig;
   onUpdate: (key: keyof VitrineConfig, value: string) => void;
   onEditProfile: () => void;
+  onHealthAction: (action: HealthAction) => void;
 }
 
-const ProfileHeroCard = ({ config, onUpdate, onEditProfile }: ProfileHeroCardProps) => {
+const ProfileHeroCard = ({ config, onUpdate, onEditProfile, onHealthAction }: ProfileHeroCardProps) => {
   const [copied, setCopied] = useState(false);
   const [showHealthDetail, setShowHealthDetail] = useState(false);
   const [editingName, setEditingName] = useState(false);
@@ -496,7 +499,7 @@ const ProfileHeroCard = ({ config, onUpdate, onEditProfile }: ProfileHeroCardPro
 
       {/* Health detail checklist */}
       {showHealthDetail && (
-        <div className="mt-4 pt-4 border-t border-[hsl(var(--dash-border-subtle))] space-y-2 animate-in slide-in-from-top-2 duration-200">
+        <div className="mt-4 pt-4 border-t border-[hsl(var(--dash-border-subtle))] space-y-1.5 animate-in slide-in-from-top-2 duration-200">
           <div className="flex items-center justify-between mb-2">
             <p className="text-[hsl(var(--dash-text))] text-xs font-semibold flex items-center gap-1.5">
               <TrendingUp size={13} className="text-primary" /> Score da Vitrine
@@ -505,25 +508,48 @@ const ProfileHeroCard = ({ config, onUpdate, onEditProfile }: ProfileHeroCardPro
           </div>
           {HEALTH_ITEMS.map(item => {
             const done = item.check(config);
-            return (
-              <div key={item.key}
-                className={`flex items-center gap-2.5 rounded-xl p-2.5 transition-all ${
-                  done ? "bg-emerald-50 border border-emerald-100" : "bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/20"
-                }`}>
-                {done
-                  ? <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0" />
-                  : <Circle size={16} className="text-[hsl(var(--dash-text-subtle))] flex-shrink-0" />
-                }
-                <div className="flex-1 min-w-0">
-                  <p className={`text-[12px] font-medium ${done ? "text-emerald-700 line-through" : "text-[hsl(var(--dash-text))]"}`}>
-                    {item.label}
-                  </p>
-                  {!done && <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">{item.tip}</p>}
+
+            const handleClick = () => {
+              if (done) return;
+              if (item.key === "avatar") {
+                setEditingName(false);
+                setEditingAvatar(true);
+              } else if (item.key === "name-bio") {
+                setEditingAvatar(false);
+                setEditingName(true);
+                setShowHealthDetail(false);
+              } else {
+                onHealthAction(item.key as HealthAction);
+                setShowHealthDetail(false);
+              }
+            };
+
+            if (done) {
+              return (
+                <div key={item.key}
+                  className="flex items-center gap-2.5 rounded-xl p-2.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30">
+                  <CheckCircle2 size={15} className="text-emerald-500 flex-shrink-0" />
+                  <p className="flex-1 text-[12px] font-medium text-emerald-700 dark:text-emerald-400 line-through">{item.label}</p>
+                  <span className="text-[10px] font-bold text-emerald-500">+{item.points}pts</span>
                 </div>
-                <span className={`text-[10px] font-bold flex-shrink-0 ${done ? "text-emerald-500" : "text-[hsl(var(--dash-text-subtle))]"}`}>
-                  +{item.points}pts
-                </span>
-              </div>
+              );
+            }
+
+            return (
+              <button key={item.key} onClick={handleClick}
+                className="w-full flex items-center gap-2.5 rounded-xl p-2.5 bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 hover:bg-primary/5 transition-all group/item text-left">
+                <Circle size={15} className="text-[hsl(var(--dash-text-subtle))] group-hover/item:text-primary/50 flex-shrink-0 transition-colors" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-[12px] font-medium text-[hsl(var(--dash-text))]">{item.label}</p>
+                  <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">{item.tip}</p>
+                </div>
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <span className="text-[10px] font-bold text-[hsl(var(--dash-text-subtle))]">+{item.points}pts</span>
+                  <span className="text-[10px] font-semibold text-primary opacity-0 group-hover/item:opacity-100 transition-opacity whitespace-nowrap">
+                    Fazer →
+                  </span>
+                </div>
+              </button>
             );
           })}
         </div>
@@ -848,6 +874,42 @@ const DashboardPagina = () => {
     else if (step.action === "link") openAddLink();
     else if (step.action === "testimonial") openAddTestimonial();
     completeOnboarding();
+  };
+
+  const leftPanelRef = useRef<HTMLDivElement>(null);
+
+  const scrollToForm = () => {
+    setTimeout(() => {
+      leftPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 80);
+  };
+
+  const handleHealthAction = (action: HealthAction) => {
+    switch (action) {
+      case "theme":
+        setActiveTab("design");
+        scrollToForm();
+        break;
+      case "products":
+        setActiveTab("vitrine");
+        openAddProduct();
+        scrollToForm();
+        break;
+      case "links":
+        setActiveTab("vitrine");
+        openAddLink();
+        scrollToForm();
+        break;
+      case "testimonials":
+        setActiveTab("vitrine");
+        openAddTestimonial();
+        scrollToForm();
+        break;
+      case "whatsapp":
+        setActiveTab("perfil");
+        scrollToForm();
+        break;
+    }
   };
 
   // ── Delete confirmation auto-cancel ───────────────────────────────────────
@@ -1190,13 +1252,13 @@ const DashboardPagina = () => {
       </div>
 
       {/* Profile Hero Card */}
-      <ProfileHeroCard config={config} onUpdate={updateConfig} onEditProfile={() => setActiveTab("perfil")} />
+      <ProfileHeroCard config={config} onUpdate={updateConfig} onEditProfile={() => setActiveTab("perfil")} onHealthAction={handleHealthAction} />
 
       {/* Two-column grid */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
 
         {/* ── LEFT PANEL ── */}
-        <div className="min-w-0">
+        <div className="min-w-0" ref={leftPanelRef}>
 
           {/* 3-tab bar */}
           <div className="flex gap-1 p-1 glass-card rounded-2xl mb-5 overflow-x-auto scrollbar-none">
