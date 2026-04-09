@@ -3,12 +3,25 @@ import {
   User, Palette, Package, Link2, Star, Plus, Trash2, Pencil,
   Check, ToggleLeft, ToggleRight, Instagram, Youtube, Twitter, Globe,
   MessageCircle, Clock, ChevronDown, ChevronUp, Eye, X, Copy, ExternalLink,
+  Sparkles, Smartphone, Tablet, Calendar,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
 type ThemeId = "dark-purple" | "midnight" | "forest" | "rose" | "amber" | "ocean";
+
+interface LinkItem {
+  id: string;
+  title: string;
+  url: string;
+  icon: "instagram" | "youtube" | "twitter" | "globe" | "link";
+  active: boolean;
+  isSocial: boolean;
+  type?: "normal" | "spotlight" | "header";
+  startsAt?: string;
+  endsAt?: string;
+}
 
 interface ProductItem {
   id: string;
@@ -21,15 +34,8 @@ interface ProductItem {
   badge: string;
   urgency: boolean;
   active: boolean;
-}
-
-interface LinkItem {
-  id: string;
-  title: string;
-  url: string;
-  icon: "instagram" | "youtube" | "twitter" | "globe" | "link";
-  active: boolean;
-  isSocial: boolean;
+  startsAt?: string;
+  endsAt?: string;
 }
 
 interface TestimonialItem {
@@ -111,6 +117,7 @@ const emptyLink = (isSocial: boolean): LinkItem => ({
   title: "", url: "",
   icon: isSocial ? "instagram" : "globe",
   active: true, isSocial,
+  type: "normal",
 });
 
 const emptyTestimonial = (): TestimonialItem => ({
@@ -140,6 +147,18 @@ function moveItem<T extends { id: string }>(arr: T[], id: string, dir: "up" | "d
   const copy = [...arr];
   [copy[idx], copy[to]] = [copy[to], copy[idx]];
   return copy;
+}
+
+function isValidUrl(url: string): boolean {
+  if (!url) return false;
+  try { new URL(url); return true; } catch { return false; }
+}
+
+function isScheduledActive(item: { startsAt?: string; endsAt?: string }): boolean {
+  const now = new Date();
+  if (item.startsAt && new Date(item.startsAt) > now) return false;
+  if (item.endsAt   && new Date(item.endsAt)   < now) return false;
+  return true;
 }
 
 function getDynamicSubtitle(cfg: VitrineConfig): { text: string; complete: boolean } {
@@ -296,8 +315,23 @@ const LinkRow = ({ link, globalIndex, totalLinks, onEdit, onDelete, onToggle, on
       {LINK_ICON_MAP[link.icon]}
     </div>
     <div className="flex-1 min-w-0">
-      <p className="text-[hsl(var(--dash-text))] text-[13px] font-medium truncate">{link.title || link.url || "Sem título"}</p>
-      {link.url && <p className="text-[hsl(var(--dash-text-subtle))] text-xs truncate">{link.url}</p>}
+      <div className="flex items-center gap-1.5 mb-0.5">
+        <p className="text-[hsl(var(--dash-text))] text-[13px] font-medium truncate">{link.title || link.url || "Sem título"}</p>
+        {link.type === "spotlight" && (
+          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 flex-shrink-0">DESTAQUE</span>
+        )}
+        {link.type === "header" && (
+          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 flex-shrink-0">SEPARADOR</span>
+        )}
+        {(link.startsAt || link.endsAt) && (
+          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-500 flex-shrink-0 flex items-center gap-0.5">
+            <Calendar size={8} /> Agendado
+          </span>
+        )}
+      </div>
+      {link.url && link.type !== "header" && (
+        <p className="text-[hsl(var(--dash-text-subtle))] text-xs truncate">{link.url}</p>
+      )}
     </div>
     <div className="flex items-center gap-1">
       <button onClick={() => onEdit(link)} className="p-1.5 rounded-lg text-[hsl(var(--dash-text-subtle))] hover:text-primary hover:bg-[hsl(var(--dash-accent))] transition-all">
@@ -322,6 +356,9 @@ const DashboardPagina = () => {
   const [activeTab, setActiveTab]           = useState<TabId>("perfil");
   const [toastVisible, setToastVisible]     = useState(false);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
+  const [previewDevice, setPreviewDevice]   = useState<"mobile" | "tablet">("mobile");
+  const [aiLoading, setAiLoading]           = useState(false);
+  const [aiSuggestion, setAiSuggestion]     = useState<string | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   // Product form
@@ -430,6 +467,28 @@ const DashboardPagina = () => {
   };
   const deleteTestimonial = (id: string) => updateConfig("testimonials", config.testimonials.filter(t => t.id !== id));
 
+  // ── BLOCO 9 — AI bio suggestion ──────────────────────────────────────────
+
+  const suggestBio = async () => {
+    if (aiLoading) return;
+    setAiLoading(true);
+    setAiSuggestion(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("maview-ai", {
+        body: {
+          message: `Crie uma bio profissional e atraente para um criador de conteúdo chamado "${config.displayName || "criador"}". Bio atual: "${config.bio || "(vazia)"}". Retorne APENAS a bio sugerida, máximo 120 caracteres, com emojis relevantes.`,
+          history: [],
+        },
+      });
+      if (error) throw error;
+      setAiSuggestion(data?.text?.trim() ?? null);
+    } catch {
+      setAiSuggestion("⚠️ IA indisponível no momento. Tente novamente mais tarde.");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   // ── Derived ───────────────────────────────────────────────────────────────
 
   const currentTheme = THEMES.find(t => t.id === config.theme) ?? THEMES[0];
@@ -506,8 +565,8 @@ const DashboardPagina = () => {
               )}
             </div>
 
-            {/* Products */}
-            {config.products.filter(p => p.active).slice(0, 2).map(p => (
+            {/* Products — BLOCO 11 schedule filter */}
+            {config.products.filter(p => p.active && isScheduledActive(p)).slice(0, 2).map(p => (
               <div key={p.id} className="flex items-center gap-2.5 rounded-xl border p-2.5 mb-2"
                 style={{ borderColor: currentTheme.accent + "30", background: currentTheme.accent + "0a" }}>
                 <span className="text-base flex-shrink-0">{p.emoji}</span>
@@ -519,14 +578,30 @@ const DashboardPagina = () => {
               </div>
             ))}
 
-            {/* Links */}
-            {config.links.filter(l => l.active).slice(0, 2).map(l => (
-              <div key={l.id} className="flex items-center gap-2 rounded-xl border p-2.5 mb-2"
-                style={{ borderColor: currentTheme.accent + "25", background: currentTheme.accent + "08" }}>
-                <span style={{ color: currentTheme.accent }}>{LINK_ICON_MAP[l.icon]}</span>
-                <span className="text-xs truncate" style={{ color: "rgba(200,200,200,0.8)" }}>{l.title || l.url}</span>
-              </div>
-            ))}
+            {/* Links — BLOCO 8 spotlight/header types + BLOCO 11 schedule filter */}
+            {config.links.filter(l => l.active && isScheduledActive(l)).slice(0, 3).map(l => {
+              if (l.type === "header") return (
+                <div key={l.id} className="flex items-center gap-2 mb-2">
+                  <div className="flex-1 h-px" style={{ background: currentTheme.accent + "30" }} />
+                  <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: currentTheme.accent + "80" }}>{l.title}</span>
+                  <div className="flex-1 h-px" style={{ background: currentTheme.accent + "30" }} />
+                </div>
+              );
+              if (l.type === "spotlight") return (
+                <div key={l.id} className="rounded-xl p-2.5 mb-2 flex items-center justify-center gap-2"
+                  style={{ background: `linear-gradient(135deg,${currentTheme.accent}25,${currentTheme.accent2}18)`, border: `1px solid ${currentTheme.accent}40` }}>
+                  <span style={{ color: currentTheme.accent }}>{LINK_ICON_MAP[l.icon]}</span>
+                  <span className="text-xs font-bold" style={{ color: currentTheme.accent }}>{l.title || l.url}</span>
+                </div>
+              );
+              return (
+                <div key={l.id} className="flex items-center gap-2 rounded-xl border p-2.5 mb-2"
+                  style={{ borderColor: currentTheme.accent + "25", background: currentTheme.accent + "08" }}>
+                  <span style={{ color: currentTheme.accent }}>{LINK_ICON_MAP[l.icon]}</span>
+                  <span className="text-xs truncate" style={{ color: "rgba(200,200,200,0.8)" }}>{l.title || l.url}</span>
+                </div>
+              );
+            })}
 
             {/* Testimonials */}
             {config.testimonials.slice(0, 1).map(t => (
@@ -669,9 +744,40 @@ const DashboardPagina = () => {
                     maxLength={120}
                     value={config.bio}
                     onChange={e => updateConfig("bio", e.target.value)} />
-                  <p className="text-[hsl(var(--dash-text-subtle))] text-[11px] mt-1.5">
-                    💡 Bios com emojis e palavras-chave recebem mais cliques
-                  </p>
+                  {/* BLOCO 9 — AI suggestion */}
+                  <div className="flex items-center gap-2 mt-2">
+                    <button
+                      onClick={suggestBio}
+                      disabled={aiLoading}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-fuchsia-50 border border-fuchsia-200 text-fuchsia-700 text-[11px] font-medium hover:bg-fuchsia-100 transition-all disabled:opacity-50"
+                    >
+                      <Sparkles size={11} className={aiLoading ? "animate-spin" : ""} />
+                      {aiLoading ? "Gerando..." : "Sugerir com IA"}
+                    </button>
+                    <p className="text-[hsl(var(--dash-text-subtle))] text-[11px]">
+                      💡 Bios com emojis recebem mais cliques
+                    </p>
+                  </div>
+                  {aiSuggestion && (
+                    <div className="mt-2 rounded-xl border border-fuchsia-200 bg-fuchsia-50 p-3 space-y-2">
+                      <p className="text-fuchsia-800 text-[12px] font-medium">Sugestão da IA:</p>
+                      <p className="text-fuchsia-900 text-[13px]">{aiSuggestion}</p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => { updateConfig("bio", aiSuggestion.slice(0, 120)); setAiSuggestion(null); }}
+                          className="text-[11px] px-3 py-1 rounded-lg btn-primary-gradient font-medium"
+                        >
+                          Aplicar
+                        </button>
+                        <button
+                          onClick={() => setAiSuggestion(null)}
+                          className="text-[11px] px-3 py-1 rounded-lg border border-[hsl(var(--dash-border))] text-[hsl(var(--dash-text-muted))] hover:bg-[hsl(var(--dash-surface-2))] transition-all"
+                        >
+                          Descartar
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -777,9 +883,37 @@ const DashboardPagina = () => {
                       </div>
                       <div className="col-span-2">
                         <label className={labelCls}>URL de compra</label>
-                        <input type="url" className={inputCls} placeholder="https://..."
-                          value={productForm.url}
-                          onChange={e => setProductForm(f => f ? { ...f, url: e.target.value } : f)} />
+                        <div className="relative">
+                          <input type="url" className={inputCls} placeholder="https://..."
+                            value={productForm.url}
+                            onChange={e => setProductForm(f => f ? { ...f, url: e.target.value } : f)} />
+                          {productForm.url && (
+                            <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold ${isValidUrl(productForm.url) ? "text-emerald-500" : "text-red-400"}`}>
+                              {isValidUrl(productForm.url) ? "✓" : "URL inválida"}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {/* BLOCO 11 — Product scheduling */}
+                      <div className="col-span-2">
+                        <label className={labelCls}>
+                          <Calendar size={11} className="inline mr-1" />
+                          Agendamento <span className="font-normal text-[hsl(var(--dash-text-subtle))]">(opcional)</span>
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1">Exibir a partir de</p>
+                            <input type="date" className={`${inputCls} text-xs`}
+                              value={productForm.startsAt ?? ""}
+                              onChange={e => setProductForm(f => f ? { ...f, startsAt: e.target.value || undefined } : f)} />
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1">Exibir até</p>
+                            <input type="date" className={`${inputCls} text-xs`}
+                              value={productForm.endsAt ?? ""}
+                              onChange={e => setProductForm(f => f ? { ...f, endsAt: e.target.value || undefined } : f)} />
+                          </div>
+                        </div>
                       </div>
                       <div>
                         <label className={labelCls}>Badge <span className="font-normal text-[hsl(var(--dash-text-subtle))]">(ex: OFERTA)</span></label>
@@ -906,17 +1040,70 @@ const DashboardPagina = () => {
                         ))}
                       </div>
                     </div>
+                    {/* BLOCO 8 — Link type */}
+                    {!linkForm.isSocial && (
+                      <div>
+                        <label className={labelCls}>Tipo</label>
+                        <div className="flex gap-2">
+                          {([
+                            { v: "normal",    label: "Normal",    desc: "Link padrão" },
+                            { v: "spotlight", label: "Destaque",  desc: "Botão grande CTA" },
+                            { v: "header",    label: "Separador", desc: "Título de seção" },
+                          ] as const).map(({ v, label }) => (
+                            <button key={v} onClick={() => setLinkForm(f => f ? { ...f, type: v } : f)}
+                              className={`flex-1 text-[11px] font-medium py-2 rounded-xl border transition-all ${
+                                (linkForm.type ?? "normal") === v
+                                  ? "border-primary/50 bg-[hsl(var(--dash-accent))] text-primary"
+                                  : "border-[hsl(var(--dash-border-subtle))] text-[hsl(var(--dash-text-muted))] hover:border-primary/20"
+                              }`}>
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                     <div>
                       <label className={labelCls}>Título</label>
-                      <input type="text" className={inputCls} placeholder="Instagram"
+                      <input type="text" className={inputCls}
+                        placeholder={(linkForm.type ?? "normal") === "header" ? "Ex: Meus Cursos" : "Instagram"}
                         value={linkForm.title}
                         onChange={e => setLinkForm(f => f ? { ...f, title: e.target.value } : f)} />
                     </div>
+                    {(linkForm.type ?? "normal") !== "header" && (
                     <div>
                       <label className={labelCls}>URL</label>
-                      <input type="url" className={inputCls} placeholder="https://..."
-                        value={linkForm.url}
-                        onChange={e => setLinkForm(f => f ? { ...f, url: e.target.value } : f)} />
+                      <div className="relative">
+                        <input type="url" className={inputCls} placeholder="https://..."
+                          value={linkForm.url}
+                          onChange={e => setLinkForm(f => f ? { ...f, url: e.target.value } : f)} />
+                        {linkForm.url && (
+                          <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold ${isValidUrl(linkForm.url) ? "text-emerald-500" : "text-red-400"}`}>
+                            {isValidUrl(linkForm.url) ? "✓" : "URL inválida"}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    )}
+                    {/* BLOCO 11 — Link scheduling */}
+                    <div>
+                      <label className={labelCls}>
+                        <Calendar size={11} className="inline mr-1" />
+                        Agendamento <span className="font-normal text-[hsl(var(--dash-text-subtle))]">(opcional)</span>
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1">Exibir a partir de</p>
+                          <input type="date" className={`${inputCls} text-xs`}
+                            value={linkForm.startsAt ?? ""}
+                            onChange={e => setLinkForm(f => f ? { ...f, startsAt: e.target.value || undefined } : f)} />
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1">Exibir até</p>
+                          <input type="date" className={`${inputCls} text-xs`}
+                            value={linkForm.endsAt ?? ""}
+                            onChange={e => setLinkForm(f => f ? { ...f, endsAt: e.target.value || undefined } : f)} />
+                        </div>
+                      </div>
                     </div>
                     <div className="flex gap-2 pt-1">
                       <button onClick={saveLink} className="flex-1 btn-primary-gradient text-xs py-2 rounded-xl">
@@ -1146,11 +1333,73 @@ const DashboardPagina = () => {
         {/* ── RIGHT PANEL: Phone preview ── */}
         <div className="hidden lg:block">
           <div className="sticky top-8">
-            <p className="text-[hsl(var(--dash-text-subtle))] text-xs font-medium mb-3 uppercase tracking-wider">
-              Pré-visualização ao vivo
-            </p>
-            {phonePreview}
-            <div className="mt-3 text-center">
+            {/* BLOCO 12 — Device toggle */}
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[hsl(var(--dash-text-subtle))] text-xs font-medium uppercase tracking-wider">
+                Pré-visualização ao vivo
+              </p>
+              <div className="flex items-center gap-1 p-0.5 rounded-lg bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))]">
+                <button
+                  onClick={() => setPreviewDevice("mobile")}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all ${
+                    previewDevice === "mobile"
+                      ? "bg-white shadow-sm text-[hsl(var(--dash-text))]"
+                      : "text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))]"
+                  }`}
+                >
+                  <Smartphone size={11} /> Mobile
+                </button>
+                <button
+                  onClick={() => setPreviewDevice("tablet")}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all ${
+                    previewDevice === "tablet"
+                      ? "bg-white shadow-sm text-[hsl(var(--dash-text))]"
+                      : "text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))]"
+                  }`}
+                >
+                  <Tablet size={11} /> Tablet
+                </button>
+              </div>
+            </div>
+            {previewDevice === "tablet" ? (
+              <div className="rounded-[1.5rem] border-[3px] border-[hsl(var(--dash-text))] overflow-hidden shadow-2xl">
+                <div className="overflow-y-auto" style={{ background: `linear-gradient(160deg,${currentTheme.bg} 60%,${currentTheme.accent}18)`, maxHeight: 520 }}>
+                  <div className="p-6 grid grid-cols-2 gap-4">
+                    <div className="col-span-2 flex flex-col items-center pb-4 border-b" style={{ borderColor: currentTheme.accent + "20" }}>
+                      <div className="w-14 h-14 rounded-full mb-2 overflow-hidden" style={{ boxShadow: `0 0 0 2px ${currentTheme.accent}40` }}>
+                        {config.avatarUrl ? (
+                          <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center"
+                            style={{ background: `linear-gradient(135deg,${currentTheme.accent},${currentTheme.accent2})` }}>
+                            <span className="text-white font-bold">{config.displayName?.[0]?.toUpperCase() ?? "?"}</span>
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-white font-bold text-sm">{config.displayName || "Seu Nome"}</p>
+                      {config.bio && <p className="text-xs text-center mt-1 px-4" style={{ color: "rgba(200,200,200,0.7)" }}>{config.bio}</p>}
+                    </div>
+                    <div className="space-y-2">
+                      {config.products.filter(p => p.active && isScheduledActive(p)).slice(0, 3).map(p => (
+                        <div key={p.id} className="rounded-xl border p-2.5" style={{ borderColor: currentTheme.accent + "30", background: currentTheme.accent + "0a" }}>
+                          <p className="text-xs font-semibold text-white">{p.emoji} {p.title}</p>
+                          {p.price && <p className="text-[10px]" style={{ color: currentTheme.accent }}>{p.price}</p>}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="space-y-2">
+                      {config.links.filter(l => l.active && isScheduledActive(l)).slice(0, 4).map(l => (
+                        <div key={l.id} className="flex items-center gap-2 rounded-xl border p-2.5" style={{ borderColor: currentTheme.accent + "25", background: currentTheme.accent + "08" }}>
+                          <span style={{ color: currentTheme.accent }}>{LINK_ICON_MAP[l.icon]}</span>
+                          <span className="text-xs truncate" style={{ color: "rgba(200,200,200,0.8)" }}>{l.title || l.url}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : phonePreview}
+            <div className="mt-3 flex items-center justify-center gap-2">
               <span className="text-[hsl(var(--dash-text-subtle))] text-[11px]">Tema: {currentTheme.label}</span>
             </div>
           </div>
