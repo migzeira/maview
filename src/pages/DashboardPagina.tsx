@@ -324,7 +324,6 @@ const ProfileHeroCard = ({ config, onUpdate, onEditProfile }: ProfileHeroCardPro
             ref={fileInputRef}
             type="file"
             accept="image/*"
-            capture="user"
             className="hidden"
             onChange={handleFileChange}
           />
