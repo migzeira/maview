@@ -24,7 +24,7 @@ interface ProductItem {
   images: string[];
   video?: string;
   url: string;
-  linkType?: "url" | "whatsapp" | "none";
+  linkType?: "url" | "whatsapp" | "none" | "booking";
   whatsappMsg?: string;
   ctaText?: string;
   badge: string;
@@ -32,6 +32,11 @@ interface ProductItem {
   active: boolean;
   startsAt?: string;
   endsAt?: string;
+  // booking fields
+  bookingDuration?: number;       // minutes: 15, 30, 45, 60, 90, 120
+  bookingDays?: string[];         // ["seg","ter","qua","qui","sex","sab","dom"]
+  bookingStart?: string;          // "09:00"
+  bookingEnd?: string;            // "18:00"
   // migration compat
   imageUrl?: string;
   videoUrl?: string;
@@ -168,11 +173,26 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
 
 // ── Empty forms ────────────────────────────────────────────────────────────
 
+const BOOKING_DAYS_ALL = ["seg", "ter", "qua", "qui", "sex", "sab", "dom"];
+const BOOKING_DAYS_LABELS: Record<string, string> = { seg: "S", ter: "T", qua: "Q", qui: "Q", sex: "S", sab: "S", dom: "D" };
+const BOOKING_DURATIONS = [
+  { min: 15,  label: "15min" },
+  { min: 30,  label: "30min" },
+  { min: 45,  label: "45min" },
+  { min: 60,  label: "1h" },
+  { min: 90,  label: "1h30" },
+  { min: 120, label: "2h" },
+];
+
 const emptyProduct = (): ProductItem => ({
   id: Date.now().toString(),
   title: "", description: "", price: "", originalPrice: "",
   emoji: "🎯", images: [], url: "", linkType: "url", whatsappMsg: "", ctaText: "",
   badge: "", urgency: false, active: true,
+  bookingDuration: 60,
+  bookingDays: ["seg", "ter", "qua", "qui", "sex"],
+  bookingStart: "09:00",
+  bookingEnd: "18:00",
 });
 
 const emptyLink = (isSocial: boolean): LinkItem => ({
@@ -1147,7 +1167,8 @@ const DashboardPagina = () => {
       const productIcon = (p.images?.length > 0)
         ? <div className="w-6 h-6 rounded-md overflow-hidden"><img src={p.images[0]} alt="" className="w-full h-full object-cover" /></div>
         : <span className="text-base">{p.emoji}</span>;
-      return { icon: productIcon, title: p.title || "Sem título", subtitle: p.price, active: p.active, hasToggle: true, typeLabel: "Produto" };
+      const typeLabel = p.linkType === "booking" ? "Agendamento" : "Produto";
+      return { icon: productIcon, title: p.title || "Sem título", subtitle: p.price, active: p.active, hasToggle: true, typeLabel };
     }
     if (block.type === "link") {
       const l = config.links.find(lk => lk.id === block.refId);
@@ -1723,7 +1744,8 @@ const DashboardPagina = () => {
                         {([
                           { key: "url" as const, icon: <Link2 size={11} />, label: "Link" },
                           { key: "whatsapp" as const, icon: <MessageCircle size={11} />, label: "WhatsApp" },
-                          { key: "none" as const, icon: <Eye size={11} />, label: "Só exibir" },
+                          { key: "booking" as const, icon: <Calendar size={11} />, label: "Agendar" },
+                          { key: "none" as const, icon: <Eye size={11} />, label: "Exibir" },
                         ]).map(opt => (
                           <button key={opt.key} onClick={() => setProductForm(f => f ? { ...f, linkType: opt.key } : f)}
                             className={`flex-1 flex items-center justify-center gap-1 text-[11px] font-medium py-1.5 rounded-md transition-all ${
@@ -1770,6 +1792,99 @@ const DashboardPagina = () => {
                               <MessageCircle size={9} /> wa.me/55{productForm.url}
                             </p>
                           )}
+                        </div>
+                      )}
+
+                      {productForm.linkType === "booking" && (
+                        <div className="space-y-3 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] p-3.5 animate-in slide-in-from-top-1 duration-150">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Calendar size={13} className="text-primary" />
+                            <span className="text-[12px] font-semibold text-[hsl(var(--dash-text))]">Configurar agendamento</span>
+                          </div>
+                          <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] -mt-1">
+                            Seus clientes escolhem data e horário, e a solicitação chega no seu WhatsApp automaticamente.
+                          </p>
+
+                          {/* Duration */}
+                          <div>
+                            <label className={labelCls}>Duração do atendimento</label>
+                            <div className="flex gap-1.5 flex-wrap">
+                              {BOOKING_DURATIONS.map(d => (
+                                <button key={d.min}
+                                  onClick={() => setProductForm(f => f ? { ...f, bookingDuration: d.min } : f)}
+                                  className={`px-3 py-1.5 rounded-lg text-[11px] font-medium border transition-all ${
+                                    (productForm.bookingDuration || 60) === d.min
+                                      ? "border-primary/50 bg-primary/10 text-primary"
+                                      : "border-[hsl(var(--dash-border-subtle))] text-[hsl(var(--dash-text-muted))] hover:border-primary/30"
+                                  }`}>
+                                  {d.label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Available days */}
+                          <div>
+                            <label className={labelCls}>Dias disponíveis</label>
+                            <div className="flex gap-1">
+                              {BOOKING_DAYS_ALL.map(day => {
+                                const isOn = (productForm.bookingDays || []).includes(day);
+                                return (
+                                  <button key={day}
+                                    onClick={() => setProductForm(f => {
+                                      if (!f) return f;
+                                      const days = f.bookingDays || [];
+                                      return { ...f, bookingDays: isOn ? days.filter(d => d !== day) : [...days, day] };
+                                    })}
+                                    className={`w-9 h-9 rounded-lg text-[11px] font-bold border transition-all ${
+                                      isOn
+                                        ? "border-primary/50 bg-primary/10 text-primary"
+                                        : "border-[hsl(var(--dash-border-subtle))] text-[hsl(var(--dash-text-subtle))] hover:border-primary/30"
+                                    }`}>
+                                    {BOOKING_DAYS_LABELS[day]}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                            <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] mt-1">
+                              {BOOKING_DAYS_ALL.filter(d => (productForm.bookingDays || []).includes(d)).join(", ") || "Nenhum dia selecionado"}
+                            </p>
+                          </div>
+
+                          {/* Hours */}
+                          <div>
+                            <label className={labelCls}>Horário de atendimento</label>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1">Das</p>
+                                <input type="time" className={`${inputCls} text-xs`}
+                                  value={productForm.bookingStart || "09:00"}
+                                  onChange={e => setProductForm(f => f ? { ...f, bookingStart: e.target.value } : f)} />
+                              </div>
+                              <div>
+                                <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1">Até</p>
+                                <input type="time" className={`${inputCls} text-xs`}
+                                  value={productForm.bookingEnd || "18:00"}
+                                  onChange={e => setProductForm(f => f ? { ...f, bookingEnd: e.target.value } : f)} />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* WhatsApp for confirmations */}
+                          <div>
+                            <label className={labelCls}>WhatsApp para receber agendamentos</label>
+                            <div className="flex items-center">
+                              <span className="flex-shrink-0 rounded-l-xl border border-r-0 border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] text-sm px-3 py-2.5 select-none">+55</span>
+                              <input type="tel" className={`${inputCls} rounded-l-none`} placeholder="11999999999"
+                                value={productForm.url}
+                                onChange={e => setProductForm(f => f ? { ...f, url: e.target.value.replace(/\D/g, "") } : f)} />
+                            </div>
+                            {productForm.url && (
+                              <p className="text-[10px] text-emerald-500 flex items-center gap-1 mt-1">
+                                <MessageCircle size={9} /> Agendamentos chegarão via wa.me/55{productForm.url}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       )}
 

@@ -4,7 +4,7 @@ import {
   Globe, Instagram, Youtube, Twitter, ShoppingBag,
   Link2, Share2, Check, ShoppingCart, Star,
   ArrowRight, Sparkles, MessageCircle, Quote,
-  Clock, Flame,
+  Clock, Flame, Calendar, Play, ChevronLeft, ChevronRight, X,
 } from "lucide-react";
 
 import logoSrc from "@/assets/maview-logo.png";
@@ -23,11 +23,15 @@ interface ProductItem {
   video?: string;
   imageUrl?: string;
   url: string;
-  linkType?: "url" | "whatsapp" | "none";
+  linkType?: "url" | "whatsapp" | "none" | "booking";
   whatsappMsg?: string;
   ctaText?: string;
   badge?: string;
   urgency?: boolean;
+  bookingDuration?: number;
+  bookingDays?: string[];
+  bookingStart?: string;
+  bookingEnd?: string;
 }
 
 interface LinkItem {
@@ -272,6 +276,221 @@ const useStagger = (count: number, baseDelay = 180, step = 70) => {
 };
 
 /* ──────────────────────────────────────────────────────────────── */
+/*  📹 Mini Video Player (inline product card)                       */
+/* ──────────────────────────────────────────────────────────────── */
+const MiniVideoPlayer = ({ src, accent }: { src: string; accent: string }) => {
+  const [playing, setPlaying] = useState(false);
+  const videoRef = useState<HTMLVideoElement | null>(null);
+  return (
+    <div className="relative w-full aspect-video rounded-xl overflow-hidden cursor-pointer group/vid"
+      onClick={() => {
+        const vid = document.getElementById("mini-vid-" + src.slice(-8)) as HTMLVideoElement;
+        if (vid) { if (vid.paused) { vid.play(); setPlaying(true); } else { vid.pause(); setPlaying(false); } }
+      }}>
+      <video id={"mini-vid-" + src.slice(-8)} src={src} className="w-full h-full object-cover" muted playsInline loop
+        onEnded={() => setPlaying(false)} />
+      {!playing && (
+        <div className="absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm"
+            style={{ background: `${accent}40`, border: `2px solid ${accent}80` }}>
+            <Play size={18} className="text-white ml-0.5" />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ──────────────────────────────────────────────────────────────── */
+/*  📅 Booking Modal                                                 */
+/* ──────────────────────────────────────────────────────────────── */
+const WEEKDAY_MAP: Record<number, string> = { 0: "dom", 1: "seg", 2: "ter", 3: "qua", 4: "qui", 5: "sex", 6: "sab" };
+const WEEKDAY_LABELS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+const MONTH_NAMES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+
+const generateTimeSlots = (start: string, end: string, durationMin: number): string[] => {
+  const slots: string[] = [];
+  const [sh, sm] = start.split(":").map(Number);
+  const [eh, em] = end.split(":").map(Number);
+  let mins = sh * 60 + sm;
+  const endMins = eh * 60 + em;
+  while (mins + durationMin <= endMins) {
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    slots.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
+    mins += durationMin;
+  }
+  return slots;
+};
+
+interface BookingModalProps {
+  product: ProductItem;
+  whatsapp: string;
+  accent: string;
+  accent2: string;
+  bg: string;
+  card: string;
+  text: string;
+  sub: string;
+  border: string;
+  onClose: () => void;
+}
+
+const BookingModal = ({ product, whatsapp, accent, accent2, bg, card, text, sub, border, onClose }: BookingModalProps) => {
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [monthOffset, setMonthOffset] = useState(0);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const viewMonth = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1);
+
+  const daysInMonth = new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 0).getDate();
+  const firstDayOfWeek = viewMonth.getDay();
+  const availableDays = product.bookingDays || ["seg", "ter", "qua", "qui", "sex"];
+  const duration = product.bookingDuration || 60;
+  const slots = generateTimeSlots(product.bookingStart || "09:00", product.bookingEnd || "18:00", duration);
+
+  const isDayAvailable = (date: Date) => {
+    if (date < today) return false;
+    const dayKey = WEEKDAY_MAP[date.getDay()];
+    return availableDays.includes(dayKey);
+  };
+
+  const handleConfirm = () => {
+    if (!selectedDate || !selectedTime) return;
+    const dateStr = `${String(selectedDate.getDate()).padStart(2, "0")}/${String(selectedDate.getMonth() + 1).padStart(2, "0")}/${selectedDate.getFullYear()}`;
+    const durationLabel = duration >= 60 ? `${Math.floor(duration / 60)}h${duration % 60 ? duration % 60 + "min" : ""}` : `${duration}min`;
+    const msg = `Olá! Gostaria de agendar:\n\n📋 *${product.title}*\n📅 ${dateStr} às ${selectedTime}\n⏱️ Duração: ${durationLabel}${product.price ? `\n💰 ${product.price}` : ""}\n\nPodemos confirmar?`;
+    const phone = whatsapp.replace(/\D/g, "");
+    window.open(`https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`, "_blank");
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center px-4 pb-4">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-[380px] rounded-3xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300"
+        style={{ background: card, border: `1px solid ${border}` }}>
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 pt-5 pb-3">
+          <div>
+            <h3 className="text-[16px] font-bold" style={{ color: text }}>Agendar</h3>
+            <p className="text-[12px] mt-0.5" style={{ color: sub }}>{product.title}</p>
+          </div>
+          <button onClick={onClose}
+            className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
+            style={{ background: `${accent}18` }}>
+            <X size={14} style={{ color: accent }} />
+          </button>
+        </div>
+
+        {/* Calendar */}
+        <div className="px-5 pb-4">
+          <div className="flex items-center justify-between mb-3">
+            <button onClick={() => setMonthOffset(o => Math.max(0, o - 1))}
+              disabled={monthOffset === 0}
+              className="w-7 h-7 rounded-lg flex items-center justify-center transition-all disabled:opacity-20"
+              style={{ background: `${accent}18` }}>
+              <ChevronLeft size={14} style={{ color: accent }} />
+            </button>
+            <span className="text-[13px] font-bold" style={{ color: text }}>
+              {MONTH_NAMES[viewMonth.getMonth()]} {viewMonth.getFullYear()}
+            </span>
+            <button onClick={() => setMonthOffset(o => Math.min(2, o + 1))}
+              className="w-7 h-7 rounded-lg flex items-center justify-center transition-all"
+              style={{ background: `${accent}18` }}>
+              <ChevronRight size={14} style={{ color: accent }} />
+            </button>
+          </div>
+
+          {/* Weekday headers */}
+          <div className="grid grid-cols-7 gap-1 mb-1">
+            {WEEKDAY_LABELS.map(d => (
+              <div key={d} className="text-center text-[10px] font-bold py-1" style={{ color: sub }}>{d}</div>
+            ))}
+          </div>
+
+          {/* Days grid */}
+          <div className="grid grid-cols-7 gap-1">
+            {Array.from({ length: firstDayOfWeek }).map((_, i) => <div key={`e-${i}`} />)}
+            {Array.from({ length: daysInMonth }).map((_, i) => {
+              const date = new Date(viewMonth.getFullYear(), viewMonth.getMonth(), i + 1);
+              const available = isDayAvailable(date);
+              const isSelected = selectedDate?.toDateString() === date.toDateString();
+              return (
+                <button key={i}
+                  onClick={() => { if (available) { setSelectedDate(date); setSelectedTime(null); } }}
+                  disabled={!available}
+                  className={`w-full aspect-square rounded-lg text-[12px] font-semibold transition-all ${
+                    isSelected ? "scale-110" : available ? "hover:scale-105" : "opacity-25 cursor-not-allowed"
+                  }`}
+                  style={{
+                    background: isSelected ? `linear-gradient(135deg, ${accent}, ${accent2})` : available ? `${accent}12` : "transparent",
+                    color: isSelected ? "#fff" : text,
+                    border: isSelected ? "none" : `1px solid ${available ? `${accent}20` : "transparent"}`,
+                  }}>
+                  {i + 1}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Time slots */}
+        {selectedDate && (
+          <div className="px-5 pb-4 animate-in slide-in-from-bottom-2 duration-200">
+            <p className="text-[11px] font-bold mb-2" style={{ color: sub }}>
+              Horários disponíveis — {selectedDate.getDate()}/{selectedDate.getMonth() + 1}
+            </p>
+            <div className="flex gap-1.5 flex-wrap max-h-[120px] overflow-y-auto scrollbar-none">
+              {slots.map(slot => {
+                const isSel = selectedTime === slot;
+                return (
+                  <button key={slot} onClick={() => setSelectedTime(slot)}
+                    className={`px-3 py-2 rounded-xl text-[12px] font-semibold transition-all ${isSel ? "scale-105" : "hover:scale-105"}`}
+                    style={{
+                      background: isSel ? `linear-gradient(135deg, ${accent}, ${accent2})` : `${accent}12`,
+                      color: isSel ? "#fff" : text,
+                      border: `1px solid ${isSel ? accent : `${accent}20`}`,
+                    }}>
+                    {slot}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Confirm */}
+        <div className="px-5 pb-5 pt-2">
+          <button onClick={handleConfirm}
+            disabled={!selectedDate || !selectedTime}
+            className="w-full py-3.5 rounded-2xl text-[14px] font-bold text-white transition-all active:scale-[0.97] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            style={{
+              background: selectedDate && selectedTime
+                ? `linear-gradient(135deg, ${accent}, ${accent2})`
+                : `${accent}30`,
+              boxShadow: selectedDate && selectedTime ? `0 8px 24px ${accent}40` : "none",
+            }}>
+            <Calendar size={15} />
+            {selectedDate && selectedTime
+              ? `Confirmar ${selectedTime} — ${selectedDate.getDate()}/${selectedDate.getMonth() + 1}`
+              : "Selecione data e horário"
+            }
+          </button>
+          {product.price && (
+            <p className="text-center text-[11px] mt-2 font-semibold" style={{ color: accent }}>
+              {product.price} · {duration >= 60 ? `${Math.floor(duration / 60)}h${duration % 60 || ""}` : `${duration}min`}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ──────────────────────────────────────────────────────────────── */
 /*  Main ProfilePage                                                */
 /* ──────────────────────────────────────────────────────────────── */
 const ProfilePage = () => {
@@ -281,6 +500,7 @@ const ProfilePage = () => {
   const [notFound, setNotFound] = useState(false);
   const [copied, setCopied]     = useState(false);
   const [heroVis, setHeroVis]   = useState(false);
+  const [bookingProduct, setBookingProduct] = useState<ProductItem | null>(null);
 
   const productStagger     = useStagger(10, 220, 80);
   const linkStagger        = useStagger(10, 380, 55);
@@ -459,60 +679,106 @@ const ProfilePage = () => {
                 <ShoppingBag size={13} style={{ color: t.accent }} />
                 <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: t.sub }}>Produtos</span>
               </div>
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 {profile.products.map((product, i) => {
                   const isWhatsApp = product.linkType === "whatsapp";
+                  const isBooking = product.linkType === "booking";
                   const isNone = product.linkType === "none";
                   const productHref = isWhatsApp && product.url
                     ? `https://wa.me/55${product.url}${product.whatsappMsg ? `?text=${encodeURIComponent(product.whatsappMsg)}` : ""}`
-                    : isNone ? undefined : product.url;
-                  const ctaLabel = product.ctaText || (isWhatsApp ? "WhatsApp" : product.price ? "Comprar" : "Ver mais");
+                    : (isNone || isBooking) ? undefined : product.url;
+                  const ctaLabel = product.ctaText || (isBooking ? "Agendar" : isWhatsApp ? "WhatsApp" : product.price ? "Comprar" : "Ver mais");
                   const coverImg = product.images?.[0] || product.imageUrl;
-                  const Wrapper = isNone ? "div" : "a";
-                  const wrapperProps = isNone ? {} : { href: productHref, target: "_blank", rel: "noopener noreferrer" };
+                  const hasVideo = !!product.video;
+
+                  // Booking: onClick opens modal; others: link or none
+                  const handleClick = isBooking
+                    ? (e: React.MouseEvent) => { e.preventDefault(); setBookingProduct(product); }
+                    : undefined;
+
+                  const Wrapper = (isNone && !isBooking) ? "div" : isBooking ? "button" : "a";
+                  const wrapperProps = isBooking
+                    ? { onClick: handleClick }
+                    : isNone
+                      ? {}
+                      : { href: productHref, target: "_blank", rel: "noopener noreferrer" };
+
                   return (
-                  <Wrapper key={product.id} {...(wrapperProps as Record<string, string>)}
-                    className="group flex items-center gap-4 w-full px-4 py-3.5 rounded-2xl transition-all duration-200 active:scale-[0.97]"
-                    style={{
-                      background: t.card, border: `1px solid ${t.border}`,
-                      opacity: productStagger[i] ? 1 : 0,
-                      transform: productStagger[i] ? "translateY(0)" : "translateY(14px)",
-                      transition: "opacity 0.45s ease, transform 0.45s ease, box-shadow 0.2s, border-color 0.2s",
-                    }}
-                    onMouseEnter={(e: React.MouseEvent) => onHoverIn(e.currentTarget as HTMLElement)}
-                    onMouseLeave={(e: React.MouseEvent) => onHoverOut(e.currentTarget as HTMLElement)}
-                  >
-                    <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center text-2xl flex-shrink-0" style={{ background: `${t.accent}12` }}>
-                      {coverImg
-                        ? <img src={coverImg} alt={product.title} className="w-full h-full object-cover" />
-                        : product.emoji
-                      }
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                        <p className="text-[13.5px] font-bold leading-snug" style={{ color: t.text }}>{product.title}</p>
-                        {product.badge && (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: `${t.accent}22`, color: t.accent, border: `1px solid ${t.accent}30` }}>
-                            {product.badge}
-                          </span>
-                        )}
-                        {product.urgency && <CountdownBadge accent={t.accent} />}
-                      </div>
-                      {product.description && <p className="text-[11.5px] truncate" style={{ color: t.sub }}>{product.description}</p>}
-                      {product.price && (
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-[14px] font-extrabold" style={{ color: t.accent }}>{product.price}</span>
-                          {product.originalPrice && <span className="text-[11px] line-through" style={{ color: t.sub }}>{product.originalPrice}</span>}
+                    <div key={product.id}
+                      className="rounded-2xl overflow-hidden transition-all duration-200"
+                      style={{
+                        background: t.card, border: `1px solid ${t.border}`,
+                        opacity: productStagger[i] ? 1 : 0,
+                        transform: productStagger[i] ? "translateY(0)" : "translateY(14px)",
+                        transition: "opacity 0.45s ease, transform 0.45s ease, box-shadow 0.2s, border-color 0.2s",
+                      }}
+                      onMouseEnter={(e: React.MouseEvent) => onHoverIn(e.currentTarget as HTMLElement)}
+                      onMouseLeave={(e: React.MouseEvent) => onHoverOut(e.currentTarget as HTMLElement)}
+                    >
+                      {/* Mini video (if product has video) */}
+                      {hasVideo && (
+                        <div className="px-3 pt-3">
+                          <MiniVideoPlayer src={product.video!} accent={t.accent} />
                         </div>
                       )}
+
+                      {/* Card body */}
+                      <Wrapper {...(wrapperProps as any)}
+                        className={`group flex items-center gap-4 w-full px-4 py-3.5 transition-all duration-200 active:scale-[0.97] ${isBooking ? "cursor-pointer text-left" : ""}`}
+                      >
+                        <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center text-2xl flex-shrink-0" style={{ background: `${t.accent}12` }}>
+                          {coverImg
+                            ? <img src={coverImg} alt={product.title} className="w-full h-full object-cover" />
+                            : product.emoji
+                          }
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                            <p className="text-[13.5px] font-bold leading-snug" style={{ color: t.text }}>{product.title}</p>
+                            {product.badge && (
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: `${t.accent}22`, color: t.accent, border: `1px solid ${t.accent}30` }}>
+                                {product.badge}
+                              </span>
+                            )}
+                            {isBooking && (
+                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
+                                style={{ background: "rgba(34,197,94,0.15)", color: "#22c55e", border: "1px solid rgba(34,197,94,0.25)" }}>
+                                Agenda online
+                              </span>
+                            )}
+                            {product.urgency && <CountdownBadge accent={t.accent} />}
+                          </div>
+                          {product.description && <p className="text-[11.5px] truncate" style={{ color: t.sub }}>{product.description}</p>}
+                          {product.price && (
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-[14px] font-extrabold" style={{ color: t.accent }}>{product.price}</span>
+                              {product.originalPrice && <span className="text-[11px] line-through" style={{ color: t.sub }}>{product.originalPrice}</span>}
+                            </div>
+                          )}
+                          {isBooking && (
+                            <p className="text-[10px] mt-1 flex items-center gap-1" style={{ color: t.sub }}>
+                              <Clock size={9} /> {(product.bookingDuration || 60) >= 60 ? `${Math.floor((product.bookingDuration || 60) / 60)}h${(product.bookingDuration || 60) % 60 || ""}` : `${product.bookingDuration}min`}
+                              {" · "}
+                              {(product.bookingDays || []).length} dias/semana
+                            </p>
+                          )}
+                        </div>
+                        {!isNone && (
+                          <div className="flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[11.5px] font-bold transition-all duration-200 group-hover:brightness-110"
+                            style={{
+                              background: isBooking
+                                ? `linear-gradient(135deg, ${t.accent}, ${t.accent2})`
+                                : isWhatsApp
+                                  ? "linear-gradient(135deg, #25d366, #128C7E)"
+                                  : `linear-gradient(135deg, ${t.accent}, ${t.accent2})`,
+                              color: "#fff",
+                              boxShadow: isWhatsApp ? "0 4px 14px #25d36640" : `0 4px 14px ${t.accent}40`,
+                            }}>
+                            {isBooking ? <Calendar size={11} /> : isWhatsApp ? <MessageCircle size={11} /> : <ShoppingCart size={11} />} {ctaLabel}
+                          </div>
+                        )}
+                      </Wrapper>
                     </div>
-                    {!isNone && (
-                      <div className="flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[11.5px] font-bold transition-all duration-200 group-hover:brightness-110"
-                        style={{ background: isWhatsApp ? "linear-gradient(135deg, #25d366, #128C7E)" : `linear-gradient(135deg, ${t.accent}, ${t.accent2})`, color: "#fff", boxShadow: isWhatsApp ? "0 4px 14px #25d36640" : `0 4px 14px ${t.accent}40` }}>
-                        {isWhatsApp ? <MessageCircle size={11} /> : <ShoppingCart size={11} />} {ctaLabel}
-                      </div>
-                    )}
-                  </Wrapper>
                   );
                 })}
               </div>
@@ -613,6 +879,37 @@ const ProfilePage = () => {
           <MessageCircle size={17} className="fill-white" />
           <span className="text-[12.5px] font-bold">Falar comigo</span>
         </a>
+      )}
+
+      {/* 📅 Booking Modal */}
+      {bookingProduct && profile.whatsapp && (
+        <BookingModal
+          product={bookingProduct}
+          whatsapp={profile.whatsapp}
+          accent={t.accent}
+          accent2={t.accent2}
+          bg={t.bg}
+          card={t.card}
+          text={t.text}
+          sub={t.sub}
+          border={t.border}
+          onClose={() => setBookingProduct(null)}
+        />
+      )}
+      {/* Booking fallback: no whatsapp set — use product.url as whatsapp */}
+      {bookingProduct && !profile.whatsapp && bookingProduct.url && (
+        <BookingModal
+          product={bookingProduct}
+          whatsapp={bookingProduct.url}
+          accent={t.accent}
+          accent2={t.accent2}
+          bg={t.bg}
+          card={t.card}
+          text={t.text}
+          sub={t.sub}
+          border={t.border}
+          onClose={() => setBookingProduct(null)}
+        />
       )}
 
       {/* ── Footer ── */}
