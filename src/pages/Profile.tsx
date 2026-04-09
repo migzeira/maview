@@ -19,7 +19,11 @@ interface ProductItem {
   price: string;
   originalPrice?: string;
   emoji: string;
+  imageUrl?: string;
+  videoUrl?: string;
   url: string;
+  linkType?: "url" | "whatsapp";
+  whatsappMsg?: string;
   badge?: string;
   /** se true, mostra countdown de urgência */
   urgency?: boolean;
@@ -431,8 +435,13 @@ const ProfilePage = () => {
                 <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: t.sub }}>Produtos</span>
               </div>
               <div className="space-y-2.5">
-                {profile.products.map((product, i) => (
-                  <a key={product.id} href={product.url} target="_blank" rel="noopener noreferrer"
+                {profile.products.map((product, i) => {
+                  const productHref = product.linkType === "whatsapp" && product.url
+                    ? `https://wa.me/55${product.url}${product.whatsappMsg ? `?text=${encodeURIComponent(product.whatsappMsg)}` : ""}`
+                    : product.url;
+                  const isWhatsApp = product.linkType === "whatsapp";
+                  return (
+                  <a key={product.id} href={productHref} target="_blank" rel="noopener noreferrer"
                     className="group flex items-center gap-4 w-full px-4 py-3.5 rounded-2xl transition-all duration-200 active:scale-[0.97]"
                     style={{
                       background: t.card, border: `1px solid ${t.border}`,
@@ -443,8 +452,11 @@ const ProfilePage = () => {
                     onMouseEnter={e => onHoverIn(e.currentTarget as HTMLElement)}
                     onMouseLeave={e => onHoverOut(e.currentTarget as HTMLElement)}
                   >
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background: `${t.accent}12` }}>
-                      {product.emoji}
+                    <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center text-2xl flex-shrink-0" style={{ background: `${t.accent}12` }}>
+                      {product.imageUrl
+                        ? <img src={product.imageUrl} alt={product.title} className="w-full h-full object-cover" />
+                        : product.emoji
+                      }
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-0.5">
@@ -454,7 +466,6 @@ const ProfilePage = () => {
                             {product.badge}
                           </span>
                         )}
-                        {/* ⏱️ Countdown de urgência */}
                         {product.urgency && <CountdownBadge accent={t.accent} />}
                       </div>
                       <p className="text-[11.5px] truncate" style={{ color: t.sub }}>{product.description}</p>
@@ -464,11 +475,12 @@ const ProfilePage = () => {
                       </div>
                     </div>
                     <div className="flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[11.5px] font-bold transition-all duration-200 group-hover:brightness-110"
-                      style={{ background: `linear-gradient(135deg, ${t.accent}, ${t.accent2})`, color: "#fff", boxShadow: `0 4px 14px ${t.accent}40` }}>
-                      <ShoppingCart size={11} /> Comprar
+                      style={{ background: isWhatsApp ? "linear-gradient(135deg, #25d366, #128C7E)" : `linear-gradient(135deg, ${t.accent}, ${t.accent2})`, color: "#fff", boxShadow: isWhatsApp ? "0 4px 14px #25d36640" : `0 4px 14px ${t.accent}40` }}>
+                      {isWhatsApp ? <><MessageCircle size={11} /> WhatsApp</> : <><ShoppingCart size={11} /> Comprar</>}
                     </div>
                   </a>
-                ))}
+                  );
+                })}
               </div>
             </section>
           )}

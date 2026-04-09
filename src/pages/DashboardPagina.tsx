@@ -5,7 +5,7 @@ import {
   Check, ToggleLeft, ToggleRight, Instagram, Youtube, Twitter, Globe,
   MessageCircle, Clock, ChevronDown, ChevronUp, Eye, X, Copy, ExternalLink,
   Sparkles, Calendar, Settings, Layout, GripVertical, AlertCircle,
-  TrendingUp, Zap, ArrowRight, CheckCircle2, Circle, Image, Type,
+  TrendingUp, Zap, ArrowRight, CheckCircle2, Circle, Image, Type, Video,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -20,7 +20,11 @@ interface ProductItem {
   price: string;
   originalPrice: string;
   emoji: string;
+  imageUrl?: string;
+  videoUrl?: string;
   url: string;
+  linkType?: "url" | "whatsapp";
+  whatsappMsg?: string;
   badge: string;
   urgency: boolean;
   active: boolean;
@@ -97,7 +101,11 @@ const LINK_ICON_MAP: Record<LinkItem["icon"], React.ReactNode> = {
   link:      <Link2 size={14} />,
 };
 
-const PRODUCT_EMOJIS = ["🎯", "📚", "🎨", "💡", "🚀", "🎤", "💎", "🔑", "⚡", "🛒"];
+const PRODUCT_EMOJIS = [
+  "🎯", "📚", "🎨", "💡", "🚀", "🎤", "💎", "🔑", "⚡", "🛒",
+  "📱", "💻", "🎓", "🎁", "🏆", "💰", "📸", "🎵", "✨", "🏠",
+  "✈️", "🎮", "💪", "📦", "🎬", "💄", "🧠", "❤️", "🍕", "☕",
+];
 
 type TabId = "vitrine" | "perfil" | "design";
 
@@ -112,7 +120,8 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
 const emptyProduct = (): ProductItem => ({
   id: Date.now().toString(),
   title: "", description: "", price: "", originalPrice: "",
-  emoji: "🎯", url: "", badge: "", urgency: false, active: true,
+  emoji: "🎯", imageUrl: "", videoUrl: "", url: "", linkType: "url", whatsappMsg: "",
+  badge: "", urgency: false, active: true,
 });
 
 const emptyLink = (isSocial: boolean): LinkItem => ({
@@ -611,6 +620,10 @@ const DashboardPagina = () => {
   const whatsappInputRef = useRef<HTMLInputElement>(null);
   const themeGridRef = useRef<HTMLDivElement>(null);
 
+  // Product form extras
+  const [showEmojiGrid, setShowEmojiGrid] = useState(false);
+  const productFileInputRef = useRef<HTMLInputElement>(null);
+
   // ── Load ──────────────────────────────────────────────────────────────────
 
   useEffect(() => {
@@ -738,12 +751,38 @@ const DashboardPagina = () => {
 
   // ── Form open/close helpers ───────────────────────────────────────────────
 
+  // ── Product image upload ─────────────────────────────────────────────────
+
+  const handleProductImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const MAX = 600;
+        const ratio = Math.min(MAX / img.width, MAX / img.height, 1);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * ratio);
+        canvas.height = Math.round(img.height * ratio);
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.80);
+        setProductForm(f => f ? { ...f, imageUrl: dataUrl } : f);
+      };
+      img.src = ev.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
   const closeAllForms = () => {
     setActiveForm(null);
     setProductForm(null);
     setEditingProductId(null);
     setLinkForm(null);
     setEditingLinkId(null);
+    setShowEmojiGrid(false);
     setTestimonialForm(emptyTestimonial());
     setEditingTestimonialId(null);
     setHeaderTitle("");
@@ -989,7 +1028,10 @@ const DashboardPagina = () => {
     if (block.type === "product") {
       const p = config.products.find(pr => pr.id === block.refId);
       if (!p) return null;
-      return { icon: <span className="text-base">{p.emoji}</span>, title: p.title || "Sem título", subtitle: p.price, active: p.active, hasToggle: true, typeLabel: "Produto" };
+      const productIcon = p.imageUrl
+        ? <div className="w-6 h-6 rounded-md overflow-hidden"><img src={p.imageUrl} alt="" className="w-full h-full object-cover" /></div>
+        : <span className="text-base">{p.emoji}</span>;
+      return { icon: productIcon, title: p.title || "Sem título", subtitle: p.price, active: p.active, hasToggle: true, typeLabel: "Produto" };
     }
     if (block.type === "link") {
       const l = config.links.find(lk => lk.id === block.refId);
@@ -1071,7 +1113,13 @@ const DashboardPagina = () => {
                 return (
                   <div key={block.id} className="flex items-center gap-2.5 rounded-xl border p-2.5 mb-2 transition-all hover:scale-[1.01]"
                     style={{ borderColor: currentTheme.accent + "30", background: currentTheme.accent + "0a" }}>
-                    <span className="text-base flex-shrink-0">{p.emoji}</span>
+                    {p.imageUrl ? (
+                      <div className="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0">
+                        <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <span className="text-base flex-shrink-0">{p.emoji}</span>
+                    )}
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-semibold truncate text-white">{p.title}</p>
                       <div className="flex items-center gap-2">
@@ -1355,7 +1403,7 @@ const DashboardPagina = () => {
 
                 {/* Product form */}
                 {activeForm === "product" && productForm && (
-                  <div className={`rounded-2xl border bg-[hsl(var(--dash-accent))]/30 p-4 space-y-3 animate-in slide-in-from-top-2 duration-200 transition-all ${
+                  <div className={`rounded-2xl border bg-[hsl(var(--dash-accent))]/30 p-4 space-y-4 animate-in slide-in-from-top-2 duration-200 transition-all ${
                     highlightField === "products"
                       ? "border-primary/70 shadow-[0_0_22px_rgba(139,92,246,0.4)]"
                       : "border-primary/20"
@@ -1366,36 +1414,107 @@ const DashboardPagina = () => {
                         <span className="text-[10px] font-bold text-primary animate-bounce">← preencha e salve</span>
                       )}
                     </h3>
-                    <div>
-                      <label className={labelCls}>Emoji</label>
-                      <div className="flex gap-2 flex-wrap">
-                        {PRODUCT_EMOJIS.map(em => (
-                          <button key={em} onClick={() => setProductForm(f => f ? { ...f, emoji: em } : f)}
-                            className={`w-9 h-9 rounded-xl text-lg flex items-center justify-center border transition-all ${
-                              productForm.emoji === em
-                                ? "border-primary/50 bg-[hsl(var(--dash-accent))] ring-1 ring-primary/20 scale-110"
-                                : "border-[hsl(var(--dash-border-subtle))] hover:border-primary/20 hover:scale-105"
-                            }`}>{em}</button>
-                        ))}
+
+                    {/* ── Product Image ── */}
+                    <input ref={productFileInputRef} type="file" accept="image/*" className="hidden" onChange={handleProductImageUpload} />
+                    {productForm.imageUrl ? (
+                      <div className="relative rounded-xl overflow-hidden h-[140px] bg-black/5 border border-[hsl(var(--dash-border-subtle))]">
+                        <img src={productForm.imageUrl} alt="Produto" className="w-full h-full object-cover" />
+                        <div className="absolute top-2 right-2 flex gap-1.5">
+                          <button onClick={() => productFileInputRef.current?.click()}
+                            className="px-2 py-1 rounded-lg bg-black/60 backdrop-blur-sm text-white text-[10px] font-medium hover:bg-black/80 transition-all">
+                            Trocar
+                          </button>
+                          <button onClick={() => setProductForm(f => f ? { ...f, imageUrl: "" } : f)}
+                            className="w-6 h-6 rounded-lg bg-black/60 backdrop-blur-sm text-white flex items-center justify-center hover:bg-red-500/80 transition-all">
+                            <X size={11} />
+                          </button>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <button onClick={() => productFileInputRef.current?.click()}
+                        className="w-full rounded-xl border-2 border-dashed border-[hsl(var(--dash-border))] hover:border-primary/40 bg-[hsl(var(--dash-surface-2))] hover:bg-primary/5 transition-all p-4 flex flex-col items-center gap-1.5 cursor-pointer">
+                        <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Image size={16} className="text-primary" />
+                        </div>
+                        <p className="text-[12px] font-semibold text-[hsl(var(--dash-text))]">Foto do produto</p>
+                        <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Câmera ou galeria · opcional</p>
+                      </button>
+                    )}
+
+                    {/* ── Emoji (shown when no image) ── */}
+                    {!productForm.imageUrl && (
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-xl">{productForm.emoji}</span>
+                          <button onClick={() => setShowEmojiGrid(!showEmojiGrid)}
+                            className="text-[11px] text-[hsl(var(--dash-text-muted))] hover:text-primary transition-colors font-medium flex items-center gap-1">
+                            Trocar emoji {showEmojiGrid ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
+                          </button>
+                        </div>
+                        {showEmojiGrid && (
+                          <div className="animate-in slide-in-from-top-1 duration-150">
+                            <div className="flex gap-1.5 flex-wrap mb-2">
+                              {PRODUCT_EMOJIS.map(em => (
+                                <button key={em} onClick={() => { setProductForm(f => f ? { ...f, emoji: em } : f); setShowEmojiGrid(false); }}
+                                  className={`w-8 h-8 rounded-lg text-base flex items-center justify-center border transition-all ${
+                                    productForm.emoji === em
+                                      ? "border-primary/50 bg-[hsl(var(--dash-accent))] scale-110"
+                                      : "border-[hsl(var(--dash-border-subtle))] hover:border-primary/20 hover:scale-105"
+                                  }`}>{em}</button>
+                              ))}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <input type="text" className={`${inputCls} w-16 text-center text-lg`} placeholder="🎯" maxLength={2}
+                                value={productForm.emoji}
+                                onChange={e => setProductForm(f => f ? { ...f, emoji: e.target.value } : f)} />
+                              <span className="text-[10px] text-[hsl(var(--dash-text-subtle))]">ou digite qualquer emoji</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* ── Title ── */}
                     <div>
                       <label className={labelCls}>Título</label>
-                      <input type="text" className={inputCls} placeholder="Nome do produto"
+                      <input type="text" className={inputCls} placeholder="Ex: Curso de Design Digital"
                         value={productForm.title}
                         onChange={e => setProductForm(f => f ? { ...f, title: e.target.value } : f)} />
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className={labelCls}>Preço</label>
-                        <input type="text" className={inputCls} placeholder="R$ 97,00"
-                          value={productForm.price}
-                          onChange={e => setProductForm(f => f ? { ...f, price: e.target.value } : f)} />
+
+                    {/* ── Price ── */}
+                    <div>
+                      <label className={labelCls}>Preço</label>
+                      <input type="text" className={inputCls} placeholder="R$ 97,00"
+                        value={productForm.price}
+                        onChange={e => setProductForm(f => f ? { ...f, price: e.target.value } : f)} />
+                    </div>
+
+                    {/* ── Link type toggle + input ── */}
+                    <div>
+                      <label className={labelCls}>Como o cliente compra?</label>
+                      <div className="flex gap-1 p-0.5 rounded-lg bg-[hsl(var(--dash-surface-2))] mb-2.5">
+                        <button onClick={() => setProductForm(f => f ? { ...f, linkType: "url" } : f)}
+                          className={`flex-1 flex items-center justify-center gap-1.5 text-[11px] font-medium py-1.5 rounded-md transition-all ${
+                            (productForm.linkType || "url") === "url"
+                              ? "bg-[hsl(var(--dash-surface))] text-[hsl(var(--dash-text))] shadow-sm"
+                              : "text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))]"
+                          }`}>
+                          <Link2 size={11} /> Link de compra
+                        </button>
+                        <button onClick={() => setProductForm(f => f ? { ...f, linkType: "whatsapp" } : f)}
+                          className={`flex-1 flex items-center justify-center gap-1.5 text-[11px] font-medium py-1.5 rounded-md transition-all ${
+                            productForm.linkType === "whatsapp"
+                              ? "bg-[hsl(var(--dash-surface))] text-[hsl(var(--dash-text))] shadow-sm"
+                              : "text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))]"
+                          }`}>
+                          <MessageCircle size={11} /> WhatsApp
+                        </button>
                       </div>
-                      <div>
-                        <label className={labelCls}>URL de compra</label>
+                      {(productForm.linkType || "url") === "url" ? (
                         <div className="relative">
-                          <input type="url" className={inputCls} placeholder="https://..."
+                          <input type="url" className={inputCls} placeholder="https://hotmart.com/produto..."
                             value={productForm.url}
                             onChange={e => setProductForm(f => f ? { ...f, url: e.target.value } : f)} />
                           {productForm.url && (
@@ -1404,9 +1523,27 @@ const DashboardPagina = () => {
                             </span>
                           )}
                         </div>
-                      </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <div className="flex items-center">
+                            <span className="flex-shrink-0 rounded-l-xl border border-r-0 border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] text-sm px-3 py-2.5 select-none">+55</span>
+                            <input type="tel" className={`${inputCls} rounded-l-none`} placeholder="11999999999"
+                              value={productForm.url}
+                              onChange={e => setProductForm(f => f ? { ...f, url: e.target.value.replace(/\D/g, "") } : f)} />
+                          </div>
+                          <input type="text" className={inputCls} placeholder="Mensagem pronta (opcional): Olá! Tenho interesse no..."
+                            value={productForm.whatsappMsg || ""}
+                            onChange={e => setProductForm(f => f ? { ...f, whatsappMsg: e.target.value } : f)} />
+                          {productForm.url && (
+                            <p className="text-[10px] text-emerald-500 flex items-center gap-1">
+                              <MessageCircle size={9} /> wa.me/55{productForm.url}
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    {/* Mais opções */}
+
+                    {/* ── Mais opções ── */}
                     <button onClick={() => setShowAdvanced(!showAdvanced)}
                       className="flex items-center gap-1.5 text-[hsl(var(--dash-text-subtle))] text-[11px] font-medium hover:text-primary transition-colors">
                       <Settings size={11} /> Mais opções
@@ -1416,13 +1553,13 @@ const DashboardPagina = () => {
                       <div className="space-y-3 pt-1 border-t border-[hsl(var(--dash-border-subtle))] animate-in slide-in-from-top-1 duration-150">
                         <div>
                           <label className={labelCls}>Descrição</label>
-                          <input type="text" className={inputCls} placeholder="Breve descrição"
+                          <input type="text" className={inputCls} placeholder="Breve descrição do produto"
                             value={productForm.description}
                             onChange={e => setProductForm(f => f ? { ...f, description: e.target.value } : f)} />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <label className={labelCls}>Preço original</label>
+                            <label className={labelCls}>Preço original <span className="text-[hsl(var(--dash-text-subtle))] font-normal">(riscado)</span></label>
                             <input type="text" className={inputCls} placeholder="R$ 197,00"
                               value={productForm.originalPrice}
                               onChange={e => setProductForm(f => f ? { ...f, originalPrice: e.target.value } : f)} />
@@ -1433,6 +1570,12 @@ const DashboardPagina = () => {
                               value={productForm.badge}
                               onChange={e => setProductForm(f => f ? { ...f, badge: e.target.value } : f)} />
                           </div>
+                        </div>
+                        <div>
+                          <label className={labelCls}><Video size={11} className="inline mr-1" />Vídeo do produto <span className="text-[hsl(var(--dash-text-subtle))] font-normal">(opcional)</span></label>
+                          <input type="url" className={inputCls} placeholder="https://youtube.com/watch?v=..."
+                            value={productForm.videoUrl || ""}
+                            onChange={e => setProductForm(f => f ? { ...f, videoUrl: e.target.value } : f)} />
                         </div>
                         <label className="flex items-center gap-2 cursor-pointer select-none">
                           <button onClick={() => setProductForm(f => f ? { ...f, urgency: !f.urgency } : f)}>
@@ -1461,12 +1604,14 @@ const DashboardPagina = () => {
                         </div>
                       </div>
                     )}
+
+                    {/* ── Save / Cancel ── */}
                     <div className="flex gap-2 pt-1">
-                      <button onClick={saveProduct} className="flex-1 btn-primary-gradient text-xs py-2 rounded-xl transition-transform active:scale-[0.97]">
+                      <button onClick={saveProduct} className="flex-1 btn-primary-gradient text-xs py-2.5 rounded-xl transition-transform active:scale-[0.97] font-semibold">
                         <Check size={13} className="inline mr-1" /> Salvar
                       </button>
                       <button onClick={closeAllForms}
-                        className="flex-1 text-xs py-2 rounded-xl border border-[hsl(var(--dash-border))] text-[hsl(var(--dash-text-muted))] hover:bg-[hsl(var(--dash-surface-2))] transition-all">
+                        className="flex-1 text-xs py-2.5 rounded-xl border border-[hsl(var(--dash-border))] text-[hsl(var(--dash-text-muted))] hover:bg-[hsl(var(--dash-surface-2))] transition-all">
                         Cancelar
                       </button>
                     </div>
