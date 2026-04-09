@@ -73,6 +73,7 @@ interface TestimonialItem {
   text: string;
   stars: number;
   avatar: string;
+  screenshotUrl?: string;
 }
 
 interface ProfileData {
@@ -1295,12 +1296,24 @@ const ProfilePage = () => {
                     <p className="text-[12.5px] leading-relaxed mb-3 italic" style={{ color: t.sub }}>
                       "{item.text}"
                     </p>
+                    {/* Screenshot do depoimento real */}
+                    {item.screenshotUrl && (
+                      <img src={item.screenshotUrl} alt="Print do depoimento"
+                        className="w-full rounded-lg mb-3 object-contain max-h-48 border border-white/10" />
+                    )}
                     {/* Author */}
                     <div className="flex items-center gap-2.5">
-                      <img src={item.avatar} alt={item.name} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                      {item.avatar ? (
+                        <img src={item.avatar} alt={item.name} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                      ) : (
+                        <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-white"
+                          style={{ background: `linear-gradient(135deg, ${t.accent}, ${t.accent2})` }}>
+                          {item.name[0]?.toUpperCase()}
+                        </div>
+                      )}
                       <div>
                         <p className="text-[12px] font-bold leading-none" style={{ color: t.text }}>{item.name}</p>
-                        <p className="text-[10.5px] mt-0.5" style={{ color: t.sub }}>{item.role}</p>
+                        {item.role && <p className="text-[10.5px] mt-0.5" style={{ color: t.sub }}>{item.role}</p>}
                       </div>
                     </div>
                   </div>

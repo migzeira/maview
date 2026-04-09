@@ -6,7 +6,7 @@ import {
   MessageCircle, Clock, ChevronDown, ChevronUp, Eye, X, Copy, ExternalLink,
   Sparkles, Calendar, Settings, Layout, GripVertical, AlertCircle,
   TrendingUp, Zap, ArrowRight, CheckCircle2, Circle, Image, Type, Video,
-  Play, Smile, Search,
+  Play, Smile, Search, Camera, Minus, MoreHorizontal, Diamond, Waves,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import DesignTab from "@/components/DesignTab";
@@ -116,13 +116,18 @@ interface TestimonialItem {
   text: string;
   stars: number;
   avatar: string;
+  screenshotUrl?: string; // foto do depoimento real (print)
 }
+
+type SeparatorStyle = "line" | "dots" | "gradient" | "stars" | "zigzag" | "diamond" | "wave" | "fade";
 
 interface VitrineBlock {
   id: string;
   type: "product" | "link" | "testimonial" | "header";
   refId?: string;
   title?: string;
+  separatorStyle?: SeparatorStyle;
+  separatorIcon?: string;
 }
 
 interface VitrineConfig {
@@ -332,7 +337,7 @@ const emptyLink = (isSocial: boolean): LinkItem => ({
 
 const emptyTestimonial = (): TestimonialItem => ({
   id: Date.now().toString(),
-  name: "", role: "", text: "", stars: 5, avatar: "",
+  name: "", role: "", text: "", stars: 5, avatar: "", screenshotUrl: "",
 });
 
 // ── Health checklist ──────────────────────────────────────────────────────
@@ -795,9 +800,15 @@ const DashboardPagina = () => {
   const [testimonialForm, setTestimonialForm] = useState<TestimonialItem>(emptyTestimonial());
   const [editingTestimonialId, setEditingTestimonialId] = useState<string | null>(null);
 
-  // Header form
+  // Header/separator form
   const [headerTitle, setHeaderTitle] = useState("");
+  const [headerSepStyle, setHeaderSepStyle] = useState<SeparatorStyle>("line");
+  const [headerSepIcon, setHeaderSepIcon] = useState("");
   const [editingHeaderBlockId, setEditingHeaderBlockId] = useState<string | null>(null);
+
+  // File input refs for testimonial
+  const testimonialAvatarRef = useRef<HTMLInputElement>(null);
+  const testimonialScreenshotRef = useRef<HTMLInputElement>(null);
 
   // Delete confirmation
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -1137,6 +1148,8 @@ const DashboardPagina = () => {
     closeAllForms();
     setActiveForm("header");
     setHeaderTitle("");
+    setHeaderSepStyle("line");
+    setHeaderSepIcon("");
   };
 
   const openEditHeader = (block: VitrineBlock) => {
@@ -1144,6 +1157,8 @@ const DashboardPagina = () => {
     setActiveForm("header");
     setEditingHeaderBlockId(block.id);
     setHeaderTitle(block.title || "");
+    setHeaderSepStyle(block.separatorStyle || "line");
+    setHeaderSepIcon(block.separatorIcon || "");
   };
 
   // ── Save helpers ──────────────────────────────────────────────────────────
@@ -1197,12 +1212,13 @@ const DashboardPagina = () => {
 
   const saveHeader = () => {
     if (!headerTitle.trim()) return;
+    const sepData = { title: headerTitle.trim(), separatorStyle: headerSepStyle, separatorIcon: headerSepIcon || undefined };
     setConfigAndSave(prev => {
       const next = { ...prev };
       if (editingHeaderBlockId) {
-        next.blocks = (prev.blocks || []).map(b => b.id === editingHeaderBlockId ? { ...b, title: headerTitle.trim() } : b);
+        next.blocks = (prev.blocks || []).map(b => b.id === editingHeaderBlockId ? { ...b, ...sepData } : b);
       } else {
-        next.blocks = [...(prev.blocks || []), { id: Date.now().toString(), type: "header" as const, title: headerTitle.trim() }];
+        next.blocks = [...(prev.blocks || []), { id: Date.now().toString(), type: "header" as const, ...sepData }];
       }
       return next;
     });
@@ -1585,15 +1601,32 @@ const DashboardPagina = () => {
                     </div>
                     <div className="text-[10px] mb-1">{"⭐".repeat(t.stars)}</div>
                     <p className="text-[9px] line-clamp-2 italic" style={{ color: pSub }}>"{t.text}"</p>
+                    {t.screenshotUrl && (
+                      <img src={t.screenshotUrl} alt="Print" className="w-full mt-1.5 rounded-md object-contain max-h-12 opacity-90" />
+                    )}
                   </div>
                 );
               }
               if (block.type === "header") {
+                const ss = block.separatorStyle || "line";
+                const sepDeco = (() => {
+                  switch (ss) {
+                    case "dots": return <div className="flex gap-1">{[0,1,2].map(i => <div key={i} className="w-1 h-1 rounded-full" style={{ background: pAccent + "50" }} />)}</div>;
+                    case "stars": return <span className="text-[7px]" style={{ color: pAccent + "60" }}>✦ ✦ ✦</span>;
+                    case "diamond": return <div className="w-1.5 h-1.5 rotate-45" style={{ background: pAccent + "50" }} />;
+                    case "wave": return <span className="text-[7px]" style={{ color: pAccent + "50" }}>∿∿∿</span>;
+                    case "zigzag": return <span className="text-[6px]" style={{ color: pAccent + "50" }}>⌇⌇⌇⌇</span>;
+                    default: return null;
+                  }
+                })();
+                const gradLine = ss === "gradient" || ss === "fade";
+                const lineS = gradLine ? { background: `linear-gradient(90deg, transparent, ${pAccent}30, transparent)` } : { background: pAccent + "25" };
                 return (
                   <div key={block.id} className="flex items-center gap-2 mb-2">
-                    <div className="flex-1 h-px" style={{ background: pAccent + "30" }} />
-                    <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: pAccent + "80" }}>{block.title}</span>
-                    <div className="flex-1 h-px" style={{ background: pAccent + "30" }} />
+                    <div className="flex-1 h-px" style={lineS} />
+                    {sepDeco}
+                    {block.title && <span className="text-[8px] font-bold uppercase tracking-wider" style={{ color: pAccent + "70" }}>{block.title}</span>}
+                    {(sepDeco || block.title) && <div className="flex-1 h-px" style={lineS} />}
                   </div>
                 );
               }
@@ -2377,12 +2410,11 @@ const DashboardPagina = () => {
                       </div>
                     </div>
                     <div>
-                      <label className={labelCls}>Tipo</label>
+                      <label className={labelCls}>Estilo</label>
                       <div className="flex gap-2">
                         {([
-                          { v: "normal" as const, label: "Normal" },
-                          { v: "spotlight" as const, label: "Destaque" },
-                          { v: "header" as const, label: "Separador" },
+                          { v: "normal" as const, label: "Normal", tip: "Link discreto na lista" },
+                          { v: "spotlight" as const, label: "Destaque", tip: "Link com mais visibilidade" },
                         ]).map(({ v, label }) => (
                           <button key={v} onClick={() => setLinkForm(f => f ? { ...f, type: v } : f)}
                             className={`flex-1 text-[11px] font-medium py-2 rounded-xl border transition-all ${
@@ -2451,11 +2483,51 @@ const DashboardPagina = () => {
                         <span className="text-[10px] font-bold text-primary animate-bounce">← preencha e salve</span>
                       )}
                     </h3>
+
+                    {/* Avatar upload */}
+                    <div>
+                      <label className={labelCls}>Foto do cliente</label>
+                      <div className="flex items-center gap-3">
+                        {testimonialForm.avatar ? (
+                          <div className="relative group">
+                            <img src={testimonialForm.avatar} alt="" className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/30" />
+                            <button onClick={() => setTestimonialForm(f => ({ ...f, avatar: "" }))}
+                              className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                              <X size={10} />
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-[hsl(var(--dash-accent))] border-2 border-dashed border-[hsl(var(--dash-border))] flex items-center justify-center text-[hsl(var(--dash-text-subtle))]">
+                            <Camera size={16} />
+                          </div>
+                        )}
+                        <button onClick={() => testimonialAvatarRef.current?.click()}
+                          className="text-[11px] font-medium text-primary hover:text-primary/80 transition-colors">
+                          {testimonialForm.avatar ? "Trocar foto" : "Enviar foto"}
+                        </button>
+                        <input type="file" ref={testimonialAvatarRef} accept="image/*" className="hidden"
+                          onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            const reader = new FileReader();
+                            reader.onload = () => setTestimonialForm(f => ({ ...f, avatar: reader.result as string }));
+                            reader.readAsDataURL(file);
+                            e.target.value = "";
+                          }} />
+                      </div>
+                    </div>
+
                     <div>
                       <label className={labelCls}>Nome</label>
                       <input type="text" className={inputCls} placeholder="João Silva"
                         value={testimonialForm.name}
                         onChange={e => setTestimonialForm(f => ({ ...f, name: e.target.value }))} />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Cargo / Função <span className="text-[hsl(var(--dash-text-subtle))] font-normal">(opcional)</span></label>
+                      <input type="text" className={inputCls} placeholder="Designer, Cliente, Empresário..."
+                        value={testimonialForm.role}
+                        onChange={e => setTestimonialForm(f => ({ ...f, role: e.target.value }))} />
                     </div>
                     <div>
                       <div className="flex items-center justify-between mb-1.5">
@@ -2480,28 +2552,40 @@ const DashboardPagina = () => {
                         ))}
                       </div>
                     </div>
-                    {/* Mais opções */}
-                    <button onClick={() => setShowAdvanced(!showAdvanced)}
-                      className="flex items-center gap-1.5 text-[hsl(var(--dash-text-subtle))] text-[11px] font-medium hover:text-primary transition-colors">
-                      <Settings size={11} /> Mais opções
-                      {showAdvanced ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
-                    </button>
-                    {showAdvanced && (
-                      <div className="space-y-3 pt-1 border-t border-[hsl(var(--dash-border-subtle))] animate-in slide-in-from-top-1 duration-150">
-                        <div>
-                          <label className={labelCls}>Cargo / Função</label>
-                          <input type="text" className={inputCls} placeholder="Designer"
-                            value={testimonialForm.role}
-                            onChange={e => setTestimonialForm(f => ({ ...f, role: e.target.value }))} />
+
+                    {/* Screenshot de depoimento real */}
+                    <div className="pt-1 border-t border-[hsl(var(--dash-border-subtle))]">
+                      <label className={labelCls}>Print do depoimento real <span className="text-[hsl(var(--dash-text-subtle))] font-normal">(opcional)</span></label>
+                      <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-2 -mt-0.5">
+                        Envie um print do WhatsApp, Instagram ou avaliação real para dar mais credibilidade
+                      </p>
+                      {testimonialForm.screenshotUrl ? (
+                        <div className="relative rounded-xl overflow-hidden border border-[hsl(var(--dash-border-subtle))]">
+                          <img src={testimonialForm.screenshotUrl} alt="Print do depoimento" className="w-full max-h-40 object-contain bg-black/5" />
+                          <button onClick={() => setTestimonialForm(f => ({ ...f, screenshotUrl: "" }))}
+                            className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-red-500 transition-colors">
+                            <X size={12} />
+                          </button>
                         </div>
-                        <div>
-                          <label className={labelCls}>URL do Avatar</label>
-                          <input type="url" className={inputCls} placeholder="https://..."
-                            value={testimonialForm.avatar}
-                            onChange={e => setTestimonialForm(f => ({ ...f, avatar: e.target.value }))} />
-                        </div>
-                      </div>
-                    )}
+                      ) : (
+                        <button onClick={() => testimonialScreenshotRef.current?.click()}
+                          className="w-full py-4 rounded-xl border-2 border-dashed border-[hsl(var(--dash-border))] flex flex-col items-center gap-1.5 text-[hsl(var(--dash-text-subtle))] hover:border-primary/40 hover:text-primary transition-all">
+                          <Image size={18} />
+                          <span className="text-[11px] font-medium">Enviar print do depoimento</span>
+                          <span className="text-[9px]">JPG, PNG ou WebP</span>
+                        </button>
+                      )}
+                      <input type="file" ref={testimonialScreenshotRef} accept="image/*" className="hidden"
+                        onChange={e => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const reader = new FileReader();
+                          reader.onload = () => setTestimonialForm(f => ({ ...f, screenshotUrl: reader.result as string }));
+                          reader.readAsDataURL(file);
+                          e.target.value = "";
+                        }} />
+                    </div>
+
                     <div className="flex gap-2 pt-1">
                       <button onClick={saveTestimonial} className="flex-1 btn-primary-gradient text-xs py-2 rounded-xl transition-transform active:scale-[0.97]">
                         <Check size={13} className="inline mr-1" /> Salvar
@@ -2521,11 +2605,71 @@ const DashboardPagina = () => {
                       {editingHeaderBlockId ? "Editar Separador" : "Novo Separador"}
                     </h3>
                     <div>
-                      <label className={labelCls}>Título da seção</label>
-                      <input type="text" className={inputCls} placeholder="Ex: Meus Cursos"
+                      <label className={labelCls}>Título da seção <span className="text-[hsl(var(--dash-text-subtle))] font-normal">(opcional)</span></label>
+                      <input type="text" className={inputCls} placeholder="Ex: Meus Cursos, Depoimentos..."
                         value={headerTitle}
                         onChange={e => setHeaderTitle(e.target.value)} />
                     </div>
+
+                    {/* Separator style selector */}
+                    <div>
+                      <label className={labelCls}>Estilo do separador</label>
+                      <div className="grid grid-cols-4 gap-1.5">
+                        {([
+                          { id: "line" as SeparatorStyle, label: "Linha", preview: <div className="w-10 h-[1px] bg-current mx-auto" /> },
+                          { id: "dots" as SeparatorStyle, label: "Pontos", preview: <div className="flex gap-1.5 justify-center">{[0,1,2].map(i => <div key={i} className="w-1 h-1 rounded-full bg-current" />)}</div> },
+                          { id: "gradient" as SeparatorStyle, label: "Degradê", preview: <div className="w-10 h-[2px] mx-auto rounded-full" style={{ background: "linear-gradient(90deg, transparent, currentColor, transparent)" }} /> },
+                          { id: "stars" as SeparatorStyle, label: "Estrelas", preview: <div className="text-[8px] text-center">✦ ✦ ✦</div> },
+                          { id: "diamond" as SeparatorStyle, label: "Losango", preview: <div className="flex gap-2 justify-center items-center"><div className="w-8 h-[1px] bg-current" /><div className="w-1.5 h-1.5 rotate-45 bg-current" /><div className="w-8 h-[1px] bg-current" /></div> },
+                          { id: "wave" as SeparatorStyle, label: "Onda", preview: <div className="text-[8px] text-center tracking-widest">∿∿∿∿∿</div> },
+                          { id: "zigzag" as SeparatorStyle, label: "Zigzag", preview: <div className="text-[7px] text-center tracking-tighter">⌇⌇⌇⌇⌇⌇</div> },
+                          { id: "fade" as SeparatorStyle, label: "Fade", preview: <div className="w-12 h-[1px] mx-auto" style={{ background: "linear-gradient(90deg, transparent 10%, currentColor 50%, transparent 90%)", opacity: 0.5 }} /> },
+                        ]).map(({ id, label, preview }) => (
+                          <button key={id} onClick={() => setHeaderSepStyle(id)}
+                            className={`flex flex-col items-center gap-1.5 py-2.5 rounded-xl text-[9px] font-medium transition-all ${
+                              headerSepStyle === id
+                                ? "bg-primary/15 text-primary border border-primary/30"
+                                : "bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/20"
+                            }`}>
+                            <div className="h-3 flex items-center">{preview}</div>
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Preview */}
+                    <div className="p-3 rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))]">
+                      <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] mb-2">Preview</p>
+                      <div className="flex items-center gap-2">
+                        {(() => {
+                          const lineStyle = { background: "hsl(var(--dash-text-subtle))", opacity: 0.3 };
+                          const sepEl = (() => {
+                            switch (headerSepStyle) {
+                              case "dots": return <div className="flex gap-1.5">{[0,1,2].map(i => <div key={i} className="w-1.5 h-1.5 rounded-full" style={{ background: "hsl(var(--dash-text-subtle))", opacity: 0.4 }} />)}</div>;
+                              case "stars": return <span className="text-[10px]" style={{ color: "hsl(var(--dash-text-subtle))", opacity: 0.5 }}>✦ ✦ ✦</span>;
+                              case "diamond": return <div className="w-2 h-2 rotate-45" style={{ background: "hsl(var(--dash-text-subtle))", opacity: 0.4 }} />;
+                              case "wave": return <span className="text-[10px] tracking-widest" style={{ color: "hsl(var(--dash-text-subtle))", opacity: 0.5 }}>∿∿∿</span>;
+                              case "zigzag": return <span className="text-[9px]" style={{ color: "hsl(var(--dash-text-subtle))", opacity: 0.5 }}>⌇⌇⌇⌇</span>;
+                              case "gradient": return null;
+                              case "fade": return null;
+                              default: return null;
+                            }
+                          })();
+                          const gradientLine = headerSepStyle === "gradient" || headerSepStyle === "fade";
+                          return (
+                            <>
+                              <div className="flex-1 h-[1px]" style={gradientLine ? { background: "linear-gradient(90deg, transparent, hsl(var(--dash-text-subtle)) 30%, hsl(var(--dash-text-subtle)) 70%, transparent)", opacity: 0.3 } : lineStyle} />
+                              {sepEl}
+                              {headerTitle && <span className="text-[10px] font-bold uppercase px-1" style={{ color: "hsl(var(--dash-text-muted))" }}>{headerTitle}</span>}
+                              {sepEl && <div className="flex-1 h-[1px]" style={lineStyle} />}
+                              {!sepEl && !headerTitle && <div className="flex-1 h-[1px]" style={gradientLine ? { background: "linear-gradient(90deg, hsl(var(--dash-text-subtle)) 30%, transparent)", opacity: 0.3 } : lineStyle} />}
+                            </>
+                          );
+                        })()}
+                      </div>
+                    </div>
+
                     <div className="flex gap-2 pt-1">
                       <button onClick={saveHeader} className="flex-1 btn-primary-gradient text-xs py-2 rounded-xl transition-transform active:scale-[0.97]">
                         <Check size={13} className="inline mr-1" /> Salvar
