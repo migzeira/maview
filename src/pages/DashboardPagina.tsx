@@ -2684,32 +2684,37 @@ const DashboardPagina = () => {
                   <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] -mt-1">Aparecem como ícones no topo da sua vitrine</p>
 
                   {([
-                    { icon: <Instagram size={14} className="text-pink-500" />, placeholder: "@seuinstagram", label: "Instagram", key: "instagram" as const },
-                    { icon: <Youtube size={14} className="text-red-500" />, placeholder: "@seucanal", label: "YouTube", key: "youtube" as const },
-                    { icon: <Twitter size={14} className="text-sky-500" />, placeholder: "@seutiktok", label: "TikTok / X", key: "twitter" as const },
+                    { icon: <Instagram size={14} className="text-pink-500" />, placeholder: "@seuinstagram", label: "Instagram", key: "instagram" as const, baseUrl: "instagram.com/" },
+                    { icon: <Youtube size={14} className="text-red-500" />, placeholder: "@seucanal", label: "YouTube", key: "youtube" as const, baseUrl: "youtube.com/@" },
+                    { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.6 5.82s.51.5 0 0A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z" fill="currentColor"/></svg>, placeholder: "@seutiktok", label: "TikTok", key: "tiktok" as const, baseUrl: "tiktok.com/@" },
+                    { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>, placeholder: "@seuX", label: "X (Twitter)", key: "twitter" as const, baseUrl: "x.com/" },
                   ]).map(social => {
                     const existing = config.links.find(l => l.icon === social.key && l.isSocial);
                     const val = existing?.url || existing?.title || "";
                     return (
                       <div key={social.key} className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-[hsl(var(--dash-accent))] flex items-center justify-center flex-shrink-0">
+                        <div className={`w-8 h-8 rounded-lg bg-[hsl(var(--dash-accent))] flex items-center justify-center flex-shrink-0 ${
+                          social.key === "tiktok" ? "text-[#010101] dark:text-white" : social.key === "twitter" ? "text-[#000] dark:text-white" : ""
+                        }`}>
                           {social.icon}
                         </div>
-                        <input type="text" className={`${inputCls} text-[12px]`}
-                          placeholder={social.placeholder}
-                          value={val}
-                          onChange={e => {
-                            const newVal = e.target.value;
-                            const links = [...config.links];
-                            const idx = links.findIndex(l => l.icon === social.key && l.isSocial);
-                            if (idx >= 0) {
-                              links[idx] = { ...links[idx], url: newVal.startsWith("http") ? newVal : `https://${social.key === "youtube" ? "youtube.com/@" : social.key === "instagram" ? "instagram.com/" : "x.com/"}${newVal.replace(/^@/, "")}`, title: social.label, active: !!newVal };
-                            } else if (newVal) {
-                              links.push({ id: Date.now().toString(), title: social.label, url: newVal.startsWith("http") ? newVal : `https://${social.key === "youtube" ? "youtube.com/@" : social.key === "instagram" ? "instagram.com/" : "x.com/"}${newVal.replace(/^@/, "")}`, icon: social.key, active: true, isSocial: true, type: "normal" });
-                            }
-                            updateConfig("links", links);
-                          }}
-                        />
+                        <div className="flex-1 min-w-0">
+                          <input type="text" className={`${inputCls} text-[12px]`}
+                            placeholder={social.placeholder}
+                            value={val}
+                            onChange={e => {
+                              const newVal = e.target.value;
+                              const links = [...config.links];
+                              const idx = links.findIndex(l => l.icon === social.key && l.isSocial);
+                              if (idx >= 0) {
+                                links[idx] = { ...links[idx], url: newVal.startsWith("http") ? newVal : `https://${social.baseUrl}${newVal.replace(/^@/, "")}`, title: social.label, active: !!newVal };
+                              } else if (newVal) {
+                                links.push({ id: Date.now().toString(), title: social.label, url: newVal.startsWith("http") ? newVal : `https://${social.baseUrl}${newVal.replace(/^@/, "")}`, icon: social.key, active: true, isSocial: true, type: "normal" });
+                              }
+                              updateConfig("links", links);
+                            }}
+                          />
+                        </div>
                         {val && <Check size={14} className="text-emerald-500 flex-shrink-0" />}
                       </div>
                     );
