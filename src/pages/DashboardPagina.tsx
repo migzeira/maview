@@ -417,27 +417,27 @@ const ONBOARDING_STEPS = [
   {
     title: "Seu perfil",
     description: "Adicione foto, nome e bio para que visitantes te conheçam",
-    icon: <User size={24} className="text-violet-500" />,
+    icon: <User size={24} className="text-primary" />,
     tab: "perfil" as TabId,
   },
   {
     title: "Primeiro produto",
     description: "Crie seu primeiro produto e comece a faturar",
-    icon: <Package size={24} className="text-emerald-500" />,
+    icon: <Package size={24} className="text-primary" />,
     tab: "vitrine" as TabId,
     action: "product",
   },
   {
     title: "Seus links",
     description: "Conecte Instagram, YouTube e outras redes",
-    icon: <Link2 size={24} className="text-blue-500" />,
+    icon: <Link2 size={24} className="text-primary" />,
     tab: "vitrine" as TabId,
     action: "link",
   },
   {
     title: "Prova social",
     description: "Depoimentos aumentam conversão em até 72%",
-    icon: <Star size={24} className="text-amber-500" />,
+    icon: <Star size={24} className="text-primary" />,
     tab: "vitrine" as TabId,
     action: "testimonial",
   },
@@ -1804,11 +1804,11 @@ const DashboardPagina = () => {
                       <div className="fixed inset-0 z-30" onClick={() => setShowAddMenu(false)} />
                       <div className="absolute top-full left-0 right-0 mt-2 z-40 glass-card rounded-xl shadow-xl border border-[hsl(var(--dash-border-subtle))] p-1.5 animate-in slide-in-from-top-2 duration-200">
                         {[
-                          { type: "product" as const, icon: <Package size={16} className="text-violet-500" />, label: "Produto", desc: "Venda produtos ou serviços" },
-                          { type: "booking" as const, icon: <Calendar size={16} className="text-emerald-500" />, label: "Agendamento", desc: "Receba marcações online" },
-                          { type: "link" as const, icon: <Link2 size={16} className="text-blue-500" />, label: "Link", desc: "Direcione para qualquer URL" },
-                          { type: "testimonial" as const, icon: <Star size={16} className="text-amber-500" />, label: "Depoimento", desc: "Prova social" },
-                          { type: "header" as const, icon: <Type size={16} className="text-slate-400" />, label: "Separador", desc: "Organize seções" },
+                          { type: "product" as const, icon: <Package size={15} className="text-primary" />, label: "Produto", desc: "Venda produtos ou serviços" },
+                          { type: "booking" as const, icon: <Calendar size={15} className="text-primary" />, label: "Agendamento", desc: "Receba marcações online" },
+                          { type: "link" as const, icon: <Link2 size={15} className="text-primary" />, label: "Link", desc: "Direcione para qualquer URL" },
+                          { type: "testimonial" as const, icon: <Star size={15} className="text-primary" />, label: "Depoimento", desc: "Prova social" },
+                          { type: "header" as const, icon: <Type size={15} className="text-[hsl(var(--dash-text-subtle))]" />, label: "Separador", desc: "Organize seções" },
                         ].map(opt => (
                           <button key={opt.type}
                             onClick={() => {
@@ -2685,8 +2685,8 @@ const DashboardPagina = () => {
                 {/* ── Block list with drag & drop ── */}
                 {blocks.length === 0 && !activeForm ? (
                   <div className="text-center py-14 space-y-4">
-                    <div className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-violet-50 to-fuchsia-50 flex items-center justify-center">
-                      <Layout size={32} className="text-violet-400" />
+                    <div className="w-20 h-20 mx-auto rounded-3xl bg-primary/5 flex items-center justify-center">
+                      <Layout size={32} className="text-primary/40" />
                     </div>
                     <div>
                       <h3 className="text-[hsl(var(--dash-text))] font-bold text-[17px]">Monte sua vitrine</h3>
@@ -2698,33 +2698,30 @@ const DashboardPagina = () => {
                     {/* Quick-start cards */}
                     <div className="grid grid-cols-2 gap-2 max-w-[340px] mx-auto">
                       <button onClick={openAddProduct}
-                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-dashed border-violet-200 bg-violet-50/50 hover:bg-violet-50 hover:border-violet-300 transition-all group">
-                        <Package size={20} className="text-violet-400 group-hover:text-violet-600 transition-colors" />
-                        <span className="text-[12px] font-medium text-violet-600">Produto</span>
+                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-dashed border-[hsl(var(--dash-border))] hover:border-primary/40 hover:bg-primary/5 transition-all group">
+                        <Package size={20} className="text-[hsl(var(--dash-text-muted))] group-hover:text-primary transition-colors" />
+                        <span className="text-[12px] font-medium text-[hsl(var(--dash-text-secondary))]">Produto</span>
                       </button>
                       <button onClick={openAddLink}
-                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-dashed border-blue-200 bg-blue-50/50 hover:bg-blue-50 hover:border-blue-300 transition-all group">
-                        <Link2 size={20} className="text-blue-400 group-hover:text-blue-600 transition-colors" />
-                        <span className="text-[12px] font-medium text-blue-600">Link</span>
+                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-dashed border-[hsl(var(--dash-border))] hover:border-primary/40 hover:bg-primary/5 transition-all group">
+                        <Link2 size={20} className="text-[hsl(var(--dash-text-muted))] group-hover:text-primary transition-colors" />
+                        <span className="text-[12px] font-medium text-[hsl(var(--dash-text-secondary))]">Link</span>
                       </button>
                       <button onClick={openAddTestimonial}
-                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-dashed border-amber-200 bg-amber-50/50 hover:bg-amber-50 hover:border-amber-300 transition-all group">
-                        <Star size={20} className="text-amber-400 group-hover:text-amber-600 transition-colors" />
-                        <span className="text-[12px] font-medium text-amber-600">Depoimento</span>
+                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-dashed border-[hsl(var(--dash-border))] hover:border-primary/40 hover:bg-primary/5 transition-all group">
+                        <Star size={20} className="text-[hsl(var(--dash-text-muted))] group-hover:text-primary transition-colors" />
+                        <span className="text-[12px] font-medium text-[hsl(var(--dash-text-secondary))]">Depoimento</span>
                       </button>
                       <button onClick={openAddHeader}
-                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-slate-300 transition-all group">
-                        <Type size={20} className="text-slate-400 group-hover:text-slate-600 transition-colors" />
-                        <span className="text-[12px] font-medium text-slate-600">Separador</span>
+                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-dashed border-[hsl(var(--dash-border))] hover:border-primary/40 hover:bg-primary/5 transition-all group">
+                        <Type size={20} className="text-[hsl(var(--dash-text-muted))] group-hover:text-primary transition-colors" />
+                        <span className="text-[12px] font-medium text-[hsl(var(--dash-text-secondary))]">Separador</span>
                       </button>
                     </div>
 
-                    <div className="flex items-center justify-center gap-2 pt-2">
-                      <Zap size={12} className="text-amber-500" />
-                      <p className="text-[hsl(var(--dash-text-subtle))] text-xs">
-                        Vitrines com 3+ itens convertem <span className="font-bold text-primary">4x mais</span>
-                      </p>
-                    </div>
+                    <p className="text-[hsl(var(--dash-text-subtle))] text-xs text-center pt-2">
+                      Vitrines com 3+ itens convertem <span className="font-semibold text-primary">4x mais</span>
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -3268,7 +3265,7 @@ const DashboardPagina = () => {
         <div className="hidden lg:block">
           <div className="sticky top-8">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[hsl(var(--dash-text-subtle))] text-xs font-medium uppercase tracking-wider">
+              <p className="text-[hsl(var(--dash-text-subtle))] text-xs font-medium tracking-wide">
                 Preview ao vivo
               </p>
               {config.username && (

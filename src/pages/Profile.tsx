@@ -803,7 +803,7 @@ const BookingModal = ({ product, whatsapp, accent, accent2, bg, card, text, sub,
             <p className="text-[12px] mt-0.5" style={{ color: sub }}>{product.title}</p>
           </div>
           <button onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
+            className="w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-150"
             style={{ background: `${accent}18` }}>
             <X size={14} style={{ color: accent }} />
           </button>
@@ -1082,15 +1082,17 @@ const ProfilePage = () => {
         <div className="w-full max-w-[400px]">
 
           {/* ── HERO ── */}
-          <div className="flex flex-col items-center mb-8 transition-all duration-700" style={{ opacity: heroVis ? 1 : 0, transform: heroVis ? "translateY(0)" : "translateY(20px)" }}>
-            {/* Avatar — dynamic shape, size, border */}
-            <div className="relative mb-5">
-              <div className="absolute inset-[-4px] blur-[14px] opacity-50"
-                style={{
-                  background: `radial-gradient(circle, ${t.accent}, ${t.accent2})`,
-                  borderRadius: profileBorderRadius(rd.profileShape),
-                  clipPath: profileClip(rd.profileShape),
-                }} />
+          <div className="flex flex-col items-center mb-7 transition-all duration-500" style={{ opacity: heroVis ? 1 : 0, transform: heroVis ? "translateY(0)" : "translateY(12px)" }}>
+            {/* Avatar */}
+            <div className="relative mb-4">
+              {rd.profileBorder && (
+                <div className="absolute inset-[-3px] opacity-30 blur-[10px]"
+                  style={{
+                    background: rd.profileBorderColor || t.accent,
+                    borderRadius: profileBorderRadius(rd.profileShape),
+                    clipPath: profileClip(rd.profileShape),
+                  }} />
+              )}
               {profile.avatar
                 ? <img src={profile.avatar} alt={profile.displayName}
                     className="relative object-cover z-10"
@@ -1098,51 +1100,50 @@ const ProfilePage = () => {
                       width: rd.profileSize, height: rd.profileSize,
                       borderRadius: profileBorderRadius(rd.profileShape),
                       clipPath: profileClip(rd.profileShape),
-                      border: rd.profileBorder ? `2.5px solid ${rd.profileBorderColor}60` : "none",
-                      boxShadow: rd.profileBorder ? `0 0 0 4px ${rd.profileBorderColor}18` : "none",
+                      border: rd.profileBorder ? `2px solid ${rd.profileBorderColor}50` : "none",
                     }} />
-                : <div className="relative z-10 flex items-center justify-center text-3xl font-extrabold text-white"
+                : <div className="relative z-10 flex items-center justify-center text-2xl font-bold text-white"
                     style={{
                       width: rd.profileSize, height: rd.profileSize,
                       borderRadius: profileBorderRadius(rd.profileShape),
                       clipPath: profileClip(rd.profileShape),
-                      background: `linear-gradient(135deg, ${t.accent}, ${t.accent2})`,
+                      background: t.accent,
                     }}>{profile.displayName[0]}</div>
               }
             </div>
 
-            <h1 className="text-[22px] font-extrabold mb-1 text-center tracking-tight" style={{ color: t.text, fontFamily: `'${rd.fontHeading}', sans-serif` }}>{profile.displayName}</h1>
-            <p className="text-[13px] font-semibold mb-3 tracking-wide" style={{ color: t.accent }}>@{profile.username}</p>
-            {profile.bio && <p className="text-[13.5px] text-center leading-relaxed max-w-[300px] mb-4" style={{ color: t.sub }}>{profile.bio}</p>}
+            <h1 className="text-xl font-bold mb-0.5 text-center" style={{ color: t.text, fontFamily: `'${rd.fontHeading}', sans-serif` }}>{profile.displayName}</h1>
+            <p className="text-[13px] font-medium mb-2" style={{ color: t.accent }}>@{profile.username}</p>
+            {profile.bio && <p className="text-[13px] text-center leading-relaxed max-w-[280px] mb-4" style={{ color: t.sub }}>{profile.bio}</p>}
 
             {/* Stats */}
             {profile.stats && (
               <div className="flex items-center gap-5 mb-4">
                 {profile.stats.map(({ label, value }) => (
                   <div key={label} className="flex flex-col items-center">
-                    <span className="text-[17px] font-extrabold" style={{ color: t.text }}>{value}</span>
-                    <span className="text-[10px] font-medium mt-0.5 uppercase tracking-wider" style={{ color: t.sub }}>{label}</span>
+                    <span className="text-base font-bold" style={{ color: t.text }}>{value}</span>
+                    <span className="text-[10px] font-medium mt-0.5" style={{ color: t.sub }}>{label}</span>
                   </div>
                 ))}
               </div>
             )}
 
             {/* Social + Share */}
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2">
               {socialLinks.map(link => {
                 const Icon = getIcon(link.icon);
                 return (
                   <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
-                    className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95"
-                    style={{ background: `${t.accent}18`, border: `1px solid ${t.accent}30` }} title={link.title}>
-                    <Icon size={15} style={{ color: t.accent }} />
+                    className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-125 active:scale-95"
+                    style={{ background: `${t.accent}15`, border: `1px solid ${t.accent}20` }} title={link.title}>
+                    <Icon size={16} style={{ color: t.accent }} />
                   </a>
                 );
               })}
               <button onClick={handleShare}
-                className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95"
-                style={{ background: `${t.accent}18`, border: `1px solid ${t.accent}30` }}>
-                {copied ? <Check size={14} style={{ color: t.accent }} /> : <Share2 size={14} style={{ color: t.accent }} />}
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-125 active:scale-95"
+                style={{ background: `${t.accent}15`, border: `1px solid ${t.accent}20` }}>
+                {copied ? <Check size={15} style={{ color: t.accent }} /> : <Share2 size={15} style={{ color: t.accent }} />}
               </button>
             </div>
           </div>
@@ -1151,8 +1152,8 @@ const ProfilePage = () => {
           {profile.products.length > 0 && (
             <section className="mb-7">
               <div className="flex items-center gap-2 mb-3">
-                <ShoppingBag size={13} style={{ color: t.accent }} />
-                <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: t.sub }}>Produtos</span>
+                <ShoppingBag size={14} style={{ color: t.sub }} />
+                <span className="text-[12px] font-semibold tracking-wide" style={{ color: t.sub }}>Produtos</span>
               </div>
               <div className="space-y-3">
                 {profile.products.map((product, i) => {
@@ -1189,12 +1190,12 @@ const ProfilePage = () => {
 
                   return (
                     <div key={product.id}
-                      className="overflow-hidden transition-all duration-200"
+                      className="overflow-hidden"
                       style={{
                         ...buttonStyles(rd),
                         opacity: productStagger[i] ? 1 : 0,
-                        transform: productStagger[i] ? "translateY(0)" : "translateY(14px)",
-                        transition: "opacity 0.45s ease, transform 0.45s ease, box-shadow 0.2s, border-color 0.2s",
+                        transform: productStagger[i] ? "translateY(0)" : "translateY(8px)",
+                        transition: "opacity 0.3s ease, transform 0.3s ease",
                       }}
                       onMouseEnter={(e: React.MouseEvent) => onHoverIn(e.currentTarget as HTMLElement)}
                       onMouseLeave={(e: React.MouseEvent) => onHoverOut(e.currentTarget as HTMLElement)}
@@ -1248,14 +1249,11 @@ const ProfilePage = () => {
                           )}
                         </div>
                         {!isNone && (
-                          <div className="flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 text-[11.5px] font-bold transition-all duration-200 group-hover:brightness-110"
+                          <div className="flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 text-[11px] font-semibold rounded-lg transition-colors duration-150"
                             style={{
-                              ...buttonStyles(rd, true),
-                              background: isWhatsApp
-                                ? "linear-gradient(135deg, #25d366, #128C7E)"
-                                : `linear-gradient(135deg, ${t.accent}, ${t.accent2})`,
+                              borderRadius: buttonBorderRadius(rd.buttonShape, rd.buttonRadius),
+                              background: isWhatsApp ? "#25d366" : t.accent,
                               color: "#fff",
-                              boxShadow: isWhatsApp ? "0 4px 14px #25d36640" : `0 4px 14px ${t.accent}40`,
                             }}>
                             {isBooking ? <Calendar size={11} /> : isWhatsApp ? <MessageCircle size={11} /> : <ShoppingCart size={11} />} {ctaLabel}
                           </div>
@@ -1268,12 +1266,12 @@ const ProfilePage = () => {
             </section>
           )}
 
-          {/* ⭐ DEPOIMENTOS — prova social diretamente na vitrine */}
+          {/* Depoimentos */}
           {profile.testimonials && profile.testimonials.length > 0 && (
             <section className="mb-7">
               <div className="flex items-center gap-2 mb-3">
-                <Star size={13} className="fill-amber-400 text-amber-400" />
-                <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: t.sub }}>O que dizem</span>
+                <Star size={14} className="fill-amber-400 text-amber-400" />
+                <span className="text-[12px] font-semibold tracking-wide" style={{ color: t.sub }}>Depoimentos</span>
               </div>
               <div className="space-y-2.5">
                 {profile.testimonials.map((item, i) => (
@@ -1282,8 +1280,8 @@ const ProfilePage = () => {
                     style={{
                       ...buttonStyles(rd),
                       opacity: testimonialStagger[i] ? 1 : 0,
-                      transform: testimonialStagger[i] ? "translateY(0)" : "translateY(12px)",
-                      transition: "opacity 0.45s ease, transform 0.45s ease",
+                      transform: testimonialStagger[i] ? "translateY(0)" : "translateY(8px)",
+                      transition: "opacity 0.3s ease, transform 0.3s ease",
                     }}
                   >
                     {/* Stars */}
@@ -1307,7 +1305,7 @@ const ProfilePage = () => {
                         <img src={item.avatar} alt={item.name} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
                       ) : (
                         <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-white"
-                          style={{ background: `linear-gradient(135deg, ${t.accent}, ${t.accent2})` }}>
+                          style={{ background: t.accent }}>
                           {item.name[0]?.toUpperCase()}
                         </div>
                       )}
@@ -1326,20 +1324,20 @@ const ProfilePage = () => {
           {regularLinks.length > 0 && (
             <section>
               <div className="flex items-center gap-2 mb-3">
-                <Link2 size={13} style={{ color: t.accent }} />
-                <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: t.sub }}>Links</span>
+                <Link2 size={14} style={{ color: t.sub }} />
+                <span className="text-[12px] font-semibold tracking-wide" style={{ color: t.sub }}>Links</span>
               </div>
               <div className="space-y-2">
                 {regularLinks.map((link, i) => {
                   const Icon = getIcon(link.icon);
                   return (
                     <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
-                      className="group flex items-center gap-3.5 w-full px-5 py-4 font-semibold text-[13.5px] transition-all duration-200 active:scale-[0.97]"
+                      className="group flex items-center gap-3.5 w-full px-4 py-3.5 font-medium text-[13px] active:scale-[0.98]"
                       style={{
                         ...buttonStyles(rd), color: t.text,
                         opacity: linkStagger[i] ? 1 : 0,
-                        transform: linkStagger[i] ? "translateY(0)" : "translateY(12px)",
-                        transition: "opacity 0.45s ease, transform 0.45s ease, box-shadow 0.2s, border-color 0.2s",
+                        transform: linkStagger[i] ? "translateY(0)" : "translateY(6px)",
+                        transition: "opacity 0.3s ease, transform 0.3s ease",
                       }}
                       onMouseEnter={e => onHoverIn(e.currentTarget as HTMLElement)}
                       onMouseLeave={e => onHoverOut(e.currentTarget as HTMLElement)}
@@ -1366,8 +1364,8 @@ const ProfilePage = () => {
           rel="noopener noreferrer"
           className="fixed bottom-[72px] right-4 z-50 flex items-center gap-2.5 px-4 py-2.5 rounded-full shadow-2xl transition-all duration-200 hover:scale-105 active:scale-95"
           style={{
-            background: "linear-gradient(135deg, #16a34a, #22c55e)",
-            boxShadow: "0 8px 32px rgba(34,197,94,0.4)",
+            background: "#22c55e",
+            boxShadow: "0 4px 16px rgba(34,197,94,0.25)",
             color: "#fff",
           }}
         >
@@ -1411,12 +1409,12 @@ const ProfilePage = () => {
       {!rd.hideWatermark && (
         <footer className="relative z-10 flex justify-center pb-6">
           <Link to="/"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full transition-all duration-200 hover:brightness-125"
-            style={{ background: t.card, border: `1px solid ${t.border}`, boxShadow: `0 4px 20px ${t.accent}10` }}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-full transition-opacity duration-150 hover:opacity-80"
+            style={{ background: t.card, border: `1px solid ${t.border}` }}
           >
-            <img src={logoSrc} alt="Maview" className="w-4 h-4 object-contain" />
-            <span className="text-[11px] font-semibold tracking-wide" style={{ color: t.sub }}>
-              Crie o seu em <span style={{ color: t.accent }}>maview.app</span>
+            <img src={logoSrc} alt="Maview" className="w-3.5 h-3.5 object-contain opacity-70" />
+            <span className="text-[10px] font-medium" style={{ color: t.sub }}>
+              maview.app
             </span>
           </Link>
         </footer>
