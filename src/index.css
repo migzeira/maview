@@ -145,3 +145,7 @@
   background-size: 200% 100%;
   animation: shimmer 3s ease-in-out infinite;
 }
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
