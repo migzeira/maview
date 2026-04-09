@@ -1163,20 +1163,37 @@ const DashboardPagina = () => {
     if (aiLoading) return;
     setAiLoading(true);
     setAiSuggestion(null);
-    try {
-      const { data, error } = await supabase.functions.invoke("maview-ai", {
-        body: {
-          message: `Crie uma bio profissional e atraente para um criador de conteúdo chamado "${config.displayName || "criador"}". Bio atual: "${config.bio || "(vazia)"}". Retorne APENAS a bio sugerida, máximo 120 caracteres, com emojis relevantes.`,
-          history: [],
-        },
-      });
-      if (error) throw error;
-      setAiSuggestion(data?.text?.trim() ?? null);
-    } catch {
-      setAiSuggestion("IA indisponível no momento. Tente novamente mais tarde.");
-    } finally {
-      setAiLoading(false);
+
+    // Smart local bio generator — professional templates based on user context
+    const name = config.displayName?.trim() || "Seu negócio";
+    const hasProducts = config.products?.length > 0;
+    const productNames = config.products?.slice(0, 3).map(p => p.title).filter(Boolean) || [];
+    const hasSocials = config.links?.some(l => l.isSocial && l.url);
+
+    const templates = [
+      `🚀 ${name} • Produtos selecionados com qualidade garantida. Confira e surpreenda-se!`,
+      `✨ ${name} | Os melhores produtos, entrega rápida para todo Brasil 🇧🇷`,
+      `🔥 ${name} — Curadoria premium. Qualidade + preço justo = satisfação total`,
+      `💎 ${name} • Sua loja de confiança. Parcele em até 12x sem juros!`,
+      `⚡ ${name} | Produtos originais com garantia. Entrega expressa 📦`,
+      `🏆 ${name} — Qualidade que você merece, preço que cabe no bolso`,
+      `🎯 ${name} • Novidades toda semana! Siga e fique por dentro 🛍️`,
+      `💼 ${name} | Referência em qualidade. Compre com segurança ✅`,
+    ];
+
+    if (hasProducts && productNames.length > 0) {
+      templates.push(
+        `🛒 ${name} • ${productNames[0]} e muito mais! Confira nossa vitrine`,
+        `📱 Especialista em ${productNames[0]}. Originais com garantia | ${name}`,
+      );
     }
+
+    // Pick a random template different from current bio
+    await new Promise(r => setTimeout(r, 600)); // Simulates brief loading
+    const filtered = templates.filter(t => t !== config.bio && t !== aiSuggestion);
+    const pick = filtered[Math.floor(Math.random() * filtered.length)] || templates[0];
+    setAiSuggestion(pick.slice(0, 120));
+    setAiLoading(false);
   };
 
   // ── Derived ───────────────────────────────────────────────────────────────
@@ -2494,216 +2511,226 @@ const DashboardPagina = () => {
 
             {/* ═══════════════ TAB: PERFIL ═══════════════ */}
             {activeTab === "perfil" && (
-              <div className="space-y-5">
+              <div className="space-y-5 pb-24">
 
-                {/* ── BLOCO 1: Preview visual ao vivo ── */}
-                <div className="rounded-2xl overflow-hidden border border-[hsl(var(--dash-border-subtle))]" style={{ background: currentTheme.bg }}>
-                  <div className="flex flex-col items-center py-6 px-4 relative">
-                    {/* Glow */}
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200px] h-[100px] rounded-full blur-[60px] opacity-30" style={{ background: currentTheme.accent }} />
+                {/* ── CARD 1: Identidade (foto + nome + username + link) ── */}
+                <div className="rounded-2xl border border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface-2))]/60 overflow-hidden shadow-sm">
+                  {/* Mini preview ao vivo */}
+                  <div className="relative flex items-center gap-4 p-5 pb-4" style={{ background: `linear-gradient(135deg, ${currentTheme.bg}, ${currentTheme.accent}15)` }}>
+                    <div className="absolute top-0 right-0 w-[140px] h-[70px] rounded-full blur-[50px] opacity-15" style={{ background: currentTheme.accent }} />
+                    <div className="absolute bottom-0 left-0 w-[80px] h-[40px] rounded-full blur-[30px] opacity-10" style={{ background: currentTheme.accent2 }} />
                     {/* Avatar */}
-                    <div className="relative mb-3 z-10">
-                      <div className="w-[72px] h-[72px] rounded-full overflow-hidden" style={{ border: `2.5px solid ${currentTheme.accent}60`, boxShadow: `0 0 0 4px ${currentTheme.accent}15` }}>
+                    <div className="relative flex-shrink-0 z-10">
+                      <div className="w-[72px] h-[72px] rounded-2xl overflow-hidden cursor-pointer group ring-2 ring-white/10 hover:ring-white/25 transition-all" style={{ boxShadow: `0 4px 20px ${currentTheme.accent}30` }}
+                        onClick={() => avatarFileInputRef.current?.click()}>
                         {config.avatarUrl
                           ? <img src={config.avatarUrl} alt="" className="w-full h-full object-cover" />
                           : <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-white" style={{ background: `linear-gradient(135deg, ${currentTheme.accent}, ${currentTheme.accent2})` }}>
                               {config.displayName?.[0]?.toUpperCase() || "?"}
                             </div>
                         }
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center rounded-2xl backdrop-blur-[2px]">
+                          <Image size={18} className="text-white drop-shadow-sm" />
+                        </div>
                       </div>
-                    </div>
-                    <p className="text-[16px] font-bold mb-0.5 z-10" style={{ color: currentTheme.accent === "#a855f7" ? "#f8f5ff" : "#f0f6ff" }}>
-                      {config.displayName || "Seu nome"}
-                    </p>
-                    <p className="text-[12px] font-medium mb-1 z-10" style={{ color: currentTheme.accent }}>
-                      @{config.username || "username"}
-                    </p>
-                    {config.bio && <p className="text-[11px] text-center max-w-[250px] z-10" style={{ color: "rgba(255,255,255,0.45)" }}>{config.bio}</p>}
-                  </div>
-                  <div className="flex items-center justify-center gap-3 py-2.5 border-t" style={{ borderColor: `${currentTheme.accent}15`, background: `${currentTheme.accent}08` }}>
-                    <p className="text-[10px] font-medium" style={{ color: "rgba(255,255,255,0.35)" }}>
-                      Tema: {currentTheme.label}
-                    </p>
-                    <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.15)" }}>·</span>
-                    <p className="text-[10px] font-medium" style={{ color: "rgba(255,255,255,0.35)" }}>
-                      É assim que seus clientes veem
-                    </p>
-                  </div>
-                </div>
-
-                {/* ── BLOCO 2: Foto de perfil ── */}
-                <div className="rounded-xl border border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface-2))]/50 p-4">
-                  <label className="text-[hsl(var(--dash-text-secondary))] text-xs font-semibold flex items-center gap-1.5 mb-3">
-                    <Image size={12} className="text-primary" /> Foto de perfil
-                  </label>
-                  <div className="flex items-center gap-4">
-                    <div className="flex-shrink-0">
-                      <div className="w-[64px] h-[64px] rounded-2xl overflow-hidden" style={{ boxShadow: `0 0 0 3px ${currentTheme.accent}30` }}>
-                        {config.avatarUrl
-                          ? <img src={config.avatarUrl} alt="" className="w-full h-full object-cover" />
-                          : <div className="w-full h-full flex items-center justify-center text-xl font-bold text-white" style={{ background: `linear-gradient(135deg, ${currentTheme.accent}, ${currentTheme.accent2})` }}>
-                              {config.displayName?.[0]?.toUpperCase() || "?"}
-                            </div>
-                        }
-                      </div>
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <div className="flex gap-2">
-                        <input type="file" accept="image/*" ref={avatarFileInputRef} className="hidden"
-                          onChange={e => {
-                            const file = e.target.files?.[0];
-                            if (!file) return;
-                            const reader = new FileReader();
-                            reader.onload = () => {
-                              const img = new window.Image();
-                              img.onload = () => {
-                                const canvas = document.createElement("canvas");
-                                const size = Math.min(img.width, img.height, 400);
-                                canvas.width = size; canvas.height = size;
-                                const ctx = canvas.getContext("2d")!;
-                                const sx = (img.width - size) / 2, sy = (img.height - size) / 2;
-                                ctx.drawImage(img, sx, sy, size, size, 0, 0, size, size);
-                                updateConfig("avatarUrl", canvas.toDataURL("image/jpeg", 0.82));
-                              };
-                              img.src = reader.result as string;
+                      <input type="file" accept="image/*" ref={avatarFileInputRef} className="hidden"
+                        onChange={e => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const reader = new FileReader();
+                          reader.onload = () => {
+                            const img = new window.Image();
+                            img.onload = () => {
+                              const canvas = document.createElement("canvas");
+                              const size = Math.min(img.width, img.height, 400);
+                              canvas.width = size; canvas.height = size;
+                              const ctx = canvas.getContext("2d")!;
+                              const sx = (img.width - size) / 2, sy = (img.height - size) / 2;
+                              ctx.drawImage(img, sx, sy, size, size, 0, 0, size, size);
+                              updateConfig("avatarUrl", canvas.toDataURL("image/jpeg", 0.82));
                             };
-                            reader.readAsDataURL(file);
-                            e.target.value = "";
-                          }} />
-                        <button onClick={() => avatarFileInputRef.current?.click()}
-                          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl btn-primary-gradient text-[11px] font-semibold transition-transform active:scale-95">
-                          <Image size={12} /> Enviar foto
+                            img.src = reader.result as string;
+                          };
+                          reader.readAsDataURL(file);
+                          e.target.value = "";
+                        }} />
+                    </div>
+                    {/* Name + username preview */}
+                    <div className="flex-1 min-w-0 z-10">
+                      <p className="text-[16px] font-bold truncate tracking-tight" style={{ color: "#f8f5ff" }}>
+                        {config.displayName || "Seu nome"}
+                      </p>
+                      <p className="text-[12px] font-semibold mt-0.5" style={{ color: currentTheme.accent }}>
+                        @{config.username || "username"}
+                      </p>
+                      {config.bio && <p className="text-[10px] mt-1 truncate leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>{config.bio}</p>}
+                    </div>
+                  </div>
+
+                  {/* Editable fields */}
+                  <div className="p-5 pt-4 space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className={labelCls}>Nome de exibição</label>
+                        <input type="text" className={inputCls} placeholder="Seu nome ou marca"
+                          value={config.displayName}
+                          onChange={e => updateConfig("displayName", e.target.value)} />
+                      </div>
+                      <div>
+                        <label className={labelCls}>Username</label>
+                        <div className="flex items-center">
+                          <span className="flex-shrink-0 rounded-l-xl border border-r-0 border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] text-sm px-3 py-2.5 select-none font-mono">@</span>
+                          <input type="text" className={`${inputCls} rounded-l-none`} placeholder="seunome"
+                            value={config.username}
+                            onChange={e => updateConfig("username", e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Link copiável */}
+                    {config.username && (
+                      <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/15">
+                        <Link2 size={12} className="text-primary flex-shrink-0" />
+                        <a href={`${window.location.origin}/${config.username.replace(/^@/, "")}`} target="_blank" rel="noopener noreferrer"
+                          className="text-[12px] font-mono text-primary hover:underline truncate font-medium">
+                          {window.location.host}/{config.username.replace(/^@/, "")}
+                        </a>
+                        <button onClick={copyLink} className="ml-auto flex-shrink-0 px-2.5 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary transition-all text-[10px] font-semibold flex items-center gap-1">
+                          {copied ? <><Check size={10} className="text-emerald-500" /> Copiado!</> : <><Copy size={10} /> Copiar</>}
                         </button>
-                        {config.avatarUrl && (
-                          <button onClick={() => updateConfig("avatarUrl", "")}
-                            className="flex items-center gap-1 px-3 py-2 rounded-xl border border-[hsl(var(--dash-border))] text-[11px] text-red-400 hover:bg-red-50 transition-all">
-                            <Trash2 size={11} /> Remover
-                          </button>
-                        )}
                       </div>
-                      <p className="text-[9px] text-[hsl(var(--dash-text-subtle))]">JPG, PNG, WebP · Quadrada · Comprimida auto</p>
-                    </div>
-                  </div>
-                  {/* URL toggle */}
-                  <details className="mt-3">
-                    <summary className="text-[10px] text-[hsl(var(--dash-text-subtle))] cursor-pointer hover:text-primary transition-colors">
-                      Ou cole uma URL de imagem
-                    </summary>
-                    <input type="url" className={`${inputCls} mt-2 text-[12px]`} placeholder="https://exemplo.com/foto.jpg"
-                      value={config.avatarUrl}
-                      onChange={e => updateConfig("avatarUrl", e.target.value)} />
-                  </details>
-                </div>
+                    )}
 
-                {/* ── BLOCO 3: Informações básicas ── */}
-                <div className="rounded-xl border border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface-2))]/50 p-4 space-y-4">
-                  <label className="text-[hsl(var(--dash-text-secondary))] text-xs font-semibold flex items-center gap-1.5">
-                    <User size={12} className="text-primary" /> Informações básicas
-                  </label>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className={labelCls}>Nome de exibição</label>
-                      <input type="text" className={inputCls} placeholder="Seu nome"
-                        value={config.displayName}
-                        onChange={e => updateConfig("displayName", e.target.value)} />
-                    </div>
-                    <div>
-                      <label className={labelCls}>Username</label>
-                      <div className="flex items-center">
-                        <span className="flex-shrink-0 rounded-l-xl border border-r-0 border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] text-sm px-3 py-2.5 select-none">@</span>
-                        <input type="text" className={`${inputCls} rounded-l-none`} placeholder="seunome"
-                          value={config.username}
-                          onChange={e => updateConfig("username", e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))} />
-                      </div>
-                    </div>
-                  </div>
-
-                  {config.username && (
-                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[hsl(var(--dash-accent))] border border-[hsl(var(--dash-border-subtle))]">
-                      <Link2 size={11} className="text-primary flex-shrink-0" />
-                      <a href={`${window.location.origin}/${config.username.replace(/^@/, "")}`} target="_blank" rel="noopener noreferrer"
-                        className="text-[11px] font-mono text-primary hover:underline truncate">
-                        {window.location.host}/{config.username.replace(/^@/, "")}
-                      </a>
-                      <button onClick={copyLink} className="ml-auto flex-shrink-0 text-[hsl(var(--dash-text-subtle))] hover:text-primary transition-colors">
-                        {copied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
+                    {/* Foto actions */}
+                    <div className="flex items-center gap-3 pt-1">
+                      <button onClick={() => avatarFileInputRef.current?.click()}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-semibold text-primary border border-primary/25 hover:bg-primary/5 hover:border-primary/40 transition-all">
+                        <Image size={12} /> {config.avatarUrl ? "Trocar foto" : "Enviar foto"}
                       </button>
+                      {config.avatarUrl && (
+                        <button onClick={() => updateConfig("avatarUrl", "")}
+                          className="text-[11px] text-[hsl(var(--dash-text-subtle))] hover:text-red-400 transition-colors font-medium">
+                          Remover
+                        </button>
+                      )}
+                      <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] ml-auto italic">Clique na foto para trocar</p>
                     </div>
-                  )}
+                  </div>
                 </div>
 
-                {/* ── BLOCO 4: Bio ── */}
-                <div className="rounded-xl border border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface-2))]/50 p-4 space-y-3">
+                {/* ── CARD 2: Bio ── */}
+                <div className="rounded-2xl border border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface-2))]/60 p-5 space-y-3 shadow-sm">
                   <div className="flex items-center justify-between">
                     <label className="text-[hsl(var(--dash-text-secondary))] text-xs font-semibold flex items-center gap-1.5">
                       <Pencil size={12} className="text-primary" /> Bio
                     </label>
-                    <span className={`text-[11px] font-medium ${config.bio.length > 110 ? "text-amber-500" : "text-[hsl(var(--dash-text-subtle))]"}`}>
+                    <span className={`text-[11px] font-mono font-medium px-2 py-0.5 rounded-md ${
+                      config.bio.length > 110
+                        ? "text-amber-500 bg-amber-500/10"
+                        : config.bio.length > 0
+                          ? "text-emerald-500 bg-emerald-500/10"
+                          : "text-[hsl(var(--dash-text-subtle))] bg-[hsl(var(--dash-accent))]"
+                    }`}>
                       {config.bio.length}/120
                     </span>
                   </div>
-                  <textarea className={`${inputCls} resize-none h-20`}
-                    placeholder="Fale sobre você em poucas palavras..."
+                  <textarea className={`${inputCls} resize-none h-[76px]`}
+                    placeholder="Ex: Loja oficial de iPhones | Entrega para todo Brasil | Parcele em 12x"
                     maxLength={120}
                     value={config.bio}
                     onChange={e => updateConfig("bio", e.target.value)} />
-                  <div className="flex items-center gap-2">
+
+                  <div className="flex items-center gap-3 flex-wrap">
                     <button onClick={suggestBio} disabled={aiLoading}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-fuchsia-500/10 to-violet-500/10 border border-fuchsia-300/30 text-fuchsia-600 text-[11px] font-medium hover:from-fuchsia-500/15 hover:to-violet-500/15 transition-all disabled:opacity-50">
-                      <Sparkles size={11} className={aiLoading ? "animate-spin" : ""} />
-                      {aiLoading ? "Gerando..." : "Sugerir com IA"}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-fuchsia-500/10 to-violet-500/10 border border-fuchsia-300/25 text-fuchsia-500 text-[11px] font-semibold hover:from-fuchsia-500/15 hover:to-violet-500/15 hover:border-fuchsia-300/40 transition-all disabled:opacity-50">
+                      <Sparkles size={12} className={aiLoading ? "animate-spin" : ""} />
+                      {aiLoading ? "Gerando..." : "Sugerir bio"}
                     </button>
-                    <p className="text-[hsl(var(--dash-text-subtle))] text-[10px]">
-                      Bios com emojis recebem mais cliques
+                    <p className="text-[hsl(var(--dash-text-subtle))] text-[10px] flex items-center gap-1">
+                      <TrendingUp size={9} /> Bios com emojis recebem mais cliques
                     </p>
                   </div>
+
                   {aiSuggestion && (
-                    <div className="rounded-xl border border-fuchsia-200/50 bg-gradient-to-r from-fuchsia-500/5 to-violet-500/5 p-3 space-y-2 animate-in slide-in-from-top-2 duration-200">
-                      <p className="text-fuchsia-600 text-[12px] font-semibold flex items-center gap-1"><Sparkles size={10} /> Sugestão da IA:</p>
-                      <p className="text-[hsl(var(--dash-text))] text-[13px]">{aiSuggestion}</p>
-                      <div className="flex gap-2">
+                    <div className="rounded-xl border border-fuchsia-300/30 bg-gradient-to-r from-fuchsia-500/5 to-violet-500/5 p-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
+                      <p className="text-fuchsia-500 text-[12px] font-bold flex items-center gap-1.5">
+                        <Sparkles size={11} /> Sugestão:
+                      </p>
+                      <p className="text-[hsl(var(--dash-text))] text-[13px] leading-relaxed bg-[hsl(var(--dash-surface))]/50 rounded-lg p-3 border border-[hsl(var(--dash-border-subtle))]">
+                        {aiSuggestion}
+                      </p>
+                      <div className="flex gap-2 pt-1">
                         <button onClick={() => { updateConfig("bio", aiSuggestion.slice(0, 120)); setAiSuggestion(null); }}
-                          className="text-[11px] px-3 py-1.5 rounded-lg btn-primary-gradient font-semibold">
-                          Aplicar
+                          className="text-[11px] px-4 py-2 rounded-xl btn-primary-gradient font-bold tracking-wide">Aplicar</button>
+                        <button onClick={suggestBio} disabled={aiLoading}
+                          className="text-[11px] px-4 py-2 rounded-xl border border-fuchsia-300/25 text-fuchsia-500 font-semibold hover:bg-fuchsia-500/5 transition-all">
+                          <Sparkles size={10} className="inline mr-1" />Outra
                         </button>
                         <button onClick={() => setAiSuggestion(null)}
-                          className="text-[11px] px-3 py-1.5 rounded-lg border border-[hsl(var(--dash-border))] text-[hsl(var(--dash-text-muted))] hover:bg-[hsl(var(--dash-surface-2))] transition-all">
-                          Descartar
-                        </button>
+                          className="text-[11px] px-3 py-2 rounded-xl text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))] transition-all ml-auto">Fechar</button>
                       </div>
                     </div>
                   )}
                 </div>
 
-                {/* ── BLOCO 5: Redes sociais ── */}
-                <div className="rounded-xl border border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface-2))]/50 p-4 space-y-3">
-                  <label className="text-[hsl(var(--dash-text-secondary))] text-xs font-semibold flex items-center gap-1.5">
-                    <Instagram size={12} className="text-pink-500" /> Redes sociais
-                  </label>
-                  <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] -mt-1">Aparecem como ícones no topo da sua vitrine</p>
+                {/* ── CARD 3: WhatsApp (contato principal) ── */}
+                <div className={`rounded-2xl border bg-[hsl(var(--dash-surface-2))]/60 p-5 space-y-3 shadow-sm transition-all duration-300 ${
+                  highlightField === "whatsapp"
+                    ? "border-emerald-400/50 shadow-[0_0_20px_rgba(34,197,94,0.12)]"
+                    : "border-[hsl(var(--dash-border-subtle))]"
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <label className="text-[hsl(var(--dash-text-secondary))] text-xs font-semibold flex items-center gap-1.5">
+                      <MessageCircle size={12} className="text-emerald-500" /> WhatsApp
+                      {highlightField === "whatsapp" && (
+                        <span className="ml-1 text-[10px] font-bold text-emerald-500 animate-pulse">essencial</span>
+                      )}
+                    </label>
+                    {config.whatsapp && (
+                      <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 bg-emerald-500/10 px-2.5 py-1 rounded-full">
+                        <CheckCircle2 size={10} /> Ativo
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center">
+                    <span className="flex-shrink-0 rounded-l-xl border border-r-0 border-[hsl(var(--dash-border))] bg-emerald-500/10 text-emerald-600 text-sm font-semibold px-3 py-2.5 select-none">+55</span>
+                    <input ref={whatsappInputRef} type="tel" className={`${inputCls} rounded-l-none`} placeholder="11999999999"
+                      value={config.whatsapp}
+                      onChange={e => updateConfig("whatsapp", e.target.value.replace(/\D/g, ""))} />
+                  </div>
+                  <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] leading-relaxed">
+                    {config.whatsapp
+                      ? <span className="text-emerald-600 font-medium flex items-center gap-1"><Zap size={10} /> Botão flutuante ativo na sua vitrine — clientes entram em contato direto</span>
+                      : <span className="flex items-center gap-1"><AlertCircle size={10} className="text-amber-500" /> Adicione para exibir botão flutuante na vitrine — 73% dos clientes preferem WhatsApp</span>
+                    }
+                  </p>
+                </div>
 
-                  {([
-                    { icon: <Instagram size={14} className="text-pink-500" />, placeholder: "@seuinstagram", label: "Instagram", key: "instagram", baseUrl: "instagram.com/", color: "" },
-                    { icon: <Youtube size={14} className="text-red-500" />, placeholder: "@seucanal", label: "YouTube", key: "youtube", baseUrl: "youtube.com/@", color: "" },
-                    { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z"/></svg>, placeholder: "@seutiktok", label: "TikTok", key: "tiktok", baseUrl: "tiktok.com/@", color: "text-[hsl(var(--dash-text))]" },
-                    { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>, placeholder: "@seuX", label: "X (Twitter)", key: "twitter", baseUrl: "x.com/", color: "text-[hsl(var(--dash-text))]" },
-                    { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.11 13.11 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.031-.03z"/></svg>, placeholder: "seudiscord", label: "Discord", key: "discord", baseUrl: "discord.gg/", color: "text-[#5865F2]" },
-                    { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.341-3.369-1.341-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.337-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>, placeholder: "seugithub", label: "GitHub", key: "github", baseUrl: "github.com/", color: "text-[hsl(var(--dash-text))]" },
-                    { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>, placeholder: "@seutwitch", label: "Twitch", key: "twitch", baseUrl: "twitch.tv/", color: "text-[#9146FF]" },
-                    { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295l.213-3.054 5.56-5.023c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.828.941z"/></svg>, placeholder: "@seutelegram", label: "Telegram", key: "telegram", baseUrl: "t.me/", color: "text-[#26A5E4]" },
-                    { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>, placeholder: "seufacebook", label: "Facebook", key: "facebook", baseUrl: "facebook.com/", color: "text-[#1877F2]" },
-                    { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>, placeholder: "seulinkedin", label: "LinkedIn", key: "linkedin", baseUrl: "linkedin.com/in/", color: "text-[#0A66C2]" },
-                    { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.237 2.636 7.855 6.356 9.312-.088-.791-.167-2.005.035-2.868.181-.78 1.172-4.97 1.172-4.97s-.299-.598-.299-1.482c0-1.388.806-2.425 1.808-2.425.853 0 1.265.64 1.265 1.408 0 .858-.546 2.14-.828 3.33-.236.995.5 1.807 1.48 1.807 1.778 0 3.144-1.874 3.144-4.58 0-2.393-1.72-4.068-4.177-4.068-2.845 0-4.515 2.135-4.515 4.34 0 .859.331 1.781.745 2.281a.3.3 0 0 1 .069.288l-.278 1.133c-.044.183-.145.222-.335.134-1.249-.581-2.03-2.407-2.03-3.874 0-3.154 2.292-6.052 6.608-6.052 3.469 0 6.165 2.473 6.165 5.776 0 3.447-2.173 6.22-5.19 6.22-1.013 0-1.965-.525-2.291-1.148l-.623 2.378c-.226.869-.835 1.958-1.244 2.621.937.29 1.931.446 2.962.446 5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>, placeholder: "seupinterest", label: "Pinterest", key: "pinterest", baseUrl: "pinterest.com/", color: "text-[#E60023]" },
-                    { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.59 12c.025 3.086.718 5.496 2.057 7.164 1.432 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.282-1.592-1.663a8.928 8.928 0 0 1-.108 2.661c-.27 1.28-.862 2.287-1.768 2.992-.89.693-2.04 1.046-3.419 1.046h-.036c-1.66-.014-3.015-.68-3.918-1.928l1.673-1.14c.603.886 1.494 1.07 2.253 1.07h.021c.924-.006 1.633-.301 2.106-.878.367-.448.603-1.065.698-1.834-1.024.187-2.07.204-3.063.034-2.828-.483-4.392-2.334-4.267-5.065.077-1.674.764-3.104 1.934-4.026 1.078-.85 2.467-1.296 4.02-1.293 1.665.01 3.003.591 3.974 1.73.878 1.027 1.37 2.455 1.462 4.243 1.076.525 1.899 1.318 2.397 2.335.716 1.46.829 3.9-.955 5.67-1.836 1.822-4.106 2.632-7.343 2.654z"/></svg>, placeholder: "@seuthreads", label: "Threads", key: "threads", baseUrl: "threads.net/@", color: "text-[hsl(var(--dash-text))]" },
-                    { icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.37.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>, placeholder: "@seukwai", label: "Kwai", key: "kwai", baseUrl: "kwai.com/@", color: "text-[#FF4906]" },
-                    { icon: <Globe size={14} className="text-[hsl(var(--dash-text-muted))]" />, placeholder: "https://seusite.com", label: "Site / Blog", key: "website", baseUrl: "", color: "" },
-                  ]).map(social => {
+                {/* ── CARD 4: Redes sociais (top 5 + expandir) ── */}
+                {(() => {
+                  const ALL_SOCIALS = [
+                    { icon: <Instagram size={15} className="text-pink-500" />, placeholder: "@seuinstagram", label: "Instagram", key: "instagram", baseUrl: "instagram.com/", color: "", primary: true },
+                    { icon: <Youtube size={15} className="text-red-500" />, placeholder: "@seucanal", label: "YouTube", key: "youtube", baseUrl: "youtube.com/@", color: "", primary: true },
+                    { icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z"/></svg>, placeholder: "@seutiktok", label: "TikTok", key: "tiktok", baseUrl: "tiktok.com/@", color: "text-[hsl(var(--dash-text))]", primary: true },
+                    { icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>, placeholder: "seufacebook", label: "Facebook", key: "facebook", baseUrl: "facebook.com/", color: "text-[#1877F2]", primary: true },
+                    { icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>, placeholder: "@seuX", label: "X (Twitter)", key: "twitter", baseUrl: "x.com/", color: "text-[hsl(var(--dash-text))]", primary: true },
+                    { icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.59 12c.025 3.086.718 5.496 2.057 7.164 1.432 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.282-1.592-1.663a8.928 8.928 0 0 1-.108 2.661c-.27 1.28-.862 2.287-1.768 2.992-.89.693-2.04 1.046-3.419 1.046h-.036c-1.66-.014-3.015-.68-3.918-1.928l1.673-1.14c.603.886 1.494 1.07 2.253 1.07h.021c.924-.006 1.633-.301 2.106-.878.367-.448.603-1.065.698-1.834-1.024.187-2.07.204-3.063.034-2.828-.483-4.392-2.334-4.267-5.065.077-1.674.764-3.104 1.934-4.026 1.078-.85 2.467-1.296 4.02-1.293 1.665.01 3.003.591 3.974 1.73.878 1.027 1.37 2.455 1.462 4.243 1.076.525 1.899 1.318 2.397 2.335.716 1.46.829 3.9-.955 5.67-1.836 1.822-4.106 2.632-7.343 2.654z"/></svg>, placeholder: "@seuthreads", label: "Threads", key: "threads", baseUrl: "threads.net/@", color: "text-[hsl(var(--dash-text))]", primary: false },
+                    { icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>, placeholder: "seulinkedin", label: "LinkedIn", key: "linkedin", baseUrl: "linkedin.com/in/", color: "text-[#0A66C2]", primary: false },
+                    { icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295l.213-3.054 5.56-5.023c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.828.941z"/></svg>, placeholder: "@seutelegram", label: "Telegram", key: "telegram", baseUrl: "t.me/", color: "text-[#26A5E4]", primary: false },
+                    { icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.11 13.11 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.12-.098.246-.198.373-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.031-.03z"/></svg>, placeholder: "seudiscord", label: "Discord", key: "discord", baseUrl: "discord.gg/", color: "text-[#5865F2]", primary: false },
+                    { icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.237 2.636 7.855 6.356 9.312-.088-.791-.167-2.005.035-2.868.181-.78 1.172-4.97 1.172-4.97s-.299-.598-.299-1.482c0-1.388.806-2.425 1.808-2.425.853 0 1.265.64 1.265 1.408 0 .858-.546 2.14-.828 3.33-.236.995.5 1.807 1.48 1.807 1.778 0 3.144-1.874 3.144-4.58 0-2.393-1.72-4.068-4.177-4.068-2.845 0-4.515 2.135-4.515 4.34 0 .859.331 1.781.745 2.281a.3.3 0 0 1 .069.288l-.278 1.133c-.044.183-.145.222-.335.134-1.249-.581-2.03-2.407-2.03-3.874 0-3.154 2.292-6.052 6.608-6.052 3.469 0 6.165 2.473 6.165 5.776 0 3.447-2.173 6.22-5.19 6.22-1.013 0-1.965-.525-2.291-1.148l-.623 2.378c-.226.869-.835 1.958-1.244 2.621.937.29 1.931.446 2.962.446 5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>, placeholder: "seupinterest", label: "Pinterest", key: "pinterest", baseUrl: "pinterest.com/", color: "text-[#E60023]", primary: false },
+                    { icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>, placeholder: "@seutwitch", label: "Twitch", key: "twitch", baseUrl: "twitch.tv/", color: "text-[#9146FF]", primary: false },
+                    { icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.341-3.369-1.341-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.337-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>, placeholder: "seugithub", label: "GitHub", key: "github", baseUrl: "github.com/", color: "text-[hsl(var(--dash-text))]", primary: false },
+                    { icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.37.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>, placeholder: "@seukwai", label: "Kwai", key: "kwai", baseUrl: "kwai.com/@", color: "text-[#FF4906]", primary: false },
+                    { icon: <Globe size={15} className="text-[hsl(var(--dash-text-muted))]" />, placeholder: "https://seusite.com", label: "Site / Blog", key: "website", baseUrl: "", color: "", primary: false },
+                  ];
+                  const filledCount = ALL_SOCIALS.filter(s => config.links.some(l => l.icon === s.key && l.isSocial)).length;
+                  const renderSocialRow = (social: typeof ALL_SOCIALS[0]) => {
                     const existing = config.links.find(l => l.icon === social.key && l.isSocial);
                     const val = existing?.url || existing?.title || "";
                     return (
-                      <div key={social.key} className="flex items-center gap-2.5">
-                        <div className={`w-8 h-8 rounded-lg bg-[hsl(var(--dash-accent))] flex items-center justify-center flex-shrink-0 ${social.color}`}>
+                      <div key={social.key} className="flex items-center gap-3 group/row">
+                        <div className={`w-9 h-9 rounded-xl bg-[hsl(var(--dash-accent))] flex items-center justify-center flex-shrink-0 ${social.color} group-hover/row:scale-105 transition-transform`}>
                           {social.icon}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -2731,65 +2758,85 @@ const DashboardPagina = () => {
                         {val && <Check size={14} className="text-emerald-500 flex-shrink-0" />}
                       </div>
                     );
-                  })}
-                </div>
-
-                {/* ── BLOCO 6: WhatsApp ── */}
-                <div className={`rounded-xl border bg-[hsl(var(--dash-surface-2))]/50 p-4 space-y-3 transition-all duration-300 ${
-                  highlightField === "whatsapp"
-                    ? "border-emerald-400/50 shadow-[0_0_18px_rgba(34,197,94,0.3)]"
-                    : "border-[hsl(var(--dash-border-subtle))]"
-                }`}>
-                  <label className="text-[hsl(var(--dash-text-secondary))] text-xs font-semibold flex items-center gap-1.5">
-                    <MessageCircle size={12} className="text-emerald-500" /> WhatsApp
-                    <span className="text-[hsl(var(--dash-text-subtle))] font-normal text-[10px]">opcional</span>
-                    {highlightField === "whatsapp" && (
-                      <span className="ml-1 text-[10px] font-bold text-primary animate-bounce">← adicione</span>
-                    )}
-                  </label>
-                  <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] -mt-1">Botão flutuante de WhatsApp na sua vitrine — essencial no Brasil</p>
-                  <div className="flex items-center">
-                    <span className="flex-shrink-0 rounded-l-xl border border-r-0 border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] text-sm px-3 py-2.5 select-none">+55</span>
-                    <input ref={whatsappInputRef} type="tel" className={`${inputCls} rounded-l-none`} placeholder="11999999999"
-                      value={config.whatsapp}
-                      onChange={e => updateConfig("whatsapp", e.target.value.replace(/\D/g, ""))} />
-                  </div>
-                  {config.whatsapp ? (
-                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/8 border border-emerald-500/15">
-                      <MessageCircle size={11} className="text-emerald-500" />
-                      <span className="text-[11px] text-emerald-600 font-medium">wa.me/55{config.whatsapp}</span>
-                      <Check size={11} className="text-emerald-500 ml-auto" />
-                    </div>
-                  ) : (
-                    <p className="text-[hsl(var(--dash-text-subtle))] text-[10px]">Com DDD. Ex: 11999999999</p>
-                  )}
-                </div>
-
-                {/* ── BLOCO 7: SEO & Compartilhamento ── */}
-                <details className="rounded-xl border border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface-2))]/50 overflow-hidden">
-                  <summary className="flex items-center gap-1.5 p-4 cursor-pointer text-[hsl(var(--dash-text-secondary))] text-xs font-semibold hover:text-primary transition-colors">
-                    <TrendingUp size={12} className="text-amber-500" /> SEO & Compartilhamento
-                    <span className="text-[hsl(var(--dash-text-subtle))] font-normal text-[10px] ml-1">avançado</span>
-                    <ChevronDown size={12} className="ml-auto text-[hsl(var(--dash-text-subtle))]" />
-                  </summary>
-                  <div className="px-4 pb-4 space-y-3 border-t border-[hsl(var(--dash-border-subtle))]">
-                    <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] pt-3">Como seu link aparece quando compartilhado no WhatsApp, Instagram, etc.</p>
-                    {/* Preview card */}
-                    <div className="rounded-lg border border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-surface))] p-3 flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-[hsl(var(--dash-accent))] flex items-center justify-center flex-shrink-0 text-primary text-sm font-bold">
-                        {config.displayName?.[0] || "M"}
+                  };
+                  return (
+                    <div className="rounded-2xl border border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface-2))]/60 p-5 space-y-4 shadow-sm">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[hsl(var(--dash-text-secondary))] text-xs font-semibold flex items-center gap-1.5">
+                          <Globe size={12} className="text-primary" /> Redes sociais
+                        </label>
+                        {filledCount > 0 && (
+                          <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-500/10 px-2.5 py-1 rounded-full flex items-center gap-1">
+                            <CheckCircle2 size={9} /> {filledCount} conectada{filledCount > 1 ? "s" : ""}
+                          </span>
+                        )}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[12px] font-semibold text-[hsl(var(--dash-text))] truncate">{config.displayName || "Seu Nome"} | Maview</p>
-                        <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] truncate">{config.bio || "Confira minha vitrine digital"}</p>
-                        <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] mt-0.5 font-mono">{window.location.host}/{config.username || "username"}</p>
+                      <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] -mt-2 leading-relaxed flex items-center gap-1">
+                        <Zap size={9} className="text-amber-500" /> Aparecem como ícones no topo da sua vitrine
+                      </p>
+
+                      {/* Top 5 always visible */}
+                      <div className="space-y-3">
+                        {ALL_SOCIALS.filter(s => s.primary).map(renderSocialRow)}
                       </div>
+
+                      {/* Expandable: more networks */}
+                      <details className="group">
+                        <summary className="flex items-center gap-2 cursor-pointer text-[11px] text-primary font-semibold hover:text-primary/80 transition-colors pt-1 pb-1">
+                          <Plus size={12} className="group-open:rotate-45 transition-transform" /> Mais redes
+                          <span className="text-[hsl(var(--dash-text-subtle))] font-normal text-[10px]">
+                            — Threads, LinkedIn, Telegram, Discord...
+                          </span>
+                          <ChevronDown size={11} className="ml-auto group-open:rotate-180 transition-transform text-[hsl(var(--dash-text-subtle))]" />
+                        </summary>
+                        <div className="space-y-3 pt-3 mt-2 border-t border-[hsl(var(--dash-border-subtle))]">
+                          {ALL_SOCIALS.filter(s => !s.primary).map(renderSocialRow)}
+                        </div>
+                      </details>
                     </div>
-                    <p className="text-[9px] text-[hsl(var(--dash-text-subtle))]">
-                      O título e descrição são gerados automaticamente a partir do seu nome e bio.
+                  );
+                })()}
+
+                {/* ── CARD 5: Preview de compartilhamento (SEO) ── */}
+                <div className="rounded-2xl border border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface-2))]/60 overflow-hidden shadow-sm">
+                  <div className="p-5 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[hsl(var(--dash-text-secondary))] text-xs font-semibold flex items-center gap-1.5">
+                        <Eye size={12} className="text-amber-500" /> Preview de compartilhamento
+                      </label>
+                      <span className="text-[9px] font-medium text-[hsl(var(--dash-text-subtle))] bg-[hsl(var(--dash-accent))] px-2 py-0.5 rounded-full">SEO</span>
+                    </div>
+                    <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] leading-relaxed -mt-2">
+                      Este card mostra como seu link aparece quando alguem compartilha no <strong className="text-[hsl(var(--dash-text-muted))]">WhatsApp</strong>, <strong className="text-[hsl(var(--dash-text-muted))]">Instagram</strong>, <strong className="text-[hsl(var(--dash-text-muted))]">Facebook</strong> e outras redes. Preencha nome e bio para um resultado profissional.
                     </p>
+
+                    {/* Preview card simulando WhatsApp/redes */}
+                    <div className="rounded-xl border border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-surface))] overflow-hidden">
+                      <div className="p-3.5 flex items-start gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-[hsl(var(--dash-accent))] flex items-center justify-center flex-shrink-0 overflow-hidden ring-1 ring-[hsl(var(--dash-border-subtle))]">
+                          {config.avatarUrl
+                            ? <img src={config.avatarUrl} alt="" className="w-full h-full object-cover" />
+                            : <span className="text-primary text-base font-bold">{config.displayName?.[0] || "M"}</span>
+                          }
+                        </div>
+                        <div className="flex-1 min-w-0 space-y-0.5">
+                          <p className="text-[13px] font-bold text-[hsl(var(--dash-text))] truncate">{config.displayName || "Seu Nome"} | Maview</p>
+                          <p className="text-[11px] text-[hsl(var(--dash-text-muted))] truncate leading-relaxed">{config.bio || "Confira minha vitrine digital"}</p>
+                          <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mt-1 font-mono flex items-center gap-1">
+                            <Link2 size={9} /> {window.location.host}/{config.username || "username"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 px-1">
+                      <AlertCircle size={10} className="text-amber-500/70 flex-shrink-0" />
+                      <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] leading-relaxed">
+                        Gerado automaticamente do seu nome e bio. Quanto mais completo, mais profissional o resultado.
+                      </p>
+                    </div>
                   </div>
-                </details>
+                </div>
 
               </div>
             )}
