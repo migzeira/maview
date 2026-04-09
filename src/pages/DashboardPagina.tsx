@@ -9,10 +9,62 @@ import {
   Play, Smile, Search,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import DesignTab from "@/components/DesignTab";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-type ThemeId = "dark-purple" | "midnight" | "forest" | "rose" | "amber" | "ocean";
+type ThemeId = "dark-purple" | "midnight" | "forest" | "rose" | "amber" | "ocean"
+  | "neon-pink" | "sunset" | "lavender" | "emerald" | "crimson" | "arctic"
+  | "gold" | "sage" | "coral" | "indigo" | "slate" | "wine"
+  | "custom";
+
+type BgType = "solid" | "gradient" | "image" | "video" | "pattern";
+type GradientDir = "to-b" | "to-t" | "to-r" | "to-l" | "to-br" | "to-bl" | "to-tr" | "to-tl" | "radial";
+type ButtonShape = "rounded" | "pill" | "square" | "soft";
+type ButtonFill = "solid" | "outline" | "glass" | "ghost";
+type ButtonShadow = "none" | "sm" | "md" | "glow";
+type ProfileShape = "circle" | "rounded" | "square" | "hexagon";
+type FontFamily = string;
+
+interface DesignConfig {
+  // Background
+  bgType: BgType;
+  bgColor: string;
+  bgGradient: [string, string];
+  bgGradientDir: GradientDir;
+  bgImageUrl: string;
+  bgVideoUrl: string;
+  bgPattern: string;
+  bgOverlay: number;       // 0-100 overlay darkness
+  bgBlur: number;          // 0-20 px blur
+
+  // Colors
+  textColor: string;
+  subtextColor: string;
+  cardBg: string;
+  cardBorder: string;
+  accentColor: string;
+  accentColor2: string;
+
+  // Fonts
+  fontHeading: FontFamily;
+  fontBody: FontFamily;
+
+  // Buttons
+  buttonShape: ButtonShape;
+  buttonFill: ButtonFill;
+  buttonShadow: ButtonShadow;
+  buttonRadius: number;    // 0-24 px
+
+  // Profile photo
+  profileShape: ProfileShape;
+  profileBorder: boolean;
+  profileBorderColor: string;
+  profileSize: number;     // 64-120 px
+
+  // Effects
+  hideWatermark: boolean;
+}
 
 interface ProductItem {
   id: string;
@@ -79,6 +131,7 @@ interface VitrineConfig {
   avatarUrl: string;
   whatsapp: string;
   theme: ThemeId;
+  design?: Partial<DesignConfig>;
   products: ProductItem[];
   links: LinkItem[];
   testimonials: TestimonialItem[];
@@ -89,12 +142,82 @@ interface VitrineConfig {
 // ── Theme definitions ──────────────────────────────────────────────────────
 
 const THEMES: { id: ThemeId; label: string; bg: string; accent: string; accent2: string }[] = [
+  // ── Classic dark ──
   { id: "dark-purple", label: "Roxo Escuro",  bg: "#080612", accent: "#a855f7", accent2: "#ec4899" },
   { id: "midnight",    label: "Meia Noite",   bg: "#05080f", accent: "#60a5fa", accent2: "#818cf8" },
   { id: "forest",      label: "Floresta",     bg: "#050f05", accent: "#4ade80", accent2: "#34d399" },
   { id: "rose",        label: "Rosa",         bg: "#100509", accent: "#f43f5e", accent2: "#fb7185" },
   { id: "amber",       label: "Âmbar",        bg: "#0f0a00", accent: "#f59e0b", accent2: "#fcd34d" },
   { id: "ocean",       label: "Oceano",       bg: "#020c14", accent: "#06b6d4", accent2: "#22d3ee" },
+  // ── Vibrant ──
+  { id: "neon-pink",   label: "Neon Pink",    bg: "#0a0010", accent: "#ff2d95", accent2: "#ff6ec7" },
+  { id: "sunset",      label: "Pôr do Sol",   bg: "#0f0805", accent: "#f97316", accent2: "#ef4444" },
+  { id: "lavender",    label: "Lavanda",      bg: "#0c0a14", accent: "#c084fc", accent2: "#a78bfa" },
+  { id: "emerald",     label: "Esmeralda",    bg: "#021a0f", accent: "#10b981", accent2: "#6ee7b7" },
+  { id: "crimson",     label: "Carmesim",     bg: "#120508", accent: "#dc2626", accent2: "#f87171" },
+  { id: "arctic",      label: "Ártico",       bg: "#050a10", accent: "#38bdf8", accent2: "#7dd3fc" },
+  // ── Premium ──
+  { id: "gold",        label: "Ouro",         bg: "#0c0a04", accent: "#eab308", accent2: "#d97706" },
+  { id: "sage",        label: "Sálvia",       bg: "#080c08", accent: "#84cc16", accent2: "#a3e635" },
+  { id: "coral",       label: "Coral",        bg: "#0f0808", accent: "#fb923c", accent2: "#f472b6" },
+  { id: "indigo",      label: "Índigo",       bg: "#06050f", accent: "#6366f1", accent2: "#a78bfa" },
+  { id: "slate",       label: "Grafite",      bg: "#0c0e12", accent: "#94a3b8", accent2: "#cbd5e1" },
+  { id: "wine",        label: "Vinho",        bg: "#100408", accent: "#be185d", accent2: "#e11d48" },
+  // ── Custom (user-defined colors) ──
+  { id: "custom",      label: "Personalizado", bg: "#080612", accent: "#a855f7", accent2: "#ec4899" },
+];
+
+const DEFAULT_DESIGN: DesignConfig = {
+  bgType: "solid", bgColor: "", bgGradient: ["#080612", "#1a0a2e"],
+  bgGradientDir: "to-b", bgImageUrl: "", bgVideoUrl: "",
+  bgPattern: "", bgOverlay: 40, bgBlur: 0,
+  textColor: "", subtextColor: "", cardBg: "", cardBorder: "",
+  accentColor: "", accentColor2: "",
+  fontHeading: "Inter", fontBody: "Inter",
+  buttonShape: "rounded", buttonFill: "solid", buttonShadow: "none", buttonRadius: 12,
+  profileShape: "circle", profileBorder: true, profileBorderColor: "", profileSize: 88,
+  hideWatermark: false,
+};
+
+const BG_PATTERNS: { id: string; label: string; svg: string }[] = [
+  { id: "dots", label: "Pontos", svg: `<svg width="20" height="20"><circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.06)"/></svg>` },
+  { id: "grid", label: "Grade", svg: `<svg width="40" height="40"><path d="M0 0h40v40" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/></svg>` },
+  { id: "diagonal", label: "Diagonal", svg: `<svg width="16" height="16"><path d="M0 16L16 0" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></svg>` },
+  { id: "waves", label: "Ondas", svg: `<svg width="100" height="20"><path d="M0 10 Q25 0 50 10 Q75 20 100 10" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5"/></svg>` },
+  { id: "cross", label: "Cruz", svg: `<svg width="24" height="24"><path d="M12 0v24M0 12h24" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/></svg>` },
+  { id: "hexagon", label: "Hexágono", svg: `<svg width="28" height="49"><path d="M14 0L28 12.25L28 36.75L14 49L0 36.75L0 12.25Z" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/></svg>` },
+  { id: "noise", label: "Textura", svg: "" },
+];
+
+const GOOGLE_FONTS = [
+  // Sans-serif
+  { name: "Inter", category: "sans" },
+  { name: "Poppins", category: "sans" },
+  { name: "Montserrat", category: "sans" },
+  { name: "Outfit", category: "sans" },
+  { name: "DM Sans", category: "sans" },
+  { name: "Space Grotesk", category: "sans" },
+  { name: "Nunito", category: "sans" },
+  { name: "Rubik", category: "sans" },
+  { name: "Manrope", category: "sans" },
+  { name: "Plus Jakarta Sans", category: "sans" },
+  { name: "Urbanist", category: "sans" },
+  { name: "Sora", category: "sans" },
+  // Serif
+  { name: "Playfair Display", category: "serif" },
+  { name: "Lora", category: "serif" },
+  { name: "Merriweather", category: "serif" },
+  { name: "DM Serif Display", category: "serif" },
+  { name: "Cormorant Garamond", category: "serif" },
+  // Display
+  { name: "Bebas Neue", category: "display" },
+  { name: "Righteous", category: "display" },
+  { name: "Pacifico", category: "handwriting" },
+  { name: "Satisfy", category: "handwriting" },
+  { name: "Dancing Script", category: "handwriting" },
+  // Mono
+  { name: "JetBrains Mono", category: "mono" },
+  { name: "Fira Code", category: "mono" },
 ];
 
 const DEFAULT_CONFIG: VitrineConfig = {
@@ -2843,78 +2966,14 @@ const DashboardPagina = () => {
 
             {/* ═══════════════ TAB: DESIGN ═══════════════ */}
             {activeTab === "design" && (
-              <div className="space-y-5">
-                <h2 className="text-[hsl(var(--dash-text))] font-semibold text-base">Visual da Vitrine</h2>
-
-                {/* Theme selector grid */}
-                <div>
-                  <label className={labelCls}>
-                    Tema
-                    {highlightField === "theme" && (
-                      <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-bold text-primary animate-bounce">
-                        ← escolha um tema
-                      </span>
-                    )}
-                  </label>
-                  <div ref={themeGridRef} className={`grid grid-cols-3 gap-2 rounded-xl transition-all duration-300 ${
-                    highlightField === "theme" ? "ring-2 ring-primary p-1 shadow-[0_0_18px_rgba(139,92,246,0.45)]" : ""
-                  }`}>
-                    {THEMES.map(theme => {
-                      const isActive = config.theme === theme.id;
-                      return (
-                        <button
-                          key={theme.id}
-                          onClick={() => updateConfig("theme", theme.id)}
-                          className={`relative rounded-xl overflow-hidden border-2 transition-all ${
-                            isActive ? "border-primary shadow-lg scale-[1.02]" : "border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 hover:scale-[1.01]"
-                          }`}
-                        >
-                          {/* Mini theme preview */}
-                          <div className="h-[80px] p-3 flex flex-col items-center justify-center gap-1.5"
-                            style={{ background: `linear-gradient(160deg, ${theme.bg} 60%, ${theme.accent}20)` }}>
-                            <div className="w-6 h-6 rounded-full" style={{ background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` }} />
-                            <div className="w-14 h-1.5 rounded" style={{ background: theme.accent + "30" }} />
-                            <div className="w-10 h-1 rounded" style={{ background: theme.accent + "20" }} />
-                          </div>
-                          <div className={`px-2 py-1.5 text-center ${isActive ? "bg-primary/10" : "bg-[hsl(var(--dash-surface-2))]"}`}>
-                            <p className={`text-[10px] font-medium ${isActive ? "text-primary" : "text-[hsl(var(--dash-text-secondary))]"}`}>
-                              {theme.label}
-                            </p>
-                          </div>
-                          {isActive && (
-                            <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                              <Check size={10} className="text-white" />
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Color swatches */}
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))]">
-                  <div className="flex gap-1.5">
-                    {[currentTheme.bg, currentTheme.accent, currentTheme.accent2].map((c, i) => (
-                      <div key={i} className="w-6 h-6 rounded-full ring-1 ring-white/10" style={{ background: c }} />
-                    ))}
-                  </div>
-                  <div>
-                    <p className="text-[hsl(var(--dash-text))] text-xs font-medium">Tema: {currentTheme.label}</p>
-                    <p className="text-[hsl(var(--dash-text-subtle))] text-[10px]">3 cores aplicadas</p>
-                  </div>
-                </div>
-
-                {/* Advanced design CTA */}
-                <button onClick={() => navigate("/dashboard/aparencia")}
-                  className="w-full btn-primary-gradient text-sm font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-[0.98]">
-                  <Palette size={16} /> Personalizar Fontes, Layout e Mais
-                  <ArrowRight size={14} />
-                </button>
-                <p className="text-center text-[hsl(var(--dash-text-subtle))] text-[10px]">
-                  Cores, fontes, layout, dark mode e mais opções avançadas
-                </p>
-              </div>
+              <DesignTab
+                config={config}
+                themes={THEMES}
+                defaultDesign={DEFAULT_DESIGN}
+                updateConfig={updateConfig}
+                highlightField={highlightField}
+                themeGridRef={themeGridRef}
+              />
             )}
 
             {/* Auto-save toast */}
