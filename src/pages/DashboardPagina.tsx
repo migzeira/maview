@@ -701,6 +701,7 @@ const DashboardPagina = () => {
   const [activeEmojiCat, setActiveEmojiCat] = useState(0);
   const productImageInputRef = useRef<HTMLInputElement>(null);
   const productVideoInputRef = useRef<HTMLInputElement>(null);
+  const productGifInputRef = useRef<HTMLInputElement>(null);
   const [videoError, setVideoError] = useState<string | null>(null);
 
   // ── Load ──────────────────────────────────────────────────────────────────
@@ -911,6 +912,26 @@ const DashboardPagina = () => {
       setVideoError("Formato de vídeo não suportado.");
     };
     videoEl.src = url;
+    e.target.value = "";
+  };
+
+  // ── GIF upload (no compression — preserves animation) ─────────────────────
+
+  const handleProductGifUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setVideoError("GIF muito grande (máx 5MB). Tente um GIF menor.");
+      e.target.value = "";
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const dataUrl = ev.target?.result as string;
+      setProductForm(f => f ? { ...f, images: [...(f.images || []), dataUrl] } : f);
+      setVideoError(null);
+    };
+    reader.readAsDataURL(file);
     e.target.value = "";
   };
 
@@ -1584,76 +1605,92 @@ const DashboardPagina = () => {
                       </div>
                     )}
 
-                    {/* ═══ MEDIA: photos + video ═══ */}
-                    <input ref={productImageInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleProductImageUpload} />
+                    {/* ═══ MEDIA: photos + video + gif ═══ */}
+                    <input ref={productImageInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={handleProductImageUpload} />
                     <input ref={productVideoInputRef} type="file" accept="video/*" className="hidden" onChange={handleProductVideoUpload} />
+                    <input ref={productGifInputRef} type="file" accept="image/gif" className="hidden" onChange={handleProductGifUpload} />
 
-                    <div>
-                      <label className={labelCls}>Mídia <span className="text-[hsl(var(--dash-text-subtle))] font-normal">fotos e vídeo</span></label>
+                    <div className="rounded-xl border border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface-2))]/50 p-3.5">
+                      <div className="flex items-center justify-between mb-3">
+                        <label className="text-[hsl(var(--dash-text-secondary))] text-xs font-semibold flex items-center gap-1.5">
+                          <Image size={12} className="text-primary" /> Mídia
+                        </label>
+                        {(productForm.images?.length > 0 || productForm.video) && (
+                          <span className="text-[9px] text-[hsl(var(--dash-text-subtle))] font-medium">
+                            {(productForm.images?.length || 0)} foto{(productForm.images?.length || 0) !== 1 ? "s" : ""}{productForm.video ? " · 1 vídeo" : ""}
+                          </span>
+                        )}
+                      </div>
 
-                      {/* Image gallery grid */}
+                      {/* Unified media gallery */}
                       {(productForm.images?.length > 0 || productForm.video) && (
-                        <div className="flex gap-2 flex-wrap mb-2.5">
-                          {(productForm.images || []).map((img, i) => (
-                            <div key={i} className="relative w-[72px] h-[72px] rounded-xl overflow-hidden border border-[hsl(var(--dash-border-subtle))] group/img">
-                              <img src={img} alt="" className="w-full h-full object-cover" />
-                              <button onClick={() => removeProductImage(i)}
-                                className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity hover:bg-red-500/80">
-                                <X size={9} />
-                              </button>
-                              {i === 0 && (
-                                <span className="absolute bottom-1 left-1 text-[8px] font-bold px-1.5 py-0.5 rounded-md bg-black/60 text-white">Capa</span>
-                              )}
-                            </div>
-                          ))}
+                        <div className="flex gap-2 flex-wrap mb-3">
+                          {(productForm.images || []).map((img, i) => {
+                            const isGif = img.startsWith("data:image/gif");
+                            return (
+                              <div key={i} className="relative w-[76px] h-[76px] rounded-xl overflow-hidden border border-[hsl(var(--dash-border-subtle))] group/img shadow-sm hover:shadow-md transition-shadow">
+                                <img src={img} alt="" className="w-full h-full object-cover" />
+                                <button onClick={() => removeProductImage(i)}
+                                  className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/70 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity hover:bg-red-500">
+                                  <X size={9} />
+                                </button>
+                                {i === 0 && !isGif && (
+                                  <span className="absolute bottom-1 left-1 text-[7px] font-bold px-1.5 py-0.5 rounded-md bg-primary/80 text-white uppercase tracking-wider">Capa</span>
+                                )}
+                                {isGif && (
+                                  <span className="absolute bottom-1 left-1 text-[7px] font-bold px-1.5 py-0.5 rounded-md bg-fuchsia-500/80 text-white uppercase tracking-wider">GIF</span>
+                                )}
+                              </div>
+                            );
+                          })}
                           {productForm.video && (
-                            <div className="relative w-[72px] h-[72px] rounded-xl overflow-hidden border border-[hsl(var(--dash-border-subtle))] group/vid">
+                            <div className="relative w-[76px] h-[76px] rounded-xl overflow-hidden border border-[hsl(var(--dash-border-subtle))] group/vid shadow-sm">
                               <video src={productForm.video} className="w-full h-full object-cover" muted />
-                              <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                                <Play size={16} className="text-white" />
+                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                                  <Play size={12} className="text-white ml-0.5" />
+                                </div>
                               </div>
                               <button onClick={() => setProductForm(f => f ? { ...f, video: undefined } : f)}
-                                className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover/vid:opacity-100 transition-opacity hover:bg-red-500/80">
+                                className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/70 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover/vid:opacity-100 transition-opacity hover:bg-red-500">
                                 <X size={9} />
                               </button>
+                              <span className="absolute bottom-1 left-1 text-[7px] font-bold px-1.5 py-0.5 rounded-md bg-blue-500/80 text-white uppercase tracking-wider">Vídeo</span>
                             </div>
                           )}
-                          {/* Add more button */}
-                          <button onClick={() => productImageInputRef.current?.click()}
-                            className="w-[72px] h-[72px] rounded-xl border-2 border-dashed border-[hsl(var(--dash-border))] hover:border-primary/40 flex items-center justify-center hover:bg-primary/5 transition-all">
-                            <Plus size={18} className="text-[hsl(var(--dash-text-subtle))]" />
-                          </button>
                         </div>
                       )}
 
-                      {/* Empty state — add photos/video */}
-                      {(!productForm.images || productForm.images.length === 0) && !productForm.video && (
-                        <div className="flex gap-2 mb-2.5">
-                          <button onClick={() => productImageInputRef.current?.click()}
-                            className="flex-1 rounded-xl border-2 border-dashed border-[hsl(var(--dash-border))] hover:border-primary/40 bg-[hsl(var(--dash-surface-2))] hover:bg-primary/5 transition-all p-4 flex flex-col items-center gap-1.5 cursor-pointer">
-                            <Image size={18} className="text-primary" />
-                            <p className="text-[11px] font-semibold text-[hsl(var(--dash-text))]">Fotos</p>
-                            <p className="text-[9px] text-[hsl(var(--dash-text-subtle))]">Câmera ou galeria</p>
-                          </button>
-                          <button onClick={() => productVideoInputRef.current?.click()}
-                            className="flex-1 rounded-xl border-2 border-dashed border-[hsl(var(--dash-border))] hover:border-primary/40 bg-[hsl(var(--dash-surface-2))] hover:bg-primary/5 transition-all p-4 flex flex-col items-center gap-1.5 cursor-pointer">
-                            <Video size={18} className="text-fuchsia-500" />
-                            <p className="text-[11px] font-semibold text-[hsl(var(--dash-text))]">Vídeo</p>
-                            <p className="text-[9px] text-[hsl(var(--dash-text-subtle))]">Até 20s · máx 10MB</p>
-                          </button>
-                        </div>
-                      )}
-
-                      {/* Add video button (when has images but no video) */}
-                      {(productForm.images?.length > 0) && !productForm.video && (
-                        <button onClick={() => productVideoInputRef.current?.click()}
-                          className="flex items-center gap-1.5 text-[11px] text-[hsl(var(--dash-text-muted))] hover:text-fuchsia-500 transition-colors font-medium mb-1">
-                          <Video size={12} /> Adicionar vídeo curto (até 20s)
+                      {/* Add media buttons — always visible */}
+                      <div className={`grid ${(!productForm.images || productForm.images.length === 0) && !productForm.video ? "grid-cols-3" : "grid-cols-3"} gap-2`}>
+                        <button onClick={() => productImageInputRef.current?.click()}
+                          className="rounded-xl border border-dashed border-[hsl(var(--dash-border))] hover:border-primary/50 bg-[hsl(var(--dash-surface))] hover:bg-primary/5 transition-all py-3 flex flex-col items-center gap-1.5 cursor-pointer group/btn">
+                          <div className="w-8 h-8 rounded-lg bg-primary/8 flex items-center justify-center group-hover/btn:bg-primary/15 transition-colors">
+                            <Image size={15} className="text-primary" />
+                          </div>
+                          <p className="text-[10px] font-semibold text-[hsl(var(--dash-text))]">Fotos</p>
+                          <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] leading-tight">JPG, PNG, WebP</p>
                         </button>
-                      )}
+                        <button onClick={() => productVideoInputRef.current?.click()}
+                          className={`rounded-xl border border-dashed border-[hsl(var(--dash-border))] hover:border-blue-400/50 bg-[hsl(var(--dash-surface))] hover:bg-blue-500/5 transition-all py-3 flex flex-col items-center gap-1.5 cursor-pointer group/btn ${productForm.video ? "opacity-40 pointer-events-none" : ""}`}>
+                          <div className="w-8 h-8 rounded-lg bg-blue-500/8 flex items-center justify-center group-hover/btn:bg-blue-500/15 transition-colors">
+                            <Video size={15} className="text-blue-500" />
+                          </div>
+                          <p className="text-[10px] font-semibold text-[hsl(var(--dash-text))]">Vídeo</p>
+                          <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] leading-tight">Até 20s · 10MB</p>
+                        </button>
+                        <button onClick={() => productGifInputRef.current?.click()}
+                          className="rounded-xl border border-dashed border-[hsl(var(--dash-border))] hover:border-fuchsia-400/50 bg-[hsl(var(--dash-surface))] hover:bg-fuchsia-500/5 transition-all py-3 flex flex-col items-center gap-1.5 cursor-pointer group/btn">
+                          <div className="w-8 h-8 rounded-lg bg-fuchsia-500/8 flex items-center justify-center group-hover/btn:bg-fuchsia-500/15 transition-colors">
+                            <Sparkles size={15} className="text-fuchsia-500" />
+                          </div>
+                          <p className="text-[10px] font-semibold text-[hsl(var(--dash-text))]">GIF</p>
+                          <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] leading-tight">Animação · 5MB</p>
+                        </button>
+                      </div>
 
                       {videoError && (
-                        <p className="text-[11px] text-red-400 flex items-center gap-1 mt-1">
+                        <p className="text-[11px] text-red-400 flex items-center gap-1 mt-2">
                           <AlertCircle size={11} /> {videoError}
                         </p>
                       )}
