@@ -105,7 +105,8 @@ const DashboardLayout = ({ children }: Props) => {
   };
 
   const copyLink = () => {
-    navigator.clipboard.writeText(`https://${profileUrl}`);
+    // Use full production URL for sharing
+    navigator.clipboard.writeText(`https://maview.app/@${username}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -344,15 +345,15 @@ const DashboardLayout = ({ children }: Props) => {
           </div>
 
           <div className="flex items-center gap-2">
-            <a
-              href={`https://${profileUrl}`}
+            <Link
+              to={`/${username}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg btn-primary-gradient text-[12px] font-medium transition-transform active:scale-95"
             >
               <ExternalLink size={12} />
               <span className="hidden sm:inline">Ver página</span>
-            </a>
+            </Link>
           </div>
         </header>
 

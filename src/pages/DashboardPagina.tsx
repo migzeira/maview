@@ -856,9 +856,9 @@ const DashboardPagina = () => {
     if (!file) return;
     setVideoError(null);
 
-    // Check size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      setVideoError("Vídeo muito grande (máx 5MB). Tente um vídeo mais curto ou de menor qualidade.");
+    // Check size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setVideoError("Vídeo muito grande (máx 10MB). Tente um vídeo mais curto ou de menor qualidade.");
       e.target.value = "";
       return;
     }
@@ -1586,7 +1586,7 @@ const DashboardPagina = () => {
                             className="flex-1 rounded-xl border-2 border-dashed border-[hsl(var(--dash-border))] hover:border-primary/40 bg-[hsl(var(--dash-surface-2))] hover:bg-primary/5 transition-all p-4 flex flex-col items-center gap-1.5 cursor-pointer">
                             <Video size={18} className="text-fuchsia-500" />
                             <p className="text-[11px] font-semibold text-[hsl(var(--dash-text))]">Vídeo</p>
-                            <p className="text-[9px] text-[hsl(var(--dash-text-subtle))]">Até 20s · máx 5MB</p>
+                            <p className="text-[9px] text-[hsl(var(--dash-text-subtle))]">Até 20s · máx 10MB</p>
                           </button>
                         </div>
                       )}
@@ -1699,15 +1699,26 @@ const DashboardPagina = () => {
 
                     {/* ═══ PRICE (optional) ═══ */}
                     <div>
-                      <label className={labelCls}>Preço <span className="text-[hsl(var(--dash-text-subtle))] font-normal">(opcional — deixe vazio se não é pra venda)</span></label>
-                      <input type="text" className={inputCls} placeholder="R$ 97,00"
-                        value={productForm.price}
-                        onChange={e => setProductForm(f => f ? { ...f, price: e.target.value } : f)} />
+                      <label className={labelCls}>
+                        Preço
+                        <span className="text-[hsl(var(--dash-text-subtle))] font-normal"> — deixe vazio se não é pra venda</span>
+                      </label>
+                      <div className="flex items-center">
+                        <span className="flex-shrink-0 rounded-l-xl border border-r-0 border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] text-sm px-3 py-2.5 select-none font-medium">R$</span>
+                        <input type="text" className={`${inputCls} rounded-l-none`}
+                          placeholder="97,00"
+                          value={productForm.price.replace(/^R\$\s?/, "")}
+                          onChange={e => {
+                            const raw = e.target.value.replace(/[^0-9,.]/g, "");
+                            setProductForm(f => f ? { ...f, price: raw ? `R$ ${raw}` : "" } : f);
+                          }} />
+                      </div>
                     </div>
 
                     {/* ═══ LINK ═══ */}
                     <div>
                       <label className={labelCls}>Ação do botão</label>
+                      <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-2 -mt-1">O que acontece quando o cliente clica no produto. Escolha abaixo:</p>
                       <div className="flex gap-1 p-0.5 rounded-lg bg-[hsl(var(--dash-surface-2))] mb-2.5">
                         {([
                           { key: "url" as const, icon: <Link2 size={11} />, label: "Link" },
@@ -1777,28 +1788,48 @@ const DashboardPagina = () => {
                     </button>
                     {showAdvanced && (
                       <div className="space-y-3 pt-1 border-t border-[hsl(var(--dash-border-subtle))] animate-in slide-in-from-top-1 duration-150">
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className={labelCls}>Preço original <span className="text-[hsl(var(--dash-text-subtle))] font-normal">(riscado)</span></label>
-                            <input type="text" className={inputCls} placeholder="R$ 197,00"
-                              value={productForm.originalPrice}
-                              onChange={e => setProductForm(f => f ? { ...f, originalPrice: e.target.value } : f)} />
-                          </div>
-                          <div>
-                            <label className={labelCls}>Badge</label>
-                            <input type="text" className={inputCls} placeholder="OFERTA"
-                              value={productForm.badge}
-                              onChange={e => setProductForm(f => f ? { ...f, badge: e.target.value } : f)} />
+                        {/* Preço original */}
+                        <div>
+                          <label className={labelCls}>
+                            Preço original
+                            <span className="text-[hsl(var(--dash-text-subtle))] font-normal"> — aparece riscado, cria sensação de desconto (ex: "De R$ 197 por R$ 97")</span>
+                          </label>
+                          <div className="flex items-center">
+                            <span className="flex-shrink-0 rounded-l-xl border border-r-0 border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] text-sm px-3 py-2.5 select-none font-medium">R$</span>
+                            <input type="text" className={`${inputCls} rounded-l-none`} placeholder="197,00"
+                              value={productForm.originalPrice.replace(/^R\$\s?/, "")}
+                              onChange={e => {
+                                const raw = e.target.value.replace(/[^0-9,.]/g, "");
+                                setProductForm(f => f ? { ...f, originalPrice: raw ? `R$ ${raw}` : "" } : f);
+                              }} />
                           </div>
                         </div>
-                        <label className="flex items-center gap-2 cursor-pointer select-none">
-                          <button onClick={() => setProductForm(f => f ? { ...f, urgency: !f.urgency } : f)}>
-                            {productForm.urgency ? <ToggleRight size={24} className="text-primary" /> : <ToggleLeft size={24} className="text-[hsl(var(--dash-text-subtle))]" />}
-                          </button>
-                          <span className="text-[hsl(var(--dash-text-secondary))] text-xs font-medium flex items-center gap-1">
-                            <Clock size={12} /> Urgência
-                          </span>
-                        </label>
+
+                        {/* Badge */}
+                        <div>
+                          <label className={labelCls}>
+                            Badge
+                            <span className="text-[hsl(var(--dash-text-subtle))] font-normal"> — etiqueta colorida no produto (ex: OFERTA, Mais vendido, Últimas vagas)</span>
+                          </label>
+                          <input type="text" className={inputCls} placeholder="OFERTA"
+                            value={productForm.badge}
+                            onChange={e => setProductForm(f => f ? { ...f, badge: e.target.value } : f)} />
+                        </div>
+
+                        {/* Urgência */}
+                        <div className="rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] p-3">
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <button onClick={() => setProductForm(f => f ? { ...f, urgency: !f.urgency } : f)}>
+                              {productForm.urgency ? <ToggleRight size={24} className="text-primary" /> : <ToggleLeft size={24} className="text-[hsl(var(--dash-text-subtle))]" />}
+                            </button>
+                            <span className="text-[hsl(var(--dash-text))] text-xs font-semibold flex items-center gap-1">
+                              <Clock size={12} className="text-amber-500" /> Urgência
+                            </span>
+                          </div>
+                          <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] pl-8">
+                            Exibe um contador regressivo ao vivo no produto — cria senso de escassez e aumenta a conversão. Ideal para promoções por tempo limitado.
+                          </p>
+                        </div>
                         <div>
                           <label className={labelCls}><Calendar size={11} className="inline mr-1" />Agendamento</label>
                           <div className="grid grid-cols-2 gap-2">

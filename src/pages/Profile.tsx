@@ -288,7 +288,8 @@ const ProfilePage = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      const slug = username?.toLowerCase() || "";
+      // strip @ prefix if present (e.g. "@fzandre" → "fzandre")
+      const slug = (username?.toLowerCase() || "").replace(/^@/, "");
 
       // 1️⃣ Try localStorage config saved by DashboardPagina
       try {
@@ -297,6 +298,12 @@ const ProfilePage = () => {
           const cfg = JSON.parse(stored);
           // match by username OR show owner's own profile
           if (cfg.username && (cfg.username.toLowerCase() === slug || slug === "demo")) {
+            // Migrate imageUrl → images for products
+            const migratedProducts = (cfg.products || []).map((p: any) => {
+              if (!p.images && p.imageUrl) return { ...p, images: [p.imageUrl] };
+              if (!p.images) return { ...p, images: [] };
+              return p;
+            });
             const lsProfile: ProfileData = {
               username: cfg.username,
               displayName: cfg.displayName || cfg.username,
@@ -304,7 +311,7 @@ const ProfilePage = () => {
               avatar: cfg.avatarUrl || undefined,
               theme: cfg.theme || "dark-purple",
               whatsapp: cfg.whatsapp || undefined,
-              products: (cfg.products || []).filter((p: any) => p.active),
+              products: migratedProducts.filter((p: any) => p.active),
               links: (cfg.links || []).filter((l: any) => l.active),
               testimonials: cfg.testimonials || [],
               stats: undefined,
