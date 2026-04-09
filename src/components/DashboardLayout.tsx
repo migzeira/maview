@@ -82,7 +82,7 @@ const DashboardLayout = ({ children }: Props) => {
       return cfg.username || authUsername;
     } catch { return authUsername; }
   })();
-  const username = vitrineUsername;
+  const username = vitrineUsername.replace(/^@/, "");
   const displayName = user?.user_metadata?.full_name || username;
   const profileUrl = `maview.app/@${username}`;
   const initials = displayName.slice(0, 2).toUpperCase();

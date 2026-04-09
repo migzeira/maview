@@ -296,8 +296,10 @@ const ProfilePage = () => {
         const stored = localStorage.getItem("maview_vitrine_config");
         if (stored) {
           const cfg = JSON.parse(stored);
+          // Normalize both sides: strip @ and lowercase
+          const cfgSlug = (cfg.username || "").toLowerCase().replace(/^@/, "");
           // match by username OR show owner's own profile
-          if (cfg.username && (cfg.username.toLowerCase() === slug || slug === "demo")) {
+          if (cfgSlug && (cfgSlug === slug || slug === "demo")) {
             // Migrate imageUrl → images for products
             const migratedProducts = (cfg.products || []).map((p: any) => {
               if (!p.images && p.imageUrl) return { ...p, images: [p.imageUrl] };
@@ -305,7 +307,7 @@ const ProfilePage = () => {
               return p;
             });
             const lsProfile: ProfileData = {
-              username: cfg.username,
+              username: cfg.username?.replace(/^@/, "") || cfg.username,
               displayName: cfg.displayName || cfg.username,
               bio: cfg.bio || "",
               avatar: cfg.avatarUrl || undefined,
@@ -328,8 +330,23 @@ const ProfilePage = () => {
 
       // 2️⃣ Fallback: mock profiles (demo page)
       const found = MOCK_PROFILES[slug];
-      if (found) { setProfile(found); setTimeout(() => setHeroVis(true), 80); }
-      else setNotFound(true);
+      if (found) {
+        setProfile(found);
+        setTimeout(() => setHeroVis(true), 80);
+      } else {
+        // 3️⃣ Always show a minimal page with the username — never leave blank
+        const minimalProfile: ProfileData = {
+          username: slug,
+          displayName: slug,
+          bio: "",
+          theme: "dark-purple",
+          links: [],
+          products: [],
+          testimonials: [],
+        };
+        setProfile(minimalProfile);
+        setTimeout(() => setHeroVis(true), 80);
+      }
       setLoading(false);
     }, 320);
   }, [username]);
