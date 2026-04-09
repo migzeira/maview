@@ -243,10 +243,14 @@ const ProfileHeroCard = ({ config, onUpdate, onEditProfile }: ProfileHeroCardPro
   const [showHealthDetail, setShowHealthDetail] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [editingAvatar, setEditingAvatar] = useState(false);
+  const [avatarTab, setAvatarTab] = useState<"upload" | "url">("upload");
   const [nameVal, setNameVal] = useState(config.displayName);
   const [avatarVal, setAvatarVal] = useState(config.avatarUrl);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
-  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const avatarUrlInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const profileUrl = config.username ? `maview.app/@${config.username}` : null;
   const currentTheme = THEMES.find(t => t.id === config.theme) ?? THEMES[0];
@@ -258,23 +262,46 @@ const ProfileHeroCard = ({ config, onUpdate, onEditProfile }: ProfileHeroCardPro
 
   useEffect(() => { setNameVal(config.displayName); }, [config.displayName]);
   useEffect(() => { setAvatarVal(config.avatarUrl); }, [config.avatarUrl]);
-
-  useEffect(() => {
-    if (editingName) nameInputRef.current?.focus();
-  }, [editingName]);
-
-  useEffect(() => {
-    if (editingAvatar) avatarInputRef.current?.focus();
-  }, [editingAvatar]);
+  useEffect(() => { if (editingName) nameInputRef.current?.focus(); }, [editingName]);
 
   const saveName = () => {
     if (nameVal.trim()) onUpdate("displayName", nameVal.trim());
     setEditingName(false);
   };
 
-  const saveAvatar = () => {
+  const saveAvatarUrl = () => {
     onUpdate("avatarUrl", avatarVal.trim());
     setEditingAvatar(false);
+    setAvatarPreview(null);
+  };
+
+  // Compress & convert file to base64 via canvas
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const MAX = 400;
+        const ratio = Math.min(MAX / img.width, MAX / img.height, 1);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * ratio);
+        canvas.height = Math.round(img.height * ratio);
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
+        setAvatarPreview(dataUrl);
+        onUpdate("avatarUrl", dataUrl);
+        setEditingAvatar(false);
+        setUploading(false);
+      };
+      img.src = ev.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+    // reset so same file can be re-selected
+    e.target.value = "";
   };
 
   const copyLink = () => {
@@ -291,13 +318,23 @@ const ProfileHeroCard = ({ config, onUpdate, onEditProfile }: ProfileHeroCardPro
       <div className="flex items-start gap-4">
 
         {/* Avatar — click to edit inline */}
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 relative">
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="user"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+
           <button onClick={() => { setEditingAvatar(v => !v); setEditingName(false); }}
             className="relative group">
             <div className="w-[56px] h-[56px] rounded-2xl overflow-hidden transition-transform group-hover:scale-105"
               style={{ boxShadow: `0 0 0 3px ${currentTheme.accent}40` }}>
-              {config.avatarUrl ? (
-                <img src={config.avatarUrl} alt={config.displayName} className="w-full h-full object-cover"
+              {(avatarPreview || config.avatarUrl) ? (
+                <img src={avatarPreview || config.avatarUrl} alt={config.displayName} className="w-full h-full object-cover"
                   onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-white text-xl font-bold"
@@ -307,32 +344,80 @@ const ProfileHeroCard = ({ config, onUpdate, onEditProfile }: ProfileHeroCardPro
               )}
             </div>
             <div className="absolute inset-0 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <Pencil size={13} className="text-white" />
+              {uploading
+                ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                : <Pencil size={13} className="text-white" />
+              }
             </div>
           </button>
 
-          {/* Avatar inline editor */}
+          {/* Avatar inline editor popover */}
           {editingAvatar && (
-            <div className="absolute z-20 mt-2 w-[260px] rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border))] shadow-xl p-3 animate-in slide-in-from-top-2 duration-150">
-              <p className="text-[11px] font-semibold text-[hsl(var(--dash-text))] mb-2">URL da foto de perfil</p>
-              <input
-                ref={avatarInputRef}
-                type="url"
-                className="w-full rounded-lg border border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text))] text-[12px] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/25 mb-2"
-                placeholder="https://..."
-                value={avatarVal}
-                onChange={e => setAvatarVal(e.target.value)}
-                onKeyDown={e => { if (e.key === "Enter") saveAvatar(); if (e.key === "Escape") setEditingAvatar(false); }}
-              />
-              <div className="flex gap-2">
-                <button onClick={saveAvatar} className="flex-1 btn-primary-gradient text-[11px] py-1.5 rounded-lg font-semibold">
-                  <Check size={11} className="inline mr-1" />Salvar
-                </button>
-                <button onClick={() => setEditingAvatar(false)} className="flex-1 text-[11px] py-1.5 rounded-lg border border-[hsl(var(--dash-border))] text-[hsl(var(--dash-text-muted))] hover:bg-[hsl(var(--dash-surface-2))] transition-all">
-                  Cancelar
-                </button>
+            <>
+              <div className="fixed inset-0 z-10" onClick={() => setEditingAvatar(false)} />
+              <div className="absolute left-0 z-20 mt-2 w-[280px] rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border))] shadow-xl p-3 animate-in slide-in-from-top-2 duration-150">
+                <p className="text-[12px] font-semibold text-[hsl(var(--dash-text))] mb-3">Foto de perfil</p>
+
+                {/* Tabs */}
+                <div className="flex gap-1 p-1 rounded-lg bg-[hsl(var(--dash-surface-2))] mb-3">
+                  {(["upload", "url"] as const).map(tab => (
+                    <button key={tab} onClick={() => setAvatarTab(tab)}
+                      className={`flex-1 text-[11px] font-medium py-1.5 rounded-md transition-all ${
+                        avatarTab === tab
+                          ? "bg-[hsl(var(--dash-surface))] text-[hsl(var(--dash-text))] shadow-sm"
+                          : "text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))]"
+                      }`}>
+                      {tab === "upload" ? "📷 Arquivo" : "🔗 URL"}
+                    </button>
+                  ))}
+                </div>
+
+                {avatarTab === "upload" ? (
+                  <div>
+                    {/* Upload area */}
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full rounded-xl border-2 border-dashed border-[hsl(var(--dash-border))] hover:border-primary/40 bg-[hsl(var(--dash-surface-2))] hover:bg-primary/5 transition-all p-5 flex flex-col items-center gap-2 cursor-pointer">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Image size={18} className="text-primary" />
+                      </div>
+                      <div className="text-center">
+                        <p className="text-[12px] font-semibold text-[hsl(var(--dash-text))]">
+                          Escolher foto
+                        </p>
+                        <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mt-0.5">
+                          Câmera ou galeria · JPG, PNG, WEBP
+                        </p>
+                      </div>
+                    </button>
+                    <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] text-center mt-2">
+                      Comprimida automaticamente para carregar rápido
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      ref={avatarUrlInputRef}
+                      type="url"
+                      className="w-full rounded-lg border border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text))] text-[12px] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/25 mb-2"
+                      placeholder="https://..."
+                      value={avatarVal}
+                      onChange={e => setAvatarVal(e.target.value)}
+                      onKeyDown={e => { if (e.key === "Enter") saveAvatarUrl(); if (e.key === "Escape") setEditingAvatar(false); }}
+                      autoFocus
+                    />
+                    <div className="flex gap-2">
+                      <button onClick={saveAvatarUrl} className="flex-1 btn-primary-gradient text-[11px] py-1.5 rounded-lg font-semibold">
+                        <Check size={11} className="inline mr-1" />Salvar
+                      </button>
+                      <button onClick={() => setEditingAvatar(false)} className="flex-1 text-[11px] py-1.5 rounded-lg border border-[hsl(var(--dash-border))] text-[hsl(var(--dash-text-muted))] hover:bg-[hsl(var(--dash-surface-2))] transition-all">
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
+            </>
           )}
         </div>
 
