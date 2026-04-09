@@ -4,7 +4,8 @@ import {
   User, Palette, Package, Link2, Star, Plus, Trash2, Pencil,
   Check, ToggleLeft, ToggleRight, Instagram, Youtube, Twitter, Globe,
   MessageCircle, Clock, ChevronDown, ChevronUp, Eye, X, Copy, ExternalLink,
-  Sparkles, Calendar, Settings, Layout,
+  Sparkles, Calendar, Settings, Layout, GripVertical, AlertCircle,
+  TrendingUp, Zap, ArrowRight, CheckCircle2, Circle, Image, Type,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -66,6 +67,7 @@ interface VitrineConfig {
   links: LinkItem[];
   testimonials: TestimonialItem[];
   blocks?: VitrineBlock[];
+  onboardingDone?: boolean;
 }
 
 // ── Theme definitions ──────────────────────────────────────────────────────
@@ -82,6 +84,7 @@ const THEMES: { id: ThemeId; label: string; bg: string; accent: string; accent2:
 const DEFAULT_CONFIG: VitrineConfig = {
   displayName: "", username: "", bio: "", avatarUrl: "", whatsapp: "",
   theme: "dark-purple", products: [], links: [], testimonials: [], blocks: [],
+  onboardingDone: false,
 };
 
 const LS_KEY = "maview_vitrine_config";
@@ -124,19 +127,31 @@ const emptyTestimonial = (): TestimonialItem => ({
   name: "", role: "", text: "", stars: 5, avatar: "",
 });
 
-// ── Utilities ──────────────────────────────────────────────────────────────
+// ── Health checklist ──────────────────────────────────────────────────────
+
+interface HealthItem {
+  key: string;
+  label: string;
+  tip: string;
+  points: number;
+  check: (cfg: VitrineConfig) => boolean;
+}
+
+const HEALTH_ITEMS: HealthItem[] = [
+  { key: "avatar",       label: "Foto de perfil",       tip: "Perfis com foto recebem 80% mais cliques",          points: 15, check: cfg => !!cfg.avatarUrl },
+  { key: "name-bio",     label: "Nome e bio",           tip: "Complete seu perfil para gerar confiança",           points: 10, check: cfg => !!(cfg.displayName && cfg.bio) },
+  { key: "theme",        label: "Tema escolhido",       tip: "Um visual consistente reforça sua marca",            points: 10, check: cfg => !!cfg.theme },
+  { key: "products",     label: "Pelo menos 1 produto", tip: "Produtos ativos geram receita direta",              points: 20, check: cfg => cfg.products.filter(p => p.active).length > 0 },
+  { key: "links",        label: "Links adicionados",    tip: "Conecte suas redes para ampliar seu alcance",        points: 15, check: cfg => cfg.links.length > 0 },
+  { key: "testimonials", label: "Depoimentos",          tip: "Prova social aumenta conversão em até 72%",          points: 15, check: cfg => cfg.testimonials.length > 0 },
+  { key: "whatsapp",     label: "WhatsApp conectado",   tip: "Contato direto converte 3x mais que formulários",    points: 15, check: cfg => !!cfg.whatsapp },
+];
 
 function calcHealth(cfg: VitrineConfig): number {
-  let s = 0;
-  if (cfg.avatarUrl) s += 15;
-  if (cfg.displayName && cfg.bio) s += 10;
-  if (cfg.theme) s += 10;
-  if (cfg.products.filter(p => p.active).length > 0) s += 20;
-  if (cfg.links.length > 0) s += 15;
-  if (cfg.testimonials.length > 0) s += 15;
-  if (cfg.whatsapp) s += 15;
-  return s;
+  return HEALTH_ITEMS.reduce((s, item) => s + (item.check(cfg) ? item.points : 0), 0);
 }
+
+// ── Utilities ──────────────────────────────────────────────────────────────
 
 function isValidUrl(url: string): boolean {
   if (!url) return false;
@@ -155,7 +170,7 @@ function getDynamicSubtitle(cfg: VitrineConfig): { text: string; complete: boole
   if (cfg.products.length === 0) return { text: "Crie seu primeiro produto e comece a vender", complete: false };
   if (cfg.links.length === 0) return { text: "Adicione seus links e conecte suas redes sociais", complete: false };
   if (cfg.testimonials.length === 0) return { text: "Depoimentos aumentam conversão em 72% — adicione um", complete: false };
-  return { text: "Sua vitrine está completa e no ar! 🚀", complete: true };
+  return { text: "Sua vitrine está completa e no ar!", complete: true };
 }
 
 function autoCompleteUrl(icon: string, raw: string): string {
@@ -183,6 +198,38 @@ function generateBlocks(cfg: VitrineConfig): VitrineBlock[] {
   return blocks;
 }
 
+// ── Onboarding Steps ──────────────────────────────────────────────────────
+
+const ONBOARDING_STEPS = [
+  {
+    title: "Seu perfil",
+    description: "Adicione foto, nome e bio para que visitantes te conheçam",
+    icon: <User size={24} className="text-violet-500" />,
+    tab: "perfil" as TabId,
+  },
+  {
+    title: "Primeiro produto",
+    description: "Crie seu primeiro produto e comece a faturar",
+    icon: <Package size={24} className="text-emerald-500" />,
+    tab: "vitrine" as TabId,
+    action: "product",
+  },
+  {
+    title: "Seus links",
+    description: "Conecte Instagram, YouTube e outras redes",
+    icon: <Link2 size={24} className="text-blue-500" />,
+    tab: "vitrine" as TabId,
+    action: "link",
+  },
+  {
+    title: "Prova social",
+    description: "Depoimentos aumentam conversão em até 72%",
+    icon: <Star size={24} className="text-amber-500" />,
+    tab: "vitrine" as TabId,
+    action: "testimonial",
+  },
+];
+
 // ── Profile Hero Card ──────────────────────────────────────────────────────
 
 interface ProfileHeroCardProps {
@@ -192,6 +239,7 @@ interface ProfileHeroCardProps {
 
 const ProfileHeroCard = ({ config, onEditProfile }: ProfileHeroCardProps) => {
   const [copied, setCopied] = useState(false);
+  const [showHealthDetail, setShowHealthDetail] = useState(false);
   const profileUrl = config.username ? `maview.app/@${config.username}` : null;
   const currentTheme = THEMES.find(t => t.id === config.theme) ?? THEMES[0];
   const health = calcHealth(config);
@@ -207,11 +255,13 @@ const ProfileHeroCard = ({ config, onEditProfile }: ProfileHeroCardProps) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const healthColor = health >= 80 ? "text-emerald-500" : health >= 50 ? "text-amber-500" : "text-red-400";
+
   return (
     <div className="glass-card rounded-2xl p-4 md:p-5 mb-5">
       <div className="flex items-start gap-4">
         <button onClick={onEditProfile} className="flex-shrink-0 relative group">
-          <div className="w-[56px] h-[56px] rounded-2xl overflow-hidden"
+          <div className="w-[56px] h-[56px] rounded-2xl overflow-hidden transition-transform group-hover:scale-105"
             style={{ boxShadow: `0 0 0 3px ${currentTheme.accent}40` }}>
             {config.avatarUrl ? (
               <img src={config.avatarUrl} alt={config.displayName} className="w-full h-full object-cover"
@@ -251,13 +301,26 @@ const ProfileHeroCard = ({ config, onEditProfile }: ProfileHeroCardProps) => {
               ))}
             </div>
           )}
-          <div className="flex items-center gap-2">
-            <div className="flex-1 h-1.5 rounded-full bg-[hsl(var(--dash-surface-2))] overflow-hidden">
-              <div className="h-full rounded-full transition-all duration-700"
-                style={{ width: `${health}%`, background: `linear-gradient(90deg, ${currentTheme.accent}, ${currentTheme.accent2})` }} />
+
+          {/* Interactive health bar */}
+          <button
+            onClick={() => setShowHealthDetail(!showHealthDetail)}
+            className="w-full group/health"
+          >
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-1.5 rounded-full bg-[hsl(var(--dash-surface-2))] overflow-hidden">
+                <div className="h-full rounded-full transition-all duration-700"
+                  style={{ width: `${health}%`, background: `linear-gradient(90deg, ${currentTheme.accent}, ${currentTheme.accent2})` }} />
+              </div>
+              <span className={`text-[10px] font-bold flex-shrink-0 w-8 ${healthColor}`}>{health}%</span>
+              <ChevronDown size={10} className={`text-[hsl(var(--dash-text-subtle))] transition-transform ${showHealthDetail ? "rotate-180" : ""}`} />
             </div>
-            <span className="text-[10px] font-bold text-[hsl(var(--dash-text-subtle))] flex-shrink-0 w-8">{health}%</span>
-          </div>
+            {health < 100 && (
+              <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mt-0.5 text-left group-hover/health:text-primary transition-colors">
+                {health < 50 ? "Clique para ver o que falta" : `Faltam ${100 - health} pontos para 100%`}
+              </p>
+            )}
+          </button>
         </div>
 
         {profileUrl && (
@@ -270,13 +333,48 @@ const ProfileHeroCard = ({ config, onEditProfile }: ProfileHeroCardProps) => {
               </button>
               <a href={`https://${profileUrl}`} target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg btn-primary-gradient text-[12px] font-medium">
-                <ExternalLink size={12} /> Ver página
+                <ExternalLink size={12} /> Ver
               </a>
             </div>
             <p className="text-[hsl(var(--dash-text-subtle))] text-[10px] font-mono">{profileUrl}</p>
           </div>
         )}
       </div>
+
+      {/* Health detail checklist */}
+      {showHealthDetail && (
+        <div className="mt-4 pt-4 border-t border-[hsl(var(--dash-border-subtle))] space-y-2 animate-in slide-in-from-top-2 duration-200">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[hsl(var(--dash-text))] text-xs font-semibold flex items-center gap-1.5">
+              <TrendingUp size={13} className="text-primary" /> Score da Vitrine
+            </p>
+            <span className={`text-xs font-bold ${healthColor}`}>{health}/100</span>
+          </div>
+          {HEALTH_ITEMS.map(item => {
+            const done = item.check(config);
+            return (
+              <div key={item.key}
+                className={`flex items-center gap-2.5 rounded-xl p-2.5 transition-all ${
+                  done ? "bg-emerald-50 border border-emerald-100" : "bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/20"
+                }`}>
+                {done
+                  ? <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0" />
+                  : <Circle size={16} className="text-[hsl(var(--dash-text-subtle))] flex-shrink-0" />
+                }
+                <div className="flex-1 min-w-0">
+                  <p className={`text-[12px] font-medium ${done ? "text-emerald-700 line-through" : "text-[hsl(var(--dash-text))]"}`}>
+                    {item.label}
+                  </p>
+                  {!done && <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">{item.tip}</p>}
+                </div>
+                <span className={`text-[10px] font-bold flex-shrink-0 ${done ? "text-emerald-500" : "text-[hsl(var(--dash-text-subtle))]"}`}>
+                  +{item.points}pts
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
@@ -317,6 +415,14 @@ const DashboardPagina = () => {
   // Delete confirmation
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
+  // Drag & drop
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  // Onboarding
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState(0);
+
   // AI
   const [aiLoading, setAiLoading] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
@@ -346,6 +452,10 @@ const DashboardPagina = () => {
         }
       } catch { /* keep localStorage */ }
       setConfig(base);
+      // Show onboarding for first-time users
+      if (!base.onboardingDone && (base.blocks || []).length === 0 && !base.products.length && !base.links.length) {
+        setShowOnboarding(true);
+      }
     })();
   }, []);
 
@@ -407,6 +517,39 @@ const DashboardPagina = () => {
     } else if (block.type === "link") {
       updateConfig("links", config.links.map(l => l.id === block.refId ? { ...l, active: !l.active } : l));
     }
+  };
+
+  // ── Drag & Drop ──────────────────────────────────────────────────────────
+
+  const handleDragStart = (blockId: string) => {
+    setDragId(blockId);
+  };
+
+  const handleDragOver = (e: React.DragEvent, blockId: string) => {
+    e.preventDefault();
+    if (blockId !== dragId) setDragOverId(blockId);
+  };
+
+  const handleDrop = (targetBlockId: string) => {
+    if (!dragId || dragId === targetBlockId) {
+      setDragId(null);
+      setDragOverId(null);
+      return;
+    }
+    const blocks = [...(config.blocks || [])];
+    const fromIdx = blocks.findIndex(b => b.id === dragId);
+    const toIdx = blocks.findIndex(b => b.id === targetBlockId);
+    if (fromIdx < 0 || toIdx < 0) return;
+    const [moved] = blocks.splice(fromIdx, 1);
+    blocks.splice(toIdx, 0, moved);
+    updateConfig("blocks", blocks);
+    setDragId(null);
+    setDragOverId(null);
+  };
+
+  const handleDragEnd = () => {
+    setDragId(null);
+    setDragOverId(null);
   };
 
   // ── Form open/close helpers ───────────────────────────────────────────────
@@ -539,6 +682,21 @@ const DashboardPagina = () => {
     closeAllForms();
   };
 
+  // ── Onboarding ───────────────────────────────────────────────────────────
+
+  const completeOnboarding = () => {
+    setShowOnboarding(false);
+    setConfigAndSave(prev => ({ ...prev, onboardingDone: true }));
+  };
+
+  const handleOnboardingAction = (step: typeof ONBOARDING_STEPS[0]) => {
+    setActiveTab(step.tab);
+    if (step.action === "product") openAddProduct();
+    else if (step.action === "link") openAddLink();
+    else if (step.action === "testimonial") openAddTestimonial();
+    completeOnboarding();
+  };
+
   // ── Delete confirmation auto-cancel ───────────────────────────────────────
 
   useEffect(() => {
@@ -574,6 +732,7 @@ const DashboardPagina = () => {
   const currentTheme = THEMES.find(t => t.id === config.theme) ?? THEMES[0];
   const { text: subtitleText, complete: subtitleComplete } = getDynamicSubtitle(config);
   const blocks = config.blocks || [];
+  const health = calcHealth(config);
 
   const tabCounts: Partial<Record<TabId, number>> = {
     vitrine: blocks.length,
@@ -582,27 +741,36 @@ const DashboardPagina = () => {
   const inputCls = "w-full rounded-xl border border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text))] text-sm px-3.5 py-2.5 placeholder:text-[hsl(var(--dash-text-subtle))] focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary/40 transition-all";
   const labelCls = "block text-[hsl(var(--dash-text-secondary))] text-xs font-medium mb-1.5";
 
+  // ── Block type label ─────────────────────────────────────────────────────
+
+  const BLOCK_TYPE_LABELS: Record<string, string> = {
+    product: "Produto",
+    link: "Link",
+    testimonial: "Depoimento",
+    header: "Separador",
+  };
+
   // ── Block info helper ─────────────────────────────────────────────────────
 
   const getBlockDisplay = (block: VitrineBlock) => {
     if (block.type === "product") {
       const p = config.products.find(pr => pr.id === block.refId);
       if (!p) return null;
-      return { icon: <span className="text-base">{p.emoji}</span>, title: p.title || "Sem título", subtitle: p.price, active: p.active, hasToggle: true };
+      return { icon: <span className="text-base">{p.emoji}</span>, title: p.title || "Sem título", subtitle: p.price, active: p.active, hasToggle: true, typeLabel: "Produto" };
     }
     if (block.type === "link") {
       const l = config.links.find(lk => lk.id === block.refId);
       if (!l) return null;
       const badge = l.type === "spotlight" ? "DESTAQUE" : l.type === "header" ? "SEPARADOR" : null;
-      return { icon: <span className="text-primary">{LINK_ICON_MAP[l.icon]}</span>, title: l.title || l.url || "Sem título", subtitle: l.url?.replace(/^https?:\/\//, ""), active: l.active, hasToggle: true, badge };
+      return { icon: <span className="text-primary">{LINK_ICON_MAP[l.icon]}</span>, title: l.title || l.url || "Sem título", subtitle: l.url?.replace(/^https?:\/\//, ""), active: l.active, hasToggle: true, badge, typeLabel: "Link" };
     }
     if (block.type === "testimonial") {
       const t = config.testimonials.find(te => te.id === block.refId);
       if (!t) return null;
-      return { icon: <Star size={14} className="text-amber-400" />, title: t.name, subtitle: `"${t.text.slice(0, 40)}..."`, active: true, hasToggle: false };
+      return { icon: <Star size={14} className="text-amber-400" />, title: t.name, subtitle: `"${t.text.slice(0, 40)}${t.text.length > 40 ? "..." : ""}"`, active: true, hasToggle: false, typeLabel: "Depoimento" };
     }
     if (block.type === "header") {
-      return { icon: <span className="text-[hsl(var(--dash-text-subtle))]">───</span>, title: block.title || "Separador", subtitle: null, active: true, hasToggle: false };
+      return { icon: <Type size={14} className="text-[hsl(var(--dash-text-subtle))]" />, title: block.title || "Separador", subtitle: null, active: true, hasToggle: false, typeLabel: "Separador" };
     }
     return null;
   };
@@ -632,7 +800,7 @@ const DashboardPagina = () => {
           <div className="w-[88px] h-[26px] rounded-full bg-black" />
         </div>
 
-        {/* Scrollable screen content — renders blocks in order */}
+        {/* Scrollable screen content */}
         <div className="overflow-y-auto" style={{ background: `linear-gradient(160deg,${currentTheme.bg} 60%,${currentTheme.accent}18)`, maxHeight: 500 }}>
           <div className="p-5">
             {/* Profile */}
@@ -668,13 +836,23 @@ const DashboardPagina = () => {
                 const p = config.products.find(pr => pr.id === block.refId);
                 if (!p || !p.active || !isScheduledActive(p)) return null;
                 return (
-                  <div key={block.id} className="flex items-center gap-2.5 rounded-xl border p-2.5 mb-2"
+                  <div key={block.id} className="flex items-center gap-2.5 rounded-xl border p-2.5 mb-2 transition-all hover:scale-[1.01]"
                     style={{ borderColor: currentTheme.accent + "30", background: currentTheme.accent + "0a" }}>
                     <span className="text-base flex-shrink-0">{p.emoji}</span>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-semibold truncate text-white">{p.title}</p>
-                      {p.price && <p className="text-[10px]" style={{ color: currentTheme.accent }}>{p.price}</p>}
+                      <div className="flex items-center gap-2">
+                        {p.originalPrice && (
+                          <span className="text-[9px] line-through" style={{ color: "rgba(200,200,200,0.4)" }}>{p.originalPrice}</span>
+                        )}
+                        {p.price && <p className="text-[10px] font-bold" style={{ color: currentTheme.accent }}>{p.price}</p>}
+                      </div>
                     </div>
+                    {p.badge && (
+                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: currentTheme.accent + "25", color: currentTheme.accent }}>
+                        {p.badge}
+                      </span>
+                    )}
                     {p.urgency && <Clock size={10} style={{ color: currentTheme.accent2 }} />}
                   </div>
                 );
@@ -690,14 +868,14 @@ const DashboardPagina = () => {
                   </div>
                 );
                 if (l.type === "spotlight") return (
-                  <div key={block.id} className="rounded-xl p-2.5 mb-2 flex items-center justify-center gap-2"
+                  <div key={block.id} className="rounded-xl p-2.5 mb-2 flex items-center justify-center gap-2 transition-all hover:scale-[1.01]"
                     style={{ background: `linear-gradient(135deg,${currentTheme.accent}25,${currentTheme.accent2}18)`, border: `1px solid ${currentTheme.accent}40` }}>
                     <span style={{ color: currentTheme.accent }}>{LINK_ICON_MAP[l.icon]}</span>
                     <span className="text-xs font-bold" style={{ color: currentTheme.accent }}>{l.title || l.url}</span>
                   </div>
                 );
                 return (
-                  <div key={block.id} className="flex items-center gap-2 rounded-xl border p-2.5 mb-2"
+                  <div key={block.id} className="flex items-center gap-2 rounded-xl border p-2.5 mb-2 transition-all hover:scale-[1.01]"
                     style={{ borderColor: currentTheme.accent + "25", background: currentTheme.accent + "08" }}>
                     <span style={{ color: currentTheme.accent }}>{LINK_ICON_MAP[l.icon]}</span>
                     <span className="text-xs truncate" style={{ color: "rgba(200,200,200,0.8)" }}>{l.title || l.url}</span>
@@ -710,9 +888,21 @@ const DashboardPagina = () => {
                 return (
                   <div key={block.id} className="rounded-xl border p-2.5 mb-2"
                     style={{ borderColor: currentTheme.accent + "20", background: currentTheme.accent + "08" }}>
+                    <div className="flex items-center gap-2 mb-1.5">
+                      {t.avatar ? (
+                        <img src={t.avatar} alt={t.name} className="w-5 h-5 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white"
+                          style={{ background: `linear-gradient(135deg,${currentTheme.accent},${currentTheme.accent2})` }}>
+                          {t.name[0]?.toUpperCase()}
+                        </div>
+                      )}
+                      <p className="text-[9px] font-semibold" style={{ color: currentTheme.accent }}>
+                        {t.name} {t.role && <span style={{ color: "rgba(200,200,200,0.5)" }}>· {t.role}</span>}
+                      </p>
+                    </div>
                     <div className="text-[10px] mb-1">{"⭐".repeat(t.stars)}</div>
                     <p className="text-[9px] line-clamp-2 italic" style={{ color: "rgba(187,187,187,0.9)" }}>"{t.text}"</p>
-                    <p className="text-[8px] mt-1 font-semibold" style={{ color: currentTheme.accent }}>— {t.name}</p>
                   </div>
                 );
               }
@@ -737,7 +927,7 @@ const DashboardPagina = () => {
 
             {/* Footer */}
             <div className="pt-4 pb-2 text-center">
-              <p className="text-[8px]" style={{ color: "#444" }}>✨ Criado com maview.app</p>
+              <p className="text-[8px]" style={{ color: "#444" }}>Criado com maview.app</p>
             </div>
           </div>
         </div>
@@ -757,6 +947,85 @@ const DashboardPagina = () => {
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-8">
+
+      {/* ═══════════════ ONBOARDING WIZARD ═══════════════ */}
+      {showOnboarding && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={completeOnboarding} />
+          <div className="relative glass-card rounded-3xl p-6 md:p-8 max-w-lg w-full shadow-2xl animate-in zoom-in-95 duration-300">
+            <button onClick={completeOnboarding}
+              className="absolute top-4 right-4 p-2 rounded-full text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] transition-all">
+              <X size={18} />
+            </button>
+
+            {/* Progress dots */}
+            <div className="flex items-center justify-center gap-2 mb-6">
+              {ONBOARDING_STEPS.map((_, i) => (
+                <div key={i} className={`h-1.5 rounded-full transition-all duration-300 ${
+                  i === onboardingStep ? "w-8 bg-primary" : i < onboardingStep ? "w-4 bg-primary/50" : "w-4 bg-[hsl(var(--dash-border))]"
+                }`} />
+              ))}
+            </div>
+
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+                {ONBOARDING_STEPS[onboardingStep].icon}
+              </div>
+              <h2 className="text-[hsl(var(--dash-text))] text-xl font-bold mb-2">
+                {onboardingStep === 0 ? "Bem-vindo ao Maview!" : ONBOARDING_STEPS[onboardingStep].title}
+              </h2>
+              <p className="text-[hsl(var(--dash-text-muted))] text-sm">
+                {onboardingStep === 0
+                  ? "Vamos montar sua vitrine em 4 passos simples"
+                  : ONBOARDING_STEPS[onboardingStep].description
+                }
+              </p>
+            </div>
+
+            {/* Steps overview */}
+            {onboardingStep === 0 && (
+              <div className="space-y-2 mb-6">
+                {ONBOARDING_STEPS.map((step, i) => (
+                  <div key={i} className="flex items-center gap-3 rounded-xl p-3 bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))]">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      {step.icon}
+                    </div>
+                    <div>
+                      <p className="text-[hsl(var(--dash-text))] text-[13px] font-medium">{step.title}</p>
+                      <p className="text-[hsl(var(--dash-text-subtle))] text-[11px]">{step.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              {onboardingStep > 0 && (
+                <button onClick={() => setOnboardingStep(s => s - 1)}
+                  className="flex-1 text-sm py-3 rounded-xl border border-[hsl(var(--dash-border))] text-[hsl(var(--dash-text-muted))] hover:bg-[hsl(var(--dash-surface-2))] transition-all font-medium">
+                  Voltar
+                </button>
+              )}
+              {onboardingStep < ONBOARDING_STEPS.length - 1 ? (
+                <button onClick={() => setOnboardingStep(s => s + 1)}
+                  className="flex-1 btn-primary-gradient text-sm py-3 rounded-xl font-semibold flex items-center justify-center gap-2">
+                  {onboardingStep === 0 ? "Começar" : "Próximo"} <ArrowRight size={14} />
+                </button>
+              ) : (
+                <button onClick={() => handleOnboardingAction(ONBOARDING_STEPS[onboardingStep])}
+                  className="flex-1 btn-primary-gradient text-sm py-3 rounded-xl font-semibold flex items-center justify-center gap-2">
+                  Vamos lá! <Zap size={14} />
+                </button>
+              )}
+            </div>
+
+            <button onClick={completeOnboarding}
+              className="w-full text-center text-[hsl(var(--dash-text-subtle))] text-[11px] mt-4 hover:text-primary transition-colors">
+              Pular e montar sozinho
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Header */}
       <div className="mb-5 space-y-1">
@@ -810,7 +1079,7 @@ const DashboardPagina = () => {
                 <div className="relative">
                   <button
                     onClick={() => setShowAddMenu(!showAddMenu)}
-                    className="w-full btn-primary-gradient text-sm font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2"
+                    className="w-full btn-primary-gradient text-sm font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
                   >
                     <Plus size={18} /> Adicionar à Vitrine
                   </button>
@@ -818,12 +1087,12 @@ const DashboardPagina = () => {
                   {showAddMenu && (
                     <>
                       <div className="fixed inset-0 z-30" onClick={() => setShowAddMenu(false)} />
-                      <div className="absolute top-full left-0 right-0 mt-2 z-40 glass-card rounded-xl shadow-xl border border-[hsl(var(--dash-border-subtle))] p-1.5">
+                      <div className="absolute top-full left-0 right-0 mt-2 z-40 glass-card rounded-xl shadow-xl border border-[hsl(var(--dash-border-subtle))] p-1.5 animate-in slide-in-from-top-2 duration-200">
                         {[
                           { type: "product" as const, icon: <Package size={16} className="text-violet-500" />, label: "Produto", desc: "Venda algo" },
                           { type: "link" as const, icon: <Link2 size={16} className="text-blue-500" />, label: "Link", desc: "Direcione para qualquer URL" },
                           { type: "testimonial" as const, icon: <Star size={16} className="text-amber-500" />, label: "Depoimento", desc: "Prova social" },
-                          { type: "header" as const, icon: <Layout size={16} className="text-slate-400" />, label: "Separador", desc: "Organize seções" },
+                          { type: "header" as const, icon: <Type size={16} className="text-slate-400" />, label: "Separador", desc: "Organize seções" },
                         ].map(opt => (
                           <button key={opt.type}
                             onClick={() => {
@@ -853,7 +1122,7 @@ const DashboardPagina = () => {
 
                 {/* Product form */}
                 {activeForm === "product" && productForm && (
-                  <div className="rounded-2xl border border-primary/20 bg-[hsl(var(--dash-accent))]/30 p-4 space-y-3">
+                  <div className="rounded-2xl border border-primary/20 bg-[hsl(var(--dash-accent))]/30 p-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
                     <h3 className="text-[hsl(var(--dash-text))] text-sm font-semibold">
                       {editingProductId ? "Editar Produto" : "Novo Produto"}
                     </h3>
@@ -864,8 +1133,8 @@ const DashboardPagina = () => {
                           <button key={em} onClick={() => setProductForm(f => f ? { ...f, emoji: em } : f)}
                             className={`w-9 h-9 rounded-xl text-lg flex items-center justify-center border transition-all ${
                               productForm.emoji === em
-                                ? "border-primary/50 bg-[hsl(var(--dash-accent))] ring-1 ring-primary/20"
-                                : "border-[hsl(var(--dash-border-subtle))] hover:border-primary/20"
+                                ? "border-primary/50 bg-[hsl(var(--dash-accent))] ring-1 ring-primary/20 scale-110"
+                                : "border-[hsl(var(--dash-border-subtle))] hover:border-primary/20 hover:scale-105"
                             }`}>{em}</button>
                         ))}
                       </div>
@@ -904,7 +1173,7 @@ const DashboardPagina = () => {
                       {showAdvanced ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
                     </button>
                     {showAdvanced && (
-                      <div className="space-y-3 pt-1 border-t border-[hsl(var(--dash-border-subtle))]">
+                      <div className="space-y-3 pt-1 border-t border-[hsl(var(--dash-border-subtle))] animate-in slide-in-from-top-1 duration-150">
                         <div>
                           <label className={labelCls}>Descrição</label>
                           <input type="text" className={inputCls} placeholder="Breve descrição"
@@ -953,7 +1222,7 @@ const DashboardPagina = () => {
                       </div>
                     )}
                     <div className="flex gap-2 pt-1">
-                      <button onClick={saveProduct} className="flex-1 btn-primary-gradient text-xs py-2 rounded-xl">
+                      <button onClick={saveProduct} className="flex-1 btn-primary-gradient text-xs py-2 rounded-xl transition-transform active:scale-[0.97]">
                         <Check size={13} className="inline mr-1" /> Salvar
                       </button>
                       <button onClick={closeAllForms}
@@ -966,7 +1235,7 @@ const DashboardPagina = () => {
 
                 {/* Link form */}
                 {activeForm === "link" && linkForm && (
-                  <div className="rounded-2xl border border-primary/20 bg-[hsl(var(--dash-accent))]/30 p-4 space-y-3">
+                  <div className="rounded-2xl border border-primary/20 bg-[hsl(var(--dash-accent))]/30 p-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
                     <h3 className="text-[hsl(var(--dash-text))] text-sm font-semibold">
                       {editingLinkId ? "Editar Link" : "Novo Link"}
                     </h3>
@@ -977,8 +1246,8 @@ const DashboardPagina = () => {
                           <button key={ic} onClick={() => setLinkForm(f => f ? { ...f, icon: ic, isSocial: ["instagram", "youtube", "twitter"].includes(ic) } : f)}
                             className={`w-9 h-9 rounded-xl flex items-center justify-center border transition-all ${
                               linkForm.icon === ic
-                                ? "border-primary/50 bg-[hsl(var(--dash-accent))] text-primary ring-1 ring-primary/20"
-                                : "border-[hsl(var(--dash-border-subtle))] text-[hsl(var(--dash-text-muted))] hover:border-primary/20"
+                                ? "border-primary/50 bg-[hsl(var(--dash-accent))] text-primary ring-1 ring-primary/20 scale-110"
+                                : "border-[hsl(var(--dash-border-subtle))] text-[hsl(var(--dash-text-muted))] hover:border-primary/20 hover:scale-105"
                             }`}>{LINK_ICON_MAP[ic]}</button>
                         ))}
                       </div>
@@ -1034,7 +1303,7 @@ const DashboardPagina = () => {
                       </div>
                     )}
                     <div className="flex gap-2 pt-1">
-                      <button onClick={saveLink} className="flex-1 btn-primary-gradient text-xs py-2 rounded-xl">
+                      <button onClick={saveLink} className="flex-1 btn-primary-gradient text-xs py-2 rounded-xl transition-transform active:scale-[0.97]">
                         <Check size={13} className="inline mr-1" /> Salvar
                       </button>
                       <button onClick={closeAllForms}
@@ -1047,7 +1316,7 @@ const DashboardPagina = () => {
 
                 {/* Testimonial form */}
                 {activeForm === "testimonial" && (
-                  <div className="rounded-2xl border border-primary/20 bg-[hsl(var(--dash-accent))]/30 p-4 space-y-3">
+                  <div className="rounded-2xl border border-primary/20 bg-[hsl(var(--dash-accent))]/30 p-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
                     <h3 className="text-[hsl(var(--dash-text))] text-sm font-semibold">
                       {editingTestimonialId ? "Editar Depoimento" : "Novo Depoimento"}
                     </h3>
@@ -1074,7 +1343,7 @@ const DashboardPagina = () => {
                       <div className="flex gap-1">
                         {[1, 2, 3, 4, 5].map(n => (
                           <button key={n} onClick={() => setTestimonialForm(f => ({ ...f, stars: n }))}
-                            className={`text-xl transition-all ${n <= testimonialForm.stars ? "opacity-100" : "opacity-25"}`}>
+                            className={`text-xl transition-all hover:scale-125 ${n <= testimonialForm.stars ? "opacity-100" : "opacity-25"}`}>
                             ⭐
                           </button>
                         ))}
@@ -1087,7 +1356,7 @@ const DashboardPagina = () => {
                       {showAdvanced ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
                     </button>
                     {showAdvanced && (
-                      <div className="space-y-3 pt-1 border-t border-[hsl(var(--dash-border-subtle))]">
+                      <div className="space-y-3 pt-1 border-t border-[hsl(var(--dash-border-subtle))] animate-in slide-in-from-top-1 duration-150">
                         <div>
                           <label className={labelCls}>Cargo / Função</label>
                           <input type="text" className={inputCls} placeholder="Designer"
@@ -1103,7 +1372,7 @@ const DashboardPagina = () => {
                       </div>
                     )}
                     <div className="flex gap-2 pt-1">
-                      <button onClick={saveTestimonial} className="flex-1 btn-primary-gradient text-xs py-2 rounded-xl">
+                      <button onClick={saveTestimonial} className="flex-1 btn-primary-gradient text-xs py-2 rounded-xl transition-transform active:scale-[0.97]">
                         <Check size={13} className="inline mr-1" /> Salvar
                       </button>
                       <button onClick={closeAllForms}
@@ -1116,7 +1385,7 @@ const DashboardPagina = () => {
 
                 {/* Header/separator form */}
                 {activeForm === "header" && (
-                  <div className="rounded-2xl border border-primary/20 bg-[hsl(var(--dash-accent))]/30 p-4 space-y-3">
+                  <div className="rounded-2xl border border-primary/20 bg-[hsl(var(--dash-accent))]/30 p-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
                     <h3 className="text-[hsl(var(--dash-text))] text-sm font-semibold">
                       {editingHeaderBlockId ? "Editar Separador" : "Novo Separador"}
                     </h3>
@@ -1127,7 +1396,7 @@ const DashboardPagina = () => {
                         onChange={e => setHeaderTitle(e.target.value)} />
                     </div>
                     <div className="flex gap-2 pt-1">
-                      <button onClick={saveHeader} className="flex-1 btn-primary-gradient text-xs py-2 rounded-xl">
+                      <button onClick={saveHeader} className="flex-1 btn-primary-gradient text-xs py-2 rounded-xl transition-transform active:scale-[0.97]">
                         <Check size={13} className="inline mr-1" /> Salvar
                       </button>
                       <button onClick={closeAllForms}
@@ -1138,25 +1407,49 @@ const DashboardPagina = () => {
                   </div>
                 )}
 
-                {/* ── Block list ── */}
+                {/* ── Block list with drag & drop ── */}
                 {blocks.length === 0 && !activeForm ? (
                   <div className="text-center py-14 space-y-4">
-                    <div className="w-16 h-16 mx-auto rounded-2xl bg-violet-50 flex items-center justify-center">
-                      <Layout size={28} className="text-violet-400" />
+                    <div className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-violet-50 to-fuchsia-50 flex items-center justify-center">
+                      <Layout size={32} className="text-violet-400" />
                     </div>
                     <div>
                       <h3 className="text-[hsl(var(--dash-text))] font-bold text-[17px]">Monte sua vitrine</h3>
-                      <p className="text-[hsl(var(--dash-text-muted))] text-sm mt-1 max-w-[280px] mx-auto leading-relaxed">
-                        Adicione produtos, links e depoimentos
+                      <p className="text-[hsl(var(--dash-text-muted))] text-sm mt-1 max-w-[320px] mx-auto leading-relaxed">
+                        Adicione produtos, links e depoimentos para criar sua página de vendas
                       </p>
                     </div>
-                    <button onClick={() => setShowAddMenu(true)}
-                      className="btn-primary-gradient text-sm px-8 py-3 rounded-xl font-semibold inline-flex items-center gap-2">
-                      <Plus size={16} /> Adicionar à Vitrine
-                    </button>
-                    <p className="text-[hsl(var(--dash-text-subtle))] text-xs">
-                      Vitrines com 3+ itens convertem 4x mais
-                    </p>
+
+                    {/* Quick-start cards */}
+                    <div className="grid grid-cols-2 gap-2 max-w-[340px] mx-auto">
+                      <button onClick={openAddProduct}
+                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-dashed border-violet-200 bg-violet-50/50 hover:bg-violet-50 hover:border-violet-300 transition-all group">
+                        <Package size={20} className="text-violet-400 group-hover:text-violet-600 transition-colors" />
+                        <span className="text-[12px] font-medium text-violet-600">Produto</span>
+                      </button>
+                      <button onClick={openAddLink}
+                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-dashed border-blue-200 bg-blue-50/50 hover:bg-blue-50 hover:border-blue-300 transition-all group">
+                        <Link2 size={20} className="text-blue-400 group-hover:text-blue-600 transition-colors" />
+                        <span className="text-[12px] font-medium text-blue-600">Link</span>
+                      </button>
+                      <button onClick={openAddTestimonial}
+                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-dashed border-amber-200 bg-amber-50/50 hover:bg-amber-50 hover:border-amber-300 transition-all group">
+                        <Star size={20} className="text-amber-400 group-hover:text-amber-600 transition-colors" />
+                        <span className="text-[12px] font-medium text-amber-600">Depoimento</span>
+                      </button>
+                      <button onClick={openAddHeader}
+                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-slate-300 transition-all group">
+                        <Type size={20} className="text-slate-400 group-hover:text-slate-600 transition-colors" />
+                        <span className="text-[12px] font-medium text-slate-600">Separador</span>
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-center gap-2 pt-2">
+                      <Zap size={12} className="text-amber-500" />
+                      <p className="text-[hsl(var(--dash-text-subtle))] text-xs">
+                        Vitrines com 3+ itens convertem <span className="font-bold text-primary">4x mais</span>
+                      </p>
+                    </div>
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -1167,7 +1460,7 @@ const DashboardPagina = () => {
                       // Delete confirmation state
                       if (confirmDeleteId === block.id) {
                         return (
-                          <div key={block.id} className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 transition-all">
+                          <div key={block.id} className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 transition-all animate-in shake duration-200">
                             <span className="text-red-600 text-[13px] font-medium flex-1 truncate">
                               Excluir "{display.title}"?
                             </span>
@@ -1183,19 +1476,22 @@ const DashboardPagina = () => {
                         );
                       }
 
+                      const isDragging = dragId === block.id;
+                      const isDragOver = dragOverId === block.id;
+
                       return (
                         <div key={block.id}
-                          className={`flex items-center gap-2 rounded-xl border p-3 transition-all glass-card-hover ${!display.active ? "opacity-50" : ""}`}>
-                          {/* Reorder */}
-                          <div className="flex flex-col gap-0.5 flex-shrink-0">
-                            <button onClick={() => moveBlock(block.id, "up")} disabled={idx === 0}
-                              className="p-0.5 rounded text-[hsl(var(--dash-text-subtle))] hover:text-primary transition-colors disabled:opacity-20 disabled:cursor-not-allowed">
-                              <ChevronUp size={12} />
-                            </button>
-                            <button onClick={() => moveBlock(block.id, "down")} disabled={idx === blocks.length - 1}
-                              className="p-0.5 rounded text-[hsl(var(--dash-text-subtle))] hover:text-primary transition-colors disabled:opacity-20 disabled:cursor-not-allowed">
-                              <ChevronDown size={12} />
-                            </button>
+                          draggable
+                          onDragStart={() => handleDragStart(block.id)}
+                          onDragOver={e => handleDragOver(e, block.id)}
+                          onDrop={() => handleDrop(block.id)}
+                          onDragEnd={handleDragEnd}
+                          className={`flex items-center gap-2 rounded-xl border p-3 transition-all glass-card-hover cursor-grab active:cursor-grabbing ${
+                            !display.active ? "opacity-50" : ""
+                          } ${isDragging ? "opacity-40 scale-95" : ""} ${isDragOver ? "border-primary/50 bg-primary/5 scale-[1.01]" : ""}`}>
+                          {/* Drag handle */}
+                          <div className="flex-shrink-0 text-[hsl(var(--dash-text-subtle))] hover:text-primary transition-colors">
+                            <GripVertical size={14} />
                           </div>
 
                           {/* Icon */}
@@ -1213,13 +1509,29 @@ const DashboardPagina = () => {
                                 </span>
                               )}
                             </div>
-                            {display.subtitle && (
-                              <p className="text-[hsl(var(--dash-text-subtle))] text-xs truncate">{display.subtitle}</p>
-                            )}
+                            <div className="flex items-center gap-2">
+                              {display.subtitle && (
+                                <p className="text-[hsl(var(--dash-text-subtle))] text-xs truncate">{display.subtitle}</p>
+                              )}
+                              <span className="text-[9px] text-[hsl(var(--dash-text-muted))] flex-shrink-0 hidden sm:inline">
+                                {display.typeLabel}
+                              </span>
+                            </div>
                           </div>
 
                           {/* Actions */}
                           <div className="flex items-center gap-1">
+                            {/* Reorder buttons for non-drag environments */}
+                            <div className="flex flex-col gap-0.5 flex-shrink-0 sm:hidden">
+                              <button onClick={() => moveBlock(block.id, "up")} disabled={idx === 0}
+                                className="p-0.5 rounded text-[hsl(var(--dash-text-subtle))] hover:text-primary transition-colors disabled:opacity-20 disabled:cursor-not-allowed">
+                                <ChevronUp size={12} />
+                              </button>
+                              <button onClick={() => moveBlock(block.id, "down")} disabled={idx === blocks.length - 1}
+                                className="p-0.5 rounded text-[hsl(var(--dash-text-subtle))] hover:text-primary transition-colors disabled:opacity-20 disabled:cursor-not-allowed">
+                                <ChevronDown size={12} />
+                              </button>
+                            </div>
                             <button onClick={() => {
                               if (block.type === "product") {
                                 const p = config.products.find(pr => pr.id === block.refId);
@@ -1242,7 +1554,7 @@ const DashboardPagina = () => {
                               <Trash2 size={13} />
                             </button>
                             {display.hasToggle && (
-                              <button onClick={() => toggleBlockItem(block.id)}>
+                              <button onClick={() => toggleBlockItem(block.id)} className="transition-transform hover:scale-110">
                                 {display.active
                                   ? <ToggleRight size={22} className="text-primary" />
                                   : <ToggleLeft size={22} className="text-[hsl(var(--dash-text-subtle))]" />}
@@ -1252,6 +1564,18 @@ const DashboardPagina = () => {
                         </div>
                       );
                     })}
+
+                    {/* Block summary */}
+                    {blocks.length > 0 && (
+                      <div className="flex items-center justify-between pt-3 border-t border-[hsl(var(--dash-border-subtle))]">
+                        <p className="text-[hsl(var(--dash-text-subtle))] text-[11px]">
+                          {blocks.length} {blocks.length === 1 ? "bloco" : "blocos"} na vitrine
+                        </p>
+                        <p className="text-[hsl(var(--dash-text-subtle))] text-[11px] flex items-center gap-1">
+                          <GripVertical size={10} /> Arraste para reordenar
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -1280,6 +1604,9 @@ const DashboardPagina = () => {
                     <input type="url" className={inputCls} placeholder="https://exemplo.com/foto.jpg"
                       value={config.avatarUrl}
                       onChange={e => updateConfig("avatarUrl", e.target.value)} />
+                    <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mt-1">
+                      Dica: Use uma foto quadrada, mínimo 200x200px
+                    </p>
                   </div>
                 </div>
 
@@ -1298,6 +1625,11 @@ const DashboardPagina = () => {
                       value={config.username}
                       onChange={e => updateConfig("username", e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))} />
                   </div>
+                  {config.username && (
+                    <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mt-1">
+                      Sua página: <span className="font-mono text-primary">maview.app/@{config.username}</span>
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -1323,7 +1655,7 @@ const DashboardPagina = () => {
                     </p>
                   </div>
                   {aiSuggestion && (
-                    <div className="mt-2 rounded-xl border border-fuchsia-200 bg-fuchsia-50 p-3 space-y-2">
+                    <div className="mt-2 rounded-xl border border-fuchsia-200 bg-fuchsia-50 p-3 space-y-2 animate-in slide-in-from-top-2 duration-200">
                       <p className="text-fuchsia-800 text-[12px] font-medium">Sugestão da IA:</p>
                       <p className="text-fuchsia-900 text-[13px]">{aiSuggestion}</p>
                       <div className="flex gap-2">
@@ -1343,13 +1675,16 @@ const DashboardPagina = () => {
                 <div>
                   <label className={labelCls}>WhatsApp <span className="text-[hsl(var(--dash-text-subtle))] font-normal">(opcional)</span></label>
                   <div className="flex items-center">
-                    <span className="flex-shrink-0 rounded-l-xl border border-r-0 border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] text-sm px-3 py-2.5 select-none">🇧🇷</span>
+                    <span className="flex-shrink-0 rounded-l-xl border border-r-0 border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] text-sm px-3 py-2.5 select-none">+55</span>
                     <input type="tel" className={`${inputCls} rounded-l-none`} placeholder="11999999999"
                       value={config.whatsapp}
                       onChange={e => updateConfig("whatsapp", e.target.value.replace(/\D/g, ""))} />
                   </div>
                   {config.whatsapp ? (
-                    <p className="text-[hsl(var(--dash-text-subtle))] text-[11px] mt-1.5">Será aberto: wa.me/55{config.whatsapp}</p>
+                    <p className="text-[11px] mt-1.5 flex items-center gap-1.5">
+                      <MessageCircle size={10} className="text-emerald-500" />
+                      <span className="text-[hsl(var(--dash-text-subtle))]">wa.me/55{config.whatsapp}</span>
+                    </p>
                   ) : (
                     <p className="text-[hsl(var(--dash-text-subtle))] text-[11px] mt-1.5">Apenas números, com DDD. Ex: 11999999999</p>
                   )}
@@ -1362,43 +1697,65 @@ const DashboardPagina = () => {
               <div className="space-y-5">
                 <h2 className="text-[hsl(var(--dash-text))] font-semibold text-base">Visual da Vitrine</h2>
 
-                {/* Mini preview */}
-                <div className="rounded-2xl border border-[hsl(var(--dash-border-subtle))] overflow-hidden">
-                  <div className="h-[200px] overflow-hidden flex items-start justify-center pt-4"
-                    style={{ background: `linear-gradient(160deg,${currentTheme.bg} 60%,${currentTheme.accent}18)` }}>
-                    <div className="transform scale-[0.45] origin-top">
-                      <div className="w-[280px]">
-                        <div className="flex flex-col items-center">
-                          <div className="w-16 h-16 rounded-full mb-2" style={{ background: `linear-gradient(135deg,${currentTheme.accent},${currentTheme.accent2})` }} />
-                          <div className="w-24 h-3 rounded bg-white/30 mb-1" />
-                          <div className="w-32 h-2 rounded bg-white/15 mb-3" />
-                          <div className="w-full h-8 rounded-xl mb-2" style={{ background: currentTheme.accent + "20", border: `1px solid ${currentTheme.accent}30` }} />
-                          <div className="w-full h-8 rounded-xl" style={{ background: currentTheme.accent + "10", border: `1px solid ${currentTheme.accent}20` }} />
-                        </div>
-                      </div>
-                    </div>
+                {/* Theme selector grid */}
+                <div>
+                  <label className={labelCls}>Tema</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {THEMES.map(theme => {
+                      const isActive = config.theme === theme.id;
+                      return (
+                        <button
+                          key={theme.id}
+                          onClick={() => updateConfig("theme", theme.id)}
+                          className={`relative rounded-xl overflow-hidden border-2 transition-all ${
+                            isActive ? "border-primary shadow-lg scale-[1.02]" : "border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 hover:scale-[1.01]"
+                          }`}
+                        >
+                          {/* Mini theme preview */}
+                          <div className="h-[80px] p-3 flex flex-col items-center justify-center gap-1.5"
+                            style={{ background: `linear-gradient(160deg, ${theme.bg} 60%, ${theme.accent}20)` }}>
+                            <div className="w-6 h-6 rounded-full" style={{ background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` }} />
+                            <div className="w-14 h-1.5 rounded" style={{ background: theme.accent + "30" }} />
+                            <div className="w-10 h-1 rounded" style={{ background: theme.accent + "20" }} />
+                          </div>
+                          <div className={`px-2 py-1.5 text-center ${isActive ? "bg-primary/10" : "bg-[hsl(var(--dash-surface-2))]"}`}>
+                            <p className={`text-[10px] font-medium ${isActive ? "text-primary" : "text-[hsl(var(--dash-text-secondary))]"}`}>
+                              {theme.label}
+                            </p>
+                          </div>
+                          {isActive && (
+                            <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                              <Check size={10} className="text-white" />
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
-                {/* Theme info */}
-                <div className="flex items-center gap-3">
+                {/* Color swatches */}
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))]">
                   <div className="flex gap-1.5">
                     {[currentTheme.bg, currentTheme.accent, currentTheme.accent2].map((c, i) => (
                       <div key={i} className="w-6 h-6 rounded-full ring-1 ring-white/10" style={{ background: c }} />
                     ))}
                   </div>
                   <div>
-                    <p className="text-[hsl(var(--dash-text))] text-sm font-medium">Tema: {currentTheme.label}</p>
-                    <p className="text-[hsl(var(--dash-text-subtle))] text-xs">Cores, fontes e layout</p>
+                    <p className="text-[hsl(var(--dash-text))] text-xs font-medium">Tema: {currentTheme.label}</p>
+                    <p className="text-[hsl(var(--dash-text-subtle))] text-[10px]">3 cores aplicadas</p>
                   </div>
                 </div>
 
-                {/* CTA to Aparência page */}
+                {/* Advanced design CTA */}
                 <button onClick={() => navigate("/dashboard/aparencia")}
-                  className="w-full btn-primary-gradient text-sm font-semibold py-3 rounded-xl flex items-center justify-center gap-2">
-                  <Palette size={16} /> Personalizar Design
-                  <ExternalLink size={12} />
+                  className="w-full btn-primary-gradient text-sm font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-[0.98]">
+                  <Palette size={16} /> Personalizar Fontes, Layout e Mais
+                  <ArrowRight size={14} />
                 </button>
+                <p className="text-center text-[hsl(var(--dash-text-subtle))] text-[10px]">
+                  Cores, fontes, layout, dark mode e mais opções avançadas
+                </p>
               </div>
             )}
 
@@ -1414,12 +1771,25 @@ const DashboardPagina = () => {
         {/* ── RIGHT PANEL: Phone preview (400px) ── */}
         <div className="hidden lg:block">
           <div className="sticky top-8">
-            <p className="text-[hsl(var(--dash-text-subtle))] text-xs font-medium mb-3 uppercase tracking-wider">
-              Pré-visualização ao vivo
-            </p>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[hsl(var(--dash-text-subtle))] text-xs font-medium uppercase tracking-wider">
+                Preview ao vivo
+              </p>
+              {config.username && (
+                <a href={`https://maview.app/@${config.username}`} target="_blank" rel="noopener noreferrer"
+                  className="text-[10px] text-primary font-medium flex items-center gap-1 hover:underline">
+                  Abrir página <ExternalLink size={9} />
+                </a>
+              )}
+            </div>
             {phonePreview}
-            <div className="mt-3 flex items-center justify-center gap-2">
+            <div className="mt-3 flex items-center justify-center gap-3">
               <span className="text-[hsl(var(--dash-text-subtle))] text-[11px]">Tema: {currentTheme.label}</span>
+              {health < 100 && (
+                <span className="text-[11px] text-amber-500 flex items-center gap-1">
+                  <AlertCircle size={10} /> {100 - health}pts restantes
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -1429,7 +1799,7 @@ const DashboardPagina = () => {
       {/* Mobile preview button */}
       <button
         onClick={() => setShowMobilePreview(true)}
-        className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 lg:hidden flex items-center gap-2 px-5 py-3 rounded-full btn-primary-gradient shadow-xl text-sm font-semibold"
+        className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 lg:hidden flex items-center gap-2 px-5 py-3 rounded-full btn-primary-gradient shadow-xl text-sm font-semibold transition-transform active:scale-95"
       >
         <Eye size={16} /> Ver Preview
       </button>
