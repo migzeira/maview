@@ -234,12 +234,20 @@ const ONBOARDING_STEPS = [
 
 interface ProfileHeroCardProps {
   config: VitrineConfig;
+  onUpdate: (key: keyof VitrineConfig, value: string) => void;
   onEditProfile: () => void;
 }
 
-const ProfileHeroCard = ({ config, onEditProfile }: ProfileHeroCardProps) => {
+const ProfileHeroCard = ({ config, onUpdate, onEditProfile }: ProfileHeroCardProps) => {
   const [copied, setCopied] = useState(false);
   const [showHealthDetail, setShowHealthDetail] = useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [editingAvatar, setEditingAvatar] = useState(false);
+  const [nameVal, setNameVal] = useState(config.displayName);
+  const [avatarVal, setAvatarVal] = useState(config.avatarUrl);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
   const profileUrl = config.username ? `maview.app/@${config.username}` : null;
   const currentTheme = THEMES.find(t => t.id === config.theme) ?? THEMES[0];
   const health = calcHealth(config);
@@ -247,6 +255,27 @@ const ProfileHeroCard = ({ config, onEditProfile }: ProfileHeroCardProps) => {
   const initials = config.displayName
     ? config.displayName.split(" ").slice(0, 2).map(n => n[0]).join("").toUpperCase()
     : "?";
+
+  useEffect(() => { setNameVal(config.displayName); }, [config.displayName]);
+  useEffect(() => { setAvatarVal(config.avatarUrl); }, [config.avatarUrl]);
+
+  useEffect(() => {
+    if (editingName) nameInputRef.current?.focus();
+  }, [editingName]);
+
+  useEffect(() => {
+    if (editingAvatar) avatarInputRef.current?.focus();
+  }, [editingAvatar]);
+
+  const saveName = () => {
+    if (nameVal.trim()) onUpdate("displayName", nameVal.trim());
+    setEditingName(false);
+  };
+
+  const saveAvatar = () => {
+    onUpdate("avatarUrl", avatarVal.trim());
+    setEditingAvatar(false);
+  };
 
   const copyLink = () => {
     if (!profileUrl) return;
@@ -260,34 +289,74 @@ const ProfileHeroCard = ({ config, onEditProfile }: ProfileHeroCardProps) => {
   return (
     <div className="glass-card rounded-2xl p-4 md:p-5 mb-5">
       <div className="flex items-start gap-4">
-        <button onClick={onEditProfile} className="flex-shrink-0 relative group">
-          <div className="w-[56px] h-[56px] rounded-2xl overflow-hidden transition-transform group-hover:scale-105"
-            style={{ boxShadow: `0 0 0 3px ${currentTheme.accent}40` }}>
-            {config.avatarUrl ? (
-              <img src={config.avatarUrl} alt={config.displayName} className="w-full h-full object-cover"
-                onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-white text-xl font-bold"
-                style={{ background: `linear-gradient(135deg, ${currentTheme.accent}, ${currentTheme.accent2})` }}>
-                {initials}
+
+        {/* Avatar — click to edit inline */}
+        <div className="flex-shrink-0">
+          <button onClick={() => { setEditingAvatar(v => !v); setEditingName(false); }}
+            className="relative group">
+            <div className="w-[56px] h-[56px] rounded-2xl overflow-hidden transition-transform group-hover:scale-105"
+              style={{ boxShadow: `0 0 0 3px ${currentTheme.accent}40` }}>
+              {config.avatarUrl ? (
+                <img src={config.avatarUrl} alt={config.displayName} className="w-full h-full object-cover"
+                  onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-white text-xl font-bold"
+                  style={{ background: `linear-gradient(135deg, ${currentTheme.accent}, ${currentTheme.accent2})` }}>
+                  {initials}
+                </div>
+              )}
+            </div>
+            <div className="absolute inset-0 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <Pencil size={13} className="text-white" />
+            </div>
+          </button>
+
+          {/* Avatar inline editor */}
+          {editingAvatar && (
+            <div className="absolute z-20 mt-2 w-[260px] rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border))] shadow-xl p-3 animate-in slide-in-from-top-2 duration-150">
+              <p className="text-[11px] font-semibold text-[hsl(var(--dash-text))] mb-2">URL da foto de perfil</p>
+              <input
+                ref={avatarInputRef}
+                type="url"
+                className="w-full rounded-lg border border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text))] text-[12px] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/25 mb-2"
+                placeholder="https://..."
+                value={avatarVal}
+                onChange={e => setAvatarVal(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter") saveAvatar(); if (e.key === "Escape") setEditingAvatar(false); }}
+              />
+              <div className="flex gap-2">
+                <button onClick={saveAvatar} className="flex-1 btn-primary-gradient text-[11px] py-1.5 rounded-lg font-semibold">
+                  <Check size={11} className="inline mr-1" />Salvar
+                </button>
+                <button onClick={() => setEditingAvatar(false)} className="flex-1 text-[11px] py-1.5 rounded-lg border border-[hsl(var(--dash-border))] text-[hsl(var(--dash-text-muted))] hover:bg-[hsl(var(--dash-surface-2))] transition-all">
+                  Cancelar
+                </button>
               </div>
-            )}
-          </div>
-          <div className="absolute inset-0 rounded-2xl bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <Pencil size={13} className="text-white" />
-          </div>
-        </button>
+            </div>
+          )}
+        </div>
 
         <div className="flex-1 min-w-0">
+          {/* Name — click to edit inline */}
           <div className="flex items-center gap-1.5 mb-0.5">
-            <button onClick={onEditProfile}
-              className="text-[hsl(var(--dash-text))] font-bold text-[17px] hover:text-primary transition-colors truncate text-left leading-tight">
-              {config.displayName || "Seu nome"}
-            </button>
-            <button onClick={onEditProfile}
-              className="p-1 rounded-lg text-[hsl(var(--dash-text-subtle))] hover:text-primary hover:bg-[hsl(var(--dash-accent))] transition-all flex-shrink-0">
-              <Pencil size={11} />
-            </button>
+            {editingName ? (
+              <input
+                ref={nameInputRef}
+                type="text"
+                className="flex-1 bg-transparent border-b-2 border-primary text-[hsl(var(--dash-text))] font-bold text-[17px] leading-tight focus:outline-none py-0.5 min-w-0"
+                value={nameVal}
+                onChange={e => setNameVal(e.target.value)}
+                onBlur={saveName}
+                onKeyDown={e => { if (e.key === "Enter") saveName(); if (e.key === "Escape") { setNameVal(config.displayName); setEditingName(false); } }}
+              />
+            ) : (
+              <button
+                onClick={() => { setEditingName(true); setEditingAvatar(false); }}
+                className="text-[hsl(var(--dash-text))] font-bold text-[17px] hover:text-primary transition-colors truncate text-left leading-tight group/name flex items-center gap-1.5">
+                {config.displayName || "Seu nome"}
+                <Pencil size={11} className="text-[hsl(var(--dash-text-subtle))] opacity-0 group-hover/name:opacity-100 transition-opacity flex-shrink-0" />
+              </button>
+            )}
           </div>
           {config.username && <p className="text-[hsl(var(--dash-text-muted))] text-[12px] mb-1">@{config.username}</p>}
           {config.bio && <p className="text-[hsl(var(--dash-text-subtle))] text-[11.5px] line-clamp-1 mb-2">{config.bio}</p>}
@@ -1037,7 +1106,7 @@ const DashboardPagina = () => {
       </div>
 
       {/* Profile Hero Card */}
-      <ProfileHeroCard config={config} onEditProfile={() => setActiveTab("perfil")} />
+      <ProfileHeroCard config={config} onUpdate={updateConfig} onEditProfile={() => setActiveTab("perfil")} />
 
       {/* Two-column grid */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
