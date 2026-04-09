@@ -74,7 +74,15 @@ const DashboardLayout = ({ children }: Props) => {
   const [copied, setCopied] = useState(false);
   const [health, setHealth] = useState({ score: 0, missing: [] as string[] });
 
-  const username = user?.user_metadata?.username || user?.email?.split("@")[0] || "usuario";
+  // Read username from vitrine config (most reliable) or fall back to auth
+  const authUsername = user?.user_metadata?.username || user?.email?.split("@")[0] || "usuario";
+  const vitrineUsername = (() => {
+    try {
+      const cfg = JSON.parse(localStorage.getItem("maview_vitrine_config") || "{}");
+      return cfg.username || authUsername;
+    } catch { return authUsername; }
+  })();
+  const username = vitrineUsername;
   const displayName = user?.user_metadata?.full_name || username;
   const profileUrl = `maview.app/@${username}`;
   const initials = displayName.slice(0, 2).toUpperCase();
@@ -104,11 +112,17 @@ const DashboardLayout = ({ children }: Props) => {
     navigate("/login");
   };
 
+  // Build the vitrine URL using current origin so it works on any deploy
+  const vitrineUrl = `${window.location.origin}/${username}`;
+
   const copyLink = () => {
-    // Use full production URL for sharing
-    navigator.clipboard.writeText(`https://maview.app/@${username}`);
+    navigator.clipboard.writeText(vitrineUrl);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), 2500);
+  };
+
+  const openVitrine = () => {
+    window.open(vitrineUrl, "_blank", "noopener,noreferrer");
   };
 
   // Health ring SVG
@@ -303,6 +317,16 @@ const DashboardLayout = ({ children }: Props) => {
 
   return (
     <div className="min-h-screen bg-[hsl(var(--dash-bg))] flex">
+
+      {/* ── Copy toast ── */}
+      {copied && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] animate-in slide-in-from-bottom-3 duration-200">
+          <div className="flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-[hsl(var(--dash-text))] text-[hsl(var(--dash-bg))] shadow-2xl text-[13px] font-semibold">
+            <Check size={15} className="text-emerald-500 flex-shrink-0" />
+            Link copiado! Cole e compartilhe sua vitrine 🚀
+          </div>
+        </div>
+      )}
       {/* Desktop sidebar */}
       <aside
         className={`
@@ -345,15 +369,13 @@ const DashboardLayout = ({ children }: Props) => {
           </div>
 
           <div className="flex items-center gap-2">
-            <Link
-              to={`/${username}`}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={openVitrine}
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg btn-primary-gradient text-[12px] font-medium transition-transform active:scale-95"
             >
               <ExternalLink size={12} />
               <span className="hidden sm:inline">Ver página</span>
-            </Link>
+            </button>
           </div>
         </header>
 
