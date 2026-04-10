@@ -262,6 +262,9 @@ function injectEffectStyles() {
     @keyframes mv-wave-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
     @keyframes mv-globe-spin { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
     @keyframes mv-vortex-pro { 0% { transform: translate(-50%,-50%) rotate(0deg) scale(1); } 50% { transform: translate(-50%,-50%) rotate(180deg) scale(1.08); } 100% { transform: translate(-50%,-50%) rotate(360deg) scale(1); } }
+    @keyframes mv-dash-chase { to { stroke-dashoffset: -320; } }
+    @keyframes mv-beam-fall { from { transform: translateY(-100%); } to { transform: translateY(100%); } }
+    @keyframes mv-wave-rotate { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(360deg); } }
     @keyframes mv-orbit-ring { 0% { transform: translate(-50%,-50%) rotate(0deg); } 100% { transform: translate(-50%,-50%) rotate(360deg); } }
     .mv-aurora { animation: mv-aurora 12s ease-in-out infinite; }
     .mv-pulse { animation: mv-pulse 4s ease-in-out infinite; }
@@ -464,20 +467,33 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
       );
     /* ── NEW: Animated motion effects ── */
     case "ocean-waves": {
-      const waveSvg = (color: string, opacity: number) => `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="${color}" fill-opacity="${opacity}" d="M0,192L48,186.7C96,181,192,171,288,186.7C384,203,480,245,576,250.7C672,256,768,224,864,213.3C960,203,1056,213,1152,218.7C1248,224,1344,224,1392,224L1440,224L1440,320L0,320Z"/></svg>`)}`;
+      /* Multi-frequency realistic sine waves — 5 layers with different curves */
+      const wavePaths = [
+        "M0,160L40,154C80,148,160,136,240,141C320,146,400,168,480,181C560,194,640,198,720,186C800,174,880,146,960,138C1040,130,1120,142,1200,157C1280,172,1360,190,1400,199L1440,208L1440,320L0,320Z",
+        "M0,200L48,190C96,180,192,160,288,165C384,170,480,200,576,215C672,230,768,230,864,218C960,206,1056,182,1152,175C1248,168,1344,178,1392,183L1440,188L1440,320L0,320Z",
+        "M0,224L60,218C120,212,240,200,360,208C480,216,600,244,720,252C840,260,960,248,1080,234C1200,220,1320,204,1380,196L1440,188L1440,320L0,320Z",
+        "M0,240L36,234C72,228,144,216,216,222C288,228,360,252,432,262C504,272,576,268,648,256C720,244,792,224,864,218C936,212,1008,220,1080,232C1152,244,1224,260,1296,264C1368,268,1404,260,1422,256L1440,252L1440,320L0,320Z",
+        "M0,260L48,256C96,252,192,244,288,250C384,256,480,276,576,282C672,288,768,280,864,270C960,260,1056,248,1152,250C1248,252,1344,268,1392,276L1440,284L1440,320L0,320Z",
+      ];
+      const waveSvg = (color: string, opacity: number, pathIdx: number) =>
+        `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="${color}" fill-opacity="${opacity}" d="${wavePaths[pathIdx]}"/></svg>`)}`;
       return (
         <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
-          {[0, 1, 2, 3].map(i => {
+          {[0, 1, 2, 3, 4].map(i => {
             const c = i % 2 === 0 ? accent : accent2;
-            const op = [0.35, 0.25, 0.2, 0.15][i];
+            const op = [0.38, 0.28, 0.22, 0.18, 0.12][i];
+            const hVh = [50, 42, 36, 30, 25][i];
+            const speed = [10, 13, 16, 20, 25][i];
+            const dir = i % 2 === 0 ? "normal" : "reverse";
             return (
               <div key={i} className="absolute bottom-0 left-0" style={{
-                width: "200%", height: `${45 - i * 5}vh`,
-                backgroundImage: `url("${waveSvg(c, op)}")`,
+                width: "200%", height: `${hVh}vh`,
+                backgroundImage: `url("${waveSvg(c, op, i)}")`,
                 backgroundSize: "50% 100%", backgroundRepeat: "repeat-x",
-                animation: `mv-wave-scroll ${8 + i * 3}s linear infinite`,
-                animationDelay: `${i * -2}s`,
-                bottom: `${i * -8}px`,
+                animation: `mv-wave-scroll ${speed}s linear infinite`,
+                animationDirection: dir,
+                animationDelay: `${i * -1.8}s`,
+                bottom: `${i * -6}px`,
               }} />
             );
           })}
@@ -735,42 +751,54 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
           }} />
         </div>
       );
-    case "wireframe-globe":
+    case "wireframe-globe": {
+      /* SVG globe with stroke-dasharray — lines chase but never close */
+      const gSize = 350;
+      const gR = gSize / 2 - 10;
+      const meridians = [0, 30, 60, 90, 120, 150];
+      const latitudes = [-60, -30, 0, 30, 60];
       return (
         <div className="fixed inset-0 pointer-events-none z-[1] flex items-center justify-center">
-          <div style={{
-            width: 350, height: 350,
-            transformStyle: "preserve-3d" as const,
-            animation: "mv-globe-spin 20s linear infinite",
-          }}>
-            {/* Meridians (vertical circles) */}
-            {[0,1,2,3,4,5].map(i => (
-              <div key={`m${i}`} className="absolute inset-0 rounded-full" style={{
-                border: `1px solid ${i % 2 === 0 ? accent : accent2}`,
-                opacity: 0.2,
-                transform: `rotateY(${i * 30}deg)`,
-              }} />
-            ))}
-            {/* Latitude lines (horizontal ellipses) */}
-            {[-2,-1,0,1,2].map(i => (
-              <div key={`l${i}`} className="absolute rounded-full" style={{
-                width: `${85 - Math.abs(i) * 20}%`,
-                height: `${85 - Math.abs(i) * 20}%`,
-                left: `${(100 - (85 - Math.abs(i) * 20)) / 2}%`,
-                top: `${50 + i * 18}%`,
-                transform: `translateY(-50%) rotateX(90deg) scaleY(0.3)`,
-                border: `1px solid ${accent}`,
-                opacity: 0.15,
-              }} />
-            ))}
-            {/* Outer glow */}
-            <div className="absolute inset-[-20%] rounded-full" style={{
-              background: `radial-gradient(circle, ${accent}12, transparent 60%)`,
-              filter: "blur(15px)",
-            }} />
+          <div style={{ animation: "mv-globe-spin 22s linear infinite", transformStyle: "preserve-3d" as const }}>
+            <svg width={gSize} height={gSize} viewBox={`0 0 ${gSize} ${gSize}`} fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Outer ring */}
+              <circle cx={gSize/2} cy={gSize/2} r={gR} stroke={accent} strokeWidth="1" opacity="0.25"
+                strokeDasharray="22 8" style={{ animation: "mv-dash-chase 6s linear infinite" }} />
+              {/* Meridians — ellipses that try to close but never do */}
+              {meridians.map((deg, i) => {
+                const scaleX = Math.abs(Math.cos((deg * Math.PI) / 180));
+                const col = i % 2 === 0 ? accent : accent2;
+                return (
+                  <ellipse key={`m${i}`} cx={gSize/2} cy={gSize/2} rx={gR * Math.max(scaleX, 0.05)} ry={gR}
+                    stroke={col} strokeWidth="0.8" opacity="0.3"
+                    strokeDasharray="28 12"
+                    style={{ animation: `mv-dash-chase ${5 + i * 0.8}s linear infinite`, animationDirection: i % 2 === 0 ? "normal" : "reverse" }} />
+                );
+              })}
+              {/* Latitude lines — horizontal ellipses */}
+              {latitudes.map((lat, i) => {
+                const latRad = (lat * Math.PI) / 180;
+                const latR = gR * Math.cos(latRad);
+                const yOff = gR * Math.sin(latRad);
+                return (
+                  <ellipse key={`l${i}`} cx={gSize/2} cy={gSize/2 - yOff} rx={latR} ry={latR * 0.25}
+                    stroke={accent} strokeWidth="0.7" opacity="0.2"
+                    strokeDasharray="18 10"
+                    style={{ animation: `mv-dash-chase ${7 + i * 0.6}s linear infinite` }} />
+                );
+              })}
+              {/* Center glow */}
+              <circle cx={gSize/2} cy={gSize/2} r={gR * 0.6} fill={`${accent}08`} filter="url(#globe-glow)" />
+              <defs>
+                <filter id="globe-glow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="20" />
+                </filter>
+              </defs>
+            </svg>
           </div>
         </div>
       );
+    }
     case "liquid-glass":
       return (
         <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">

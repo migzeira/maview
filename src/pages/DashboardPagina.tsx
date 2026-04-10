@@ -514,6 +514,7 @@ const ProfileHeroCard = ({ config, onUpdate, onEditProfile, onHealthAction, onCo
       @keyframes mvp-wave-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
       @keyframes mvp-globe-spin{from{transform:rotateY(0deg)}to{transform:rotateY(360deg)}}
       @keyframes mvp-vortex-pro{0%{transform:translate(-50%,-50%) rotate(0) scale(1)}50%{transform:translate(-50%,-50%) rotate(180deg) scale(1.08)}100%{transform:translate(-50%,-50%) rotate(360deg) scale(1)}}
+      @keyframes mvp-dash-chase{to{stroke-dashoffset:-160}}
       @keyframes mvp-flicker{0%,100%{opacity:.04}10%{opacity:.08}30%{opacity:.1}50%{opacity:.05}70%{opacity:.08}90%{opacity:.04}}
       @keyframes mvp-slide-diag{0%{background-position:0% 0%}100%{background-position:100% 100%}}
     `;
@@ -1516,8 +1517,22 @@ const DashboardPagina = () => {
       /* ─── Motion effects — profissional, forte, visível ─── */
       case "ocean-waves":
       case "layered-waves": {
-        const wSvg = (c: string, op: number) => `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="${c}" fill-opacity="${op}" d="M0,192L48,186.7C96,181,192,171,288,186.7C384,203,480,245,576,250.7C672,256,768,224,864,213.3C960,203,1056,213,1152,218.7C1248,224,1344,224,1392,224L1440,224L1440,320L0,320Z"/></svg>`)}")`;
-        return wrap(<>{[0,1,2,3].map(i => <div key={i} className="absolute bottom-0 left-0" style={{ width: "200%", height: `${45 - i * 6}%`, backgroundImage: wSvg(i % 2 === 0 ? a : a2, [0.5,0.35,0.25,0.18][i]), backgroundSize: "50% 100%", backgroundRepeat: "repeat-x", animation: `mvp-wave-scroll ${6 + i * 2}s linear infinite`, animationDelay: `${i * -1.5}s`, bottom: `${i * -3}px` }} />)}</>);
+        const wPaths = [
+          "M0,160L40,154C80,148,160,136,240,141C320,146,400,168,480,181C560,194,640,198,720,186C800,174,880,146,960,138C1040,130,1120,142,1200,157C1280,172,1360,190,1400,199L1440,208L1440,320L0,320Z",
+          "M0,200L48,190C96,180,192,160,288,165C384,170,480,200,576,215C672,230,768,230,864,218C960,206,1056,182,1152,175C1248,168,1344,178,1392,183L1440,188L1440,320L0,320Z",
+          "M0,224L60,218C120,212,240,200,360,208C480,216,600,244,720,252C840,260,960,248,1080,234C1200,220,1320,204,1380,196L1440,188L1440,320L0,320Z",
+          "M0,240L36,234C72,228,144,216,216,222C288,228,360,252,432,262C504,272,576,268,648,256C720,244,792,224,864,218C936,212,1008,220,1080,232C1152,244,1224,260,1296,264C1368,268,1404,260,1422,256L1440,252L1440,320L0,320Z",
+          "M0,260L48,256C96,252,192,244,288,250C384,256,480,276,576,282C672,288,768,280,864,270C960,260,1056,248,1152,250C1248,252,1344,268,1392,276L1440,284L1440,320L0,320Z",
+        ];
+        const wSvg = (c: string, op: number, pi: number) => `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="${c}" fill-opacity="${op}" d="${wPaths[pi]}"/></svg>`)}")`;
+        return wrap(<>{[0,1,2,3,4].map(i => {
+          const c = i % 2 === 0 ? a : a2;
+          const op = [0.5,0.38,0.28,0.2,0.14][i];
+          const h = [50,42,35,28,22][i];
+          const spd = [6,8,10,13,16][i];
+          const dir = i % 2 === 0 ? "normal" : "reverse";
+          return <div key={i} className="absolute bottom-0 left-0" style={{ width: "200%", height: `${h}%`, backgroundImage: wSvg(c, op, i), backgroundSize: "50% 100%", backgroundRepeat: "repeat-x", animation: `mvp-wave-scroll ${spd}s linear infinite`, animationDirection: dir, animationDelay: `${i * -1.2}s`, bottom: `${i * -2}px` }} />;
+        })}</>);
       }
       case "orbit-circles": return wrap(<>{[0,1,2,3,4].map(i => <div key={i} className="absolute rounded-full" style={{ width: 12 - i, height: 12 - i, left: "50%", top: "50%", background: i % 2 === 0 ? a : a2, opacity: 1, boxShadow: `0 0 10px ${i % 2 === 0 ? a : a2}`, animation: `mvp-orbit ${4 + i * 1.5}s linear infinite`, ["--orbit-r" as string]: `${22 + i * 22}px` } as React.CSSProperties} />)}</>);
       case "ripple-rings": return wrap(<>{[0,1,2,3].map(i => <div key={i} className="absolute rounded-full" style={{ width: 60, height: 60, left: "calc(50% - 30px)", top: "calc(50% - 30px)", border: `2px solid ${a}`, opacity: 0.8, animation: "mvp-ripple 3s ease-out infinite", animationDelay: `${i * 0.75}s` }} />)}</>);
@@ -1536,7 +1551,25 @@ const DashboardPagina = () => {
       case "gradient-aurora-mesh": return wrap(<><div className="absolute w-[250%] h-[70%] top-[-15%] left-[-75%]" style={{ background: `linear-gradient(135deg, ${a}80, transparent 40%, ${a2}70, transparent)`, filter: "blur(12px)", animation: "mvp-aurora 8s ease-in-out infinite" }} /><div className="absolute w-[250%] h-[60%] bottom-[-15%] left-[-50%]" style={{ background: `linear-gradient(225deg, ${a2}70, transparent 40%, ${a}60, transparent)`, filter: "blur(12px)", animation: "mvp-aurora 11s ease-in-out infinite reverse" }} /></>);
       case "stripe-gradient": return wrap(<div className="absolute inset-0" style={{ background: `repeating-linear-gradient(135deg, ${a}50 0px, ${a}50 5px, transparent 5px, transparent 14px)`, animation: "mvp-slide-diag 8s linear infinite", backgroundSize: "200% 200%" }} />);
       case "vortex-spin": return wrap(<><div className="absolute" style={{ width: 250, height: 250, left: "50%", top: "55%", background: `conic-gradient(from 0deg, ${a}70, transparent 15%, transparent 35%, ${a2}60, transparent 50%, transparent 70%, ${a}50, transparent 85%)`, borderRadius: "50%", filter: "blur(8px)", animation: "mvp-vortex-pro 8s ease-in-out infinite" }} /><div className="absolute" style={{ width: 150, height: 150, left: "50%", top: "55%", background: `conic-gradient(from 90deg, ${a2}60, transparent 20%, transparent 50%, ${a}50, transparent 70%)`, borderRadius: "50%", filter: "blur(5px)", animation: "mvp-vortex-pro 5s ease-in-out infinite reverse" }} /></>);
-      case "wireframe-globe": return wrap(<div className="absolute" style={{ width: 180, height: 180, left: "calc(50% - 90px)", top: "calc(45% - 90px)", transformStyle: "preserve-3d" as unknown as string, animation: "mvp-globe-spin 12s linear infinite" }}>{[0,1,2,3,4,5].map(i => <div key={i} className="absolute inset-0 rounded-full" style={{ border: `1px solid ${i % 2 === 0 ? a : a2}`, opacity: 0.35, transform: `rotateY(${i * 30}deg)` }} />)}</div>);
+      case "wireframe-globe": {
+        const gs = 180, gr = gs / 2 - 6;
+        return wrap(
+          <div className="absolute" style={{ left: "calc(50% - 90px)", top: "calc(45% - 90px)", animation: "mvp-globe-spin 12s linear infinite", transformStyle: "preserve-3d" as unknown as string }}>
+            <svg width={gs} height={gs} viewBox={`0 0 ${gs} ${gs}`} fill="none">
+              <circle cx={gs/2} cy={gs/2} r={gr} stroke={a} strokeWidth="0.8" opacity="0.3" strokeDasharray="14 5" style={{ animation: "mvp-dash-chase 4s linear infinite" }} />
+              {[0,30,60,90,120,150].map((deg,i) => {
+                const sx = Math.abs(Math.cos((deg * Math.PI) / 180));
+                return <ellipse key={`m${i}`} cx={gs/2} cy={gs/2} rx={gr * Math.max(sx, 0.04)} ry={gr} stroke={i % 2 === 0 ? a : a2} strokeWidth="0.6" opacity="0.35" strokeDasharray="16 8" style={{ animation: `mvp-dash-chase ${3.5 + i * 0.5}s linear infinite`, animationDirection: i % 2 === 0 ? "normal" : "reverse" }} />;
+              })}
+              {[-60,-30,0,30,60].map((lat,i) => {
+                const lr = gr * Math.cos((lat * Math.PI) / 180);
+                const yo = gr * Math.sin((lat * Math.PI) / 180);
+                return <ellipse key={`l${i}`} cx={gs/2} cy={gs/2 - yo} rx={lr} ry={lr * 0.25} stroke={a} strokeWidth="0.5" opacity="0.25" strokeDasharray="10 6" style={{ animation: `mvp-dash-chase ${5 + i * 0.4}s linear infinite` }} />;
+              })}
+            </svg>
+          </div>
+        );
+      }
       case "liquid-glass": return wrap(<>{[{x:25,y:25,s:160},{x:70,y:60,s:140}].map((p,i) => <div key={i} className="absolute" style={{ width: p.s, height: p.s, left: `${p.x}%`, top: `${p.y}%`, transform: "translate(-50%,-50%)", background: `radial-gradient(circle, ${i === 0 ? a : a2}50, transparent 65%)`, borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%", animation: "mvp-morph 6s ease-in-out infinite", animationDelay: `${i * -3}s`, filter: "blur(5px)" }} />)}</>);
       default: return null;
     }
