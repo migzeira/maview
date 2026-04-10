@@ -16,6 +16,7 @@ import DesignTab from "@/components/DesignTab";
 type ThemeId = "dark-purple" | "midnight" | "forest" | "rose" | "amber" | "ocean"
   | "neon-pink" | "sunset" | "lavender" | "emerald" | "crimson" | "arctic"
   | "gold" | "sage" | "coral" | "indigo" | "slate" | "wine"
+  | "white" | "cream" | "pure-black" | "bold-red"
   | "custom";
 
 type BgType = "solid" | "gradient" | "image" | "video" | "pattern" | "effect";
@@ -3204,7 +3205,7 @@ const DashboardPagina = () => {
                               if (idx >= 0) {
                                 links[idx] = { ...links[idx], url: buildUrl(newVal), title: social.label, active: !!newVal };
                               } else if (newVal) {
-                                links.push({ id: Date.now().toString(), title: social.label, url: buildUrl(newVal), icon: social.key, active: true, isSocial: true, type: "normal" });
+                                links.push({ id: Date.now().toString(), title: social.label, url: buildUrl(newVal), icon: social.key as LinkItem["icon"], active: true, isSocial: true, type: "normal" });
                               }
                               updateConfig("links", links);
                             }}
@@ -3306,7 +3307,7 @@ const DashboardPagina = () => {
                     {/* Mini phone mockup */}
                     <div className="flex-shrink-0 w-[140px] rounded-2xl overflow-hidden border-2 border-[hsl(var(--dash-text))]/30 shadow-lg">
                       <div className="overflow-hidden relative" style={{ ...previewBgStyle, height: 180, fontFamily: `'${pFontB}', sans-serif` }}>
-                        {previewEffectOverlay && <div className="absolute inset-0 pointer-events-none z-[1]" style={previewEffectOverlay} />}
+                        {previewEffectOverlay && <div className="absolute inset-0 pointer-events-none z-[1]">{previewEffectOverlay}</div>}
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[80px] pointer-events-none" style={{ background: `radial-gradient(ellipse, ${pAccent}20, transparent 70%)` }} />
                         <div className="p-2.5 relative z-10">
                           <div className="flex flex-col items-center mb-2">
