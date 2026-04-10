@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import {
   Check, ChevronDown, Palette, Image, Video, Type, Square, Circle,
-  Sparkles, Eye, Sliders, Upload, X, Play, Globe, Zap, Hexagon,
+  Sparkles, Eye, Upload, X, Play, Globe, Zap, Hexagon,
   PaintBucket, Droplets, Sun, Moon, Layers, Grid3X3, Wand2, Info,
   LayoutTemplate, Link2,
 } from "lucide-react";
@@ -117,6 +117,24 @@ const BG_EFFECTS: { id: string; label: string; desc: string; category: string }[
   { id: "morph-blobs", label: "Blobs", desc: "Formas orgânicas que se transformam", category: "motion" },
   { id: "orbit-rings", label: "Anéis Girando", desc: "Anéis concêntricos com pontos orbitando", category: "motion" },
   { id: "neon-lines", label: "Linhas Neon", desc: "Linhas luminosas ondulando", category: "motion" },
+  // Light & Sweep
+  { id: "gradient-shift-hue", label: "Arco-Íris", desc: "Cores do espectro girando suavemente", category: "gradient" },
+  { id: "light-sweep", label: "Varredura", desc: "Feixe de luz varrendo a tela", category: "glow" },
+  { id: "breathing-glow", label: "Respiração", desc: "Brilho pulsante como respiração", category: "glow" },
+  { id: "conic-spotlight", label: "Holofote Cônico", desc: "Feixe de luz girando do centro", category: "glow" },
+  // Particles & Motion
+  { id: "rising-particles", label: "Partículas Subindo", desc: "Partículas flutuando para cima", category: "particle" },
+  { id: "noise-flicker", label: "Ruído", desc: "Textura granulada com flicker sutil", category: "atmosphere" },
+  { id: "diagonal-shimmer", label: "Diagonal", desc: "Listras diagonais deslizando", category: "wave" },
+  // Orbs & Layers
+  { id: "floating-orbs", label: "Orbes Flutuantes", desc: "Esferas de luz derivando lentamente", category: "glow" },
+  { id: "layered-waves", label: "Ondas em Camadas", desc: "4 camadas de ondas paralaxe", category: "motion" },
+  { id: "pulse-circles", label: "Círculos Pulsantes", desc: "Ondas concêntricas expandindo", category: "motion" },
+  // Premium
+  { id: "gradient-aurora-mesh", label: "Aurora Mesh", desc: "Aurora + ondas + brilho combinados", category: "gradient" },
+  { id: "stripe-gradient", label: "Stripe", desc: "Gradiente animado estilo Stripe", category: "gradient" },
+  { id: "vortex-spin", label: "Vórtex", desc: "Espiral de luz girando lentamente", category: "motion" },
+  { id: "liquid-glass", label: "Vidro Líquido", desc: "Formas de vidro líquido orgânicas", category: "motion" },
 ];
 
 const EFFECT_CATEGORIES = [
@@ -793,6 +811,20 @@ function getEffectPreviewStyle(effectId: string, accent: string): React.CSSPrope
     case "morph-blobs": return { background: `radial-gradient(ellipse at 30% 40%, ${a}20 0%, transparent 50%), radial-gradient(ellipse at 70% 60%, #ec489915 0%, transparent 50%)` };
     case "orbit-rings": return { background: `radial-gradient(circle, transparent 30%, ${a}08 31%, transparent 32%), radial-gradient(circle, transparent 45%, ${a}06 46%, transparent 47%), radial-gradient(circle, transparent 60%, ${a}04 61%, transparent 62%)` };
     case "neon-lines": return { backgroundImage: `linear-gradient(0deg, transparent 45%, ${a}15 50%, transparent 55%), linear-gradient(0deg, transparent 65%, #ec489910 70%, transparent 75%)` };
+    case "gradient-shift-hue": return { background: `linear-gradient(135deg, ${a}30, #ec489920, #60a5fa20)` };
+    case "light-sweep": return { background: `linear-gradient(90deg, transparent 30%, ${a}20 50%, transparent 70%)` };
+    case "breathing-glow": return { background: `radial-gradient(circle at 40% 40%, ${a}25, transparent 60%)` };
+    case "conic-spotlight": return { background: `conic-gradient(from 45deg, transparent 0%, ${a}15 10%, transparent 20%)` };
+    case "rising-particles": return { background: `radial-gradient(1px 1px at 30% 70%, ${a} 50%, transparent), radial-gradient(2px 2px at 60% 40%, ${a} 50%, transparent), radial-gradient(1px 1px at 80% 60%, ${a} 50%, transparent)` };
+    case "noise-flicker": return { background: `repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)` };
+    case "diagonal-shimmer": return { background: `repeating-linear-gradient(45deg, transparent, transparent 10px, ${a}06 10px, ${a}06 20px)` };
+    case "floating-orbs": return { background: `radial-gradient(circle at 30% 30%, ${a}20, transparent 50%), radial-gradient(circle at 70% 70%, #ec489915, transparent 50%)` };
+    case "layered-waves": return { background: `linear-gradient(180deg, transparent 40%, ${a}12 60%, ${a}06 80%, transparent)` };
+    case "pulse-circles": return { background: `radial-gradient(circle, transparent 25%, ${a}08 27%, transparent 29%), radial-gradient(circle, transparent 40%, ${a}06 42%, transparent 44%)` };
+    case "gradient-aurora-mesh": return { background: `linear-gradient(135deg, ${a}15, transparent, ${a}10), radial-gradient(circle at 50% 80%, #ec489910, transparent 50%)` };
+    case "stripe-gradient": return { background: `linear-gradient(-45deg, ${a}15, #ec489910, #60a5fa10, ${a}15)` };
+    case "vortex-spin": return { background: `conic-gradient(from 0deg, transparent, ${a}10, transparent, ${a}05, transparent)` };
+    case "liquid-glass": return { background: `radial-gradient(ellipse at 35% 40%, ${a}18, transparent 50%), radial-gradient(ellipse at 65% 65%, #ec489912, transparent 50%)` };
     default: return {};
   }
 }
@@ -939,24 +971,23 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   return (
     <div className="space-y-5 pb-28">
 
-      {/* ═══════════ HERO: DESIGN PACKS — the main feature ═══════════ */}
+      {/* ═══════════ HERO: DESIGN PACKS ═══════════ */}
       <div className="space-y-4">
-        {/* Hero header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center">
               <LayoutTemplate size={18} className="text-primary" />
             </div>
             <div>
-              <h2 className="text-[hsl(var(--dash-text))] font-bold text-lg tracking-tight">Design Packs</h2>
-              <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Escolha um template e customize depois</p>
+              <h2 className="text-[hsl(var(--dash-text))] font-bold text-lg tracking-tight">Escolha seu estilo</h2>
+              <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] mt-0.5">1 clique = design completo</p>
             </div>
           </div>
           {config.avatarUrl && (
-            <Tooltip text="Gera cores automaticamente a partir da sua foto de perfil">
+            <Tooltip text="Gera cores a partir da sua foto">
               <button onClick={autoThemeFromAvatar}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[11px] font-semibold text-fuchsia-400 bg-fuchsia-500/10 border border-fuchsia-500/20 hover:bg-fuchsia-500/20 transition-all">
-                <Wand2 size={12} /> Auto-cores
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-semibold text-fuchsia-400 bg-fuchsia-500/10 border border-fuchsia-500/20 hover:bg-fuchsia-500/20 transition-all">
+                <Wand2 size={12} /> Auto
               </button>
             </Tooltip>
           )}
@@ -993,39 +1024,27 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
                   className={`relative rounded-xl overflow-hidden text-left transition-all group w-full ${
                     isActive ? "ring-2 ring-primary scale-[1.02] shadow-lg shadow-primary/20" : "ring-1 ring-white/8 hover:ring-primary/40 hover:scale-[1.01]"
                   }`}>
-                  {/* Preview bar with effect hint */}
                   <div className="h-[52px] relative" style={{ background: pack.preview.bg }}>
-                    <div className="absolute inset-0" style={{
-                      background: `linear-gradient(135deg, ${pack.preview.accent}18, transparent 40%, ${pack.preview.accent2}12)`,
+                    <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${pack.preview.accent}18, transparent 40%, ${pack.preview.accent2}12)` }} />
+                    <div className="absolute top-2.5 left-3 w-5 h-5 rounded-full border border-white/20" style={{
+                      background: `linear-gradient(135deg, ${pack.preview.accent}40, ${pack.preview.accent2}30)`,
+                      borderRadius: pack.config.design.profileShape === "square" ? "4px" : pack.config.design.profileShape === "rounded" ? "6px" : "9999px",
                     }} />
-                    {/* Mini profile circle */}
-                    <div className="absolute top-2.5 left-3 w-5 h-5 rounded-full border border-white/20"
-                      style={{
-                        background: `linear-gradient(135deg, ${pack.preview.accent}40, ${pack.preview.accent2}30)`,
-                        borderRadius: pack.config.design.profileShape === "square" ? "4px" : pack.config.design.profileShape === "rounded" ? "6px" : "9999px",
-                      }} />
-                    {/* Mini text lines */}
                     <div className="absolute top-3 left-10 space-y-1">
                       <div className="w-12 h-1 rounded-full bg-white/30" />
                       <div className="w-8 h-0.5 rounded-full bg-white/15" />
                     </div>
-                    {/* Mini button preview */}
                     <div className="absolute bottom-2 left-3 right-3 flex gap-1.5">
-                      <div className="flex-1 h-3 rounded text-[5px] font-bold flex items-center justify-center"
-                        style={{
-                          borderRadius: pack.config.design.buttonShape === "pill" ? "999px" : pack.config.design.buttonShape === "square" ? "2px" : "4px",
-                          background: pack.config.design.buttonFill === "outline" ? "transparent" : `${pack.preview.accent}80`,
-                          border: pack.config.design.buttonFill === "outline" ? `1px solid ${pack.preview.accent}60` : "none",
-                          color: pack.config.design.buttonFill === "outline" ? pack.preview.accent : "rgba(255,255,255,0.9)",
-                          boxShadow: pack.config.design.buttonShadow === "glow" ? `0 0 8px ${pack.preview.accent}40` : "none",
-                        }} />
-                      <div className="flex-1 h-3 rounded"
-                        style={{
-                          borderRadius: pack.config.design.buttonShape === "pill" ? "999px" : pack.config.design.buttonShape === "square" ? "2px" : "4px",
-                          background: `linear-gradient(135deg, ${pack.preview.accent}50, ${pack.preview.accent2}50)`,
-                        }} />
+                      <div className="flex-1 h-3 rounded" style={{
+                        borderRadius: pack.config.design.buttonShape === "pill" ? "999px" : pack.config.design.buttonShape === "square" ? "2px" : "4px",
+                        background: pack.config.design.buttonFill === "outline" ? "transparent" : `${pack.preview.accent}80`,
+                        border: pack.config.design.buttonFill === "outline" ? `1px solid ${pack.preview.accent}60` : "none",
+                      }} />
+                      <div className="flex-1 h-3 rounded" style={{
+                        borderRadius: pack.config.design.buttonShape === "pill" ? "999px" : pack.config.design.buttonShape === "square" ? "2px" : "4px",
+                        background: `linear-gradient(135deg, ${pack.preview.accent}50, ${pack.preview.accent2}50)`,
+                      }} />
                     </div>
-                    {/* Color dots */}
                     <div className="absolute top-2 right-2.5 flex gap-1">
                       <div className="w-2.5 h-2.5 rounded-full ring-1 ring-black/20" style={{ background: pack.preview.accent }} />
                       <div className="w-2.5 h-2.5 rounded-full ring-1 ring-black/20" style={{ background: pack.preview.accent2 }} />
@@ -1055,18 +1074,20 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
             );
           })}
         </div>
-
-        <div className="h-px bg-gradient-to-r from-transparent via-[hsl(var(--dash-border-subtle))] to-transparent" />
-        <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] text-center">Aplique um pack acima e refine cada detalhe nas seções abaixo</p>
       </div>
 
-      {/* ═══════════ AUTO HARMONY — generate full palette from 1 color ═══════════ */}
+      {/* ═══════════ SEPARATOR ═══════════ */}
+      <div className="space-y-2">
+        <div className="h-px bg-gradient-to-r from-transparent via-[hsl(var(--dash-border-subtle))] to-transparent" />
+        <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] text-center">Quer personalizar mais? Ajuste abaixo</p>
+      </div>
+
+      {/* ═══════════ QUICK CUSTOMIZE — all collapsed ═══════════ */}
+
+      {/* Quick: Generate palette from 1 color */}
       <SectionCard title="Cores automáticas" icon={<Wand2 size={14} />} defaultOpen={false}
-        desc="Escolha 1 cor e gere a paleta completa automaticamente">
+        desc="Escolha 1 cor e gere a paleta completa">
         <div className="space-y-3 pt-2">
-          <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">
-            Clique em uma cor para gerar fundo, cards, texto e cor secundária automaticamente
-          </p>
           <div className="grid grid-cols-6 gap-2">
             {ACCENT_COLORS.map(c => (
               <Tooltip key={`auto-${c}`} text={`Gerar paleta a partir de ${c.toUpperCase()}`}>
@@ -1086,77 +1107,24 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
                 <Wand2 size={12} className="text-white/60" />
               </div>
             </label>
-            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Ou escolha qualquer cor personalizada</p>
-          </div>
-          {/* Preview of generated palette */}
-          <div className="p-3 rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))]">
-            <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] mb-2">Paleta gerada</p>
-            <div className="flex gap-1.5 items-center">
-              {[
-                { c: d.bgColor || currentTheme.bg, l: "BG" },
-                { c: d.cardBg || "#13102a", l: "Card" },
-                { c: d.accentColor || currentTheme.accent, l: "Accent" },
-                { c: d.accentColor2 || currentTheme.accent2, l: "Sec" },
-                { c: d.textColor || "#f8f5ff", l: "Text" },
-              ].map((item, i) => (
-                <div key={i} className="flex flex-col items-center gap-1">
-                  <div className="w-6 h-6 rounded-lg ring-1 ring-white/10" style={{ background: item.c }} />
-                  <span className="text-[7px] text-[hsl(var(--dash-text-subtle))]">{item.l}</span>
-                </div>
-              ))}
-            </div>
+            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Ou escolha qualquer cor</p>
           </div>
         </div>
       </SectionCard>
 
-      {/* ═══════════ SECTION: Theme Presets ═══════════ */}
-      <SectionCard title="Tema base" icon={<Sliders size={14} />} defaultOpen={false} desc="Ou escolha apenas o tema de cores" step={2}>
-        <div ref={themeGridRef} className={`grid grid-cols-3 gap-2 pt-2 rounded-xl transition-all duration-300 ${
-          highlightField === "theme" ? "ring-2 ring-primary p-1 shadow-[0_0_18px_rgba(139,92,246,0.45)]" : ""
-        }`}>
-          {themes.filter(t => t.id !== "custom").map(theme => {
-            const isActive = config.theme === theme.id;
-            return (
-              <Tooltip key={theme.id} text={`Tema ${theme.label}`}>
-                <button onClick={() => updateConfig("theme", theme.id)}
-                  className={`relative rounded-xl overflow-hidden border-2 transition-all w-full ${
-                    isActive ? "border-primary shadow-lg scale-[1.02]" : "border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 hover:scale-[1.01]"
-                  }`}>
-                  <div className="h-[52px] flex items-center justify-center"
-                    style={{ background: `linear-gradient(160deg, ${theme.bg} 60%, ${theme.accent}20)` }}>
-                    <div className="w-5 h-5 rounded-full" style={{ background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` }} />
-                  </div>
-                  <div className={`px-1.5 py-1 text-center ${isActive ? "bg-primary/10" : "bg-[hsl(var(--dash-surface-2))]"}`}>
-                    <p className={`text-[9px] font-medium truncate ${isActive ? "text-primary" : "text-[hsl(var(--dash-text-secondary))]"}`}>
-                      {theme.label}
-                    </p>
-                  </div>
-                  {isActive && (
-                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
-                      <Check size={8} className="text-white" />
-                    </div>
-                  )}
-                </button>
-              </Tooltip>
-            );
-          })}
-        </div>
-      </SectionCard>
-
-      {/* ═══════════ SECTION 2: Background ═══════════ */}
-      {/* ═══════════ SECTION 2: Background ═══════════ */}
-      <SectionCard title="Fundo" icon={<Layers size={14} />} defaultOpen={false} desc="Refine o fundo do pack escolhido" step={3}>
+      {/* Quick: Background */}
+      <SectionCard title="Fundo" icon={<Layers size={14} />} defaultOpen={false} desc="Tipo de fundo e efeitos animados">
         {/* BG Type selector */}
         <div className="flex gap-1.5 pt-2 flex-wrap">
           {([
-            { type: "solid" as BgType, icon: <PaintBucket size={12} />, label: "Cor", tip: "Uma cor sólida de fundo" },
-            { type: "gradient" as BgType, icon: <Droplets size={12} />, label: "Degradê", tip: "Duas cores em transição suave" },
-            { type: "image" as BgType, icon: <Image size={12} />, label: "Imagem", tip: "Sua imagem como fundo" },
-            { type: "video" as BgType, icon: <Video size={12} />, label: "Vídeo", tip: "Vídeo em loop como fundo" },
-            { type: "pattern" as BgType, icon: <Grid3X3 size={12} />, label: "Padrão", tip: "Padrões geométricos sutis" },
-            { type: "effect" as BgType, icon: <Sparkles size={12} />, label: "Efeito", tip: "Efeitos animados estilo 21st.dev" },
-          ]).map(({ type, icon, label, tip }) => (
-            <Tooltip key={type} text={tip}>
+            { type: "solid" as BgType, icon: <PaintBucket size={12} />, label: "Cor" },
+            { type: "gradient" as BgType, icon: <Droplets size={12} />, label: "Degradê" },
+            { type: "image" as BgType, icon: <Image size={12} />, label: "Imagem" },
+            { type: "video" as BgType, icon: <Video size={12} />, label: "Vídeo" },
+            { type: "pattern" as BgType, icon: <Grid3X3 size={12} />, label: "Padrão" },
+            { type: "effect" as BgType, icon: <Sparkles size={12} />, label: "Efeito" },
+          ]).map(({ type, icon, label }) => (
+            <Tooltip key={type} text={label}>
               <button onClick={() => setDesign("bgType", type)}
                 className={`flex-1 min-w-[60px] flex flex-col items-center gap-1 px-2 py-2 rounded-xl text-[10px] font-medium transition-all ${
                   d.bgType === type
@@ -1411,27 +1379,23 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         )}
       </SectionCard>
 
-      {/* ═══════════ SECTION 3: Colors ═══════════ */}
-      <SectionCard title="Cores" icon={<Palette size={14} />} defaultOpen={false} desc="Ajuste fino das cores" step={4}>
+      {/* Quick: Colors */}
+      <SectionCard title="Cores" icon={<Palette size={14} />} defaultOpen={false} desc="Ajuste fino das cores">
         <div className="space-y-3 pt-2">
           <div className="grid grid-cols-2 gap-3">
             <ColorPicker value={d.accentColor || currentTheme.accent} onChange={v => { setDesign("accentColor", v); updateConfig("theme", "custom"); }} label="Cor principal" />
             <ColorPicker value={d.accentColor2 || currentTheme.accent2} onChange={v => { setDesign("accentColor2", v); updateConfig("theme", "custom"); }} label="Cor secundária" />
           </div>
-          <div>
-            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Paleta rápida</p>
-            <div className="grid grid-cols-6 gap-2">
-              {ACCENT_COLORS.map(c => (
-                <Tooltip key={c} text={c.toUpperCase()}>
-                  <button onClick={() => { setDesign("accentColor", c); updateConfig("theme", "custom"); }}
-                    className={`w-8 h-8 rounded-lg transition-all hover:scale-110 ${
-                      (d.accentColor || currentTheme.accent) === c ? "ring-2 ring-white scale-110" : "ring-1 ring-white/10"
-                    }`} style={{ background: c }} />
-                </Tooltip>
-              ))}
-            </div>
+          <div className="grid grid-cols-6 gap-2">
+            {ACCENT_COLORS.map(c => (
+              <Tooltip key={c} text={c.toUpperCase()}>
+                <button onClick={() => { setDesign("accentColor", c); updateConfig("theme", "custom"); }}
+                  className={`w-8 h-8 rounded-lg transition-all hover:scale-110 ${
+                    (d.accentColor || currentTheme.accent) === c ? "ring-2 ring-white scale-110" : "ring-1 ring-white/10"
+                  }`} style={{ background: c }} />
+              </Tooltip>
+            ))}
           </div>
-          {/* Advanced colors — always visible */}
           <div className="pt-1 space-y-2">
             <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] font-medium">Refinamento</p>
             <div className="grid grid-cols-2 gap-3">
@@ -1446,8 +1410,8 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         </div>
       </SectionCard>
 
-      {/* ═══════════ SECTION 4: Button Styles ═══════════ */}
-      <SectionCard title="Estilo dos botões" icon={<Square size={14} />} defaultOpen={false} desc="Formato, preenchimento e sombra" step={5}>
+      {/* Quick: Buttons */}
+      <SectionCard title="Botões" icon={<Square size={14} />} defaultOpen={false} desc="Formato e estilo">
         <div className="space-y-4 pt-2">
           {/* Shape */}
           <div>
@@ -1556,67 +1520,8 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         </div>
       </SectionCard>
 
-      {/* ═══════════ SECTION 4: Profile Photo ═══════════ */}
-      <SectionCard title="Foto de perfil" icon={<Circle size={14} />} defaultOpen={false} desc="Formato, tamanho e borda da foto" step={7}>
-        <div className="space-y-3 pt-2">
-          <div className="grid grid-cols-4 gap-1.5">
-            {([
-              { shape: "circle" as ProfileShape, label: "Círculo", cls: "rounded-full", tip: "Formato redondo clássico" },
-              { shape: "rounded" as ProfileShape, label: "Arredondado", cls: "rounded-2xl", tip: "Quadrado com cantos arredondados" },
-              { shape: "square" as ProfileShape, label: "Quadrado", cls: "rounded-none", tip: "Sem arredondamento" },
-              { shape: "hexagon" as ProfileShape, label: "Hexágono", cls: "rounded-full", tip: "Formato hexagonal" },
-            ]).map(({ shape, label, cls, tip }) => (
-              <Tooltip key={shape} text={tip}>
-                <button onClick={() => setDesign("profileShape", shape)}
-                  className={`flex flex-col items-center gap-1 py-2.5 rounded-xl text-[9px] font-medium transition-all w-full ${
-                    d.profileShape === shape ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/20"
-                  }`}>
-                  <div className={`w-6 h-6 ${cls} bg-gradient-to-br from-primary/40 to-primary/20 border border-primary/30`}
-                    style={shape === "hexagon" ? { clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" } : {}} />
-                  {label}
-                </button>
-              </Tooltip>
-            ))}
-          </div>
-          <div className="grid grid-cols-2 gap-3 items-center">
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Tamanho</p>
-                <span className="text-[10px] font-mono text-[hsl(var(--dash-text-muted))]">{d.profileSize}px</span>
-              </div>
-              <input type="range" min={64} max={120} value={d.profileSize} onChange={e => setDesign("profileSize", +e.target.value)}
-                className="w-full h-1.5 rounded-full appearance-none bg-[hsl(var(--dash-border))] accent-primary" />
-            </div>
-            <div className="flex items-center justify-between">
-              <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Borda colorida</p>
-              <Tooltip text={d.profileBorder ? "Desativar borda" : "Ativar borda colorida"}>
-                <button onClick={() => setDesign("profileBorder", !d.profileBorder)}
-                  className={`relative w-9 h-5 rounded-full transition-colors ${d.profileBorder ? "bg-primary" : "bg-[hsl(var(--dash-border))]"}`}>
-                  <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${d.profileBorder ? "left-[18px]" : "left-0.5"}`} />
-                </button>
-              </Tooltip>
-            </div>
-          </div>
-          {d.profileBorder && (
-            <ColorPicker value={d.profileBorderColor || d.accentColor || currentTheme.accent}
-              onChange={v => setDesign("profileBorderColor", v)} label="Cor da borda" />
-          )}
-          {config.avatarUrl && (
-            <div className="flex justify-center p-3 rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))]">
-              <img src={config.avatarUrl} alt="preview" className="object-cover"
-                style={{
-                  width: d.profileSize, height: d.profileSize,
-                  borderRadius: d.profileShape === "circle" ? "9999px" : d.profileShape === "rounded" ? "20%" : d.profileShape === "square" ? "8px" : "0",
-                  clipPath: d.profileShape === "hexagon" ? "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" : undefined,
-                  border: d.profileBorder ? `2.5px solid ${d.profileBorderColor || accent}60` : "none",
-                }} />
-            </div>
-          )}
-        </div>
-      </SectionCard>
-
-      {/* ═══════════ SECTION 5: Typography ═══════════ */}
-      <SectionCard title="Tipografia" icon={<Type size={14} />} defaultOpen={false} desc="Fontes do Google Fonts para títulos e corpo" step={6}>
+      {/* Quick: Typography */}
+      <SectionCard title="Tipografia" icon={<Type size={14} />} defaultOpen={false} desc="Fontes — auto-pareamento incluído">
         <div className="space-y-3 pt-2">
           <div className="flex gap-1 flex-wrap">
             {[
@@ -1695,7 +1600,66 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         </div>
       </SectionCard>
 
-      {/* ═══════════ Summary bar ═══════════ */}
+      {/* Quick: Profile Photo */}
+      <SectionCard title="Foto de perfil" icon={<Circle size={14} />} defaultOpen={false} desc="Formato e borda">
+        <div className="space-y-3 pt-2">
+          <div className="grid grid-cols-4 gap-1.5">
+            {([
+              { shape: "circle" as ProfileShape, label: "Círculo", cls: "rounded-full", tip: "Formato redondo clássico" },
+              { shape: "rounded" as ProfileShape, label: "Arredondado", cls: "rounded-2xl", tip: "Quadrado com cantos arredondados" },
+              { shape: "square" as ProfileShape, label: "Quadrado", cls: "rounded-none", tip: "Sem arredondamento" },
+              { shape: "hexagon" as ProfileShape, label: "Hexágono", cls: "rounded-full", tip: "Formato hexagonal" },
+            ]).map(({ shape, label, cls, tip }) => (
+              <Tooltip key={shape} text={tip}>
+                <button onClick={() => setDesign("profileShape", shape)}
+                  className={`flex flex-col items-center gap-1 py-2.5 rounded-xl text-[9px] font-medium transition-all w-full ${
+                    d.profileShape === shape ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/20"
+                  }`}>
+                  <div className={`w-6 h-6 ${cls} bg-gradient-to-br from-primary/40 to-primary/20 border border-primary/30`}
+                    style={shape === "hexagon" ? { clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" } : {}} />
+                  {label}
+                </button>
+              </Tooltip>
+            ))}
+          </div>
+          <div className="grid grid-cols-2 gap-3 items-center">
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Tamanho</p>
+                <span className="text-[10px] font-mono text-[hsl(var(--dash-text-muted))]">{d.profileSize}px</span>
+              </div>
+              <input type="range" min={64} max={120} value={d.profileSize} onChange={e => setDesign("profileSize", +e.target.value)}
+                className="w-full h-1.5 rounded-full appearance-none bg-[hsl(var(--dash-border))] accent-primary" />
+            </div>
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Borda colorida</p>
+              <Tooltip text={d.profileBorder ? "Desativar borda" : "Ativar borda colorida"}>
+                <button onClick={() => setDesign("profileBorder", !d.profileBorder)}
+                  className={`relative w-9 h-5 rounded-full transition-colors ${d.profileBorder ? "bg-primary" : "bg-[hsl(var(--dash-border))]"}`}>
+                  <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${d.profileBorder ? "left-[18px]" : "left-0.5"}`} />
+                </button>
+              </Tooltip>
+            </div>
+          </div>
+          {d.profileBorder && (
+            <ColorPicker value={d.profileBorderColor || d.accentColor || currentTheme.accent}
+              onChange={v => setDesign("profileBorderColor", v)} label="Cor da borda" />
+          )}
+          {config.avatarUrl && (
+            <div className="flex justify-center p-3 rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))]">
+              <img src={config.avatarUrl} alt="preview" className="object-cover"
+                style={{
+                  width: d.profileSize, height: d.profileSize,
+                  borderRadius: d.profileShape === "circle" ? "9999px" : d.profileShape === "rounded" ? "20%" : d.profileShape === "square" ? "8px" : "0",
+                  clipPath: d.profileShape === "hexagon" ? "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" : undefined,
+                  border: d.profileBorder ? `2.5px solid ${d.profileBorderColor || accent}60` : "none",
+                }} />
+            </div>
+          )}
+        </div>
+      </SectionCard>
+
+      {/* Summary */}
       <div className="flex items-center gap-3 p-3 rounded-xl bg-[hsl(var(--dash-surface-2))]/60 border border-[hsl(var(--dash-border-subtle))]">
         <div className="flex gap-1">
           {[d.bgColor || currentTheme.bg, d.accentColor || currentTheme.accent, d.accentColor2 || currentTheme.accent2].map((c, i) => (

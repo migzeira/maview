@@ -272,6 +272,20 @@ function injectEffectStyles() {
     .mv-sway { animation: mv-sway 8s ease-in-out infinite; }
     .mv-morph { animation: mv-morph 12s ease-in-out infinite; }
     .mv-orbit-ring { animation: mv-orbit-ring var(--ring-dur, 20s) linear infinite; }
+    @keyframes mv-hue { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+    @keyframes mv-sweep { 0% { transform: translateX(-100%) skewX(-15deg); } 100% { transform: translateX(200%) skewX(-15deg); } }
+    @keyframes mv-breathe { 0%,100% { transform: scale(1); opacity: 0.12; } 50% { transform: scale(1.15); opacity: 0.25; } }
+    @keyframes mv-spin-slow { 0% { transform: translate(-50%,-50%) rotate(0deg); } 100% { transform: translate(-50%,-50%) rotate(360deg); } }
+    @keyframes mv-rise { 0% { transform: translateY(100vh) scale(0.5); opacity: 0; } 50% { opacity: 0.3; } 100% { transform: translateY(-20vh) scale(1); opacity: 0; } }
+    @keyframes mv-flicker { 0%,100% { opacity: 0.03; } 10% { opacity: 0.06; } 20% { opacity: 0.02; } 30% { opacity: 0.07; } 50% { opacity: 0.04; } 70% { opacity: 0.06; } 90% { opacity: 0.03; } }
+    @keyframes mv-slide-diag { 0% { background-position: 0% 0%; } 100% { background-position: 100% 100%; } }
+    .mv-hue { animation: mv-hue 20s linear infinite; }
+    .mv-sweep { animation: mv-sweep 5s ease-in-out infinite; }
+    .mv-breathe { animation: mv-breathe 6s ease-in-out infinite; }
+    .mv-spin-slow { animation: mv-spin-slow var(--spin-dur, 30s) linear infinite; }
+    .mv-rise { animation: mv-rise var(--rise-dur, 8s) ease-in-out infinite; }
+    .mv-flicker { animation: mv-flicker 4s steps(1) infinite; }
+    .mv-slide-diag { animation: mv-slide-diag 15s linear infinite; background-size: 200% 200%; }
   `;
   document.head.appendChild(style);
 }
@@ -557,6 +571,140 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
         </div>
       );
     }
+    case "gradient-shift-hue":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] mv-hue">
+          <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${accent}30, ${accent2}20, ${accent}15)` }} />
+        </div>
+      );
+    case "light-sweep":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+          <div className="absolute inset-0 mv-sweep" style={{ background: `linear-gradient(90deg, transparent 30%, ${accent}12 50%, transparent 70%)`, width: "50%" }} />
+        </div>
+      );
+    case "breathing-glow":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1]">
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full mv-breathe" style={{ background: `radial-gradient(circle, ${accent}25, transparent 60%)`, filter: "blur(60px)" }} />
+          <div className="absolute bottom-1/4 left-1/3 w-[300px] h-[300px] rounded-full mv-breathe" style={{ background: `radial-gradient(circle, ${accent2}20, transparent 60%)`, filter: "blur(50px)", animationDelay: "-3s" }} />
+        </div>
+      );
+    case "conic-spotlight": {
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1]">
+          <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] mv-spin-slow" style={{ background: `conic-gradient(from 0deg, transparent 0%, ${accent}15 10%, transparent 20%, transparent 100%)`, filter: "blur(30px)", "--spin-dur": "12s" } as React.CSSProperties} />
+        </div>
+      );
+    }
+    case "rising-particles": {
+      const particles = Array.from({ length: 15 }, (_, i) => ({
+        left: ((i * 67 + 11) % 100), size: 3 + (i % 4) * 2, dur: 6 + (i * 1.3) % 6, delay: (i * 0.8) % 8,
+        color: i % 3 === 0 ? accent2 : accent,
+      }));
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+          {particles.map((p, i) => (
+            <div key={i} className="absolute rounded-full mv-rise" style={{
+              width: p.size, height: p.size, left: `${p.left}%`, bottom: 0,
+              background: p.color, opacity: 0.25,
+              "--rise-dur": `${p.dur}s`, animationDelay: `${p.delay}s`,
+            } as React.CSSProperties} />
+          ))}
+        </div>
+      );
+    }
+    case "noise-flicker":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1]">
+          <div className="absolute inset-0 mv-flicker" style={{ backgroundImage: `url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#n)" opacity="0.08"/></svg>')}")`, backgroundRepeat: "repeat" }} />
+        </div>
+      );
+    case "diagonal-shimmer":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+          <div className="absolute inset-0 mv-slide-diag" style={{ background: `repeating-linear-gradient(45deg, transparent 0px, transparent 40px, ${accent}06 40px, ${accent}06 80px)`, backgroundSize: "200% 200%" }} />
+        </div>
+      );
+    case "floating-orbs":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+          <div className="absolute w-[350px] h-[350px] top-[5%] left-[10%] rounded-full mv-drift" style={{ background: `radial-gradient(circle, ${accent}20, transparent 60%)`, filter: "blur(80px)" }} />
+          <div className="absolute w-[280px] h-[280px] top-[40%] right-[5%] rounded-full mv-drift" style={{ background: `radial-gradient(circle, ${accent2}18, transparent 60%)`, filter: "blur(70px)", animationDelay: "-8s" }} />
+          <div className="absolute w-[220px] h-[220px] bottom-[10%] left-[25%] rounded-full mv-drift" style={{ background: `radial-gradient(circle, ${accent}14, transparent 60%)`, filter: "blur(90px)", animationDelay: "-15s" }} />
+        </div>
+      );
+    case "layered-waves":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+          {[0, 1, 2, 3].map(i => (
+            <div key={i} className="absolute w-[250%] left-[-75%] mv-sway" style={{
+              height: `${80 + i * 30}px`, bottom: `${i * 20}px`,
+              background: `linear-gradient(180deg, transparent, ${i % 2 === 0 ? accent : accent2}${String(10 - i * 2).padStart(2, "0")})`,
+              borderRadius: "45% 45% 0 0",
+              animationDelay: `${i * -1.8}s`,
+              animationDuration: `${6 + i * 1.5}s`,
+            }} />
+          ))}
+        </div>
+      );
+    case "pulse-circles": {
+      const circles = [
+        { size: 100, delay: 0, dur: 5 },
+        { size: 160, delay: 1.2, dur: 5 },
+        { size: 220, delay: 2.4, dur: 5 },
+        { size: 280, delay: 3.6, dur: 5 },
+      ];
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1]">
+          {circles.map((c, i) => (
+            <div key={i} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full mv-ripple" style={{
+              width: c.size, height: c.size,
+              border: `1px solid ${accent}20`,
+              animationDelay: `${c.delay}s`,
+              animationDuration: `${c.dur}s`,
+            }} />
+          ))}
+        </div>
+      );
+    }
+    case "gradient-aurora-mesh":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+          <div className="absolute w-[120%] h-[60%] top-[-10%] left-[-10%] mv-aurora" style={{ background: `linear-gradient(120deg, ${accent}18, transparent 30%, ${accent2}15, transparent 60%, ${accent}10)`, filter: "blur(50px)" }} />
+          <div className="absolute w-[100%] h-[40%] bottom-[0%] left-0 mv-wave" style={{ background: `linear-gradient(90deg, transparent, ${accent2}10, ${accent}08, transparent)`, filter: "blur(40px)" }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50%] h-[50%] rounded-full mv-breathe" style={{ background: `radial-gradient(circle, ${accent}12, transparent 60%)`, filter: "blur(60px)" }} />
+        </div>
+      );
+    case "stripe-gradient":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1]">
+          <div className="absolute inset-0 mv-gradient-anim" style={{ background: `linear-gradient(-45deg, ${accent}15, ${accent2}12, #60a5fa10, ${accent}15, #ec489910, ${accent2}12)`, backgroundSize: "400% 400%" }} />
+        </div>
+      );
+    case "vortex-spin":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1]">
+          <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] mv-spin-slow" style={{
+            background: `conic-gradient(from 0deg, transparent, ${accent}10, transparent, ${accent2}08, transparent, ${accent}06, transparent)`,
+            filter: "blur(40px)",
+            "--spin-dur": "25s",
+          } as React.CSSProperties} />
+        </div>
+      );
+    case "liquid-glass":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+          <div className="absolute w-[300px] h-[300px] top-[15%] left-[10%] mv-morph mv-drift" style={{
+            background: `radial-gradient(circle, ${accent}18, transparent 60%)`,
+            filter: "blur(50px)",
+          }} />
+          <div className="absolute w-[250px] h-[250px] bottom-[20%] right-[10%] mv-morph" style={{
+            background: `radial-gradient(circle, ${accent2}15, transparent 60%)`,
+            filter: "blur(45px)", animationDelay: "-6s",
+          }} />
+        </div>
+      );
     default:
       return null;
   }
