@@ -155,30 +155,18 @@ const GRADIENT_PRESETS: [string, string][] = [
   ["#43e97b", "#38f9d7"],
   ["#fa709a", "#fee140"],
   ["#a18cd1", "#fbc2eb"],
-  ["#ffecd2", "#fcb69f"],
-  ["#ff9a9e", "#fecfef"],
-  ["#a1c4fd", "#c2e9fb"],
-  ["#d4fc79", "#96e6a1"],
   ["#f6d365", "#fda085"],
-  ["#89f7fe", "#66a6ff"],
   ["#c471f5", "#fa71cd"],
-  ["#48c6ef", "#6f86d6"],
-  ["#feada6", "#f5efef"],
-  ["#e0c3fc", "#8ec5fc"],
 ];
 
 const SOLID_COLORS: string[] = [
-  "#080612", "#05080f", "#050f05", "#100509", "#0f0a00", "#020c14",
-  "#0a0010", "#0c0a14", "#021a0f", "#120508", "#0c0a04", "#0c0e12",
-  "#111111", "#1a1a2e", "#16213e", "#0f3460", "#1b1b2f", "#162447",
-  "#1f1f38", "#2d132c", "#1a1a1a", "#2c2c2c", "#0d1b2a", "#1b263b",
+  "#080612", "#05080f", "#050f05", "#100509", "#020c14", "#0a0010",
+  "#111111", "#1a1a2e", "#0f3460", "#1a1a1a", "#0d1b2a", "#1b263b",
 ];
 
 const ACCENT_COLORS: string[] = [
-  "#a855f7", "#ec4899", "#60a5fa", "#4ade80", "#f43f5e", "#06b6d4",
-  "#f59e0b", "#10b981", "#6366f1", "#f97316", "#14b8a6", "#8b5cf6",
-  "#ef4444", "#22c55e", "#3b82f6", "#eab308", "#84cc16", "#e11d48",
-  "#dc2626", "#c084fc", "#38bdf8", "#fb923c", "#94a3b8", "#be185d",
+  "#a855f7", "#ec4899", "#f43f5e", "#f97316", "#f59e0b", "#eab308",
+  "#4ade80", "#10b981", "#06b6d4", "#3b82f6", "#6366f1", "#8b5cf6",
 ];
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -283,20 +271,25 @@ function ColorPicker({ value, onChange, label }: { value: string; onChange: (c: 
   );
 }
 
-function SectionCard({ title, icon, children, defaultOpen = true, desc }: {
-  title: string; icon: React.ReactNode; children: React.ReactNode; defaultOpen?: boolean; desc?: string;
+function SectionCard({ title, icon, children, defaultOpen = true, desc, step }: {
+  title: string; icon: React.ReactNode; children: React.ReactNode; defaultOpen?: boolean; desc?: string; step?: number;
 }) {
   return (
-    <details open={defaultOpen} className="group rounded-2xl border border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface-2))]/60 overflow-hidden shadow-sm">
-      <summary className="flex items-center gap-2 p-4 cursor-pointer select-none hover:bg-[hsl(var(--dash-accent))]/30 transition-colors">
-        <span className="text-primary">{icon}</span>
+    <details open={defaultOpen} className="group rounded-2xl border border-[hsl(var(--dash-border-subtle))]/60 bg-gradient-to-b from-[hsl(var(--dash-surface-2))]/80 to-[hsl(var(--dash-surface-2))]/40 overflow-hidden backdrop-blur-sm">
+      <summary className="flex items-center gap-2.5 px-5 py-4 cursor-pointer select-none hover:bg-[hsl(var(--dash-accent))]/30 transition-colors">
+        {step && (
+          <span className="w-5 h-5 rounded-full bg-primary/15 text-primary text-[9px] font-bold flex items-center justify-center flex-shrink-0">
+            {step}
+          </span>
+        )}
+        <span className="text-primary flex-shrink-0">{icon}</span>
         <div className="flex-1 min-w-0">
-          <span className="text-[hsl(var(--dash-text-secondary))] text-xs font-semibold">{title}</span>
-          {desc && <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] leading-tight mt-0.5">{desc}</p>}
+          <span className="text-[hsl(var(--dash-text-secondary))] text-[13px] font-semibold">{title}</span>
+          {desc && <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] leading-tight mt-0.5">{desc}</p>}
         </div>
         <ChevronDown size={14} className="text-[hsl(var(--dash-text-subtle))] group-open:rotate-180 transition-transform" />
       </summary>
-      <div className="px-4 pb-4 space-y-3 border-t border-[hsl(var(--dash-border-subtle))]">
+      <div className="px-5 pb-5 space-y-3 border-t border-[hsl(var(--dash-border-subtle))]/60">
         {children}
       </div>
     </details>
@@ -357,65 +350,64 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   const accent = d.accentColor || currentTheme.accent;
 
   return (
-    <div className="space-y-4 pb-24">
+    <div className="space-y-5 pb-28">
 
       {/* ═══════════ HEADER ═══════════ */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-[hsl(var(--dash-text))] font-semibold text-base">Personalizar</h2>
-          <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Ajuste cores, fundo e estilo — tudo reflete ao vivo</p>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-[hsl(var(--dash-text))] font-bold text-lg tracking-tight">Personalizar</h2>
+            <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] mt-1">Tema, fundo, cores e estilo — tudo reflete ao vivo</p>
+          </div>
+          {config.avatarUrl && (
+            <Tooltip text="Gera cores automaticamente a partir da sua foto de perfil">
+              <button onClick={autoThemeFromAvatar}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[11px] font-semibold text-fuchsia-400 bg-fuchsia-500/10 border border-fuchsia-500/20 hover:bg-fuchsia-500/20 transition-all">
+                <Wand2 size={12} /> Auto-cores
+              </button>
+            </Tooltip>
+          )}
         </div>
-        {config.avatarUrl && (
-          <Tooltip text="Gera cores automaticamente a partir da sua foto de perfil">
-            <button onClick={autoThemeFromAvatar}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-semibold text-fuchsia-500 bg-fuchsia-500/10 border border-fuchsia-500/20 hover:bg-fuchsia-500/15 transition-all">
-              <Wand2 size={11} /> Auto-cores
-            </button>
-          </Tooltip>
-        )}
+        <div className="h-px bg-gradient-to-r from-transparent via-[hsl(var(--dash-border-subtle))] to-transparent" />
       </div>
 
-      {/* ═══════════ SECTION 1: Colors (most impactful) ═══════════ */}
-      <SectionCard title="Cores" icon={<Palette size={14} />} desc="As cores definem a identidade visual — comece por aqui">
-        <div className="space-y-3 pt-2">
-          <div className="grid grid-cols-2 gap-3">
-            <ColorPicker value={d.accentColor || currentTheme.accent} onChange={v => { setDesign("accentColor", v); updateConfig("theme", "custom"); }} label="Cor principal" />
-            <ColorPicker value={d.accentColor2 || currentTheme.accent2} onChange={v => { setDesign("accentColor2", v); updateConfig("theme", "custom"); }} label="Cor secundária" />
-          </div>
-          <div>
-            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Paleta rápida</p>
-            <div className="grid grid-cols-8 gap-1.5">
-              {ACCENT_COLORS.map(c => (
-                <Tooltip key={c} text={c.toUpperCase()}>
-                  <button onClick={() => { setDesign("accentColor", c); updateConfig("theme", "custom"); }}
-                    className={`w-full aspect-square rounded-lg transition-all hover:scale-110 ${
-                      (d.accentColor || currentTheme.accent) === c ? "ring-2 ring-white scale-110" : "ring-1 ring-white/10"
-                    }`} style={{ background: c }} />
-                </Tooltip>
-              ))}
-            </div>
-          </div>
-          <details className="group">
-            <summary className="text-[10px] text-[hsl(var(--dash-text-subtle))] cursor-pointer hover:text-[hsl(var(--dash-text-muted))] transition-colors select-none flex items-center gap-1">
-              <ChevronDown size={10} className="group-open:rotate-180 transition-transform" />
-              Cores avançadas (textos, cards)
-            </summary>
-            <div className="mt-2 space-y-2">
-              <div className="grid grid-cols-2 gap-3">
-                <ColorPicker value={d.textColor || "#f8f5ff"} onChange={v => setDesign("textColor", v)} label="Texto" />
-                <ColorPicker value={d.subtextColor || "rgba(248,245,255,0.5)"} onChange={v => setDesign("subtextColor", v)} label="Subtexto" />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <ColorPicker value={d.cardBg || "#13102a"} onChange={v => setDesign("cardBg", v)} label="Fundo card" />
-                <ColorPicker value={d.cardBorder || "rgba(168,85,247,0.18)"} onChange={v => setDesign("cardBorder", v)} label="Borda card" />
-              </div>
-            </div>
-          </details>
+      {/* ═══════════ SECTION 1: Theme Presets (quick start) ═══════════ */}
+      <SectionCard title="Tema base" icon={<Sliders size={14} />} defaultOpen={true} desc="Escolha um ponto de partida e personalize depois" step={1}>
+        <div ref={themeGridRef} className={`grid grid-cols-3 gap-2 pt-2 rounded-xl transition-all duration-300 ${
+          highlightField === "theme" ? "ring-2 ring-primary p-1 shadow-[0_0_18px_rgba(139,92,246,0.45)]" : ""
+        }`}>
+          {themes.filter(t => t.id !== "custom").map(theme => {
+            const isActive = config.theme === theme.id;
+            return (
+              <Tooltip key={theme.id} text={`Tema ${theme.label}`}>
+                <button onClick={() => updateConfig("theme", theme.id)}
+                  className={`relative rounded-xl overflow-hidden border-2 transition-all w-full ${
+                    isActive ? "border-primary shadow-lg scale-[1.02]" : "border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 hover:scale-[1.01]"
+                  }`}>
+                  <div className="h-[52px] flex items-center justify-center"
+                    style={{ background: `linear-gradient(160deg, ${theme.bg} 60%, ${theme.accent}20)` }}>
+                    <div className="w-5 h-5 rounded-full" style={{ background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` }} />
+                  </div>
+                  <div className={`px-1.5 py-1 text-center ${isActive ? "bg-primary/10" : "bg-[hsl(var(--dash-surface-2))]"}`}>
+                    <p className={`text-[9px] font-medium truncate ${isActive ? "text-primary" : "text-[hsl(var(--dash-text-secondary))]"}`}>
+                      {theme.label}
+                    </p>
+                  </div>
+                  {isActive && (
+                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                      <Check size={8} className="text-white" />
+                    </div>
+                  )}
+                </button>
+              </Tooltip>
+            );
+          })}
         </div>
       </SectionCard>
 
       {/* ═══════════ SECTION 2: Background ═══════════ */}
-      <SectionCard title="Fundo" icon={<Layers size={14} />} desc="Cor sólida, degradê, imagem, vídeo, padrão ou efeito animado">
+      {/* ═══════════ SECTION 2: Background ═══════════ */}
+      <SectionCard title="Fundo" icon={<Layers size={14} />} desc="Cor sólida, degradê, imagem, vídeo, padrão ou efeito animado" step={2}>
         {/* BG Type selector */}
         <div className="flex gap-1.5 pt-2 flex-wrap">
           {([
@@ -444,11 +436,11 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         {d.bgType === "solid" && (
           <div className="space-y-3">
             <ColorPicker value={d.bgColor || currentTheme.bg} onChange={v => { setDesign("bgColor", v); updateConfig("theme", "custom"); }} label="Cor de fundo" />
-            <div className="grid grid-cols-8 gap-1.5">
+            <div className="grid grid-cols-6 gap-2">
               {SOLID_COLORS.map(c => (
                 <Tooltip key={c} text={c.toUpperCase()}>
                   <button onClick={() => { setDesign("bgColor", c); updateConfig("theme", "custom"); }}
-                    className={`w-full aspect-square rounded-lg ring-1 transition-all hover:scale-110 ${
+                    className={`w-8 h-8 rounded-lg ring-1 transition-all hover:scale-110 ${
                       (d.bgColor || currentTheme.bg) === c ? "ring-2 ring-primary scale-110" : "ring-white/10"
                     }`} style={{ background: c }} />
                 </Tooltip>
@@ -681,8 +673,43 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         )}
       </SectionCard>
 
-      {/* ═══════════ SECTION 3: Button Styles ═══════════ */}
-      <SectionCard title="Estilo dos botões" icon={<Square size={14} />} desc="Formato, preenchimento e sombra — afeta todos os CTAs">
+      {/* ═══════════ SECTION 3: Colors ═══════════ */}
+      <SectionCard title="Cores" icon={<Palette size={14} />} desc="Ajuste as cores da sua identidade visual" step={3}>
+        <div className="space-y-3 pt-2">
+          <div className="grid grid-cols-2 gap-3">
+            <ColorPicker value={d.accentColor || currentTheme.accent} onChange={v => { setDesign("accentColor", v); updateConfig("theme", "custom"); }} label="Cor principal" />
+            <ColorPicker value={d.accentColor2 || currentTheme.accent2} onChange={v => { setDesign("accentColor2", v); updateConfig("theme", "custom"); }} label="Cor secundária" />
+          </div>
+          <div>
+            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Paleta rápida</p>
+            <div className="grid grid-cols-6 gap-2">
+              {ACCENT_COLORS.map(c => (
+                <Tooltip key={c} text={c.toUpperCase()}>
+                  <button onClick={() => { setDesign("accentColor", c); updateConfig("theme", "custom"); }}
+                    className={`w-8 h-8 rounded-lg transition-all hover:scale-110 ${
+                      (d.accentColor || currentTheme.accent) === c ? "ring-2 ring-white scale-110" : "ring-1 ring-white/10"
+                    }`} style={{ background: c }} />
+                </Tooltip>
+              ))}
+            </div>
+          </div>
+          {/* Advanced colors — always visible */}
+          <div className="pt-1 space-y-2">
+            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] font-medium">Refinamento</p>
+            <div className="grid grid-cols-2 gap-3">
+              <ColorPicker value={d.textColor || "#f8f5ff"} onChange={v => setDesign("textColor", v)} label="Texto" />
+              <ColorPicker value={d.subtextColor || "rgba(248,245,255,0.5)"} onChange={v => setDesign("subtextColor", v)} label="Subtexto" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <ColorPicker value={d.cardBg || "#13102a"} onChange={v => setDesign("cardBg", v)} label="Fundo card" />
+              <ColorPicker value={d.cardBorder || "rgba(168,85,247,0.18)"} onChange={v => setDesign("cardBorder", v)} label="Borda card" />
+            </div>
+          </div>
+        </div>
+      </SectionCard>
+
+      {/* ═══════════ SECTION 4: Button Styles ═══════════ */}
+      <SectionCard title="Estilo dos botões" icon={<Square size={14} />} desc="Formato, preenchimento e sombra — afeta todos os CTAs" step={4}>
         <div className="space-y-4 pt-2">
           {/* Shape */}
           <div>
@@ -792,7 +819,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
       </SectionCard>
 
       {/* ═══════════ SECTION 4: Profile Photo ═══════════ */}
-      <SectionCard title="Foto de perfil" icon={<Circle size={14} />} defaultOpen={false} desc="Formato, tamanho e borda da foto">
+      <SectionCard title="Foto de perfil" icon={<Circle size={14} />} defaultOpen={false} desc="Formato, tamanho e borda da foto" step={6}>
         <div className="space-y-3 pt-2">
           <div className="grid grid-cols-4 gap-1.5">
             {([
@@ -851,7 +878,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
       </SectionCard>
 
       {/* ═══════════ SECTION 5: Typography ═══════════ */}
-      <SectionCard title="Tipografia" icon={<Type size={14} />} defaultOpen={false} desc="Fontes do Google Fonts para títulos e corpo">
+      <SectionCard title="Tipografia" icon={<Type size={14} />} defaultOpen={false} desc="Fontes do Google Fonts para títulos e corpo" step={5}>
         <div className="space-y-3 pt-2">
           <div className="flex gap-1 flex-wrap">
             {[
@@ -918,40 +945,6 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
               Este é um preview do texto do corpo com a fonte selecionada.
             </p>
           </div>
-        </div>
-      </SectionCard>
-
-      {/* ═══════════ SECTION 6: Theme Presets (quick start) ═══════════ */}
-      <SectionCard title="Temas prontos" icon={<Sliders size={14} />} defaultOpen={false} desc="Atalho — aplique um tema base e personalize depois">
-        <div ref={themeGridRef} className={`grid grid-cols-4 gap-1.5 pt-2 rounded-xl transition-all duration-300 ${
-          highlightField === "theme" ? "ring-2 ring-primary p-1 shadow-[0_0_18px_rgba(139,92,246,0.45)]" : ""
-        }`}>
-          {themes.filter(t => t.id !== "custom").map(theme => {
-            const isActive = config.theme === theme.id;
-            return (
-              <Tooltip key={theme.id} text={`Tema ${theme.label}`}>
-                <button onClick={() => updateConfig("theme", theme.id)}
-                  className={`relative rounded-xl overflow-hidden border-2 transition-all w-full ${
-                    isActive ? "border-primary shadow-lg scale-[1.02]" : "border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 hover:scale-[1.01]"
-                  }`}>
-                  <div className="h-[44px] flex items-center justify-center"
-                    style={{ background: `linear-gradient(160deg, ${theme.bg} 60%, ${theme.accent}20)` }}>
-                    <div className="w-4 h-4 rounded-full" style={{ background: `linear-gradient(135deg, ${theme.accent}, ${theme.accent2})` }} />
-                  </div>
-                  <div className={`px-1 py-0.5 text-center ${isActive ? "bg-primary/10" : "bg-[hsl(var(--dash-surface-2))]"}`}>
-                    <p className={`text-[8px] font-medium truncate ${isActive ? "text-primary" : "text-[hsl(var(--dash-text-secondary))]"}`}>
-                      {theme.label}
-                    </p>
-                  </div>
-                  {isActive && (
-                    <div className="absolute top-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-primary flex items-center justify-center">
-                      <Check size={7} className="text-white" />
-                    </div>
-                  )}
-                </button>
-              </Tooltip>
-            );
-          })}
         </div>
       </SectionCard>
 
