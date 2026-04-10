@@ -95,25 +95,25 @@ const THEMES: Record<string, {
   bg: string; accent: string; accent2: string;
   card: string; text: string; sub: string; border: string;
 }> = {
-  "dark-purple": { bg: "#080612", accent: "#a855f7", accent2: "#ec4899", card: "#13102a", text: "#f8f5ff", sub: "rgba(248,245,255,0.72)", border: "rgba(168,85,247,0.18)" },
-  "midnight":    { bg: "#05080f", accent: "#60a5fa", accent2: "#818cf8", card: "#0d1524", text: "#f0f6ff", sub: "rgba(240,246,255,0.72)", border: "rgba(96,165,250,0.18)"   },
-  "forest":      { bg: "#050f05", accent: "#4ade80", accent2: "#34d399", card: "#0a1a0a", text: "#f0fff4", sub: "rgba(240,255,244,0.72)", border: "rgba(74,222,128,0.18)"   },
-  "rose":        { bg: "#100509", accent: "#f43f5e", accent2: "#fb7185", card: "#1e0912", text: "#fff0f3", sub: "rgba(255,240,243,0.72)", border: "rgba(244,63,94,0.18)"    },
-  "amber":       { bg: "#0f0a00", accent: "#f59e0b", accent2: "#fcd34d", card: "#1f1500", text: "#fffbeb", sub: "rgba(255,251,235,0.72)", border: "rgba(245,158,11,0.18)"   },
-  "ocean":       { bg: "#020c14", accent: "#06b6d4", accent2: "#22d3ee", card: "#051e30", text: "#ecfeff", sub: "rgba(236,254,255,0.72)", border: "rgba(6,182,212,0.18)"    },
-  "neon-pink":   { bg: "#0a0010", accent: "#ff2d95", accent2: "#ff6ec7", card: "#1a0828", text: "#fff0f8", sub: "rgba(255,240,248,0.72)", border: "rgba(255,45,149,0.18)"   },
-  "sunset":      { bg: "#0f0805", accent: "#f97316", accent2: "#ef4444", card: "#1f150a", text: "#fff7ed", sub: "rgba(255,247,237,0.72)", border: "rgba(249,115,22,0.18)"   },
-  "lavender":    { bg: "#0c0a14", accent: "#c084fc", accent2: "#a78bfa", card: "#1a1530", text: "#f5f0ff", sub: "rgba(245,240,255,0.72)", border: "rgba(192,132,252,0.18)" },
-  "emerald":     { bg: "#021a0f", accent: "#10b981", accent2: "#6ee7b7", card: "#0a2a1a", text: "#ecfdf5", sub: "rgba(236,253,245,0.72)", border: "rgba(16,185,129,0.18)"  },
-  "crimson":     { bg: "#120508", accent: "#dc2626", accent2: "#f87171", card: "#220a10", text: "#fff1f2", sub: "rgba(255,241,242,0.72)", border: "rgba(220,38,38,0.18)"    },
-  "arctic":      { bg: "#050a10", accent: "#38bdf8", accent2: "#7dd3fc", card: "#0c1828", text: "#f0f9ff", sub: "rgba(240,249,255,0.72)", border: "rgba(56,189,248,0.18)"   },
-  "gold":        { bg: "#0c0a04", accent: "#eab308", accent2: "#d97706", card: "#1c1808", text: "#fefce8", sub: "rgba(254,252,232,0.72)", border: "rgba(234,179,8,0.18)"    },
-  "sage":        { bg: "#080c08", accent: "#84cc16", accent2: "#a3e635", card: "#121a12", text: "#f7fee7", sub: "rgba(247,254,231,0.72)", border: "rgba(132,204,22,0.18)"   },
-  "coral":       { bg: "#0f0808", accent: "#fb923c", accent2: "#f472b6", card: "#1f1212", text: "#fff7ed", sub: "rgba(255,247,237,0.72)", border: "rgba(251,146,60,0.18)"   },
-  "indigo":      { bg: "#06050f", accent: "#6366f1", accent2: "#a78bfa", card: "#100e28", text: "#eef2ff", sub: "rgba(238,242,255,0.72)", border: "rgba(99,102,241,0.18)"   },
-  "slate":       { bg: "#0c0e12", accent: "#94a3b8", accent2: "#cbd5e1", card: "#1a1e28", text: "#f8fafc", sub: "rgba(248,250,252,0.72)", border: "rgba(148,163,184,0.18)" },
-  "wine":        { bg: "#100408", accent: "#be185d", accent2: "#e11d48", card: "#200a14", text: "#fff0f6", sub: "rgba(255,240,246,0.72)", border: "rgba(190,24,93,0.18)"    },
-  "custom":      { bg: "#080612", accent: "#a855f7", accent2: "#ec4899", card: "#13102a", text: "#f8f5ff", sub: "rgba(248,245,255,0.72)", border: "rgba(168,85,247,0.18)" },
+  "dark-purple": { bg: "#080612", accent: "#a855f7", accent2: "#ec4899", card: "#13102a", text: "#f8f5ff", sub: "rgba(248,245,255,0.80)", border: "rgba(168,85,247,0.28)" },
+  "midnight":    { bg: "#05080f", accent: "#60a5fa", accent2: "#818cf8", card: "#0d1524", text: "#f0f6ff", sub: "rgba(240,246,255,0.80)", border: "rgba(96,165,250,0.28)"   },
+  "forest":      { bg: "#050f05", accent: "#4ade80", accent2: "#34d399", card: "#0a1a0a", text: "#f0fff4", sub: "rgba(240,255,244,0.80)", border: "rgba(74,222,128,0.28)"   },
+  "rose":        { bg: "#100509", accent: "#f43f5e", accent2: "#fb7185", card: "#1e0912", text: "#fff0f3", sub: "rgba(255,240,243,0.80)", border: "rgba(244,63,94,0.28)"    },
+  "amber":       { bg: "#0f0a00", accent: "#f59e0b", accent2: "#fcd34d", card: "#1f1500", text: "#fffbeb", sub: "rgba(255,251,235,0.80)", border: "rgba(245,158,11,0.28)"   },
+  "ocean":       { bg: "#020c14", accent: "#06b6d4", accent2: "#22d3ee", card: "#051e30", text: "#ecfeff", sub: "rgba(236,254,255,0.80)", border: "rgba(6,182,212,0.28)"    },
+  "neon-pink":   { bg: "#0a0010", accent: "#ff2d95", accent2: "#ff6ec7", card: "#1a0828", text: "#fff0f8", sub: "rgba(255,240,248,0.80)", border: "rgba(255,45,149,0.28)"   },
+  "sunset":      { bg: "#0f0805", accent: "#f97316", accent2: "#ef4444", card: "#1f150a", text: "#fff7ed", sub: "rgba(255,247,237,0.80)", border: "rgba(249,115,22,0.28)"   },
+  "lavender":    { bg: "#0c0a14", accent: "#c084fc", accent2: "#a78bfa", card: "#1a1530", text: "#f5f0ff", sub: "rgba(245,240,255,0.80)", border: "rgba(192,132,252,0.28)" },
+  "emerald":     { bg: "#021a0f", accent: "#10b981", accent2: "#6ee7b7", card: "#0a2a1a", text: "#ecfdf5", sub: "rgba(236,253,245,0.80)", border: "rgba(16,185,129,0.28)"  },
+  "crimson":     { bg: "#120508", accent: "#dc2626", accent2: "#f87171", card: "#220a10", text: "#fff1f2", sub: "rgba(255,241,242,0.80)", border: "rgba(220,38,38,0.28)"    },
+  "arctic":      { bg: "#050a10", accent: "#38bdf8", accent2: "#7dd3fc", card: "#0c1828", text: "#f0f9ff", sub: "rgba(240,249,255,0.80)", border: "rgba(56,189,248,0.28)"   },
+  "gold":        { bg: "#0c0a04", accent: "#eab308", accent2: "#d97706", card: "#1c1808", text: "#fefce8", sub: "rgba(254,252,232,0.80)", border: "rgba(234,179,8,0.28)"    },
+  "sage":        { bg: "#080c08", accent: "#84cc16", accent2: "#a3e635", card: "#121a12", text: "#f7fee7", sub: "rgba(247,254,231,0.80)", border: "rgba(132,204,22,0.28)"   },
+  "coral":       { bg: "#0f0808", accent: "#fb923c", accent2: "#f472b6", card: "#1f1212", text: "#fff7ed", sub: "rgba(255,247,237,0.80)", border: "rgba(251,146,60,0.28)"   },
+  "indigo":      { bg: "#06050f", accent: "#6366f1", accent2: "#a78bfa", card: "#100e28", text: "#eef2ff", sub: "rgba(238,242,255,0.80)", border: "rgba(99,102,241,0.28)"   },
+  "slate":       { bg: "#0c0e12", accent: "#94a3b8", accent2: "#cbd5e1", card: "#1a1e28", text: "#f8fafc", sub: "rgba(248,250,252,0.80)", border: "rgba(148,163,184,0.28)" },
+  "wine":        { bg: "#100408", accent: "#be185d", accent2: "#e11d48", card: "#200a14", text: "#fff0f6", sub: "rgba(255,240,246,0.80)", border: "rgba(190,24,93,0.28)"    },
+  "custom":      { bg: "#080612", accent: "#a855f7", accent2: "#ec4899", card: "#13102a", text: "#f8f5ff", sub: "rgba(248,245,255,0.80)", border: "rgba(168,85,247,0.28)" },
 };
 
 /* ─── Background patterns (SVG) ─────────────────────────────── */
@@ -625,37 +625,36 @@ const SocialProofToast = ({ accent, products }: { accent: string; products?: Pro
 
   return (
     <div
-      className="fixed bottom-20 left-4 z-50 max-w-[260px] pointer-events-none"
+      className="fixed bottom-20 left-4 z-50 max-w-[280px] pointer-events-none"
       style={{
         opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0) scale(1)" : "translateY(12px) scale(0.95)",
-        transition: "opacity 0.4s ease, transform 0.4s ease",
+        transform: visible ? "translateY(0) scale(1)" : "translateY(16px) scale(0.88)",
+        transition: "opacity 0.28s ease-out, transform 0.28s ease-out",
       }}
     >
       <div
-        className="flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl"
+        className="flex items-center gap-3 px-4 py-3.5 rounded-2xl"
         style={{
-          background: "rgba(10,7,20,0.92)",
-          border: `1px solid ${accent}20`,
-          backdropFilter: "blur(16px)",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
+          background: "rgba(8,5,18,0.97)",
+          border: `1px solid ${accent}40`,
+          boxShadow: `0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)`,
         }}
       >
         <div
-          className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-sm"
-          style={{ background: `${accent}20`, border: `1px solid ${accent}30` }}
+          className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold"
+          style={{ background: `${accent}30`, color: accent }}
         >
-          🛍️
+          {current.name[0]}
         </div>
-        <div>
-          <p className="text-white text-[11.5px] font-semibold leading-snug">
-            {current.name} de {current.city}
+        <div className="min-w-0">
+          <p className="text-white text-[12px] font-bold leading-snug truncate">
+            {current.name}
           </p>
-          <p className="text-[11px] leading-snug mt-0.5" style={{ color: accent }}>
+          <p className="text-[11.5px] font-medium leading-snug mt-0.5 truncate" style={{ color: accent }}>
             comprou {current.product}
           </p>
-          <p className="text-[9.5px] mt-0.5" style={{ color: "rgba(255,255,255,0.50)" }}>
-            há {current.time}
+          <p className="text-[10px] mt-0.5 font-medium" style={{ color: "rgba(255,255,255,0.55)" }}>
+            {current.city} · há {current.time}
           </p>
         </div>
       </div>
@@ -685,7 +684,7 @@ const CountdownBadge = ({ accent }: { accent: string }) => {
   return (
     <span
       className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
-      style={{ background: "rgba(239,68,68,0.18)", color: "#f87171", border: "1px solid rgba(239,68,68,0.25)" }}
+      style={{ background: "rgba(239,68,68,0.25)", color: "#f87171", border: "1px solid rgba(239,68,68,0.40)" }}
     >
       <Clock size={9} /> {time}
     </span>
@@ -839,7 +838,7 @@ const BookingModal = ({ product, whatsapp, accent, accent2, bg, card, text, sub,
           <div className="flex items-center justify-between mb-3">
             <button onClick={() => setMonthOffset(o => Math.max(0, o - 1))}
               disabled={monthOffset === 0}
-              className="w-7 h-7 rounded-lg flex items-center justify-center transition-all disabled:opacity-20"
+              className="w-7 h-7 rounded-lg flex items-center justify-center transition-all disabled:opacity-40"
               style={{ background: `${accent}18` }}>
               <ChevronLeft size={14} style={{ color: accent }} />
             </button>
@@ -872,7 +871,7 @@ const BookingModal = ({ product, whatsapp, accent, accent2, bg, card, text, sub,
                   onClick={() => { if (available) { setSelectedDate(date); setSelectedTime(null); } }}
                   disabled={!available}
                   className={`w-full aspect-square rounded-lg text-[12px] font-semibold transition-all ${
-                    isSelected ? "scale-110" : available ? "hover:scale-105" : "opacity-25 cursor-not-allowed"
+                    isSelected ? "scale-110" : available ? "hover:scale-105" : "opacity-40 cursor-not-allowed"
                   }`}
                   style={{
                     background: isSelected ? `linear-gradient(135deg, ${accent}, ${accent2})` : available ? `${accent}12` : "transparent",
@@ -915,7 +914,7 @@ const BookingModal = ({ product, whatsapp, accent, accent2, bg, card, text, sub,
         <div className="px-5 pb-5 pt-2">
           <button onClick={handleConfirm}
             disabled={!selectedDate || !selectedTime}
-            className="w-full py-3.5 rounded-2xl text-[14px] font-bold text-white transition-all active:scale-[0.97] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full py-3.5 rounded-2xl text-[14px] font-bold text-white transition-all active:scale-[0.97] disabled:opacity-45 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             style={{
               background: selectedDate && selectedTime
                 ? `linear-gradient(135deg, ${accent}, ${accent2})`
@@ -1297,8 +1296,8 @@ const ProfilePage = () => {
                               </span>
                             )}
                             {isBooking && (
-                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
-                                style={{ background: "rgba(34,197,94,0.15)", color: "#22c55e", border: "1px solid rgba(34,197,94,0.25)" }}>
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
+                                style={{ background: "rgba(34,197,94,0.20)", color: "#22c55e", border: "1px solid rgba(34,197,94,0.35)" }}>
                                 Agenda online
                               </span>
                             )}
@@ -1417,7 +1416,7 @@ const ProfilePage = () => {
                         <Icon size={15} style={{ color: t.accent }} />
                       </div>
                       <span className="flex-1 truncate">{link.title}</span>
-                      <ArrowRight size={14} style={{ color: t.sub, opacity: 0.65 }} className="group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200" />
+                      <ArrowRight size={14} style={{ color: t.sub, opacity: 0.75 }} className="group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200" />
                     </a>
                   );
                 })}
@@ -1483,7 +1482,7 @@ const ProfilePage = () => {
             className="flex items-center gap-1.5 px-4 py-2 rounded-full transition-opacity duration-150 hover:opacity-80"
             style={{ background: t.card, border: `1px solid ${t.border}` }}
           >
-            <img src={logoSrc} alt="Maview" className="w-3.5 h-3.5 object-contain opacity-70" />
+            <img src={logoSrc} alt="Maview" className="w-3.5 h-3.5 object-contain opacity-85" />
             <span className="text-[10px] font-medium" style={{ color: t.sub }}>
               maview.app
             </span>
