@@ -1032,6 +1032,27 @@ const ProfilePage = () => {
     loadGoogleFont(rd.fontBody);
   }, [rd.fontHeading, rd.fontBody]);
 
+  /* Dynamic SEO meta tags — updates browser tab + OG tags */
+  useEffect(() => {
+    if (!profile) return;
+    const name = profile.displayName || profile.username;
+    const desc = profile.bio || `Vitrine digital de ${name}`;
+    document.title = `${name} | Maview`;
+    const setMeta = (selector: string, attr: string, value: string) => {
+      const el = document.querySelector(selector);
+      if (el) el.setAttribute(attr, value);
+    };
+    setMeta('meta[property="og:title"]', "content", `${name} | Maview`);
+    setMeta('meta[property="og:description"]', "content", desc);
+    setMeta('meta[name="twitter:title"]', "content", `${name} | Maview`);
+    setMeta('meta[name="twitter:description"]', "content", desc);
+    if (profile.avatar) {
+      setMeta('meta[property="og:image"]', "content", profile.avatar);
+      setMeta('meta[name="twitter:image"]', "content", profile.avatar);
+    }
+    return () => { document.title = "Maview — Sua vitrine digital"; };
+  }, [profile]);
+
   const handleShare = async () => {
     const url = window.location.href;
     try {

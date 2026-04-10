@@ -2989,7 +2989,7 @@ const DashboardPagina = () => {
                         <Link2 size={12} className="text-primary flex-shrink-0" />
                         <a href={`${window.location.origin}/${config.username.replace(/^@/, "")}`} target="_blank" rel="noopener noreferrer"
                           className="text-[12px] font-mono text-primary hover:underline truncate font-medium">
-                          {window.location.host}/{config.username.replace(/^@/, "")}
+                          maview.app/{config.username.replace(/^@/, "")}
                         </a>
                         <button onClick={copyLink} className="ml-auto flex-shrink-0 px-2.5 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary transition-all text-[10px] font-semibold flex items-center gap-1">
                           {copied ? <><Check size={10} className="text-emerald-500" /> Copiado!</> : <><Copy size={10} /> Copiar</>}
@@ -3219,7 +3219,7 @@ const DashboardPagina = () => {
                           <p className="text-[13px] font-bold text-[hsl(var(--dash-text))] truncate">{config.displayName || "Seu Nome"} | Maview</p>
                           <p className="text-[11px] text-[hsl(var(--dash-text-muted))] truncate leading-relaxed">{config.bio || "Confira minha vitrine digital"}</p>
                           <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mt-1 font-mono flex items-center gap-1">
-                            <Link2 size={9} /> {window.location.host}/{config.username || "username"}
+                            <Link2 size={9} /> maview.app/{config.username || "username"}
                           </p>
                         </div>
                       </div>

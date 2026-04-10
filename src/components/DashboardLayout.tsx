@@ -73,6 +73,7 @@ const DashboardLayout = ({ children }: Props) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [health, setHealth] = useState({ score: 0, missing: [] as string[] });
+  const [proWaitlist, setProWaitlist] = useState(() => localStorage.getItem("maview_pro_waitlist") === "1");
 
   // Read username from vitrine config (most reliable) or fall back to auth
   const authUsername = user?.user_metadata?.username || user?.email?.split("@")[0] || "usuario";
@@ -84,7 +85,7 @@ const DashboardLayout = ({ children }: Props) => {
   })();
   const username = vitrineUsername.replace(/^@/, "");
   const displayName = user?.user_metadata?.full_name || username;
-  const profileUrl = `${window.location.host}/${username}`;
+  const profileUrl = `maview.app/${username}`;
   const initials = displayName.slice(0, 2).toUpperCase();
 
   // Auth
@@ -263,8 +264,13 @@ const DashboardLayout = ({ children }: Props) => {
             <p className="text-[hsl(var(--dash-bg))]/60 text-[10px] mb-2.5">
               Remova "maview.app" do link
             </p>
-            <button className="w-full text-[11px] font-semibold py-1.5 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors">
-              Em breve
+            <button
+              onClick={() => { setProWaitlist(true); localStorage.setItem("maview_pro_waitlist", "1"); }}
+              disabled={proWaitlist}
+              className={`w-full text-[11px] font-semibold py-1.5 rounded-lg transition-colors ${
+                proWaitlist ? "bg-emerald-500 text-white cursor-default" : "bg-primary text-white hover:bg-primary/90"
+              }`}>
+              {proWaitlist ? "✓ Na lista de espera" : "Entrar na lista de espera"}
             </button>
           </div>
 

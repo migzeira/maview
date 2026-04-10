@@ -6,6 +6,7 @@ import {
   Copy, Check, ExternalLink,
   QrCode, X, Download, MessageCircle, Clock,
   Sparkles, Package, Link2, Star, Image, FileText,
+  Trophy, Share2, BarChart3,
 } from "lucide-react";
 
 /* ── localStorage ──────────────────────────────────────────── */
@@ -68,6 +69,7 @@ const DashboardHome = () => {
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const profileUrl = username ? `${window.location.origin}/${username.replace(/^@/, "")}` : "";
+  const displayUrl = username ? `maview.app/${username.replace(/^@/, "")}` : "";
 
   /* ── Load ── */
   useEffect(() => {
@@ -159,77 +161,108 @@ const DashboardHome = () => {
         {/* ══ LEFT COLUMN ══ */}
         <div className="space-y-5 min-w-0">
 
-          {/* ── Progress card: Health + Checklist unified ── */}
-          <div className="glass-card rounded-2xl p-5 md:p-6">
-            <div className="flex items-start gap-5">
-              {/* Health ring */}
-              <div className="flex-shrink-0">
-                <div className="relative w-[100px] h-[100px]">
-                  <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-                    <circle cx="50" cy="50" r={r} fill="none"
-                      stroke="hsl(var(--dash-surface-2))" strokeWidth="8" />
-                    <circle cx="50" cy="50" r={r} fill="none"
-                      stroke={healthColor} strokeWidth="8" strokeLinecap="round"
-                      strokeDasharray={circ} strokeDashoffset={offset}
-                      style={{ transition: "stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)" }} />
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-[22px] font-extrabold text-[hsl(var(--dash-text))] leading-none">{health}</span>
-                    <span className="text-[9px] text-[hsl(var(--dash-text-subtle))] font-medium mt-0.5">/100</span>
-                  </div>
+          {/* ── Progress card / Celebration card ── */}
+          {health === 100 ? (
+            /* ── Celebration: vitrine complete ── */
+            <div className="glass-card rounded-2xl p-5 md:p-6">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
+                  <Trophy size={22} className="text-emerald-500" />
+                </div>
+                <div>
+                  <h2 className="text-[hsl(var(--dash-text))] font-bold text-[16px]">Vitrine 100% completa!</h2>
+                  <p className="text-[hsl(var(--dash-text-muted))] text-[12px] mt-0.5">Agora é hora de compartilhar e crescer</p>
                 </div>
               </div>
-
-              {/* Checklist */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-[hsl(var(--dash-text))] font-semibold text-[15px]">
-                    {health === 100 ? "Vitrine completa!" : "Complete sua vitrine"}
-                  </h2>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ background: healthColor + "18", color: healthColor }}>
-                    {doneCount}/{steps.length}
-                  </span>
-                </div>
-
-                <div className="space-y-1">
-                  {steps.map(step => (
-                    <Link key={step.key} to={step.path}
-                      className={`flex items-center gap-2.5 px-2.5 py-2 rounded-xl transition-all group ${
-                        step.done ? "opacity-50" : "hover:bg-[hsl(var(--dash-surface-2))]"
-                      }`}>
-                      {step.done
-                        ? <CheckCircle2 size={15} className="text-emerald-500 flex-shrink-0" />
-                        : <Circle size={15} className="text-[hsl(var(--dash-text-subtle))] flex-shrink-0 group-hover:text-primary transition-colors" strokeWidth={1.5} />
-                      }
-                      <span className={`text-[12px] flex-1 font-medium ${step.done ? "line-through text-[hsl(var(--dash-text-muted))]" : "text-[hsl(var(--dash-text-secondary))]"}`}>
-                        {step.label}
-                      </span>
-                      {!step.done && (
-                        <span className="text-[9px] text-[hsl(var(--dash-text-subtle))] hidden sm:inline">+{step.points}pts</span>
-                      )}
-                      {!step.done && <ArrowRight size={11} className="text-[hsl(var(--dash-text-subtle))] group-hover:text-primary group-hover:translate-x-0.5 transition-all flex-shrink-0" />}
-                    </Link>
-                  ))}
-                </div>
-
-                {/* Progress bar */}
-                <div className="mt-3">
-                  <div className="h-1.5 rounded-full bg-[hsl(var(--dash-surface-2))] overflow-hidden">
-                    <div className="h-full rounded-full transition-all duration-700"
-                      style={{ width: `${health}%`, background: `linear-gradient(90deg, ${healthColor}, ${healthColor}cc)` }} />
-                  </div>
-                </div>
+              <div className="grid grid-cols-3 gap-2">
+                <button onClick={copyLink}
+                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 transition-all text-[hsl(var(--dash-text-secondary))]">
+                  <Share2 size={16} className="text-primary" />
+                  <span className="text-[10px] font-medium">Compartilhar</span>
+                </button>
+                <Link to="/dashboard/audiencia"
+                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 transition-all text-[hsl(var(--dash-text-secondary))]">
+                  <BarChart3 size={16} className="text-primary" />
+                  <span className="text-[10px] font-medium">Analytics</span>
+                </Link>
+                <Link to="/dashboard/pagina"
+                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 transition-all text-[hsl(var(--dash-text-secondary))]">
+                  <FileText size={16} className="text-primary" />
+                  <span className="text-[10px] font-medium">Editar</span>
+                </Link>
               </div>
             </div>
+          ) : (
+            /* ── Progress: health < 100 ── */
+            <div className="glass-card rounded-2xl p-5 md:p-6">
+              <div className="flex items-start gap-5">
+                {/* Health ring */}
+                <div className="flex-shrink-0">
+                  <div className="relative w-[100px] h-[100px]">
+                    <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+                      <circle cx="50" cy="50" r={r} fill="none"
+                        stroke="hsl(var(--dash-surface-2))" strokeWidth="8" />
+                      <circle cx="50" cy="50" r={r} fill="none"
+                        stroke={healthColor} strokeWidth="8" strokeLinecap="round"
+                        strokeDasharray={circ} strokeDashoffset={offset}
+                        style={{ transition: "stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)" }} />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-[22px] font-extrabold text-[hsl(var(--dash-text))] leading-none">{health}</span>
+                      <span className="text-[9px] text-[hsl(var(--dash-text-muted))] font-medium mt-0.5">/100</span>
+                    </div>
+                  </div>
+                </div>
 
-            {/* Primary CTA — always visible, adapts to state */}
-            <Link to="/dashboard/pagina"
-              className="mt-5 w-full btn-primary-gradient text-sm font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-[0.98]">
-              <FileText size={16} />
-              {health === 100 ? "Editar Vitrine" : nextStep ? `Próximo: ${nextStep.label}` : "Montar Vitrine"}
-              <ArrowRight size={14} />
-            </Link>
-          </div>
+                {/* Checklist */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-[hsl(var(--dash-text))] font-semibold text-[15px]">Complete sua vitrine</h2>
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ background: healthColor + "18", color: healthColor }}>
+                      {doneCount}/{steps.length}
+                    </span>
+                  </div>
+
+                  <div className="space-y-1">
+                    {steps.map(step => (
+                      <Link key={step.key} to={step.path}
+                        className={`flex items-center gap-2.5 px-2.5 py-2 rounded-xl transition-all group ${
+                          step.done ? "opacity-50" : "hover:bg-[hsl(var(--dash-surface-2))]"
+                        }`}>
+                        {step.done
+                          ? <CheckCircle2 size={15} className="text-emerald-500 flex-shrink-0" />
+                          : <Circle size={15} className="text-[hsl(var(--dash-text-muted))] flex-shrink-0 group-hover:text-primary transition-colors" strokeWidth={1.5} />
+                        }
+                        <span className={`text-[12px] flex-1 font-medium ${step.done ? "line-through text-[hsl(var(--dash-text-muted))]" : "text-[hsl(var(--dash-text-secondary))]"}`}>
+                          {step.label}
+                        </span>
+                        {!step.done && (
+                          <span className="text-[10px] text-[hsl(var(--dash-text-muted))] hidden sm:inline">+{step.points}pts</span>
+                        )}
+                        {!step.done && <ArrowRight size={11} className="text-[hsl(var(--dash-text-muted))] group-hover:text-primary group-hover:translate-x-0.5 transition-all flex-shrink-0" />}
+                      </Link>
+                    ))}
+                  </div>
+
+                  {/* Progress bar */}
+                  <div className="mt-3">
+                    <div className="h-1.5 rounded-full bg-[hsl(var(--dash-surface-2))] overflow-hidden">
+                      <div className="h-full rounded-full transition-all duration-700"
+                        style={{ width: `${health}%`, background: `linear-gradient(90deg, ${healthColor}, ${healthColor}cc)` }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Primary CTA */}
+              <Link to="/dashboard/pagina"
+                className="mt-5 w-full btn-primary-gradient text-sm font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-[0.98]">
+                <FileText size={16} />
+                {nextStep ? `Próximo: ${nextStep.label}` : "Montar Vitrine"}
+                <ArrowRight size={14} />
+              </Link>
+            </div>
+          )}
 
           {/* ── Share card ── */}
           {profileUrl && (
@@ -242,7 +275,7 @@ const DashboardHome = () => {
               </div>
 
               <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] mb-3">
-                <p className="flex-1 text-[12px] text-[hsl(var(--dash-text-muted))] font-mono truncate">{profileUrl}</p>
+                <p className="flex-1 text-[12px] text-[hsl(var(--dash-text-muted))] font-mono truncate">{displayUrl}</p>
                 <button onClick={copyLink}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 text-[11px] text-[hsl(var(--dash-text-secondary))] font-medium transition-all flex-shrink-0">
                   {copied ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
@@ -489,7 +522,7 @@ const DashboardHome = () => {
             </button>
             <div className="text-center">
               <h3 className="font-bold text-gray-900 text-[16px]">QR Code</h3>
-              <p className="text-gray-500 text-[11px] mt-0.5 font-mono">{profileUrl}</p>
+              <p className="text-gray-500 text-[11px] mt-0.5 font-mono">{displayUrl}</p>
             </div>
             <canvas ref={qrCanvasRef} className="rounded-xl border border-gray-100" />
             <button onClick={downloadQR}
