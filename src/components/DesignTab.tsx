@@ -313,6 +313,134 @@ const DESIGN_PACKS: DesignPack[] = [
       },
     },
   },
+  {
+    id: "wine-elegance",
+    label: "Wine",
+    desc: "Refinado e marcante",
+    preview: { bg: "#100408", accent: "#be185d", accent2: "#e11d48" },
+    config: {
+      theme: "wine",
+      design: {
+        bgType: "gradient", bgGradient: ["#100408", "#200a14"] as [string, string], bgGradientDir: "to-br",
+        buttonShape: "soft", buttonFill: "solid", buttonShadow: "md", buttonRadius: 14,
+        fontHeading: "Cormorant Garamond", fontBody: "Montserrat",
+        profileShape: "circle", profileBorder: true, profileBorderColor: "#be185d", profileSize: 96,
+        accentColor: "#be185d", accentColor2: "#e11d48",
+      },
+    },
+  },
+  {
+    id: "arctic-ice",
+    label: "Arctic",
+    desc: "Frio e impactante",
+    preview: { bg: "#050a10", accent: "#38bdf8", accent2: "#7dd3fc" },
+    config: {
+      theme: "arctic",
+      design: {
+        bgType: "effect", bgEffect: "starfield", bgColor: "#050a10",
+        buttonShape: "pill", buttonFill: "glass", buttonShadow: "glow", buttonRadius: 12,
+        fontHeading: "Sora", fontBody: "Inter",
+        profileShape: "circle", profileBorder: true, profileBorderColor: "#38bdf8", profileSize: 92,
+        accentColor: "#38bdf8", accentColor2: "#7dd3fc",
+      },
+    },
+  },
+  {
+    id: "coral-creative",
+    label: "Coral",
+    desc: "Criativo e divertido",
+    preview: { bg: "#0f0808", accent: "#fb923c", accent2: "#f472b6" },
+    config: {
+      theme: "coral",
+      design: {
+        bgType: "pattern", bgPattern: "dots", bgColor: "#0f0808",
+        buttonShape: "rounded", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 16,
+        fontHeading: "Righteous", fontBody: "Urbanist",
+        profileShape: "rounded", profileBorder: true, profileBorderColor: "#fb923c", profileSize: 88,
+        accentColor: "#fb923c", accentColor2: "#f472b6",
+      },
+    },
+  },
+  {
+    id: "indigo-deep",
+    label: "Indigo",
+    desc: "Profundo e misterioso",
+    preview: { bg: "#06050f", accent: "#6366f1", accent2: "#a78bfa" },
+    config: {
+      theme: "indigo",
+      design: {
+        bgType: "effect", bgEffect: "aurora-waves", bgColor: "#06050f",
+        buttonShape: "soft", buttonFill: "glass", buttonShadow: "glow", buttonRadius: 14,
+        fontHeading: "Plus Jakarta Sans", fontBody: "DM Sans",
+        profileShape: "circle", profileBorder: false, profileSize: 92,
+        accentColor: "#6366f1", accentColor2: "#a78bfa",
+      },
+    },
+  },
+  {
+    id: "emerald-pro",
+    label: "Emerald",
+    desc: "Profissional e clean",
+    preview: { bg: "#021a0f", accent: "#10b981", accent2: "#6ee7b7" },
+    config: {
+      theme: "emerald",
+      design: {
+        bgType: "solid", bgColor: "#021a0f", bgEffect: "",
+        buttonShape: "rounded", buttonFill: "outline", buttonShadow: "none", buttonRadius: 12,
+        fontHeading: "Manrope", fontBody: "Rubik",
+        profileShape: "circle", profileBorder: false, profileSize: 88,
+        accentColor: "#10b981", accentColor2: "#6ee7b7",
+      },
+    },
+  },
+  {
+    id: "rose-romantic",
+    label: "Rose",
+    desc: "Delicado e atraente",
+    preview: { bg: "#100509", accent: "#f43f5e", accent2: "#fb7185" },
+    config: {
+      theme: "rose",
+      design: {
+        bgType: "effect", bgEffect: "gradient-flow", bgColor: "#100509",
+        buttonShape: "pill", buttonFill: "solid", buttonShadow: "md", buttonRadius: 12,
+        fontHeading: "Dancing Script", fontBody: "DM Sans",
+        profileShape: "circle", profileBorder: true, profileBorderColor: "#f43f5e", profileSize: 96,
+        accentColor: "#f43f5e", accentColor2: "#fb7185",
+      },
+    },
+  },
+  {
+    id: "lavender-dream",
+    label: "Lavender",
+    desc: "Suave e inspirador",
+    preview: { bg: "#0c0a14", accent: "#c084fc", accent2: "#a78bfa" },
+    config: {
+      theme: "lavender",
+      design: {
+        bgType: "effect", bgEffect: "fog", bgColor: "#0c0a14",
+        buttonShape: "soft", buttonFill: "glass", buttonShadow: "sm", buttonRadius: 16,
+        fontHeading: "Satisfy", fontBody: "Outfit",
+        profileShape: "rounded", profileBorder: false, profileSize: 88,
+        accentColor: "#c084fc", accentColor2: "#a78bfa",
+      },
+    },
+  },
+  {
+    id: "crimson-power",
+    label: "Crimson",
+    desc: "Forte e poderoso",
+    preview: { bg: "#120508", accent: "#dc2626", accent2: "#f87171" },
+    config: {
+      theme: "crimson",
+      design: {
+        bgType: "effect", bgEffect: "radial-glow", bgColor: "#120508",
+        buttonShape: "square", buttonFill: "solid", buttonShadow: "glow", buttonRadius: 6,
+        fontHeading: "Bebas Neue", fontBody: "Poppins",
+        profileShape: "hexagon", profileBorder: false, profileSize: 96,
+        accentColor: "#dc2626", accentColor2: "#f87171",
+      },
+    },
+  },
 ];
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -611,12 +739,18 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   return (
     <div className="space-y-5 pb-28">
 
-      {/* ═══════════ HEADER ═══════════ */}
-      <div className="space-y-3">
+      {/* ═══════════ HERO: DESIGN PACKS — the main feature ═══════════ */}
+      <div className="space-y-4">
+        {/* Hero header */}
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-[hsl(var(--dash-text))] font-bold text-lg tracking-tight">Personalizar</h2>
-            <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] mt-1">Tema, fundo, cores e estilo — tudo reflete ao vivo</p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center">
+              <LayoutTemplate size={18} className="text-primary" />
+            </div>
+            <div>
+              <h2 className="text-[hsl(var(--dash-text))] font-bold text-lg tracking-tight">Design Packs</h2>
+              <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Escolha um template e customize depois</p>
+            </div>
           </div>
           {config.avatarUrl && (
             <Tooltip text="Gera cores automaticamente a partir da sua foto de perfil">
@@ -627,54 +761,72 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
             </Tooltip>
           )}
         </div>
-        <div className="h-px bg-gradient-to-r from-transparent via-[hsl(var(--dash-border-subtle))] to-transparent" />
-      </div>
 
-      {/* ═══════════ DESIGN PACKS — one click complete design ═══════════ */}
-      <SectionCard title="Design Packs" icon={<LayoutTemplate size={14} />} defaultOpen={true}
-        desc="Templates completos — tema, fundo, botões, fontes e mais com 1 clique">
-        <div className="grid grid-cols-2 gap-2.5 pt-2">
+        {/* Pack grid — 16 templates */}
+        <div className="grid grid-cols-2 gap-2.5">
           {DESIGN_PACKS.map(pack => {
             const isActive = config.theme === pack.config.theme
               && d.fontHeading === (pack.config.design.fontHeading || "Inter")
               && d.bgEffect === (pack.config.design.bgEffect || "");
             return (
-              <Tooltip key={pack.id} text={`Aplicar pack "${pack.label}" — ${pack.desc}`}>
+              <Tooltip key={pack.id} text={`Aplicar "${pack.label}" — ${pack.desc}`}>
                 <button onClick={() => applyPack(pack)}
-                  className={`relative rounded-xl overflow-hidden text-left transition-all group ${
-                    isActive ? "ring-2 ring-primary scale-[1.02] shadow-lg shadow-primary/20" : "ring-1 ring-white/10 hover:ring-primary/40 hover:scale-[1.01]"
+                  className={`relative rounded-xl overflow-hidden text-left transition-all group w-full ${
+                    isActive ? "ring-2 ring-primary scale-[1.02] shadow-lg shadow-primary/20" : "ring-1 ring-white/8 hover:ring-primary/40 hover:scale-[1.01]"
                   }`}>
-                  {/* Preview bar */}
-                  <div className="h-[44px] relative" style={{ background: pack.preview.bg }}>
+                  {/* Preview bar with effect hint */}
+                  <div className="h-[52px] relative" style={{ background: pack.preview.bg }}>
                     <div className="absolute inset-0" style={{
-                      background: `linear-gradient(135deg, ${pack.preview.accent}15, transparent 50%, ${pack.preview.accent2}10)`,
+                      background: `linear-gradient(135deg, ${pack.preview.accent}18, transparent 40%, ${pack.preview.accent2}12)`,
                     }} />
-                    <div className="absolute bottom-2 left-3 flex gap-1.5">
-                      <div className="w-3.5 h-3.5 rounded-full" style={{ background: pack.preview.accent }} />
-                      <div className="w-3.5 h-3.5 rounded-full" style={{ background: pack.preview.accent2 }} />
+                    {/* Mini profile circle */}
+                    <div className="absolute top-2.5 left-3 w-5 h-5 rounded-full border border-white/20"
+                      style={{
+                        background: `linear-gradient(135deg, ${pack.preview.accent}40, ${pack.preview.accent2}30)`,
+                        borderRadius: pack.config.design.profileShape === "square" ? "4px" : pack.config.design.profileShape === "rounded" ? "6px" : "9999px",
+                      }} />
+                    {/* Mini text lines */}
+                    <div className="absolute top-3 left-10 space-y-1">
+                      <div className="w-12 h-1 rounded-full bg-white/30" />
+                      <div className="w-8 h-0.5 rounded-full bg-white/15" />
                     </div>
                     {/* Mini button preview */}
-                    <div className="absolute bottom-2 right-3 px-2 py-0.5 text-[7px] font-bold text-white/90 rounded"
-                      style={{
-                        background: `${pack.preview.accent}90`,
-                        borderRadius: pack.config.design.buttonShape === "pill" ? "999px" : pack.config.design.buttonShape === "square" ? "3px" : "6px",
-                        border: pack.config.design.buttonFill === "outline" ? `1px solid ${pack.preview.accent}` : "none",
-                        backgroundColor: pack.config.design.buttonFill === "outline" ? "transparent" : `${pack.preview.accent}90`,
-                        color: pack.config.design.buttonFill === "outline" ? pack.preview.accent : "white",
-                      }}>
-                      CTA
+                    <div className="absolute bottom-2 left-3 right-3 flex gap-1.5">
+                      <div className="flex-1 h-3 rounded text-[5px] font-bold flex items-center justify-center"
+                        style={{
+                          borderRadius: pack.config.design.buttonShape === "pill" ? "999px" : pack.config.design.buttonShape === "square" ? "2px" : "4px",
+                          background: pack.config.design.buttonFill === "outline" ? "transparent" : `${pack.preview.accent}80`,
+                          border: pack.config.design.buttonFill === "outline" ? `1px solid ${pack.preview.accent}60` : "none",
+                          color: pack.config.design.buttonFill === "outline" ? pack.preview.accent : "rgba(255,255,255,0.9)",
+                          boxShadow: pack.config.design.buttonShadow === "glow" ? `0 0 8px ${pack.preview.accent}40` : "none",
+                        }} />
+                      <div className="flex-1 h-3 rounded"
+                        style={{
+                          borderRadius: pack.config.design.buttonShape === "pill" ? "999px" : pack.config.design.buttonShape === "square" ? "2px" : "4px",
+                          background: `linear-gradient(135deg, ${pack.preview.accent}50, ${pack.preview.accent2}50)`,
+                        }} />
+                    </div>
+                    {/* Color dots */}
+                    <div className="absolute top-2 right-2.5 flex gap-1">
+                      <div className="w-2.5 h-2.5 rounded-full ring-1 ring-black/20" style={{ background: pack.preview.accent }} />
+                      <div className="w-2.5 h-2.5 rounded-full ring-1 ring-black/20" style={{ background: pack.preview.accent2 }} />
                     </div>
                     {isActive && (
-                      <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                      <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-primary flex items-center justify-center shadow-lg">
                         <Check size={8} className="text-white" />
                       </div>
                     )}
                   </div>
                   <div className={`px-3 py-2 ${isActive ? "bg-primary/10" : "bg-[hsl(var(--dash-surface-2))]"}`}>
-                    <p className={`text-[11px] font-bold ${isActive ? "text-primary" : "text-[hsl(var(--dash-text))]"}`}
-                      style={{ fontFamily: `"${pack.config.design.fontHeading}", sans-serif` }}>
-                      {pack.label}
-                    </p>
+                    <div className="flex items-center justify-between">
+                      <p className={`text-[11px] font-bold ${isActive ? "text-primary" : "text-[hsl(var(--dash-text))]"}`}
+                        style={{ fontFamily: `"${pack.config.design.fontHeading}", sans-serif` }}>
+                        {pack.label}
+                      </p>
+                      <span className="text-[7px] px-1.5 py-0.5 rounded-full bg-white/5 text-[hsl(var(--dash-text-subtle))]">
+                        {pack.config.design.bgType === "effect" ? "Animado" : pack.config.design.bgType === "gradient" ? "Degradê" : pack.config.design.bgType === "pattern" ? "Padrão" : "Sólido"}
+                      </span>
+                    </div>
                     <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] leading-tight mt-0.5">
                       {pack.desc} · {pack.config.design.fontHeading}
                     </p>
@@ -684,7 +836,10 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
             );
           })}
         </div>
-      </SectionCard>
+
+        <div className="h-px bg-gradient-to-r from-transparent via-[hsl(var(--dash-border-subtle))] to-transparent" />
+        <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] text-center">Aplique um pack acima e refine cada detalhe nas seções abaixo</p>
+      </div>
 
       {/* ═══════════ AUTO HARMONY — generate full palette from 1 color ═══════════ */}
       <SectionCard title="Cores automáticas" icon={<Wand2 size={14} />} defaultOpen={false}
@@ -735,8 +890,8 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         </div>
       </SectionCard>
 
-      {/* ═══════════ SECTION 1: Theme Presets (quick start) ═══════════ */}
-      <SectionCard title="Tema base" icon={<Sliders size={14} />} defaultOpen={true} desc="Escolha um ponto de partida e personalize depois" step={1}>
+      {/* ═══════════ SECTION: Theme Presets ═══════════ */}
+      <SectionCard title="Tema base" icon={<Sliders size={14} />} defaultOpen={false} desc="Ou escolha apenas o tema de cores" step={2}>
         <div ref={themeGridRef} className={`grid grid-cols-3 gap-2 pt-2 rounded-xl transition-all duration-300 ${
           highlightField === "theme" ? "ring-2 ring-primary p-1 shadow-[0_0_18px_rgba(139,92,246,0.45)]" : ""
         }`}>
@@ -771,7 +926,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
 
       {/* ═══════════ SECTION 2: Background ═══════════ */}
       {/* ═══════════ SECTION 2: Background ═══════════ */}
-      <SectionCard title="Fundo" icon={<Layers size={14} />} desc="Cor sólida, degradê, imagem, vídeo, padrão ou efeito animado" step={2}>
+      <SectionCard title="Fundo" icon={<Layers size={14} />} desc="Cor sólida, degradê, imagem, vídeo, padrão ou efeito animado" step={3}>
         {/* BG Type selector */}
         <div className="flex gap-1.5 pt-2 flex-wrap">
           {([
@@ -1038,7 +1193,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
       </SectionCard>
 
       {/* ═══════════ SECTION 3: Colors ═══════════ */}
-      <SectionCard title="Cores" icon={<Palette size={14} />} desc="Ajuste as cores da sua identidade visual" step={3}>
+      <SectionCard title="Cores" icon={<Palette size={14} />} desc="Ajuste as cores da sua identidade visual" step={4}>
         <div className="space-y-3 pt-2">
           <div className="grid grid-cols-2 gap-3">
             <ColorPicker value={d.accentColor || currentTheme.accent} onChange={v => { setDesign("accentColor", v); updateConfig("theme", "custom"); }} label="Cor principal" />
@@ -1073,7 +1228,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
       </SectionCard>
 
       {/* ═══════════ SECTION 4: Button Styles ═══════════ */}
-      <SectionCard title="Estilo dos botões" icon={<Square size={14} />} desc="Formato, preenchimento e sombra — afeta todos os CTAs" step={4}>
+      <SectionCard title="Estilo dos botões" icon={<Square size={14} />} desc="Formato, preenchimento e sombra — afeta todos os CTAs" step={5}>
         <div className="space-y-4 pt-2">
           {/* Shape */}
           <div>
@@ -1183,7 +1338,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
       </SectionCard>
 
       {/* ═══════════ SECTION 4: Profile Photo ═══════════ */}
-      <SectionCard title="Foto de perfil" icon={<Circle size={14} />} defaultOpen={false} desc="Formato, tamanho e borda da foto" step={6}>
+      <SectionCard title="Foto de perfil" icon={<Circle size={14} />} defaultOpen={false} desc="Formato, tamanho e borda da foto" step={7}>
         <div className="space-y-3 pt-2">
           <div className="grid grid-cols-4 gap-1.5">
             {([
@@ -1242,7 +1397,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
       </SectionCard>
 
       {/* ═══════════ SECTION 5: Typography ═══════════ */}
-      <SectionCard title="Tipografia" icon={<Type size={14} />} defaultOpen={false} desc="Fontes do Google Fonts para títulos e corpo" step={5}>
+      <SectionCard title="Tipografia" icon={<Type size={14} />} defaultOpen={false} desc="Fontes do Google Fonts para títulos e corpo" step={6}>
         <div className="space-y-3 pt-2">
           <div className="flex gap-1 flex-wrap">
             {[
