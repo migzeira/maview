@@ -25,7 +25,7 @@ const NAV_TOP: NavItem[] = [
 ];
 
 const NAV_MAIN: NavItem[] = [
-  { path: "/dashboard/pagina", label: "Minha Página", icon: FileText },
+  { path: "/dashboard/pagina", label: "Minha Vitrine", icon: FileText },
   { path: "/dashboard/audiencia", label: "Analytics", icon: BarChart3 },
   { path: "/dashboard/ia", label: "IA Maview", icon: Sparkles, badge: "Novo" },
 ];
@@ -116,7 +116,7 @@ const DashboardLayout = ({ children }: Props) => {
   const vitrineUrl = `${window.location.origin}/${username}`;
 
   const copyLink = () => {
-    navigator.clipboard.writeText(vitrineUrl);
+    navigator.clipboard.writeText(vitrineUrl).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   };
@@ -184,7 +184,7 @@ const DashboardLayout = ({ children }: Props) => {
             <span className="flex-1 truncate">{item.label}</span>
             {showHealth && health.score < 100 && healthRing}
             {item.badge && (
-              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-500 text-white leading-none animate-pulse">
+              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-primary text-white leading-none">
                 {item.badge}
               </span>
             )}
@@ -202,34 +202,25 @@ const DashboardLayout = ({ children }: Props) => {
       <div className="flex items-center gap-3 px-5 h-16 flex-shrink-0">
         <MaviewLogo size={36} />
         {!collapsed && (
-          <span className="text-[20px] font-extrabold tracking-tight bg-gradient-to-r from-[#6D28D9] via-[#8B5CF6] to-[#60A5FA] bg-clip-text text-transparent">
+          <span className="text-[20px] font-bold tracking-tight text-[hsl(var(--dash-text))]">
             Maview
           </span>
         )}
       </div>
-
-      <div className="mx-4 dash-divider" />
 
       {/* Navigation */}
       <nav className="flex-1 px-3 pt-4 space-y-1 overflow-y-auto">
         {/* Home */}
         {NAV_TOP.map(item => renderNavItem(item))}
 
-        {/* Divider */}
-        <div className="pt-3 pb-1">
-          {!collapsed && (
-            <div className="dash-divider mx-1" />
-          )}
-          {collapsed && <div className="dash-divider mx-1" />}
-        </div>
+        {/* Spacer */}
+        <div className="pt-2" />
 
         {/* Main nav */}
         {NAV_MAIN.map((item, i) => renderNavItem(item, i === 0))}
 
-        {/* Divider */}
-        <div className="pt-3 pb-1">
-          <div className="dash-divider mx-1" />
-        </div>
+        {/* Spacer */}
+        <div className="pt-2" />
 
         {/* Bottom nav */}
         {NAV_BOTTOM.map(item => renderNavItem(item))}
@@ -260,29 +251,26 @@ const DashboardLayout = ({ children }: Props) => {
             </Link>
           )}
 
-          {/* Pro upgrade teaser — conversion trigger */}
-          <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-[#1a1035] to-[#0f0a1e] p-3.5 border border-white/5">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-violet-500/20 to-transparent rounded-bl-full" />
-            <div className="relative">
-              <div className="flex items-center gap-1.5 mb-1.5">
-                <Zap size={12} className="text-amber-400" />
-                <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Pro</span>
-              </div>
-              <p className="text-white text-[12px] font-semibold leading-tight mb-1">
-                Domínio próprio + analytics avançado
-              </p>
-              <p className="text-white/40 text-[10px] mb-2.5">
-                Remova "maview.app" do seu link
-              </p>
-              <button className="w-full text-[11px] font-semibold py-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:from-violet-500 hover:to-fuchsia-500 transition-all">
-                Em breve
-              </button>
+          {/* Pro upgrade teaser */}
+          <div className="rounded-xl bg-[hsl(var(--dash-text))] p-3.5">
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <Zap size={12} className="text-amber-400" />
+              <span className="text-[10px] font-bold text-amber-400">Pro</span>
             </div>
+            <p className="text-[hsl(var(--dash-bg))] text-[12px] font-semibold leading-tight mb-1">
+              Domínio próprio + analytics
+            </p>
+            <p className="text-[hsl(var(--dash-bg))]/40 text-[10px] mb-2.5">
+              Remova "maview.app" do link
+            </p>
+            <button className="w-full text-[11px] font-semibold py-1.5 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors">
+              Em breve
+            </button>
           </div>
 
           {/* Profile mini-card */}
           <div className="flex items-center gap-2.5 px-2 py-1">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-primary-foreground text-[11px] font-bold ring-2 ring-primary/10 flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-[11px] font-bold flex-shrink-0">
               {initials}
             </div>
             <div className="flex-1 min-w-0">
@@ -319,14 +307,11 @@ const DashboardLayout = ({ children }: Props) => {
     <div className="min-h-screen bg-[hsl(var(--dash-bg))] flex">
 
       {/* ── Copy toast ── */}
-      {copied && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] animate-in slide-in-from-bottom-3 duration-200">
-          <div className="flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-[hsl(var(--dash-text))] text-[hsl(var(--dash-bg))] shadow-2xl text-[13px] font-semibold">
-            <Check size={15} className="text-emerald-500 flex-shrink-0" />
-            Link copiado! Cole e compartilhe sua vitrine 🚀
-          </div>
-        </div>
-      )}
+      <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-[9999] flex items-center gap-2 px-5 py-2.5 rounded-full shadow-lg transition-all duration-300 pointer-events-none ${copied ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3"}`}
+        style={{ background: "hsl(var(--primary))", color: "#fff" }}>
+        <Check size={14} />
+        <span className="text-[13px] font-semibold">Link copiado com sucesso!</span>
+      </div>
       {/* Desktop sidebar */}
       <aside
         className={`
@@ -374,7 +359,7 @@ const DashboardLayout = ({ children }: Props) => {
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg btn-primary-gradient text-[12px] font-medium transition-transform active:scale-95"
             >
               <ExternalLink size={12} />
-              <span className="hidden sm:inline">Ver página</span>
+              <span className="hidden sm:inline">Ver vitrine</span>
             </button>
           </div>
         </header>
