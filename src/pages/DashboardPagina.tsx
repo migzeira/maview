@@ -452,9 +452,10 @@ interface ProfileHeroCardProps {
   onUpdate: (key: keyof VitrineConfig, value: string) => void;
   onEditProfile: () => void;
   onHealthAction: (action: HealthAction) => void;
+  onCopyToast?: (text?: string) => void;
 }
 
-const ProfileHeroCard = ({ config, onUpdate, onEditProfile, onHealthAction }: ProfileHeroCardProps) => {
+const ProfileHeroCard = ({ config, onUpdate, onEditProfile, onHealthAction, onCopyToast }: ProfileHeroCardProps) => {
   const [copied, setCopied] = useState(false);
   const [showHealthDetail, setShowHealthDetail] = useState(false);
   const [editingName, setEditingName] = useState(false);
@@ -524,6 +525,7 @@ const ProfileHeroCard = ({ config, onUpdate, onEditProfile, onHealthAction }: Pr
     if (!profileUrl) return;
     navigator.clipboard.writeText(profileUrl);
     setCopied(true);
+    onCopyToast?.("Link copiado com sucesso!");
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -779,8 +781,11 @@ const DashboardPagina = () => {
   const [config, setConfig] = useState<VitrineConfig>(DEFAULT_CONFIG);
   const [activeTab, setActiveTab] = useState<TabId>("vitrine");
   const [toastVisible, setToastVisible] = useState(false);
+  const [copyToastVisible, setCopyToastVisible] = useState(false);
+  const [copyToastText, setCopyToastText] = useState("URL copiada!");
   const [showMobilePreview, setShowMobilePreview] = useState(false);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const copyToastTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   // Add menu
   const [showAddMenu, setShowAddMenu] = useState(false);
@@ -840,6 +845,7 @@ const DashboardPagina = () => {
     if (!profileUrl) return;
     navigator.clipboard.writeText(profileUrl);
     setCopied(true);
+    showCopyToast("Link copiado com sucesso!");
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -902,6 +908,13 @@ const DashboardPagina = () => {
     setToastVisible(true);
     clearTimeout(toastTimerRef.current);
     toastTimerRef.current = setTimeout(() => setToastVisible(false), 2000);
+  }, []);
+
+  const showCopyToast = useCallback((text = "URL copiada!") => {
+    setCopyToastText(text);
+    setCopyToastVisible(true);
+    clearTimeout(copyToastTimerRef.current);
+    copyToastTimerRef.current = setTimeout(() => setCopyToastVisible(false), 2500);
   }, []);
 
   const updateConfig = useCallback(<K extends keyof VitrineConfig>(key: K, value: VitrineConfig[K]) => {
@@ -1396,7 +1409,7 @@ const DashboardPagina = () => {
   const pAccent2 = d.accentColor2 || currentTheme.accent2;
   const pBg = d.bgColor || currentTheme.bg;
   const pText = d.textColor || "#f8f5ff";
-  const pSub = d.subtextColor || "rgba(200,200,200,0.7)";
+  const pSub = d.subtextColor || "rgba(220,220,220,0.8)";
   const pCard = d.cardBg || currentTheme.accent + "0a";
   const pBorder = d.cardBorder || currentTheme.accent + "30";
   const pFontH = d.fontHeading || "Inter";
@@ -1461,10 +1474,11 @@ const DashboardPagina = () => {
   })();
 
   const phonePreview = (
-    <div className="relative">
-      <div className="rounded-[2.8rem] border-[3px] border-[hsl(var(--dash-text))] overflow-hidden shadow-2xl">
+    <div className="relative mx-auto" style={{ width: 310 }}>
+      <div className="rounded-[2.8rem] border-[3px] border-[hsl(var(--dash-text))] overflow-hidden shadow-2xl flex flex-col"
+        style={{ aspectRatio: "9/16" }}>
         {/* Status bar */}
-        <div className="flex items-center justify-between px-6 pt-3 pb-1" style={{ background: pBg }}>
+        <div className="flex items-center justify-between px-6 pt-3 pb-1 flex-shrink-0" style={{ background: pBg }}>
           <span className="text-[10px] font-semibold" style={{ color: "rgba(255,255,255,0.7)" }}>9:41</span>
           <div className="flex items-center gap-1">
             <div className="flex gap-[2px] items-end">
@@ -1479,12 +1493,12 @@ const DashboardPagina = () => {
         </div>
 
         {/* Dynamic Island */}
-        <div className="flex justify-center pb-3" style={{ background: pBg }}>
+        <div className="flex justify-center pb-3 flex-shrink-0" style={{ background: pBg }}>
           <div className="w-[88px] h-[26px] rounded-full bg-black" />
         </div>
 
         {/* Scrollable screen content */}
-        <div className="overflow-y-auto relative" style={{ ...previewBgStyle, maxHeight: 500, fontFamily: `'${pFontB}', sans-serif` }}>
+        <div className="flex-1 overflow-y-auto relative" style={{ ...previewBgStyle, fontFamily: `'${pFontB}', sans-serif` }}>
           {/* Effect overlay */}
           {previewEffectOverlay && <div className="absolute inset-0 pointer-events-none z-[1]" style={previewEffectOverlay} />}
           {/* Ambient glow */}
@@ -1504,7 +1518,7 @@ const DashboardPagina = () => {
                     onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center"
-                    style={{ background: `linear-gradient(135deg,${pAccent},${pAccent2})` }}>
+                    style={{ background: pAccent }}>
                     <span className="text-white text-xl font-bold">
                       {config.displayName ? config.displayName[0].toUpperCase() : "?"}
                     </span>
@@ -1520,6 +1534,33 @@ const DashboardPagina = () => {
                   <span className="text-[10px]" style={{ color: "#25d366" }}>WhatsApp</span>
                 </div>
               )}
+
+              {/* Social icons row */}
+              {(() => {
+                const socialLinks = config.links.filter(l => l.isSocial && l.active);
+                const hasSocials = socialLinks.length > 0;
+                const PLACEHOLDER_SOCIALS = [
+                  { icon: <Instagram size={12} />, key: "instagram" },
+                  { icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>, key: "x" },
+                  { icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V9.44a8.16 8.16 0 004.77 1.53V7.52a4.85 4.85 0 01-1.01-.83z"/></svg>, key: "tiktok" },
+                ];
+                return (
+                  <div className="flex items-center gap-1.5 mt-2.5">
+                    {hasSocials
+                      ? socialLinks.slice(0, 4).map(link => (
+                          <div key={link.id} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: `${pAccent}15`, border: `1px solid ${pAccent}18` }}>
+                            <span style={{ color: pAccent }}>{LINK_ICON_MAP[link.icon] || <Globe size={10} />}</span>
+                          </div>
+                        ))
+                      : PLACEHOLDER_SOCIALS.map(s => (
+                          <div key={s.key} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: `${pAccent}08`, border: `1px solid ${pAccent}10`, color: `${pAccent}40` }}>
+                            {s.icon}
+                          </div>
+                        ))
+                    }
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Blocks in order */}
@@ -1567,7 +1608,7 @@ const DashboardPagina = () => {
                 );
                 if (l.type === "spotlight") return (
                   <div key={block.id} className="p-2.5 mb-2 flex items-center justify-center gap-2 transition-all hover:scale-[1.01]"
-                    style={{ background: `linear-gradient(135deg,${pAccent}25,${pAccent2}18)`, border: `1px solid ${pAccent}40`, borderRadius: pBtnRadius }}>
+                    style={{ background: `${pAccent}20`, border: `1px solid ${pAccent}35`, borderRadius: pBtnRadius }}>
                     <span style={{ color: pAccent }}>{LINK_ICON_MAP[l.icon]}</span>
                     <span className="text-xs font-bold" style={{ color: pAccent }}>{l.title || l.url}</span>
                   </div>
@@ -1591,7 +1632,7 @@ const DashboardPagina = () => {
                         <img src={t.avatar} alt={t.name} className="w-5 h-5 rounded-full object-cover" />
                       ) : (
                         <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white"
-                          style={{ background: `linear-gradient(135deg,${pAccent},${pAccent2})` }}>
+                          style={{ background: pAccent }}>
                           {t.name[0]?.toUpperCase()}
                         </div>
                       )}
@@ -1635,8 +1676,12 @@ const DashboardPagina = () => {
 
             {/* Empty state */}
             {blocks.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-8 opacity-30">
-                <p className="text-xs" style={{ color: "#aaa" }}>Adicione produtos e links</p>
+              <div className="flex flex-col items-center justify-center py-6 gap-2">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${pAccent}12`, border: `1px dashed ${pAccent}25` }}>
+                  <Package size={16} style={{ color: `${pAccent}50` }} />
+                </div>
+                <p className="text-[10px] font-medium" style={{ color: pSub }}>Adicione produtos</p>
+                <p className="text-[8px]" style={{ color: `${pSub}80` }}>Adicione itens à sua vitrine</p>
               </div>
             )}
 
@@ -1662,6 +1707,13 @@ const DashboardPagina = () => {
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-8">
+
+      {/* Purple copy toast */}
+      <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-2 px-5 py-2.5 rounded-full shadow-lg transition-all duration-300 pointer-events-none ${copyToastVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3"}`}
+        style={{ background: "linear-gradient(135deg, hsl(var(--primary)), hsl(270 60% 55%))", color: "#fff" }}>
+        <Check size={14} />
+        <span className="text-[13px] font-semibold">{copyToastText}</span>
+      </div>
 
       {/* ═══════════════ ONBOARDING WIZARD ═══════════════ */}
       {showOnboarding && (
@@ -1752,7 +1804,7 @@ const DashboardPagina = () => {
       </div>
 
       {/* Profile Hero Card */}
-      <ProfileHeroCard config={config} onUpdate={updateConfig} onEditProfile={() => setActiveTab("perfil")} onHealthAction={handleHealthAction} />
+      <ProfileHeroCard config={config} onUpdate={updateConfig} onEditProfile={() => setActiveTab("perfil")} onHealthAction={handleHealthAction} onCopyToast={showCopyToast} />
 
       {/* Two-column grid */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
@@ -3313,9 +3365,7 @@ const DashboardPagina = () => {
             <div className="px-4 pb-4">
               <p className="text-[hsl(var(--dash-text))] font-semibold text-[15px] mb-4 text-center">Preview da Vitrine</p>
               <div className="flex justify-center">
-                <div className="w-full max-w-[300px]">
-                  {phonePreview}
-                </div>
+                {phonePreview}
               </div>
               <p className="text-center text-[hsl(var(--dash-text-subtle))] text-[11px] mt-3">
                 Tema: {currentTheme.label}
