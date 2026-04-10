@@ -487,6 +487,33 @@ const ProfileHeroCard = ({ config, onUpdate, onEditProfile, onHealthAction, onCo
   useEffect(() => { setAvatarVal(config.avatarUrl); }, [config.avatarUrl]);
   useEffect(() => { if (editingName) nameInputRef.current?.focus(); }, [editingName]);
 
+  /* Inject preview animation keyframes once */
+  useEffect(() => {
+    if (document.getElementById("mvp-effect-styles")) return;
+    const s = document.createElement("style");
+    s.id = "mvp-effect-styles";
+    s.textContent = `
+      @keyframes mvp-aurora{0%,100%{transform:translateX(-20%) rotate(0deg)}50%{transform:translateX(20%) rotate(3deg)}}
+      @keyframes mvp-pulse{0%,100%{opacity:.15;transform:scale(1)}50%{opacity:.35;transform:scale(1.08)}}
+      @keyframes mvp-gradient{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+      @keyframes mvp-drift{0%{transform:translate(0,0) scale(1)}25%{transform:translate(8%,4%) scale(1.04)}50%{transform:translate(-4%,8%) scale(.96)}75%{transform:translate(-8%,-4%) scale(1.02)}100%{transform:translate(0,0) scale(1)}}
+      @keyframes mvp-float{0%,100%{transform:translateY(0) translateX(0)}33%{transform:translateY(-10px) translateX(6px)}66%{transform:translateY(6px) translateX(-4px)}}
+      @keyframes mvp-twinkle{0%,100%{opacity:.3}50%{opacity:.8}}
+      @keyframes mvp-sway{0%,100%{transform:translateX(0) scaleX(1)}25%{transform:translateX(6%) scaleX(1.03)}75%{transform:translateX(-6%) scaleX(.97)}}
+      @keyframes mvp-orbit{0%{transform:rotate(0deg) translateX(var(--orbit-r,30px)) rotate(0deg)}100%{transform:rotate(360deg) translateX(var(--orbit-r,30px)) rotate(-360deg)}}
+      @keyframes mvp-ripple{0%{transform:scale(.3);opacity:.5}100%{transform:scale(2.5);opacity:0}}
+      @keyframes mvp-morph{0%,100%{border-radius:60% 40% 30% 70%/60% 30% 70% 40%}25%{border-radius:30% 60% 70% 40%/50% 60% 30% 60%}50%{border-radius:50% 60% 30% 60%/30% 50% 70% 50%}75%{border-radius:40% 60% 70% 30%/60% 40% 30% 70%}}
+      @keyframes mvp-spin{0%{transform:translate(-50%,-50%) rotate(0deg)}100%{transform:translate(-50%,-50%) rotate(360deg)}}
+      @keyframes mvp-hue{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
+      @keyframes mvp-sweep{0%{transform:translateX(-100%) skewX(-15deg)}100%{transform:translateX(300%) skewX(-15deg)}}
+      @keyframes mvp-breathe{0%,100%{transform:scale(1);opacity:.15}50%{transform:scale(1.12);opacity:.3}}
+      @keyframes mvp-rise{0%{transform:translateY(100%) scale(.5);opacity:0}50%{opacity:.4}100%{transform:translateY(-20%) scale(1);opacity:0}}
+      @keyframes mvp-flicker{0%,100%{opacity:.04}10%{opacity:.08}30%{opacity:.1}50%{opacity:.05}70%{opacity:.08}90%{opacity:.04}}
+      @keyframes mvp-slide-diag{0%{background-position:0% 0%}100%{background-position:100% 100%}}
+    `;
+    document.head.appendChild(s);
+  }, []);
+
   const saveName = () => {
     if (nameVal.trim()) onUpdate("displayName", nameVal.trim());
     setEditingName(false);
@@ -1450,31 +1477,57 @@ const DashboardPagina = () => {
     }
   })();
 
-  /* Effect overlay for phone preview — CSS-based mini effect */
-  const previewEffectOverlay: React.CSSProperties | null = (() => {
+  /* Effect overlay for phone preview — animated mini effect */
+  const previewEffectOverlay: React.ReactNode = (() => {
     if (d.bgType !== "effect" || !d.bgEffect) return null;
     const a = pAccent;
+    const a2 = d.accentColor2 || pAccent;
+    const wrap = (children: React.ReactNode) => (
+      <div className="absolute inset-0 pointer-events-none z-[1] overflow-hidden">{children}</div>
+    );
     switch (d.bgEffect) {
-      case "aurora": return { background: `linear-gradient(135deg, ${a}30, transparent 40%, ${a}20 70%, transparent)` };
-      case "aurora-waves": return { background: `linear-gradient(180deg, transparent 10%, ${a}25 40%, transparent 60%, ${a}15 80%, transparent)` };
-      case "ambient-glow": return { background: `radial-gradient(circle at center, ${a}30, transparent 70%)` };
-      case "spotlight": return { background: `radial-gradient(ellipse at 50% 30%, ${a}35, transparent 60%)` };
-      case "radial-glow": return { background: `radial-gradient(circle, ${a}25, transparent 65%)` };
-      case "gradient-flow": return { background: `linear-gradient(45deg, ${a}30, #ec489920, ${a}30)` };
-      case "gradient-mesh": return { background: `radial-gradient(at 20% 30%, ${a}25 0%, transparent 50%), radial-gradient(at 80% 70%, #ec489920 0%, transparent 50%)` };
-      case "gradient-shift": return { background: `linear-gradient(90deg, ${a}20, #60a5fa20, ${a}20)` };
-      case "starfield": return { background: `radial-gradient(1px 1px at 20% 30%, white 50%, transparent), radial-gradient(1px 1px at 70% 60%, white 50%, transparent), radial-gradient(1px 1px at 40% 80%, white 50%, transparent)` };
-      case "floating-dots": return { background: `radial-gradient(2px 2px at 25% 25%, ${a}40, transparent), radial-gradient(2px 2px at 75% 45%, ${a}30, transparent), radial-gradient(2px 2px at 50% 75%, ${a}20, transparent)` };
-      case "sparkles": return { background: `radial-gradient(1px 1px at 30% 20%, ${a} 50%, transparent), radial-gradient(1px 1px at 60% 50%, #fcd34d 50%, transparent), radial-gradient(1px 1px at 80% 80%, ${a} 50%, transparent)` };
-      case "wave-layers": return { background: `linear-gradient(180deg, transparent 30%, ${a}15 50%, ${a}08 70%, transparent)` };
-      case "flow-field": return { background: `linear-gradient(135deg, transparent 20%, ${a}10 40%, transparent 60%, ${a}08 80%)` };
-      case "liquid": return { background: `radial-gradient(ellipse at 30% 50%, ${a}20 0%, transparent 60%), radial-gradient(ellipse at 70% 50%, #ec489915 0%, transparent 60%)` };
-      case "matrix-grid": return { backgroundImage: `linear-gradient(${a}15 1px, transparent 1px), linear-gradient(90deg, ${a}15 1px, transparent 1px)`, backgroundSize: "8px 8px" };
-      case "pulse-grid": return { backgroundImage: `radial-gradient(${a}30 1px, transparent 1px)`, backgroundSize: "10px 10px" };
-      case "scan-lines": return { backgroundImage: `repeating-linear-gradient(0deg, transparent 0px, transparent 2px, ${a}08 2px, ${a}08 4px)` };
-      case "fog": return { background: `linear-gradient(135deg, transparent, rgba(255,255,255,0.04) 40%, transparent 70%)` };
-      case "smoke": return { background: `radial-gradient(ellipse at 40% 60%, rgba(255,255,255,0.05), transparent 60%)` };
-      case "clouds": return { background: `radial-gradient(ellipse at 30% 40%, rgba(255,255,255,0.06) 0%, transparent 50%), radial-gradient(ellipse at 70% 60%, rgba(255,255,255,0.04) 0%, transparent 50%)` };
+      /* ─── Static effects ─── */
+      case "aurora": return wrap(<div className="absolute w-[200%] h-[60%] top-[-10%] left-[-50%]" style={{ background: `linear-gradient(135deg, ${a}30, transparent 40%, ${a}20 70%, transparent)`, filter: "blur(30px)", animation: "mvp-aurora 8s ease-in-out infinite" }} />);
+      case "aurora-waves": return wrap(<div className="absolute inset-0" style={{ background: `linear-gradient(180deg, transparent 10%, ${a}25 40%, transparent 60%, ${a}15 80%, transparent)`, animation: "mvp-pulse 5s ease-in-out infinite" }} />);
+      case "ambient-glow": return wrap(<div className="absolute inset-0" style={{ background: `radial-gradient(circle at center, ${a}35, transparent 70%)`, animation: "mvp-pulse 4s ease-in-out infinite" }} />);
+      case "spotlight": return wrap(<div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 50% 30%, ${a}40, transparent 60%)`, animation: "mvp-pulse 5s ease-in-out infinite" }} />);
+      case "radial-glow": return wrap(<div className="absolute inset-0" style={{ background: `radial-gradient(circle, ${a}30, transparent 65%)`, animation: "mvp-pulse 4s ease-in-out infinite" }} />);
+      case "gradient-flow": return wrap(<div className="absolute inset-0" style={{ background: `linear-gradient(45deg, ${a}40, ${a2}30, ${a}40)`, backgroundSize: "200% 200%", animation: "mvp-gradient 6s ease infinite" }} />);
+      case "gradient-mesh": return wrap(<><div className="absolute w-[150%] h-[150%] top-[-25%] left-[-25%]" style={{ background: `radial-gradient(at 20% 30%, ${a}30 0%, transparent 50%)`, animation: "mvp-drift 12s ease-in-out infinite" }} /><div className="absolute w-[150%] h-[150%] top-[-25%] left-[-25%]" style={{ background: `radial-gradient(at 80% 70%, ${a2}25 0%, transparent 50%)`, animation: "mvp-drift 15s ease-in-out infinite reverse" }} /></>);
+      case "gradient-shift": return wrap(<div className="absolute inset-0" style={{ background: `linear-gradient(90deg, ${a}30, #60a5fa30, ${a}30)`, backgroundSize: "200% 200%", animation: "mvp-gradient 8s ease infinite" }} />);
+      case "starfield": return wrap(<div className="absolute inset-0" style={{ background: `radial-gradient(1px 1px at 20% 30%, white 50%, transparent), radial-gradient(1px 1px at 70% 60%, white 50%, transparent), radial-gradient(1px 1px at 40% 80%, white 50%, transparent), radial-gradient(1px 1px at 55% 15%, white 50%, transparent), radial-gradient(1px 1px at 85% 40%, white 50%, transparent)`, animation: "mvp-twinkle 3s ease-in-out infinite" }} />);
+      case "floating-dots": return wrap(<>{[{x:25,y:25,s:6},{x:75,y:45,s:5},{x:50,y:75,s:4},{x:15,y:60,s:5}].map((p,i) => <div key={i} className="absolute rounded-full" style={{ width: p.s, height: p.s, left: `${p.x}%`, top: `${p.y}%`, background: a, opacity: 0.4, animation: `mvp-float 6s ease-in-out infinite`, animationDelay: `${i * -1.5}s` }} />)}</>);
+      case "sparkles": return wrap(<>{[{x:30,y:20},{x:60,y:50},{x:80,y:80},{x:20,y:70},{x:50,y:10}].map((p,i) => <div key={i} className="absolute" style={{ left: `${p.x}%`, top: `${p.y}%`, width: 3, height: 3, borderRadius: "50%", background: i % 2 === 0 ? a : "#fcd34d", animation: "mvp-twinkle 2s ease-in-out infinite", animationDelay: `${i * 0.4}s` }} />)}</>);
+      case "wave-layers": return wrap(<>{[0,1,2].map(i => <div key={i} className="absolute w-[200%] left-[-50%]" style={{ height: 40, bottom: i * 15, background: `linear-gradient(180deg, transparent, ${i % 2 === 0 ? a : a2}20)`, borderRadius: "45% 45% 0 0", animation: "mvp-sway 6s ease-in-out infinite", animationDelay: `${i * -2}s` }} />)}</>);
+      case "flow-field": return wrap(<div className="absolute inset-0" style={{ background: `linear-gradient(135deg, transparent 20%, ${a}15 40%, transparent 60%, ${a}10 80%)`, animation: "mvp-drift 12s ease-in-out infinite" }} />);
+      case "liquid": return wrap(<><div className="absolute w-[120%] h-[120%] top-[-10%] left-[-10%] rounded-full" style={{ background: `radial-gradient(ellipse at 30% 50%, ${a}25 0%, transparent 60%)`, animation: "mvp-drift 10s ease-in-out infinite" }} /><div className="absolute w-[120%] h-[120%] top-[-10%] left-[-10%] rounded-full" style={{ background: `radial-gradient(ellipse at 70% 50%, ${a2}20 0%, transparent 60%)`, animation: "mvp-drift 14s ease-in-out infinite reverse" }} /></>);
+      case "matrix-grid": return wrap(<div className="absolute inset-0" style={{ backgroundImage: `linear-gradient(${a}20 1px, transparent 1px), linear-gradient(90deg, ${a}20 1px, transparent 1px)`, backgroundSize: "8px 8px" }} />);
+      case "pulse-grid": return wrap(<div className="absolute inset-0" style={{ backgroundImage: `radial-gradient(${a}35 1px, transparent 1px)`, backgroundSize: "10px 10px", animation: "mvp-pulse 3s ease-in-out infinite" }} />);
+      case "scan-lines": return wrap(<div className="absolute inset-0" style={{ backgroundImage: `repeating-linear-gradient(0deg, transparent 0px, transparent 2px, ${a}10 2px, ${a}10 4px)` }} />);
+      case "fog": return wrap(<div className="absolute w-[200%] h-full left-[-50%]" style={{ background: `linear-gradient(135deg, transparent, rgba(255,255,255,0.06) 40%, transparent 70%)`, animation: "mvp-drift 12s ease-in-out infinite" }} />);
+      case "smoke": return wrap(<div className="absolute w-[150%] h-[150%] top-[-25%] left-[-25%] rounded-full" style={{ background: `radial-gradient(ellipse at 40% 60%, rgba(255,255,255,0.08), transparent 60%)`, animation: "mvp-drift 15s ease-in-out infinite" }} />);
+      case "clouds": return wrap(<><div className="absolute w-[150%] h-[80%] top-[5%] left-[-25%] rounded-full" style={{ background: `radial-gradient(ellipse at 30% 40%, rgba(255,255,255,0.08) 0%, transparent 50%)`, animation: "mvp-drift 12s ease-in-out infinite" }} /><div className="absolute w-[130%] h-[70%] top-[20%] left-[-15%] rounded-full" style={{ background: `radial-gradient(ellipse at 70% 60%, rgba(255,255,255,0.06) 0%, transparent 50%)`, animation: "mvp-drift 16s ease-in-out infinite reverse" }} /></>);
+      /* ─── Motion effects (new) ─── */
+      case "ocean-waves": return wrap(<>{[0,1,2].map(i => <div key={i} className="absolute w-[250%] left-[-75%]" style={{ height: `${50 + i * 20}px`, bottom: `${i * 12}px`, background: `linear-gradient(180deg, transparent, ${i % 2 === 0 ? a : a2}25)`, borderRadius: "45% 45% 0 0", animation: `mvp-sway ${6 + i * 2}s ease-in-out infinite`, animationDelay: `${i * -2}s` }} />)}</>);
+      case "orbit-circles": return wrap(<>{[0,1,2,3].map(i => <div key={i} className="absolute rounded-full" style={{ width: 8, height: 8, left: "50%", top: "50%", background: i % 2 === 0 ? a : a2, opacity: 0.5, animation: `mvp-orbit ${6 + i * 3}s linear infinite`, ["--orbit-r" as string]: `${30 + i * 18}px` } as React.CSSProperties} />)}</>);
+      case "ripple-rings": return wrap(<>{[0,1,2].map(i => <div key={i} className="absolute rounded-full border" style={{ width: 60, height: 60, left: "calc(50% - 30px)", top: "calc(50% - 30px)", borderColor: `${a}30`, animation: "mvp-ripple 4s ease-out infinite", animationDelay: `${i * 1.3}s` }} />)}</>);
+      case "morph-blobs": return wrap(<>{[{x:30,y:25},{x:65,y:60}].map((p,i) => <div key={i} className="absolute" style={{ width: 80, height: 80, left: `${p.x}%`, top: `${p.y}%`, transform: "translate(-50%,-50%)", background: `radial-gradient(circle, ${i === 0 ? a : a2}25, transparent 60%)`, borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%", animation: "mvp-morph 10s ease-in-out infinite", animationDelay: `${i * -5}s`, filter: "blur(8px)" }} />)}</>);
+      case "orbit-rings": return wrap(<>{[0,1].map(i => <div key={i} className="absolute rounded-full border" style={{ width: 100 + i * 50, height: 100 + i * 50, left: "50%", top: "50%", transform: "translate(-50%,-50%)", borderColor: `${i === 0 ? a : a2}20`, borderWidth: 1, animation: `mvp-spin ${20 + i * 10}s linear infinite` }} />)}</>);
+      case "neon-lines": return wrap(<>{[0,1,2,3].map(i => <div key={i} className="absolute" style={{ width: "120%", height: 2, left: "-10%", top: `${20 + i * 20}%`, background: `linear-gradient(90deg, transparent, ${i % 2 === 0 ? a : a2}50, transparent)`, animation: `mvp-sway ${5 + i}s ease-in-out infinite`, animationDelay: `${i * -1.2}s` }} />)}</>);
+      case "gradient-shift-hue": return wrap(<div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${a}35, ${a2}30, ${a}35)`, animation: "mvp-hue 12s linear infinite" }} />);
+      case "light-sweep": return wrap(<div className="absolute" style={{ width: "40%", height: "150%", top: "-25%", left: "-40%", background: `linear-gradient(90deg, transparent, ${a}20, transparent)`, transform: "skewX(-15deg)", animation: "mvp-sweep 4s ease-in-out infinite" }} />);
+      case "breathing-glow": return wrap(<div className="absolute inset-0" style={{ background: `radial-gradient(circle at 50% 50%, ${a}25, transparent 65%)`, animation: "mvp-breathe 5s ease-in-out infinite" }} />);
+      case "conic-spotlight": return wrap(<div className="absolute" style={{ width: 200, height: 200, left: "calc(50% - 100px)", top: "calc(50% - 100px)", background: `conic-gradient(from 0deg, ${a}30, transparent 30%, transparent 70%, ${a2}25)`, borderRadius: "50%", animation: "mvp-spin 20s linear infinite" }} />);
+      case "rising-particles": return wrap(<>{[0,1,2,3,4].map(i => <div key={i} className="absolute rounded-full" style={{ width: 4, height: 4, left: `${15 + i * 18}%`, bottom: 0, background: i % 2 === 0 ? a : a2, opacity: 0.4, animation: `mvp-rise ${5 + i}s ease-in-out infinite`, animationDelay: `${i * -1}s` }} />)}</>);
+      case "noise-flicker": return wrap(<div className="absolute inset-0" style={{ background: `repeating-conic-gradient(${a}08 0% 25%, transparent 0% 50%) 0 0 / 4px 4px`, animation: "mvp-flicker 3s steps(3) infinite" }} />);
+      case "diagonal-shimmer": return wrap(<div className="absolute inset-0" style={{ background: `repeating-linear-gradient(45deg, transparent 0px, transparent 8px, ${a}12 8px, ${a}12 10px)`, backgroundSize: "200% 200%", animation: "mvp-slide-diag 10s linear infinite" }} />);
+      case "floating-orbs": return wrap(<>{[{x:15,y:10,s:80},{x:70,y:50,s:60},{x:35,y:75,s:50}].map((p,i) => <div key={i} className="absolute rounded-full" style={{ width: p.s, height: p.s, left: `${p.x}%`, top: `${p.y}%`, background: `radial-gradient(circle, ${i % 2 === 0 ? a : a2}25, transparent 60%)`, filter: "blur(15px)", animation: `mvp-drift ${12 + i * 5}s ease-in-out infinite`, animationDelay: `${i * -4}s` }} />)}</>);
+      case "layered-waves": return wrap(<>{[0,1,2,3].map(i => <div key={i} className="absolute w-[250%] left-[-75%]" style={{ height: `${40 + i * 15}px`, bottom: `${i * 10}px`, background: `linear-gradient(180deg, transparent, ${i % 2 === 0 ? a : a2}${String(10 - i * 2).padStart(2, "0")})`, borderRadius: "45% 45% 0 0", animation: `mvp-sway ${5 + i * 1.5}s ease-in-out infinite`, animationDelay: `${i * -1.5}s` }} />)}</>);
+      case "pulse-circles": return wrap(<>{[0,1,2].map(i => <div key={i} className="absolute rounded-full" style={{ width: 50, height: 50, left: "calc(50% - 25px)", top: "calc(50% - 25px)", border: `1px solid ${a}30`, animation: "mvp-ripple 5s ease-out infinite", animationDelay: `${i * 1.6}s` }} />)}</>);
+      case "gradient-aurora-mesh": return wrap(<><div className="absolute w-[200%] h-[60%] top-[-10%] left-[-50%]" style={{ background: `linear-gradient(135deg, ${a}30, transparent 40%, ${a2}25, transparent)`, filter: "blur(25px)", animation: "mvp-aurora 10s ease-in-out infinite" }} /><div className="absolute w-[200%] h-[50%] bottom-[-10%] left-[-30%]" style={{ background: `linear-gradient(225deg, ${a2}25, transparent 40%, ${a}20, transparent)`, filter: "blur(25px)", animation: "mvp-aurora 14s ease-in-out infinite reverse" }} /></>);
+      case "stripe-gradient": return wrap(<div className="absolute inset-0" style={{ background: `repeating-linear-gradient(135deg, ${a}15 0px, ${a}15 4px, transparent 4px, transparent 12px)`, animation: "mvp-slide-diag 12s linear infinite", backgroundSize: "200% 200%" }} />);
+      case "vortex-spin": return wrap(<div className="absolute" style={{ width: 200, height: 200, left: "calc(50% - 100px)", top: "calc(50% - 100px)", background: `conic-gradient(from 0deg, ${a}25, ${a2}20, transparent, ${a}25)`, borderRadius: "50%", filter: "blur(15px)", animation: "mvp-spin 15s linear infinite" }} />);
+      case "liquid-glass": return wrap(<>{[{x:25,y:30},{x:65,y:55}].map((p,i) => <div key={i} className="absolute" style={{ width: 100, height: 100, left: `${p.x}%`, top: `${p.y}%`, transform: "translate(-50%,-50%)", background: `radial-gradient(circle, ${i === 0 ? a : a2}18, transparent 60%)`, borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%", animation: "mvp-morph 8s ease-in-out infinite", animationDelay: `${i * -4}s`, filter: "blur(10px)" }} />)}</>);
       default: return null;
     }
   })();
@@ -1506,7 +1559,7 @@ const DashboardPagina = () => {
         {/* Scrollable screen content */}
         <div className="flex-1 overflow-y-auto relative" style={{ ...previewBgStyle, fontFamily: `'${pFontB}', sans-serif` }}>
           {/* Effect overlay */}
-          {previewEffectOverlay && <div className="absolute inset-0 pointer-events-none z-[1]" style={previewEffectOverlay} />}
+          {previewEffectOverlay}
           {/* Ambient glow */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[200px] pointer-events-none" style={{ background: `radial-gradient(ellipse, ${pAccent}20, transparent 70%)` }} />
           <div className="p-5 relative z-10">
