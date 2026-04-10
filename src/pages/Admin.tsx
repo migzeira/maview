@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { checkTablesExist, SETUP_SQL } from "@/lib/supabase-setup";
 import type { User } from "@supabase/supabase-js";
 import {
   Users, LogOut, Search, RefreshCw, Shield,
   Mail, Calendar, Clock, User as UserIcon,
-  Link2, ChevronDown, ChevronUp, AlertTriangle,
+  Link2, ChevronDown, ChevronUp, AlertTriangle, Database, Copy, Check,
 } from "lucide-react";
 
 /* ─────────────────────────────────────────────────
@@ -67,6 +68,8 @@ const Admin = () => {
   const [sortDir, setSortDir]         = useState<SortDir>("desc");
   const [tableError, setTableError]   = useState(false);
   const [expanded, setExpanded]       = useState<string | null>(null);
+  const [dbStatus, setDbStatus]       = useState<{ vitrines: boolean; events: boolean } | null>(null);
+  const [sqlCopied, setSqlCopied]     = useState(false);
 
   /* ── Auth guard ── */
   useEffect(() => {
@@ -75,8 +78,16 @@ const Admin = () => {
       if (!ADMIN_EMAILS.includes(session.user.email || "")) { navigate("/dashboard"); return; }
       setCurrentUser(session.user);
       setLoading(false);
+      // Check database tables
+      checkTablesExist().then(setDbStatus);
     });
   }, [navigate]);
+
+  const copySql = () => {
+    navigator.clipboard.writeText(SETUP_SQL).catch(() => {});
+    setSqlCopied(true);
+    setTimeout(() => setSqlCopied(false), 2000);
+  };
 
   /* ── Fetch profiles ── */
   const fetchProfiles = async () => {
@@ -204,6 +215,43 @@ const Admin = () => {
             </div>
           ))}
         </div>
+
+        {/* ── Database Setup Status ── */}
+        {dbStatus && (!dbStatus.vitrines || !dbStatus.events) && (
+          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-6 flex items-start gap-4">
+            <Database size={20} className="text-blue-500 flex-shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <p className="text-blue-800 font-semibold mb-1">Setup do Banco de Dados</p>
+              <p className="text-blue-700 text-sm mb-2">
+                {!dbStatus.vitrines && !dbStatus.events
+                  ? "As tabelas vitrines e events precisam ser criadas."
+                  : !dbStatus.vitrines
+                    ? "A tabela vitrines precisa ser criada."
+                    : "A tabela events precisa ser criada."}
+                {" "}Copie o SQL abaixo e execute no <strong>Supabase Dashboard → SQL Editor</strong>.
+              </p>
+              <div className="flex items-center gap-2 mb-3">
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold ${dbStatus.vitrines ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>
+                  {dbStatus.vitrines ? "✓" : "✗"} vitrines
+                </span>
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold ${dbStatus.events ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>
+                  {dbStatus.events ? "✓" : "✗"} events
+                </span>
+              </div>
+              <button onClick={copySql}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors mb-3">
+                {sqlCopied ? <Check size={14} /> : <Copy size={14} />}
+                {sqlCopied ? "SQL Copiado!" : "Copiar SQL de Setup"}
+              </button>
+              <details className="group">
+                <summary className="text-blue-600 text-xs font-medium cursor-pointer hover:underline">Ver SQL completo</summary>
+                <pre className="mt-2 bg-blue-100 border border-blue-200 rounded-xl p-4 text-[10px] text-blue-900 overflow-x-auto whitespace-pre-wrap font-mono max-h-64 overflow-y-auto">
+                  {SETUP_SQL}
+                </pre>
+              </details>
+            </div>
+          </div>
+        )}
 
         {/* ── Table Error (tabela profiles não existe ainda) ── */}
         {tableError && (

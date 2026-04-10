@@ -3,6 +3,7 @@ import {
   Palette, Camera, User, Sparkles, ArrowRight, ArrowLeft,
   Check, X, PartyPopper, Copy, ExternalLink,
 } from "lucide-react";
+import { uploadImage } from "@/lib/vitrine-sync";
 
 /* ── Types ─────────────────────────────────────── */
 interface OnboardingProps {
@@ -62,16 +63,22 @@ const OnboardingWizard = ({
   };
 
   /* ── Step 2: Avatar upload ────────── */
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Show local preview immediately
     const reader = new FileReader();
-    reader.onload = () => {
-      const url = reader.result as string;
-      setPreviewAvatar(url);
-      onUpdate("avatarUrl", url);
-    };
+    reader.onload = () => setPreviewAvatar(reader.result as string);
     reader.readAsDataURL(file);
+    // Upload to Supabase Storage (fallback to base64)
+    const publicUrl = await uploadImage(file, "avatars");
+    if (publicUrl) {
+      setPreviewAvatar(publicUrl);
+      onUpdate("avatarUrl", publicUrl);
+    } else {
+      // fallback: use base64 from reader
+      onUpdate("avatarUrl", previewAvatar || "");
+    }
   };
 
   /* ── Step 3: Save name & bio ──────── */

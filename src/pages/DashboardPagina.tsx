@@ -9,7 +9,7 @@ import {
   Play, Smile, Search, Camera, MoreHorizontal,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { initialLoad, saveWithSync, onSyncStatus, type VitrineConfig as SyncVitrineConfig } from "@/lib/vitrine-sync";
+import { initialLoad, saveWithSync, onSyncStatus, uploadImage, type VitrineConfig as SyncVitrineConfig } from "@/lib/vitrine-sync";
 import { useHistory } from "@/hooks/useHistory";
 import DesignTab from "@/components/DesignTab";
 import OnboardingWizard from "@/components/OnboardingWizard";
@@ -505,33 +505,39 @@ const ProfileHeroCard = ({ config, onUpdate, onEditProfile, onHealthAction, onCo
     setAvatarPreview(null);
   };
 
-  // Compress & convert file to base64 via canvas
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Compress, upload to Supabase Storage (fallback to base64)
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const img = new window.Image();
-      img.onload = () => {
-        const MAX = 400;
-        const ratio = Math.min(MAX / img.width, MAX / img.height, 1);
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.round(img.width * ratio);
-        canvas.height = Math.round(img.height * ratio);
-        const ctx = canvas.getContext("2d")!;
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
-        setAvatarPreview(dataUrl);
-        onUpdate("avatarUrl", dataUrl);
-        setEditingAvatar(false);
-        setUploading(false);
-      };
-      img.src = ev.target?.result as string;
-    };
-    reader.readAsDataURL(file);
-    // reset so same file can be re-selected
     e.target.value = "";
+
+    // Compress via canvas
+    const dataUrl = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new window.Image();
+        img.onload = () => {
+          const MAX = 400;
+          const ratio = Math.min(MAX / img.width, MAX / img.height, 1);
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.round(img.width * ratio);
+          canvas.height = Math.round(img.height * ratio);
+          canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL("image/jpeg", 0.82));
+        };
+        img.src = ev.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    setAvatarPreview(dataUrl);
+
+    // Try Supabase Storage upload
+    const publicUrl = await uploadImage(file, "avatars");
+    onUpdate("avatarUrl", publicUrl || dataUrl);
+    setEditingAvatar(false);
+    setUploading(false);
   };
 
   const copyLink = () => {
@@ -1073,29 +1079,36 @@ const DashboardPagina = () => {
 
   // ── Product image upload (multiple) ──────────────────────────────────────
 
-  const handleProductImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProductImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const img = new window.Image();
-        img.onload = () => {
-          const MAX = 500;
-          const ratio = Math.min(MAX / img.width, MAX / img.height, 1);
-          const canvas = document.createElement("canvas");
-          canvas.width = Math.round(img.width * ratio);
-          canvas.height = Math.round(img.height * ratio);
-          const ctx = canvas.getContext("2d")!;
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          const dataUrl = canvas.toDataURL("image/jpeg", 0.72);
-          setProductForm(f => f ? { ...f, images: [...(f.images || []), dataUrl] } : f);
-        };
-        img.src = ev.target?.result as string;
-      };
-      reader.readAsDataURL(file);
-    });
     e.target.value = "";
+
+    for (const file of files) {
+      // Compress via canvas
+      const dataUrl = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new window.Image();
+          img.onload = () => {
+            const MAX = 500;
+            const ratio = Math.min(MAX / img.width, MAX / img.height, 1);
+            const canvas = document.createElement("canvas");
+            canvas.width = Math.round(img.width * ratio);
+            canvas.height = Math.round(img.height * ratio);
+            canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL("image/jpeg", 0.72));
+          };
+          img.src = ev.target?.result as string;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // Try Supabase Storage, fallback to base64
+      const publicUrl = await uploadImage(file, "products");
+      const finalUrl = publicUrl || dataUrl;
+      setProductForm(f => f ? { ...f, images: [...(f.images || []), finalUrl] } : f);
+    }
   };
 
   const removeProductImage = (index: number) => {
