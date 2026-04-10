@@ -317,42 +317,55 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
           <div className="absolute inset-0 mv-gradient-anim" style={{ background: `linear-gradient(90deg, ${accent}15, ${accent2}15, #60a5fa15, ${accent}15)`, backgroundSize: "200% 200%" }} />
         </div>
       );
-    case "starfield":
+    case "starfield": {
+      // Stable positions using index-based seeding
+      const stars = Array.from({ length: 20 }, (_, i) => ({
+        w: i % 2 === 0 ? 2 : 1, left: ((i * 47 + 13) % 100), top: ((i * 71 + 7) % 100),
+        delay: (i * 0.25) % 5, dur: 2 + (i * 0.2) % 4,
+      }));
       return (
         <div className="fixed inset-0 pointer-events-none z-[1]">
-          {Array.from({ length: 20 }).map((_, i) => (
+          {stars.map((s, i) => (
             <div key={i} className="absolute rounded-full mv-shimmer" style={{
-              width: Math.random() > 0.5 ? 2 : 1, height: Math.random() > 0.5 ? 2 : 1,
-              left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%`,
-              background: "white", animationDelay: `${Math.random() * 5}s`, animationDuration: `${2 + Math.random() * 4}s`,
+              width: s.w, height: s.w, left: `${s.left}%`, top: `${s.top}%`,
+              background: "white", animationDelay: `${s.delay}s`, animationDuration: `${s.dur}s`,
             }} />
           ))}
         </div>
       );
-    case "floating-dots":
+    }
+    case "floating-dots": {
+      const dots = Array.from({ length: 8 }, (_, i) => ({
+        size: 4 + (i * 3) % 5, left: 10 + ((i * 61 + 11) % 80), top: 10 + ((i * 43 + 17) % 80),
+        opacity: 0.15 + (i * 0.02), delay: i * 1, dur: 6 + (i % 3) * 2,
+      }));
       return (
         <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
-          {Array.from({ length: 8 }).map((_, i) => (
+          {dots.map((d, i) => (
             <div key={i} className="absolute rounded-full mv-float" style={{
-              width: 4 + Math.random() * 4, height: 4 + Math.random() * 4,
-              left: `${10 + Math.random() * 80}%`, top: `${10 + Math.random() * 80}%`,
-              background: accent, opacity: 0.15 + Math.random() * 0.15,
-              animationDelay: `${Math.random() * 8}s`, animationDuration: `${6 + Math.random() * 6}s`,
+              width: d.size, height: d.size, left: `${d.left}%`, top: `${d.top}%`,
+              background: accent, opacity: d.opacity, animationDelay: `${d.delay}s`, animationDuration: `${d.dur}s`,
             }} />
           ))}
         </div>
       );
-    case "sparkles":
+    }
+    case "sparkles": {
+      const sparks = Array.from({ length: 12 }, (_, i) => ({
+        left: ((i * 53 + 19) % 100), top: ((i * 37 + 23) % 100),
+        delay: (i * 0.33) % 4, dur: 1.5 + (i * 0.25) % 3,
+      }));
       return (
         <div className="fixed inset-0 pointer-events-none z-[1]">
-          {Array.from({ length: 12 }).map((_, i) => (
+          {sparks.map((s, i) => (
             <div key={i} className="absolute rounded-full mv-shimmer" style={{
-              width: 3, height: 3, left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%`,
-              background: i % 3 === 0 ? "#fcd34d" : accent, animationDelay: `${Math.random() * 4}s`, animationDuration: `${1.5 + Math.random() * 3}s`,
+              width: 3, height: 3, left: `${s.left}%`, top: `${s.top}%`,
+              background: i % 3 === 0 ? "#fcd34d" : accent, animationDelay: `${s.delay}s`, animationDuration: `${s.dur}s`,
             }} />
           ))}
         </div>
       );
+    }
     case "wave-layers":
       return (
         <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
@@ -568,34 +581,45 @@ const MOCK_PROFILES: Record<string, ProfileData> = {
 /* ──────────────────────────────────────────────────────────────── */
 /*  🔥 SOCIAL PROOF TOAST — nenhum concorrente tem nativo          */
 /* ──────────────────────────────────────────────────────────────── */
-const PROOF_EVENTS = [
-  { name: "Juliana S.",  city: "São Paulo",       product: "Curso de Design",  time: "2 min" },
-  { name: "Pedro M.",    city: "Rio de Janeiro",  product: "Mentoria 1:1",     time: "5 min" },
-  { name: "Camila R.",   city: "Belo Horizonte",  product: "Ebook Guia",       time: "8 min" },
-  { name: "Lucas T.",    city: "Curitiba",         product: "Curso de Design",  time: "12 min" },
-  { name: "Aline F.",   city: "Recife",           product: "Mentoria 1:1",     time: "17 min" },
-  { name: "Rodrigo B.", city: "Porto Alegre",     product: "Ebook Guia",       time: "21 min" },
+const PROOF_NAMES = [
+  { name: "Juliana S.",  city: "São Paulo" },
+  { name: "Pedro M.",    city: "Rio de Janeiro" },
+  { name: "Camila R.",   city: "Belo Horizonte" },
+  { name: "Lucas T.",    city: "Curitiba" },
+  { name: "Aline F.",    city: "Recife" },
+  { name: "Rodrigo B.",  city: "Porto Alegre" },
 ];
+const PROOF_TIMES = ["2 min", "5 min", "8 min", "12 min", "17 min", "21 min"];
 
-const SocialProofToast = ({ accent }: { accent: string }) => {
-  const [current, setCurrent] = useState<typeof PROOF_EVENTS[0] | null>(null);
+const SocialProofToast = ({ accent, products }: { accent: string; products?: ProductItem[] }) => {
+  const [current, setCurrent] = useState<{ name: string; city: string; product: string; time: string } | null>(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    // Use real product names from the store, fallback to generic
+    const productNames = products && products.length > 0
+      ? products.map(p => p.title)
+      : ["este produto"];
+
     let idx = 0;
+    let intervalId: ReturnType<typeof setInterval>;
     const show = () => {
-      setCurrent(PROOF_EVENTS[idx % PROOF_EVENTS.length]);
+      const person = PROOF_NAMES[idx % PROOF_NAMES.length];
+      setCurrent({
+        ...person,
+        product: productNames[idx % productNames.length],
+        time: PROOF_TIMES[idx % PROOF_TIMES.length],
+      });
       setVisible(true);
       idx++;
       setTimeout(() => setVisible(false), 4000);
     };
     const timer = setTimeout(() => {
       show();
-      const interval = setInterval(show, 9000);
-      return () => clearInterval(interval);
+      intervalId = setInterval(show, 9000);
     }, 3500);
-    return () => clearTimeout(timer);
-  }, []);
+    return () => { clearTimeout(timer); clearInterval(intervalId); };
+  }, [products]);
 
   if (!current) return null;
 
@@ -612,9 +636,9 @@ const SocialProofToast = ({ accent }: { accent: string }) => {
         className="flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl"
         style={{
           background: "rgba(10,7,20,0.92)",
-          border: `1px solid ${accent}30`,
+          border: `1px solid ${accent}20`,
           backdropFilter: "blur(16px)",
-          boxShadow: `0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px ${accent}15`,
+          boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
         }}
       >
         <div
@@ -627,10 +651,10 @@ const SocialProofToast = ({ accent }: { accent: string }) => {
           <p className="text-white text-[11.5px] font-semibold leading-snug">
             {current.name} de {current.city}
           </p>
-          <p className="text-[11px] leading-snug mt-0.5" style={{ color: `${accent}` }}>
+          <p className="text-[11px] leading-snug mt-0.5" style={{ color: accent }}>
             comprou {current.product}
           </p>
-          <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>
+          <p className="text-[9.5px] mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>
             há {current.time}
           </p>
         </div>
@@ -1072,14 +1096,15 @@ const ProfilePage = () => {
         <div className="fixed inset-0 pointer-events-none z-[1]" style={{ background: `rgba(0,0,0,${rd.bgOverlay / 100})` }} />
       )}
 
-      {/* ── Ambient BG glow ── */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-[2]" aria-hidden>
-        <div className="absolute top-[-120px] left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full blur-[100px] opacity-20" style={{ background: `radial-gradient(ellipse, ${t.accent}, transparent 70%)` }} />
-        <div className="absolute bottom-[-80px] right-[-80px] w-[300px] h-[300px] rounded-full blur-[80px] opacity-10" style={{ background: t.accent2 }} />
-      </div>
+      {/* ── Ambient BG glow — subtle, only on solid bg ── */}
+      {rd.bgType === "solid" && (
+        <div className="fixed inset-0 pointer-events-none overflow-hidden z-[2]" aria-hidden>
+          <div className="absolute top-[-120px] left-1/2 -translate-x-1/2 w-[500px] h-[300px] rounded-full blur-[120px] opacity-10" style={{ background: t.accent }} />
+        </div>
+      )}
 
       {/* 🔥 Social Proof Toast */}
-      <SocialProofToast accent={t.accent} />
+      <SocialProofToast accent={t.accent} products={profile.products} />
 
       {/* Copy toast */}
       <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-2 px-5 py-2.5 rounded-full shadow-lg transition-all duration-300 pointer-events-none ${copyToastVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3"}`}
