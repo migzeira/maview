@@ -463,7 +463,7 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
           {[0, 1, 2].map(i => (
             <div key={i} className="absolute w-[250%] left-[-75%] mv-sway" style={{
               height: `${100 + i * 40}px`, bottom: `${i * 25}px`,
-              background: `linear-gradient(180deg, transparent, ${accent}${12 - i * 3})`,
+              background: `linear-gradient(180deg, transparent, ${accent}${35 - i * 8})`,
               borderRadius: "40% 40% 0 0",
               animationDelay: `${i * -2.5}s`,
               animationDuration: `${7 + i * 2}s`,
@@ -473,11 +473,11 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
       );
     case "orbit-circles": {
       const orbs = [
-        { r: 80, size: 10, dur: 8, color: accent, opacity: 0.4 },
-        { r: 130, size: 7, dur: 12, color: accent2, opacity: 0.3 },
-        { r: 60, size: 5, dur: 6, color: accent, opacity: 0.25 },
-        { r: 160, size: 8, dur: 16, color: accent2, opacity: 0.2 },
-        { r: 100, size: 6, dur: 10, color: accent, opacity: 0.35 },
+        { r: 80, size: 12, dur: 8, color: accent, opacity: 0.6 },
+        { r: 130, size: 9, dur: 12, color: accent2, opacity: 0.5 },
+        { r: 60, size: 7, dur: 6, color: accent, opacity: 0.45 },
+        { r: 160, size: 10, dur: 16, color: accent2, opacity: 0.4 },
+        { r: 100, size: 8, dur: 10, color: accent, opacity: 0.55 },
       ];
       return (
         <div className="fixed inset-0 pointer-events-none z-[1]">
@@ -499,7 +499,7 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
           {rings.map(i => (
             <div key={i} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full mv-ripple" style={{
               width: 120, height: 120,
-              border: `1.5px solid ${accent}30`,
+              border: `2px solid ${accent}55`,
               animationDelay: `${i * 1}s`,
               animationDuration: "4s",
             }} />
@@ -511,10 +511,10 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
       return (
         <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
           <div className="absolute w-[300px] h-[300px] top-[10%] left-[5%] mv-morph" style={{
-            background: `radial-gradient(circle, ${accent}18, transparent 70%)`, filter: "blur(40px)",
+            background: `radial-gradient(circle, ${accent}40, transparent 70%)`, filter: "blur(30px)",
           }} />
           <div className="absolute w-[250px] h-[250px] bottom-[15%] right-[5%] mv-morph" style={{
-            background: `radial-gradient(circle, ${accent2}15, transparent 70%)`, filter: "blur(40px)",
+            background: `radial-gradient(circle, ${accent2}35, transparent 70%)`, filter: "blur(30px)",
             animationDelay: "-4s",
           }} />
           <div className="absolute w-[200px] h-[200px] top-[45%] left-[30%] mv-morph" style={{
@@ -525,9 +525,9 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
       );
     case "orbit-rings": {
       const ringData = [
-        { size: 200, dur: 20, border: accent, opacity: 0.15 },
-        { size: 300, dur: 28, border: accent2, opacity: 0.1 },
-        { size: 400, dur: 36, border: accent, opacity: 0.07 },
+        { size: 200, dur: 20, border: accent, opacity: 0.35 },
+        { size: 300, dur: 28, border: accent2, opacity: 0.25 },
+        { size: 400, dur: 36, border: accent, opacity: 0.18 },
       ];
       return (
         <div className="fixed inset-0 pointer-events-none z-[1]">
@@ -560,10 +560,10 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
       return (
         <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
           {lines.map((l, i) => (
-            <div key={i} className="absolute h-[1px] mv-sway" style={{
+            <div key={i} className="absolute h-[2px] mv-sway" style={{
               width: `${l.width}%`, left: `${(100 - l.width) / 2}%`, top: `${l.top}%`,
-              background: `linear-gradient(90deg, transparent, ${l.color}25, ${l.color}40, ${l.color}25, transparent)`,
-              boxShadow: `0 0 8px ${l.color}15`,
+              background: `linear-gradient(90deg, transparent, ${l.color}50, ${l.color}70, ${l.color}50, transparent)`,
+              boxShadow: `0 0 12px ${l.color}35`,
               animationDelay: `${l.delay}s`,
               animationDuration: `${l.dur}s`,
             }} />
@@ -599,7 +599,7 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
     }
     case "rising-particles": {
       const particles = Array.from({ length: 15 }, (_, i) => ({
-        left: ((i * 67 + 11) % 100), size: 3 + (i % 4) * 2, dur: 6 + (i * 1.3) % 6, delay: (i * 0.8) % 8,
+        left: ((i * 67 + 11) % 100), size: 4 + (i % 4) * 3, dur: 6 + (i * 1.3) % 6, delay: (i * 0.8) % 8,
         color: i % 3 === 0 ? accent2 : accent,
       }));
       return (
@@ -607,7 +607,7 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
           {particles.map((p, i) => (
             <div key={i} className="absolute rounded-full mv-rise" style={{
               width: p.size, height: p.size, left: `${p.left}%`, bottom: 0,
-              background: p.color, opacity: 0.25,
+              background: p.color, opacity: 0.5,
               "--rise-dur": `${p.dur}s`, animationDelay: `${p.delay}s`,
             } as React.CSSProperties} />
           ))}
@@ -629,9 +629,9 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
     case "floating-orbs":
       return (
         <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
-          <div className="absolute w-[350px] h-[350px] top-[5%] left-[10%] rounded-full mv-drift" style={{ background: `radial-gradient(circle, ${accent}20, transparent 60%)`, filter: "blur(80px)" }} />
-          <div className="absolute w-[280px] h-[280px] top-[40%] right-[5%] rounded-full mv-drift" style={{ background: `radial-gradient(circle, ${accent2}18, transparent 60%)`, filter: "blur(70px)", animationDelay: "-8s" }} />
-          <div className="absolute w-[220px] h-[220px] bottom-[10%] left-[25%] rounded-full mv-drift" style={{ background: `radial-gradient(circle, ${accent}14, transparent 60%)`, filter: "blur(90px)", animationDelay: "-15s" }} />
+          <div className="absolute w-[350px] h-[350px] top-[5%] left-[10%] rounded-full mv-drift" style={{ background: `radial-gradient(circle, ${accent}45, transparent 60%)`, filter: "blur(50px)" }} />
+          <div className="absolute w-[280px] h-[280px] top-[40%] right-[5%] rounded-full mv-drift" style={{ background: `radial-gradient(circle, ${accent2}40, transparent 60%)`, filter: "blur(45px)", animationDelay: "-8s" }} />
+          <div className="absolute w-[220px] h-[220px] bottom-[10%] left-[25%] rounded-full mv-drift" style={{ background: `radial-gradient(circle, ${accent}35, transparent 60%)`, filter: "blur(55px)", animationDelay: "-15s" }} />
         </div>
       );
     case "layered-waves":
@@ -640,7 +640,7 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
           {[0, 1, 2, 3].map(i => (
             <div key={i} className="absolute w-[250%] left-[-75%] mv-sway" style={{
               height: `${80 + i * 30}px`, bottom: `${i * 20}px`,
-              background: `linear-gradient(180deg, transparent, ${i % 2 === 0 ? accent : accent2}${String(10 - i * 2).padStart(2, "0")})`,
+              background: `linear-gradient(180deg, transparent, ${i % 2 === 0 ? accent : accent2}${String(30 - i * 5).padStart(2, "0")})`,
               borderRadius: "45% 45% 0 0",
               animationDelay: `${i * -1.8}s`,
               animationDuration: `${6 + i * 1.5}s`,
@@ -686,8 +686,8 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
       return (
         <div className="fixed inset-0 pointer-events-none z-[1]">
           <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] mv-spin-slow" style={{
-            background: `conic-gradient(from 0deg, transparent, ${accent}10, transparent, ${accent2}08, transparent, ${accent}06, transparent)`,
-            filter: "blur(40px)",
+            background: `conic-gradient(from 0deg, transparent, ${accent}30, transparent, ${accent2}25, transparent, ${accent}20, transparent)`,
+            filter: "blur(25px)",
             "--spin-dur": "25s",
           } as React.CSSProperties} />
         </div>

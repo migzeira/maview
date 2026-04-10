@@ -315,7 +315,7 @@ const DESIGN_PACKS: DesignPack[] = [
     config: {
       theme: "sunset",
       design: {
-        bgType: "effect", bgEffect: "gradient-flow", bgColor: "#0f0805",
+        bgType: "effect", bgEffect: "rising-particles", bgColor: "#0f0805",
         buttonShape: "pill", buttonFill: "solid", buttonShadow: "md", buttonRadius: 12,
         fontHeading: "Poppins", fontBody: "DM Sans",
         profileShape: "circle", profileBorder: true, profileBorderColor: "#f97316", profileSize: 92,
@@ -349,7 +349,7 @@ const DESIGN_PACKS: DesignPack[] = [
     config: {
       theme: "ocean",
       design: {
-        bgType: "effect", bgEffect: "wave-layers", bgColor: "#020c14",
+        bgType: "effect", bgEffect: "layered-waves", bgColor: "#020c14",
         buttonShape: "rounded", buttonFill: "glass", buttonShadow: "sm", buttonRadius: 14,
         fontHeading: "Montserrat", fontBody: "Urbanist",
         profileShape: "circle", profileBorder: false, profileSize: 88,
@@ -383,7 +383,7 @@ const DESIGN_PACKS: DesignPack[] = [
     config: {
       theme: "arctic",
       design: {
-        bgType: "effect", bgEffect: "starfield", bgColor: "#050a10",
+        bgType: "effect", bgEffect: "ripple-rings", bgColor: "#050a10",
         buttonShape: "pill", buttonFill: "glass", buttonShadow: "glow", buttonRadius: 12,
         fontHeading: "Sora", fontBody: "Inter",
         profileShape: "circle", profileBorder: true, profileBorderColor: "#38bdf8", profileSize: 92,
@@ -417,7 +417,7 @@ const DESIGN_PACKS: DesignPack[] = [
     config: {
       theme: "indigo",
       design: {
-        bgType: "effect", bgEffect: "aurora-waves", bgColor: "#06050f",
+        bgType: "effect", bgEffect: "vortex-spin", bgColor: "#06050f",
         buttonShape: "soft", buttonFill: "glass", buttonShadow: "glow", buttonRadius: 14,
         fontHeading: "Plus Jakarta Sans", fontBody: "DM Sans",
         profileShape: "circle", profileBorder: false, profileSize: 92,
@@ -451,7 +451,7 @@ const DESIGN_PACKS: DesignPack[] = [
     config: {
       theme: "rose",
       design: {
-        bgType: "effect", bgEffect: "gradient-flow", bgColor: "#100509",
+        bgType: "effect", bgEffect: "floating-orbs", bgColor: "#100509",
         buttonShape: "pill", buttonFill: "solid", buttonShadow: "md", buttonRadius: 12,
         fontHeading: "Dancing Script", fontBody: "DM Sans",
         profileShape: "circle", profileBorder: true, profileBorderColor: "#f43f5e", profileSize: 96,
