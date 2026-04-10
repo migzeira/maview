@@ -1168,9 +1168,9 @@ const ProfilePage = () => {
               }
             </div>
 
-            <h1 className="text-xl font-bold mb-0.5 text-center" style={{ color: t.text, fontFamily: `'${rd.fontHeading}', sans-serif` }}>{profile.displayName}</h1>
-            <p className="text-[12px] font-medium mb-2" style={{ color: t.accent }}>@{profile.username}</p>
-            {profile.bio && <p className="text-[12.5px] text-center leading-relaxed max-w-[280px] mb-4 line-clamp-3" style={{ color: t.sub }}>{profile.bio}</p>}
+            <h1 className="text-[22px] font-extrabold mb-1 text-center tracking-tight" style={{ color: t.text, fontFamily: `'${rd.fontHeading}', sans-serif` }}>{profile.displayName}</h1>
+            <p className="text-[13px] font-semibold mb-2" style={{ color: t.accent }}>@{profile.username}</p>
+            {profile.bio && <p className="text-[14px] text-center leading-relaxed max-w-[300px] mb-5 line-clamp-3" style={{ color: t.sub, fontFamily: `'${rd.fontBody}', sans-serif` }}>{profile.bio}</p>}
 
             {/* Stats */}
             {profile.stats && (
@@ -1185,35 +1185,35 @@ const ProfilePage = () => {
             )}
 
             {/* Social + Share */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               {socialLinks.length > 0
                 ? socialLinks.map(link => {
                     const Icon = getIcon(link.icon);
                     return (
                       <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
-                        className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-125 active:scale-95"
-                        style={{ background: `${t.accent}15`, border: `1px solid ${t.accent}20` }} title={link.title}>
-                        <Icon size={16} style={{ color: t.accent }} />
+                        className="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
+                        style={{ background: `${t.accent}18`, border: `1.5px solid ${t.accent}30` }} title={link.title}>
+                        <Icon size={18} style={{ color: t.text }} />
                       </a>
                     );
                   })
                 : /* Placeholder social icons when none configured */
                   [
-                    { key: "ig", icon: <Instagram size={15} /> },
-                    { key: "x", icon: <Twitter size={15} /> },
-                    { key: "yt", icon: <Youtube size={15} /> },
+                    { key: "ig", icon: <Instagram size={17} /> },
+                    { key: "x", icon: <Twitter size={17} /> },
+                    { key: "yt", icon: <Youtube size={17} /> },
                   ].map(s => (
                     <div key={s.key}
-                      className="w-10 h-10 rounded-full flex items-center justify-center"
-                      style={{ background: `${t.accent}10`, border: `1px solid ${t.accent}18`, color: `${t.accent}50` }}>
+                      className="w-11 h-11 rounded-full flex items-center justify-center"
+                      style={{ background: `${t.accent}12`, border: `1.5px solid ${t.accent}20`, color: `${t.accent}40` }}>
                       {s.icon}
                     </div>
                   ))
               }
               <button onClick={handleShare}
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-150 hover:brightness-125 active:scale-95"
-                style={{ background: `${t.accent}15`, border: `1px solid ${t.accent}20` }}>
-                {copied ? <Check size={15} style={{ color: t.accent }} /> : <Share2 size={15} style={{ color: t.accent }} />}
+                className="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
+                style={{ background: `${t.accent}18`, border: `1.5px solid ${t.accent}30` }}>
+                {copied ? <Check size={17} style={{ color: "#22c55e" }} /> : <Share2 size={17} style={{ color: t.text }} />}
               </button>
             </div>
           </div>
@@ -1221,9 +1221,9 @@ const ProfilePage = () => {
           {/* ── PRODUTOS ── */}
           {profile.products.length > 0 && (
             <section className="mb-7">
-              <div className="flex items-center gap-2 mb-3">
-                <ShoppingBag size={14} style={{ color: t.sub }} />
-                <span className="text-[12px] font-semibold tracking-wide" style={{ color: t.sub }}>Produtos</span>
+              <div className="flex items-center gap-2 mb-4">
+                <ShoppingBag size={14} style={{ color: t.text, opacity: 0.7 }} />
+                <span className="text-[13px] font-bold tracking-wide uppercase" style={{ color: t.text, opacity: 0.7 }}>Produtos</span>
               </div>
               <div className="space-y-3">
                 {profile.products.map((product, i) => {
@@ -1289,7 +1289,7 @@ const ProfilePage = () => {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                            <p className="text-[14px] font-bold leading-snug line-clamp-2" style={{ color: t.text }}>{product.title}</p>
+                            <p className="text-[15px] font-bold leading-snug line-clamp-2" style={{ color: t.text, fontFamily: `'${rd.fontHeading}', sans-serif` }}>{product.title}</p>
                             {product.badge && (
                               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: `${t.accent}22`, color: t.accent, border: `1px solid ${t.accent}30` }}>
                                 {product.badge}
@@ -1303,7 +1303,7 @@ const ProfilePage = () => {
                             )}
                             {product.urgency && <CountdownBadge accent={t.accent} />}
                           </div>
-                          {product.description && <p className="text-[11.5px] truncate" style={{ color: t.sub }}>{product.description}</p>}
+                          {product.description && <p className="text-[12px] truncate" style={{ color: t.sub }}>{product.description}</p>}
                           {product.price && (
                             <div className="flex items-center gap-2 mt-1">
                               <span className="text-[13px] font-bold" style={{ color: t.accent }}>{product.price}</span>
@@ -1341,7 +1341,7 @@ const ProfilePage = () => {
             <section className="mb-7">
               <div className="flex items-center gap-2 mb-3">
                 <Star size={14} className="fill-amber-400 text-amber-400" />
-                <span className="text-[12px] font-semibold tracking-wide" style={{ color: t.sub }}>Depoimentos</span>
+                <span className="text-[13px] font-bold tracking-wide uppercase" style={{ color: t.text, opacity: 0.7 }}>Depoimentos</span>
               </div>
               <div className="space-y-2.5">
                 {profile.testimonials.map((item, i) => (
@@ -1361,7 +1361,7 @@ const ProfilePage = () => {
                       ))}
                     </div>
                     {/* Quote */}
-                    <p className="text-[13px] leading-relaxed mb-3 italic" style={{ color: t.sub }}>
+                    <p className="text-[14px] leading-relaxed mb-3 italic" style={{ color: t.sub }}>
                       "{item.text}"
                     </p>
                     {/* Screenshot do depoimento real */}
@@ -1380,8 +1380,8 @@ const ProfilePage = () => {
                         </div>
                       )}
                       <div>
-                        <p className="text-[13px] font-bold leading-none" style={{ color: t.text }}>{item.name}</p>
-                        {item.role && <p className="text-[10.5px] mt-0.5" style={{ color: t.sub }}>{item.role}</p>}
+                        <p className="text-[14px] font-bold leading-none" style={{ color: t.text }}>{item.name}</p>
+                        {item.role && <p className="text-[11px] mt-0.5" style={{ color: t.sub }}>{item.role}</p>}
                       </div>
                     </div>
                   </div>
@@ -1394,15 +1394,15 @@ const ProfilePage = () => {
           {regularLinks.length > 0 && (
             <section>
               <div className="flex items-center gap-2 mb-3">
-                <Link2 size={14} style={{ color: t.sub }} />
-                <span className="text-[12px] font-semibold tracking-wide" style={{ color: t.sub }}>Links</span>
+                <Link2 size={14} style={{ color: t.text, opacity: 0.7 }} />
+                <span className="text-[13px] font-bold tracking-wide uppercase" style={{ color: t.text, opacity: 0.7 }}>Links</span>
               </div>
               <div className="space-y-2">
                 {regularLinks.map((link, i) => {
                   const Icon = getIcon(link.icon);
                   return (
                     <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
-                      className="group flex items-center gap-3.5 w-full px-4 py-3.5 font-medium text-[13.5px] active:scale-[0.98]"
+                      className="group flex items-center gap-3.5 w-full px-4 py-4 font-semibold text-[14px] active:scale-[0.98]"
                       style={{
                         ...buttonStyles(rd), color: t.text,
                         opacity: linkStagger[i] ? 1 : 0,
@@ -1432,15 +1432,15 @@ const ProfilePage = () => {
           href={`https://wa.me/${profile.whatsapp}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="fixed bottom-[72px] right-4 z-50 flex items-center gap-2.5 px-4 py-2.5 rounded-full shadow-2xl transition-all duration-200 hover:scale-105 active:scale-95"
+          className="fixed bottom-[72px] right-4 z-50 flex items-center gap-2.5 px-5 py-3 rounded-full shadow-2xl transition-all duration-200 hover:scale-105 active:scale-95"
           style={{
-            background: "#22c55e",
-            boxShadow: "0 4px 16px rgba(34,197,94,0.25)",
+            background: "#25d366",
+            boxShadow: "0 6px 24px rgba(37,211,102,0.35)",
             color: "#fff",
           }}
         >
-          <MessageCircle size={17} className="fill-white" />
-          <span className="text-[12.5px] font-bold">Chamar no WhatsApp</span>
+          <MessageCircle size={18} className="fill-white" />
+          <span className="text-[13px] font-bold">Chamar no WhatsApp</span>
         </a>
       )}
 
