@@ -259,6 +259,9 @@ function injectEffectStyles() {
     @keyframes mv-wave-ud { 0%,100% { transform: translateY(0) scaleY(1); } 30% { transform: translateY(-30px) scaleY(1.2); } 60% { transform: translateY(15px) scaleY(0.85); } 85% { transform: translateY(-10px) scaleY(1.08); } }
     @keyframes mv-neon-scan { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
     @keyframes mv-morph { 0%,100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: scale(1); } 25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; transform: scale(1.06); } 50% { border-radius: 50% 60% 30% 60% / 30% 50% 70% 50%; transform: scale(0.94); } 75% { border-radius: 40% 60% 70% 30% / 60% 40% 30% 70%; transform: scale(1.04); } }
+    @keyframes mv-wave-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    @keyframes mv-globe-spin { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
+    @keyframes mv-vortex-pro { 0% { transform: translate(-50%,-50%) rotate(0deg) scale(1); } 50% { transform: translate(-50%,-50%) rotate(180deg) scale(1.08); } 100% { transform: translate(-50%,-50%) rotate(360deg) scale(1); } }
     @keyframes mv-orbit-ring { 0% { transform: translate(-50%,-50%) rotate(0deg); } 100% { transform: translate(-50%,-50%) rotate(360deg); } }
     .mv-aurora { animation: mv-aurora 12s ease-in-out infinite; }
     .mv-pulse { animation: mv-pulse 4s ease-in-out infinite; }
@@ -460,20 +463,27 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
         </div>
       );
     /* ── NEW: Animated motion effects ── */
-    case "ocean-waves":
+    case "ocean-waves": {
+      const waveSvg = (color: string, opacity: number) => `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="${color}" fill-opacity="${opacity}" d="M0,192L48,186.7C96,181,192,171,288,186.7C384,203,480,245,576,250.7C672,256,768,224,864,213.3C960,203,1056,213,1152,218.7C1248,224,1344,224,1392,224L1440,224L1440,320L0,320Z"/></svg>`)}`;
       return (
         <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
-          {[0, 1, 2, 3, 4].map(i => (
-            <div key={i} className="absolute w-[300%] left-[-100%] mv-wave-ud" style={{
-              height: `${80 + i * 30}px`, bottom: `${i * 22}px`,
-              background: `linear-gradient(180deg, transparent 15%, ${i % 2 === 0 ? accent : accent2}${40 - i * 6})`,
-              borderRadius: "42% 58% 42% 58% / 100% 100% 0% 0%",
-              animationDelay: `${i * -0.8}s`,
-              "--wave-dur": `${3 + i * 0.6}s`,
-            } as React.CSSProperties} />
-          ))}
+          {[0, 1, 2, 3].map(i => {
+            const c = i % 2 === 0 ? accent : accent2;
+            const op = [0.35, 0.25, 0.2, 0.15][i];
+            return (
+              <div key={i} className="absolute bottom-0 left-0" style={{
+                width: "200%", height: `${45 - i * 5}vh`,
+                backgroundImage: `url("${waveSvg(c, op)}")`,
+                backgroundSize: "50% 100%", backgroundRepeat: "repeat-x",
+                animation: `mv-wave-scroll ${8 + i * 3}s linear infinite`,
+                animationDelay: `${i * -2}s`,
+                bottom: `${i * -8}px`,
+              }} />
+            );
+          })}
         </div>
       );
+    }
     case "orbit-circles": {
       const orbs = [
         { r: 80, size: 12, dur: 8, color: accent, opacity: 0.6 },
@@ -639,20 +649,32 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
           <div className="absolute w-[220px] h-[220px] bottom-[10%] left-[25%] rounded-full mv-drift" style={{ background: `radial-gradient(circle, ${accent}35, transparent 60%)`, filter: "blur(55px)", animationDelay: "-15s" }} />
         </div>
       );
-    case "layered-waves":
+    case "layered-waves": {
+      const wavePaths = [
+        "M0,160L60,170.7C120,181,240,203,360,197.3C480,192,600,160,720,165.3C840,171,960,213,1080,218.7C1200,224,1320,192,1380,176L1440,160L1440,320L0,320Z",
+        "M0,224L60,213.3C120,203,240,181,360,186.7C480,192,600,224,720,234.7C840,245,960,235,1080,218.7C1200,203,1320,181,1380,170.7L1440,160L1440,320L0,320Z",
+        "M0,256L60,250.7C120,245,240,235,360,229.3C480,224,600,224,720,213.3C840,203,960,181,1080,186.7C1200,192,1320,224,1380,240L1440,256L1440,320L0,320Z",
+      ];
       return (
         <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
-          {[0, 1, 2, 3, 4].map(i => (
-            <div key={i} className="absolute w-[300%] left-[-100%] mv-wave-ud" style={{
-              height: `${80 + i * 28}px`, bottom: `${i * 22}px`,
-              background: `linear-gradient(180deg, transparent 15%, ${i % 2 === 0 ? accent : accent2}${40 - i * 6})`,
-              borderRadius: "42% 58% 42% 58% / 100% 100% 0% 0%",
-              animationDelay: `${i * -0.7}s`,
-              "--wave-dur": `${3.5 + i * 0.5}s`,
-            } as React.CSSProperties} />
-          ))}
+          {wavePaths.map((d, i) => {
+            const c = i % 2 === 0 ? accent : accent2;
+            const op = [0.3, 0.2, 0.15][i];
+            const svg = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="${c}" fill-opacity="${op}" d="${d}"/></svg>`)}`;
+            return (
+              <div key={i} className="absolute bottom-0 left-0" style={{
+                width: "200%", height: `${50 - i * 8}vh`,
+                backgroundImage: `url("${svg}")`,
+                backgroundSize: "50% 100%", backgroundRepeat: "repeat-x",
+                animation: `mv-wave-scroll ${10 + i * 4}s linear infinite`,
+                animationDirection: i % 2 === 0 ? "normal" : "reverse",
+                bottom: `${i * -5}px`,
+              }} />
+            );
+          })}
         </div>
       );
+    }
     case "pulse-circles": {
       const circles = [
         { size: 100, delay: 0, dur: 5 },
@@ -690,12 +712,63 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
     case "vortex-spin":
       return (
         <div className="fixed inset-0 pointer-events-none z-[1]">
-          <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] mv-spin-slow" style={{
-            background: `conic-gradient(from 0deg, transparent, ${accent}40, transparent 25%, transparent 45%, ${accent2}35, transparent 65%, transparent 85%, ${accent}25)`,
-            filter: "blur(20px)",
-            top: "calc(60% - 300px)",
-            "--spin-dur": "25s",
-          } as React.CSSProperties} />
+          {/* Outer ring */}
+          <div className="absolute left-1/2 top-1/2" style={{
+            width: 700, height: 700,
+            background: `conic-gradient(from 0deg, ${accent}30, transparent 15%, transparent 35%, ${accent2}25, transparent 50%, transparent 70%, ${accent}20, transparent 85%)`,
+            borderRadius: "50%", filter: "blur(25px)",
+            animation: "mv-vortex-pro 12s ease-in-out infinite",
+          }} />
+          {/* Inner ring - counter rotate */}
+          <div className="absolute left-1/2 top-1/2" style={{
+            width: 400, height: 400,
+            background: `conic-gradient(from 90deg, ${accent2}35, transparent 20%, transparent 45%, ${accent}30, transparent 60%, transparent 80%, ${accent2}25)`,
+            borderRadius: "50%", filter: "blur(15px)",
+            animation: "mv-vortex-pro 8s ease-in-out infinite reverse",
+          }} />
+          {/* Core glow */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" style={{
+            width: 200, height: 200,
+            background: `radial-gradient(circle, ${accent}40, transparent 70%)`,
+            borderRadius: "50%", filter: "blur(20px)",
+            animation: "mv-breathe 4s ease-in-out infinite",
+          }} />
+        </div>
+      );
+    case "wireframe-globe":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] flex items-center justify-center">
+          <div style={{
+            width: 350, height: 350,
+            transformStyle: "preserve-3d" as const,
+            animation: "mv-globe-spin 20s linear infinite",
+          }}>
+            {/* Meridians (vertical circles) */}
+            {[0,1,2,3,4,5].map(i => (
+              <div key={`m${i}`} className="absolute inset-0 rounded-full" style={{
+                border: `1px solid ${i % 2 === 0 ? accent : accent2}`,
+                opacity: 0.2,
+                transform: `rotateY(${i * 30}deg)`,
+              }} />
+            ))}
+            {/* Latitude lines (horizontal ellipses) */}
+            {[-2,-1,0,1,2].map(i => (
+              <div key={`l${i}`} className="absolute rounded-full" style={{
+                width: `${85 - Math.abs(i) * 20}%`,
+                height: `${85 - Math.abs(i) * 20}%`,
+                left: `${(100 - (85 - Math.abs(i) * 20)) / 2}%`,
+                top: `${50 + i * 18}%`,
+                transform: `translateY(-50%) rotateX(90deg) scaleY(0.3)`,
+                border: `1px solid ${accent}`,
+                opacity: 0.15,
+              }} />
+            ))}
+            {/* Outer glow */}
+            <div className="absolute inset-[-20%] rounded-full" style={{
+              background: `radial-gradient(circle, ${accent}12, transparent 60%)`,
+              filter: "blur(15px)",
+            }} />
+          </div>
         </div>
       );
     case "liquid-glass":

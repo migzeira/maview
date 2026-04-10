@@ -135,6 +135,7 @@ const BG_EFFECTS: { id: string; label: string; desc: string; category: string }[
   { id: "stripe-gradient", label: "Stripe", desc: "Gradiente animado estilo Stripe", category: "gradient" },
   { id: "vortex-spin", label: "Vórtex", desc: "Espiral de luz girando lentamente", category: "motion" },
   { id: "liquid-glass", label: "Vidro Líquido", desc: "Formas de vidro líquido orgânicas", category: "motion" },
+  { id: "wireframe-globe", label: "Globe", desc: "Globo wireframe 3D girando", category: "motion" },
 ];
 
 const EFFECT_CATEGORIES = [
@@ -579,6 +580,23 @@ const DESIGN_PACKS: DesignPack[] = [
       },
     },
   },
+  {
+    id: "wireframe-globe",
+    label: "Globe",
+    desc: "Globo wireframe girando",
+    category: "animated",
+    preview: { bg: "#050810", accent: "#22d3ee", accent2: "#06b6d4" },
+    config: {
+      theme: "midnight",
+      design: {
+        bgType: "effect", bgEffect: "wireframe-globe", bgColor: "#050810",
+        buttonShape: "rounded", buttonFill: "glass", buttonShadow: "glow", buttonRadius: 14,
+        fontHeading: "Space Grotesk", fontBody: "Inter",
+        profileShape: "circle", profileBorder: true, profileBorderColor: "#22d3ee", profileSize: 92,
+        accentColor: "#22d3ee", accentColor2: "#06b6d4",
+      },
+    },
+  },
   /* ── NEW: Light / White / Black theme packs ── */
   {
     id: "clean-white",
@@ -825,6 +843,7 @@ function getEffectPreviewStyle(effectId: string, accent: string): React.CSSPrope
     case "stripe-gradient": return { background: `linear-gradient(-45deg, ${a}15, #ec489910, #60a5fa10, ${a}15)` };
     case "vortex-spin": return { background: `conic-gradient(from 0deg, transparent, ${a}10, transparent, ${a}05, transparent)` };
     case "liquid-glass": return { background: `radial-gradient(ellipse at 35% 40%, ${a}18, transparent 50%), radial-gradient(ellipse at 65% 65%, #ec489912, transparent 50%)` };
+    case "wireframe-globe": return { background: `radial-gradient(circle, transparent 30%, ${a}08 31%, transparent 32%), radial-gradient(circle, transparent 55%, ${a}06 56%, transparent 57%), linear-gradient(0deg, transparent 48%, ${a}08 49%, ${a}08 51%, transparent 52%), linear-gradient(90deg, transparent 48%, ${a}06 49%, ${a}06 51%, transparent 52%)` };
     default: return {};
   }
 }
