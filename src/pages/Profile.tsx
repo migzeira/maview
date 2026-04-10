@@ -95,25 +95,25 @@ const THEMES: Record<string, {
   bg: string; accent: string; accent2: string;
   card: string; text: string; sub: string; border: string;
 }> = {
-  "dark-purple": { bg: "#080612", accent: "#a855f7", accent2: "#ec4899", card: "#13102a", text: "#f8f5ff", sub: "rgba(248,245,255,0.65)", border: "rgba(168,85,247,0.18)" },
-  "midnight":    { bg: "#05080f", accent: "#60a5fa", accent2: "#818cf8", card: "#0d1524", text: "#f0f6ff", sub: "rgba(240,246,255,0.65)", border: "rgba(96,165,250,0.18)"   },
-  "forest":      { bg: "#050f05", accent: "#4ade80", accent2: "#34d399", card: "#0a1a0a", text: "#f0fff4", sub: "rgba(240,255,244,0.65)", border: "rgba(74,222,128,0.18)"   },
-  "rose":        { bg: "#100509", accent: "#f43f5e", accent2: "#fb7185", card: "#1e0912", text: "#fff0f3", sub: "rgba(255,240,243,0.65)", border: "rgba(244,63,94,0.18)"    },
-  "amber":       { bg: "#0f0a00", accent: "#f59e0b", accent2: "#fcd34d", card: "#1f1500", text: "#fffbeb", sub: "rgba(255,251,235,0.65)", border: "rgba(245,158,11,0.18)"   },
-  "ocean":       { bg: "#020c14", accent: "#06b6d4", accent2: "#22d3ee", card: "#051e30", text: "#ecfeff", sub: "rgba(236,254,255,0.65)", border: "rgba(6,182,212,0.18)"    },
-  "neon-pink":   { bg: "#0a0010", accent: "#ff2d95", accent2: "#ff6ec7", card: "#1a0828", text: "#fff0f8", sub: "rgba(255,240,248,0.65)", border: "rgba(255,45,149,0.18)"   },
-  "sunset":      { bg: "#0f0805", accent: "#f97316", accent2: "#ef4444", card: "#1f150a", text: "#fff7ed", sub: "rgba(255,247,237,0.65)", border: "rgba(249,115,22,0.18)"   },
-  "lavender":    { bg: "#0c0a14", accent: "#c084fc", accent2: "#a78bfa", card: "#1a1530", text: "#f5f0ff", sub: "rgba(245,240,255,0.65)", border: "rgba(192,132,252,0.18)" },
-  "emerald":     { bg: "#021a0f", accent: "#10b981", accent2: "#6ee7b7", card: "#0a2a1a", text: "#ecfdf5", sub: "rgba(236,253,245,0.65)", border: "rgba(16,185,129,0.18)"  },
-  "crimson":     { bg: "#120508", accent: "#dc2626", accent2: "#f87171", card: "#220a10", text: "#fff1f2", sub: "rgba(255,241,242,0.65)", border: "rgba(220,38,38,0.18)"    },
-  "arctic":      { bg: "#050a10", accent: "#38bdf8", accent2: "#7dd3fc", card: "#0c1828", text: "#f0f9ff", sub: "rgba(240,249,255,0.65)", border: "rgba(56,189,248,0.18)"   },
-  "gold":        { bg: "#0c0a04", accent: "#eab308", accent2: "#d97706", card: "#1c1808", text: "#fefce8", sub: "rgba(254,252,232,0.65)", border: "rgba(234,179,8,0.18)"    },
-  "sage":        { bg: "#080c08", accent: "#84cc16", accent2: "#a3e635", card: "#121a12", text: "#f7fee7", sub: "rgba(247,254,231,0.65)", border: "rgba(132,204,22,0.18)"   },
-  "coral":       { bg: "#0f0808", accent: "#fb923c", accent2: "#f472b6", card: "#1f1212", text: "#fff7ed", sub: "rgba(255,247,237,0.65)", border: "rgba(251,146,60,0.18)"   },
-  "indigo":      { bg: "#06050f", accent: "#6366f1", accent2: "#a78bfa", card: "#100e28", text: "#eef2ff", sub: "rgba(238,242,255,0.65)", border: "rgba(99,102,241,0.18)"   },
-  "slate":       { bg: "#0c0e12", accent: "#94a3b8", accent2: "#cbd5e1", card: "#1a1e28", text: "#f8fafc", sub: "rgba(248,250,252,0.65)", border: "rgba(148,163,184,0.18)" },
-  "wine":        { bg: "#100408", accent: "#be185d", accent2: "#e11d48", card: "#200a14", text: "#fff0f6", sub: "rgba(255,240,246,0.65)", border: "rgba(190,24,93,0.18)"    },
-  "custom":      { bg: "#080612", accent: "#a855f7", accent2: "#ec4899", card: "#13102a", text: "#f8f5ff", sub: "rgba(248,245,255,0.65)", border: "rgba(168,85,247,0.18)" },
+  "dark-purple": { bg: "#080612", accent: "#a855f7", accent2: "#ec4899", card: "#13102a", text: "#f8f5ff", sub: "rgba(248,245,255,0.72)", border: "rgba(168,85,247,0.18)" },
+  "midnight":    { bg: "#05080f", accent: "#60a5fa", accent2: "#818cf8", card: "#0d1524", text: "#f0f6ff", sub: "rgba(240,246,255,0.72)", border: "rgba(96,165,250,0.18)"   },
+  "forest":      { bg: "#050f05", accent: "#4ade80", accent2: "#34d399", card: "#0a1a0a", text: "#f0fff4", sub: "rgba(240,255,244,0.72)", border: "rgba(74,222,128,0.18)"   },
+  "rose":        { bg: "#100509", accent: "#f43f5e", accent2: "#fb7185", card: "#1e0912", text: "#fff0f3", sub: "rgba(255,240,243,0.72)", border: "rgba(244,63,94,0.18)"    },
+  "amber":       { bg: "#0f0a00", accent: "#f59e0b", accent2: "#fcd34d", card: "#1f1500", text: "#fffbeb", sub: "rgba(255,251,235,0.72)", border: "rgba(245,158,11,0.18)"   },
+  "ocean":       { bg: "#020c14", accent: "#06b6d4", accent2: "#22d3ee", card: "#051e30", text: "#ecfeff", sub: "rgba(236,254,255,0.72)", border: "rgba(6,182,212,0.18)"    },
+  "neon-pink":   { bg: "#0a0010", accent: "#ff2d95", accent2: "#ff6ec7", card: "#1a0828", text: "#fff0f8", sub: "rgba(255,240,248,0.72)", border: "rgba(255,45,149,0.18)"   },
+  "sunset":      { bg: "#0f0805", accent: "#f97316", accent2: "#ef4444", card: "#1f150a", text: "#fff7ed", sub: "rgba(255,247,237,0.72)", border: "rgba(249,115,22,0.18)"   },
+  "lavender":    { bg: "#0c0a14", accent: "#c084fc", accent2: "#a78bfa", card: "#1a1530", text: "#f5f0ff", sub: "rgba(245,240,255,0.72)", border: "rgba(192,132,252,0.18)" },
+  "emerald":     { bg: "#021a0f", accent: "#10b981", accent2: "#6ee7b7", card: "#0a2a1a", text: "#ecfdf5", sub: "rgba(236,253,245,0.72)", border: "rgba(16,185,129,0.18)"  },
+  "crimson":     { bg: "#120508", accent: "#dc2626", accent2: "#f87171", card: "#220a10", text: "#fff1f2", sub: "rgba(255,241,242,0.72)", border: "rgba(220,38,38,0.18)"    },
+  "arctic":      { bg: "#050a10", accent: "#38bdf8", accent2: "#7dd3fc", card: "#0c1828", text: "#f0f9ff", sub: "rgba(240,249,255,0.72)", border: "rgba(56,189,248,0.18)"   },
+  "gold":        { bg: "#0c0a04", accent: "#eab308", accent2: "#d97706", card: "#1c1808", text: "#fefce8", sub: "rgba(254,252,232,0.72)", border: "rgba(234,179,8,0.18)"    },
+  "sage":        { bg: "#080c08", accent: "#84cc16", accent2: "#a3e635", card: "#121a12", text: "#f7fee7", sub: "rgba(247,254,231,0.72)", border: "rgba(132,204,22,0.18)"   },
+  "coral":       { bg: "#0f0808", accent: "#fb923c", accent2: "#f472b6", card: "#1f1212", text: "#fff7ed", sub: "rgba(255,247,237,0.72)", border: "rgba(251,146,60,0.18)"   },
+  "indigo":      { bg: "#06050f", accent: "#6366f1", accent2: "#a78bfa", card: "#100e28", text: "#eef2ff", sub: "rgba(238,242,255,0.72)", border: "rgba(99,102,241,0.18)"   },
+  "slate":       { bg: "#0c0e12", accent: "#94a3b8", accent2: "#cbd5e1", card: "#1a1e28", text: "#f8fafc", sub: "rgba(248,250,252,0.72)", border: "rgba(148,163,184,0.18)" },
+  "wine":        { bg: "#100408", accent: "#be185d", accent2: "#e11d48", card: "#200a14", text: "#fff0f6", sub: "rgba(255,240,246,0.72)", border: "rgba(190,24,93,0.18)"    },
+  "custom":      { bg: "#080612", accent: "#a855f7", accent2: "#ec4899", card: "#13102a", text: "#f8f5ff", sub: "rgba(248,245,255,0.72)", border: "rgba(168,85,247,0.18)" },
 };
 
 /* ─── Background patterns (SVG) ─────────────────────────────── */
@@ -654,7 +654,7 @@ const SocialProofToast = ({ accent, products }: { accent: string; products?: Pro
           <p className="text-[11px] leading-snug mt-0.5" style={{ color: accent }}>
             comprou {current.product}
           </p>
-          <p className="text-[9.5px] mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>
+          <p className="text-[9.5px] mt-0.5" style={{ color: "rgba(255,255,255,0.50)" }}>
             há {current.time}
           </p>
         </div>
@@ -1396,7 +1396,7 @@ const ProfilePage = () => {
                         <Icon size={15} style={{ color: t.accent }} />
                       </div>
                       <span className="flex-1 truncate">{link.title}</span>
-                      <ArrowRight size={14} style={{ color: t.sub, opacity: 0.5 }} className="group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200" />
+                      <ArrowRight size={14} style={{ color: t.sub, opacity: 0.65 }} className="group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200" />
                     </a>
                   );
                 })}

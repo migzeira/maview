@@ -260,7 +260,7 @@ const DashboardLayout = ({ children }: Props) => {
             <p className="text-[hsl(var(--dash-bg))] text-[12px] font-semibold leading-tight mb-1">
               Domínio próprio + analytics
             </p>
-            <p className="text-[hsl(var(--dash-bg))]/40 text-[10px] mb-2.5">
+            <p className="text-[hsl(var(--dash-bg))]/60 text-[10px] mb-2.5">
               Remova "maview.app" do link
             </p>
             <button className="w-full text-[11px] font-semibold py-1.5 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors">

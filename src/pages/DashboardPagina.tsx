@@ -1588,7 +1588,7 @@ const DashboardPagina = () => {
                       </div>
                     </div>
                     {p.badge && (
-                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: pAccent + "25", color: pAccent }}>
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: pAccent + "25", color: pAccent }}>
                         {p.badge}
                       </span>
                     )}
@@ -1653,10 +1653,10 @@ const DashboardPagina = () => {
                 const sepDeco = (() => {
                   switch (ss) {
                     case "dots": return <div className="flex gap-1">{[0,1,2].map(i => <div key={i} className="w-1 h-1 rounded-full" style={{ background: pAccent + "50" }} />)}</div>;
-                    case "stars": return <span className="text-[7px]" style={{ color: pAccent + "60" }}>✦ ✦ ✦</span>;
+                    case "stars": return <span className="text-[9px]" style={{ color: pAccent + "70" }}>✦ ✦ ✦</span>;
                     case "diamond": return <div className="w-1.5 h-1.5 rotate-45" style={{ background: pAccent + "50" }} />;
-                    case "wave": return <span className="text-[7px]" style={{ color: pAccent + "50" }}>∿∿∿</span>;
-                    case "zigzag": return <span className="text-[6px]" style={{ color: pAccent + "50" }}>⌇⌇⌇⌇</span>;
+                    case "wave": return <span className="text-[9px]" style={{ color: pAccent + "60" }}>∿∿∿</span>;
+                    case "zigzag": return <span className="text-[8px]" style={{ color: pAccent + "60" }}>⌇⌇⌇⌇</span>;
                     default: return null;
                   }
                 })();
@@ -1666,7 +1666,7 @@ const DashboardPagina = () => {
                   <div key={block.id} className="flex items-center gap-2 mb-2">
                     <div className="flex-1 h-px" style={lineS} />
                     {sepDeco}
-                    {block.title && <span className="text-[8px] font-bold uppercase tracking-wider" style={{ color: pAccent + "70" }}>{block.title}</span>}
+                    {block.title && <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: pAccent + "85" }}>{block.title}</span>}
                     {(sepDeco || block.title) && <div className="flex-1 h-px" style={lineS} />}
                   </div>
                 );
@@ -1681,13 +1681,13 @@ const DashboardPagina = () => {
                   <Package size={16} style={{ color: `${pAccent}50` }} />
                 </div>
                 <p className="text-[10px] font-medium" style={{ color: pSub }}>Adicione produtos</p>
-                <p className="text-[8px]" style={{ color: `${pSub}80` }}>Adicione itens à sua vitrine</p>
+                <p className="text-[9px]" style={{ color: pSub }}>Adicione itens à sua vitrine</p>
               </div>
             )}
 
             {/* Footer */}
             <div className="pt-4 pb-2 text-center">
-              <p className="text-[8px]" style={{ color: "#444" }}>Criado com maview.app</p>
+              <p className="text-[9px]" style={{ color: "#555" }}>Criado com maview.app</p>
             </div>
           </div>
         </div>
@@ -1987,7 +1987,7 @@ const DashboardPagina = () => {
                             <Image size={15} className="text-primary" />
                           </div>
                           <p className="text-[10px] font-semibold text-[hsl(var(--dash-text))]">Fotos</p>
-                          <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] leading-tight">JPG, PNG, WebP</p>
+                          <p className="text-[9px] text-[hsl(var(--dash-text-muted))] leading-tight">JPG, PNG, WebP</p>
                         </button>
                         <button onClick={() => productVideoInputRef.current?.click()}
                           className={`rounded-xl border border-dashed border-[hsl(var(--dash-border))] hover:border-blue-400/50 bg-[hsl(var(--dash-surface))] hover:bg-blue-500/5 transition-all py-3 flex flex-col items-center gap-1.5 cursor-pointer group/btn ${productForm.video ? "opacity-40 pointer-events-none" : ""}`}>
@@ -1995,7 +1995,7 @@ const DashboardPagina = () => {
                             <Video size={15} className="text-blue-500" />
                           </div>
                           <p className="text-[10px] font-semibold text-[hsl(var(--dash-text))]">Vídeo</p>
-                          <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] leading-tight">Até 20s · 10MB</p>
+                          <p className="text-[9px] text-[hsl(var(--dash-text-muted))] leading-tight">Até 20s · 10MB</p>
                         </button>
                         <button onClick={() => productGifInputRef.current?.click()}
                           className="rounded-xl border border-dashed border-[hsl(var(--dash-border))] hover:border-fuchsia-400/50 bg-[hsl(var(--dash-surface))] hover:bg-fuchsia-500/5 transition-all py-3 flex flex-col items-center gap-1.5 cursor-pointer group/btn">
@@ -2003,7 +2003,7 @@ const DashboardPagina = () => {
                             <Sparkles size={15} className="text-fuchsia-500" />
                           </div>
                           <p className="text-[10px] font-semibold text-[hsl(var(--dash-text))]">GIF</p>
-                          <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] leading-tight">Animação · 5MB</p>
+                          <p className="text-[9px] text-[hsl(var(--dash-text-muted))] leading-tight">Animação · 5MB</p>
                         </button>
                       </div>
 
@@ -2671,10 +2671,10 @@ const DashboardPagina = () => {
                           { id: "line" as SeparatorStyle, label: "Linha", preview: <div className="w-10 h-[1px] bg-current mx-auto" /> },
                           { id: "dots" as SeparatorStyle, label: "Pontos", preview: <div className="flex gap-1.5 justify-center">{[0,1,2].map(i => <div key={i} className="w-1 h-1 rounded-full bg-current" />)}</div> },
                           { id: "gradient" as SeparatorStyle, label: "Degradê", preview: <div className="w-10 h-[2px] mx-auto rounded-full" style={{ background: "linear-gradient(90deg, transparent, currentColor, transparent)" }} /> },
-                          { id: "stars" as SeparatorStyle, label: "Estrelas", preview: <div className="text-[8px] text-center">✦ ✦ ✦</div> },
+                          { id: "stars" as SeparatorStyle, label: "Estrelas", preview: <div className="text-[9px] text-center">✦ ✦ ✦</div> },
                           { id: "diamond" as SeparatorStyle, label: "Losango", preview: <div className="flex gap-2 justify-center items-center"><div className="w-8 h-[1px] bg-current" /><div className="w-1.5 h-1.5 rotate-45 bg-current" /><div className="w-8 h-[1px] bg-current" /></div> },
-                          { id: "wave" as SeparatorStyle, label: "Onda", preview: <div className="text-[8px] text-center tracking-widest">∿∿∿∿∿</div> },
-                          { id: "zigzag" as SeparatorStyle, label: "Zigzag", preview: <div className="text-[7px] text-center tracking-tighter">⌇⌇⌇⌇⌇⌇</div> },
+                          { id: "wave" as SeparatorStyle, label: "Onda", preview: <div className="text-[9px] text-center tracking-widest">∿∿∿∿∿</div> },
+                          { id: "zigzag" as SeparatorStyle, label: "Zigzag", preview: <div className="text-[8px] text-center tracking-tighter">⌇⌇⌇⌇⌇⌇</div> },
                           { id: "fade" as SeparatorStyle, label: "Fade", preview: <div className="w-12 h-[1px] mx-auto" style={{ background: "linear-gradient(90deg, transparent 10%, currentColor 50%, transparent 90%)", opacity: 0.5 }} /> },
                         ]).map(({ id, label, preview }) => (
                           <button key={id} onClick={() => setHeaderSepStyle(id)}
@@ -3267,7 +3267,7 @@ const DashboardPagina = () => {
                                 </div>
                               )}
                             </div>
-                            <p className="text-[7px] font-bold" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif` }}>{config.displayName || "Nome"}</p>
+                            <p className="text-[8px] font-bold" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif` }}>{config.displayName || "Nome"}</p>
                           </div>
                           {/* Mini product/link placeholders */}
                           {blocks.slice(0, 3).map(block => (

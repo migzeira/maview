@@ -374,7 +374,7 @@ const DashboardHome = () => {
                               style={{ borderColor: theme.accent + "30", background: theme.accent + "0a" }}>
                               <span className="text-[11px] flex-shrink-0">{p.emoji || "📦"}</span>
                               <span className="text-[9px] font-semibold text-white flex-1 truncate">{p.title}</span>
-                              {p.price && <span className="text-[8px] font-bold" style={{ color: theme.accent }}>{p.price}</span>}
+                              {p.price && <span className="text-[9px] font-bold" style={{ color: theme.accent }}>{p.price}</span>}
                             </div>
                           );
                         }
@@ -394,8 +394,8 @@ const DashboardHome = () => {
                           return (
                             <div key={block.id} className="rounded-xl border p-2 mb-1.5"
                               style={{ borderColor: theme.accent + "20", background: theme.accent + "08" }}>
-                              <p className="text-[8px] italic line-clamp-1" style={{ color: "rgba(187,187,187,0.8)" }}>"{t.text}"</p>
-                              <p className="text-[7px] mt-0.5 font-semibold" style={{ color: theme.accent }}>— {t.name}</p>
+                              <p className="text-[9px] italic line-clamp-1" style={{ color: "rgba(200,200,200,0.85)" }}>"{t.text}"</p>
+                              <p className="text-[8px] mt-0.5 font-semibold" style={{ color: theme.accent }}>— {t.name}</p>
                             </div>
                           );
                         }
@@ -403,7 +403,7 @@ const DashboardHome = () => {
                           return (
                             <div key={block.id} className="flex items-center gap-2 mb-1.5">
                               <div className="flex-1 h-px" style={{ background: theme.accent + "30" }} />
-                              <span className="text-[7px] font-bold uppercase tracking-wider" style={{ color: theme.accent + "80" }}>{block.title}</span>
+                              <span className="text-[8px] font-bold uppercase tracking-wider" style={{ color: theme.accent + "90" }}>{block.title}</span>
                               <div className="flex-1 h-px" style={{ background: theme.accent + "30" }} />
                             </div>
                           );
@@ -417,13 +417,13 @@ const DashboardHome = () => {
                             style={{ borderColor: theme.accent + "30", background: theme.accent + "0a" }}>
                             <span className="text-[11px]">{p.emoji || "📦"}</span>
                             <span className="text-[9px] font-semibold text-white flex-1 truncate">{p.title}</span>
-                            {p.price && <span className="text-[8px] font-bold" style={{ color: theme.accent }}>{p.price}</span>}
+                            {p.price && <span className="text-[9px] font-bold" style={{ color: theme.accent }}>{p.price}</span>}
                           </div>
                         )) : (
                           <div className="rounded-xl border border-dashed p-3 mb-2 flex flex-col items-center gap-1"
                             style={{ borderColor: "rgba(255,255,255,0.1)" }}>
-                            <Package size={12} style={{ color: "rgba(255,255,255,0.2)" }} />
-                            <p className="text-[7px]" style={{ color: "rgba(255,255,255,0.2)" }}>Adicione produtos</p>
+                            <Package size={12} style={{ color: "rgba(255,255,255,0.35)" }} />
+                            <p className="text-[9px]" style={{ color: "rgba(255,255,255,0.35)" }}>Adicione produtos</p>
                           </div>
                         )}
 
@@ -438,14 +438,14 @@ const DashboardHome = () => {
 
                     {/* Empty state */}
                     {products.length === 0 && links.length === 0 && blocks.length === 0 && (
-                      <div className="text-center py-4 opacity-30">
-                        <p className="text-[8px]" style={{ color: "#aaa" }}>Adicione itens à sua vitrine</p>
+                      <div className="text-center py-4 opacity-50">
+                        <p className="text-[9px]" style={{ color: "#aaa" }}>Adicione itens à sua vitrine</p>
                       </div>
                     )}
 
                     {/* Footer */}
                     <div className="pt-4 pb-2 text-center">
-                      <p className="text-[7px]" style={{ color: "#444" }}>Criado com maview.app</p>
+                      <p className="text-[8px]" style={{ color: "#555" }}>Criado com maview.app</p>
                     </div>
                   </div>
                 </div>
