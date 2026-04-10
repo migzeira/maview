@@ -256,7 +256,9 @@ function injectEffectStyles() {
     @keyframes mv-orbit { 0% { transform: rotate(0deg) translateX(var(--orbit-r)) rotate(0deg); } 100% { transform: rotate(360deg) translateX(var(--orbit-r)) rotate(-360deg); } }
     @keyframes mv-ripple { 0% { transform: scale(0.3); opacity: 0.5; } 100% { transform: scale(2.5); opacity: 0; } }
     @keyframes mv-sway { 0%,100% { transform: translateX(0) scaleX(1); } 25% { transform: translateX(8%) scaleX(1.04); } 75% { transform: translateX(-8%) scaleX(0.96); } }
-    @keyframes mv-morph { 0%,100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; } 25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; } 50% { border-radius: 50% 60% 30% 60% / 30% 50% 70% 50%; } 75% { border-radius: 40% 60% 70% 30% / 60% 40% 30% 70%; } }
+    @keyframes mv-wave-ud { 0%,100% { transform: translateY(0) scaleY(1); } 30% { transform: translateY(-30px) scaleY(1.2); } 60% { transform: translateY(15px) scaleY(0.85); } 85% { transform: translateY(-10px) scaleY(1.08); } }
+    @keyframes mv-neon-scan { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+    @keyframes mv-morph { 0%,100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: scale(1); } 25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; transform: scale(1.06); } 50% { border-radius: 50% 60% 30% 60% / 30% 50% 70% 50%; transform: scale(0.94); } 75% { border-radius: 40% 60% 70% 30% / 60% 40% 30% 70%; transform: scale(1.04); } }
     @keyframes mv-orbit-ring { 0% { transform: translate(-50%,-50%) rotate(0deg); } 100% { transform: translate(-50%,-50%) rotate(360deg); } }
     .mv-aurora { animation: mv-aurora 12s ease-in-out infinite; }
     .mv-pulse { animation: mv-pulse 4s ease-in-out infinite; }
@@ -270,13 +272,14 @@ function injectEffectStyles() {
     .mv-orbit { animation: mv-orbit var(--orbit-dur, 10s) linear infinite; }
     .mv-ripple { animation: mv-ripple 4s ease-out infinite; }
     .mv-sway { animation: mv-sway 8s ease-in-out infinite; }
-    .mv-morph { animation: mv-morph 12s ease-in-out infinite; }
+    .mv-wave-ud { animation: mv-wave-ud var(--wave-dur, 4s) ease-in-out infinite; }
+    .mv-morph { animation: mv-morph 10s ease-in-out infinite; }
     .mv-orbit-ring { animation: mv-orbit-ring var(--ring-dur, 20s) linear infinite; }
     @keyframes mv-hue { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
     @keyframes mv-sweep { 0% { transform: translateX(-100%) skewX(-15deg); } 100% { transform: translateX(200%) skewX(-15deg); } }
-    @keyframes mv-breathe { 0%,100% { transform: scale(1); opacity: 0.12; } 50% { transform: scale(1.15); opacity: 0.25; } }
+    @keyframes mv-breathe { 0%,100% { transform: scale(1); opacity: 0.25; } 50% { transform: scale(1.2); opacity: 0.55; } }
     @keyframes mv-spin-slow { 0% { transform: translate(-50%,-50%) rotate(0deg); } 100% { transform: translate(-50%,-50%) rotate(360deg); } }
-    @keyframes mv-rise { 0% { transform: translateY(100vh) scale(0.5); opacity: 0; } 50% { opacity: 0.3; } 100% { transform: translateY(-20vh) scale(1); opacity: 0; } }
+    @keyframes mv-rise { 0% { transform: translateY(100vh) scale(0.5); opacity: 0; } 20% { opacity: 0.7; } 70% { opacity: 0.5; } 100% { transform: translateY(-20vh) scale(1); opacity: 0; } }
     @keyframes mv-flicker { 0%,100% { opacity: 0.03; } 10% { opacity: 0.06; } 20% { opacity: 0.02; } 30% { opacity: 0.07; } 50% { opacity: 0.04; } 70% { opacity: 0.06; } 90% { opacity: 0.03; } }
     @keyframes mv-slide-diag { 0% { background-position: 0% 0%; } 100% { background-position: 100% 100%; } }
     .mv-hue { animation: mv-hue 20s linear infinite; }
@@ -460,14 +463,14 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
     case "ocean-waves":
       return (
         <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
-          {[0, 1, 2].map(i => (
-            <div key={i} className="absolute w-[250%] left-[-75%] mv-sway" style={{
-              height: `${100 + i * 40}px`, bottom: `${i * 25}px`,
-              background: `linear-gradient(180deg, transparent, ${accent}${35 - i * 8})`,
-              borderRadius: "40% 40% 0 0",
-              animationDelay: `${i * -2.5}s`,
-              animationDuration: `${7 + i * 2}s`,
-            }} />
+          {[0, 1, 2, 3, 4].map(i => (
+            <div key={i} className="absolute w-[300%] left-[-100%] mv-wave-ud" style={{
+              height: `${80 + i * 30}px`, bottom: `${i * 22}px`,
+              background: `linear-gradient(180deg, transparent 15%, ${i % 2 === 0 ? accent : accent2}${40 - i * 6})`,
+              borderRadius: "42% 58% 42% 58% / 100% 100% 0% 0%",
+              animationDelay: `${i * -0.8}s`,
+              "--wave-dur": `${3 + i * 0.6}s`,
+            } as React.CSSProperties} />
           ))}
         </div>
       );
@@ -510,24 +513,24 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
     case "morph-blobs":
       return (
         <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
-          <div className="absolute w-[300px] h-[300px] top-[10%] left-[5%] mv-morph" style={{
-            background: `radial-gradient(circle, ${accent}40, transparent 70%)`, filter: "blur(30px)",
+          <div className="absolute w-[350px] h-[350px] top-[5%] left-[0%] mv-morph" style={{
+            background: `radial-gradient(circle, ${accent}45, transparent 65%)`, filter: "blur(20px)",
           }} />
-          <div className="absolute w-[250px] h-[250px] bottom-[15%] right-[5%] mv-morph" style={{
-            background: `radial-gradient(circle, ${accent2}35, transparent 70%)`, filter: "blur(30px)",
-            animationDelay: "-4s",
+          <div className="absolute w-[300px] h-[300px] bottom-[10%] right-[0%] mv-morph" style={{
+            background: `radial-gradient(circle, ${accent2}40, transparent 65%)`, filter: "blur(20px)",
+            animationDelay: "-3s",
           }} />
-          <div className="absolute w-[200px] h-[200px] top-[45%] left-[30%] mv-morph" style={{
-            background: `radial-gradient(circle, ${accent}12, transparent 70%)`, filter: "blur(50px)",
-            animationDelay: "-8s",
+          <div className="absolute w-[250px] h-[250px] top-[40%] left-[25%] mv-morph" style={{
+            background: `radial-gradient(circle, ${accent}30, transparent 65%)`, filter: "blur(25px)",
+            animationDelay: "-7s",
           }} />
         </div>
       );
     case "orbit-rings": {
       const ringData = [
-        { size: 200, dur: 20, border: accent, opacity: 0.35 },
-        { size: 300, dur: 28, border: accent2, opacity: 0.25 },
-        { size: 400, dur: 36, border: accent, opacity: 0.18 },
+        { size: 250, dur: 18, border: accent, opacity: 0.2 },
+        { size: 380, dur: 25, border: accent2, opacity: 0.15 },
+        { size: 500, dur: 35, border: accent, opacity: 0.1 },
       ];
       return (
         <div className="fixed inset-0 pointer-events-none z-[1]">
@@ -539,10 +542,9 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
               "--ring-dur": `${r.dur}s`,
               animationDirection: i % 2 === 0 ? "normal" : "reverse",
             } as React.CSSProperties}>
-              {/* Orbiting dot on ring */}
               <div className="absolute rounded-full" style={{
                 width: 6, height: 6, top: -3, left: "50%", marginLeft: -3,
-                background: r.border, opacity: 0.6,
+                background: r.border, opacity: 0.5,
               }} />
             </div>
           ))}
@@ -551,22 +553,25 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
     }
     case "neon-lines": {
       const lines = Array.from({ length: 6 }, (_, i) => ({
-        top: 10 + i * 16,
-        delay: i * -2,
-        dur: 6 + (i % 3) * 2,
+        top: 8 + i * 16,
+        delay: i * -0.8,
+        dur: 3 + (i % 3) * 0.8,
         color: i % 2 === 0 ? accent : accent2,
-        width: 40 + (i % 3) * 20,
       }));
       return (
         <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
           {lines.map((l, i) => (
-            <div key={i} className="absolute h-[2px] mv-sway" style={{
-              width: `${l.width}%`, left: `${(100 - l.width) / 2}%`, top: `${l.top}%`,
-              background: `linear-gradient(90deg, transparent, ${l.color}50, ${l.color}70, ${l.color}50, transparent)`,
-              boxShadow: `0 0 12px ${l.color}35`,
-              animationDelay: `${l.delay}s`,
-              animationDuration: `${l.dur}s`,
-            }} />
+            <div key={i} className="absolute h-[2px] overflow-hidden" style={{
+              width: "100%", left: 0, top: `${l.top}%`,
+            }}>
+              <div className="absolute h-full" style={{
+                width: "40%",
+                background: `linear-gradient(90deg, transparent, ${l.color}80, ${l.color}, ${l.color}80, transparent)`,
+                boxShadow: `0 0 15px ${l.color}60, 0 0 30px ${l.color}30`,
+                animation: `mv-neon-scan ${l.dur}s ease-in-out infinite`,
+                animationDelay: `${l.delay}s`,
+              }} />
+            </div>
           ))}
         </div>
       );
@@ -586,8 +591,8 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
     case "breathing-glow":
       return (
         <div className="fixed inset-0 pointer-events-none z-[1]">
-          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full mv-breathe" style={{ background: `radial-gradient(circle, ${accent}25, transparent 60%)`, filter: "blur(60px)" }} />
-          <div className="absolute bottom-1/4 left-1/3 w-[300px] h-[300px] rounded-full mv-breathe" style={{ background: `radial-gradient(circle, ${accent2}20, transparent 60%)`, filter: "blur(50px)", animationDelay: "-3s" }} />
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full mv-breathe" style={{ background: `radial-gradient(circle, ${accent}45, transparent 65%)`, filter: "blur(30px)" }} />
+          <div className="absolute bottom-1/4 left-1/3 w-[400px] h-[400px] rounded-full mv-breathe" style={{ background: `radial-gradient(circle, ${accent2}35, transparent 65%)`, filter: "blur(25px)", animationDelay: "-3s" }} />
         </div>
       );
     case "conic-spotlight": {
@@ -637,14 +642,14 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
     case "layered-waves":
       return (
         <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
-          {[0, 1, 2, 3].map(i => (
-            <div key={i} className="absolute w-[250%] left-[-75%] mv-sway" style={{
-              height: `${80 + i * 30}px`, bottom: `${i * 20}px`,
-              background: `linear-gradient(180deg, transparent, ${i % 2 === 0 ? accent : accent2}${String(30 - i * 5).padStart(2, "0")})`,
-              borderRadius: "45% 45% 0 0",
-              animationDelay: `${i * -1.8}s`,
-              animationDuration: `${6 + i * 1.5}s`,
-            }} />
+          {[0, 1, 2, 3, 4].map(i => (
+            <div key={i} className="absolute w-[300%] left-[-100%] mv-wave-ud" style={{
+              height: `${80 + i * 28}px`, bottom: `${i * 22}px`,
+              background: `linear-gradient(180deg, transparent 15%, ${i % 2 === 0 ? accent : accent2}${40 - i * 6})`,
+              borderRadius: "42% 58% 42% 58% / 100% 100% 0% 0%",
+              animationDelay: `${i * -0.7}s`,
+              "--wave-dur": `${3.5 + i * 0.5}s`,
+            } as React.CSSProperties} />
           ))}
         </div>
       );
@@ -686,8 +691,9 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
       return (
         <div className="fixed inset-0 pointer-events-none z-[1]">
           <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] mv-spin-slow" style={{
-            background: `conic-gradient(from 0deg, transparent, ${accent}30, transparent, ${accent2}25, transparent, ${accent}20, transparent)`,
-            filter: "blur(25px)",
+            background: `conic-gradient(from 0deg, transparent, ${accent}40, transparent 25%, transparent 45%, ${accent2}35, transparent 65%, transparent 85%, ${accent}25)`,
+            filter: "blur(20px)",
+            top: "calc(60% - 300px)",
             "--spin-dur": "25s",
           } as React.CSSProperties} />
         </div>
