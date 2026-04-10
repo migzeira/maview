@@ -120,7 +120,7 @@ const DashboardHome = () => {
   const offset = circ - (health / 100) * circ;
 
   const copyLink = () => {
-    navigator.clipboard.writeText(profileUrl);
+    navigator.clipboard.writeText(profileUrl).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2200);
   };
@@ -226,7 +226,7 @@ const DashboardHome = () => {
             <Link to="/dashboard/pagina"
               className="mt-5 w-full btn-primary-gradient text-sm font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-[0.98]">
               <FileText size={16} />
-              {health === 100 ? "Editar Página" : nextStep ? `Próximo: ${nextStep.label}` : "Montar Página"}
+              {health === 100 ? "Editar Vitrine" : nextStep ? `Próximo: ${nextStep.label}` : "Montar Vitrine"}
               <ArrowRight size={14} />
             </Link>
           </div>
@@ -237,7 +237,7 @@ const DashboardHome = () => {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <p className="text-[hsl(var(--dash-text))] text-[13px] font-semibold">Sua página está no ar</p>
+                  <p className="text-[hsl(var(--dash-text))] text-[13px] font-semibold">Sua vitrine está no ar</p>
                 </div>
               </div>
 
@@ -257,7 +257,7 @@ const DashboardHome = () => {
                 </button>
                 <a href={profileUrl} target="_blank" rel="noopener noreferrer"
                   className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl btn-primary-gradient text-[12px] font-medium transition-transform active:scale-95">
-                  <ExternalLink size={14} /> Ver página
+                  <ExternalLink size={14} /> Ver vitrine
                 </a>
               </div>
             </div>
@@ -310,10 +310,11 @@ const DashboardHome = () => {
             </div>
 
             {/* Phone mockup */}
-            <div className="relative">
-              <div className="rounded-[2.8rem] border-[3px] border-[hsl(var(--dash-text))] overflow-hidden shadow-2xl">
+            <div className="relative mx-auto" style={{ width: 310 }}>
+              <div className="rounded-[2.8rem] border-[3px] border-[hsl(var(--dash-text))] overflow-hidden shadow-2xl flex flex-col"
+                style={{ aspectRatio: "9/16" }}>
                 {/* Status bar */}
-                <div className="flex items-center justify-between px-6 pt-3 pb-1" style={{ background: theme.bg }}>
+                <div className="flex items-center justify-between px-6 pt-3 pb-1 flex-shrink-0" style={{ background: theme.bg }}>
                   <span className="text-[10px] font-semibold" style={{ color: "rgba(255,255,255,0.7)" }}>9:41</span>
                   <div className="flex items-center gap-1">
                     <div className="flex gap-[2px] items-end">
@@ -328,12 +329,12 @@ const DashboardHome = () => {
                 </div>
 
                 {/* Dynamic Island */}
-                <div className="flex justify-center pb-3" style={{ background: theme.bg }}>
+                <div className="flex justify-center pb-3 flex-shrink-0" style={{ background: theme.bg }}>
                   <div className="w-[88px] h-[26px] rounded-full bg-black" />
                 </div>
 
                 {/* Screen content */}
-                <div className="overflow-y-auto" style={{ background: `linear-gradient(160deg,${theme.bg} 60%,${theme.accent}18)`, maxHeight: 460 }}>
+                <div className="flex-1 overflow-y-auto" style={{ background: `linear-gradient(160deg,${theme.bg} 60%,${theme.accent}18)` }}>
                   <div className="p-5">
                     {/* Profile */}
                     <div className="flex flex-col items-center mb-5">
@@ -356,7 +357,7 @@ const DashboardHome = () => {
                         <p className="text-[10px] mt-0.5" style={{ color: theme.accent }}>@{(cfg.username as string) || username}</p>
                       )}
                       {cfg.bio && (
-                        <p className="text-[9px] text-center mt-1 px-3 line-clamp-2" style={{ color: "rgba(200,200,200,0.6)" }}>
+                        <p className="text-[9px] text-center mt-1 px-3 line-clamp-2" style={{ color: "rgba(220,220,220,0.8)" }}>
                           {cfg.bio as string}
                         </p>
                       )}
@@ -473,7 +474,7 @@ const DashboardHome = () => {
       <Link to="/dashboard/pagina"
         className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 lg:hidden flex items-center gap-2 px-5 py-3 rounded-full btn-primary-gradient shadow-xl text-sm font-semibold transition-transform active:scale-95"
       >
-        <FileText size={16} /> Editar Página
+        <FileText size={16} /> Editar Vitrine
       </Link>
 
       {/* ── QR Code Modal ── */}
