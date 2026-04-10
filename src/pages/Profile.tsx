@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 import logoSrc from "@/assets/maview-logo.png";
+import { fetchByUsername, trackEvent } from "@/lib/vitrine-sync";
 
 /* ─── Types ───────────────────────────────────────────────────── */
 type ThemeId = "dark-purple" | "midnight" | "forest" | "rose" | "amber" | "ocean"
@@ -1367,20 +1368,45 @@ const ProfilePage = () => {
   const testimonialStagger = useStagger(10, 520, 90);
 
   useEffect(() => {
-    setTimeout(() => {
-      // strip @ prefix if present (e.g. "@fzandre" → "fzandre")
+    (async () => {
       const slug = (username?.toLowerCase() || "").replace(/^@/, "");
 
-      // 1️⃣ Try localStorage config saved by DashboardPagina
+      // 1️⃣ Try Supabase first (real persistent data)
+      const remote = await fetchByUsername(slug);
+      if (remote) {
+        const migratedProducts = ((remote.products as any[]) || []).map((p: any) => {
+          if (!p.images && p.imageUrl) return { ...p, images: [p.imageUrl] };
+          if (!p.images) return { ...p, images: [] };
+          return p;
+        });
+        const dbProfile: ProfileData = {
+          username: (remote.username || slug).replace(/^@/, ""),
+          displayName: remote.displayName || slug,
+          bio: remote.bio || "",
+          avatar: remote.avatarUrl || undefined,
+          theme: remote.theme || "dark-purple",
+          design: remote.design as any || undefined,
+          whatsapp: remote.whatsapp || undefined,
+          products: migratedProducts.filter((p: any) => p.active),
+          links: ((remote.links as any[]) || []).filter((l: any) => l.active),
+          testimonials: (remote.testimonials as any[]) || [],
+          stats: undefined,
+        };
+        setProfile(dbProfile);
+        setTimeout(() => setHeroVis(true), 80);
+        setLoading(false);
+        // Track view event
+        trackEvent(slug, "view");
+        return;
+      }
+
+      // 2️⃣ Fallback: localStorage (for local dev / own profile)
       try {
         const stored = localStorage.getItem("maview_vitrine_config");
         if (stored) {
           const cfg = JSON.parse(stored);
-          // Normalize both sides: strip @ and lowercase
           const cfgSlug = (cfg.username || "").toLowerCase().replace(/^@/, "");
-          // match by username OR show owner's own profile
           if (cfgSlug && (cfgSlug === slug || slug === "demo")) {
-            // Migrate imageUrl → images for products
             const migratedProducts = (cfg.products || []).map((p: any) => {
               if (!p.images && p.imageUrl) return { ...p, images: [p.imageUrl] };
               if (!p.images) return { ...p, images: [] };
@@ -1405,31 +1431,23 @@ const ProfilePage = () => {
             return;
           }
         }
-      } catch {
-        // fallback to mock
-      }
+      } catch { /* fallback to mock */ }
 
-      // 2️⃣ Fallback: mock profiles (demo page)
+      // 3️⃣ Fallback: mock profiles (demo page)
       const found = MOCK_PROFILES[slug];
       if (found) {
         setProfile(found);
         setTimeout(() => setHeroVis(true), 80);
       } else {
-        // 3️⃣ Always show a minimal page with the username — never leave blank
         const minimalProfile: ProfileData = {
-          username: slug,
-          displayName: slug,
-          bio: "",
-          theme: "dark-purple",
-          links: [],
-          products: [],
-          testimonials: [],
+          username: slug, displayName: slug, bio: "", theme: "dark-purple",
+          links: [], products: [], testimonials: [],
         };
         setProfile(minimalProfile);
         setTimeout(() => setHeroVis(true), 80);
       }
       setLoading(false);
-    }, 320);
+    })();
   }, [username]);
 
   /* Resolve design early (before returns) so hooks are stable */
@@ -1900,9 +1918,27 @@ const ProfilePage = () => {
         />
       )}
 
+      {/* ── CTA flutuante — viral loop (visitantes nao logados) ── */}
+      {!rd.hideWatermark && (
+        <div className="fixed bottom-0 inset-x-0 z-50 pointer-events-none flex justify-center pb-3 px-4">
+          <Link to={`/login?ref=profile&from=${profile.username}`}
+            className="pointer-events-auto flex items-center gap-2 px-5 py-2.5 rounded-full shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl"
+            style={{
+              background: "linear-gradient(135deg, #7c3aed, #a855f7)",
+              border: "1px solid rgba(255,255,255,0.15)",
+              boxShadow: "0 8px 32px rgba(124,58,237,0.4)",
+            }}
+          >
+            <Sparkles size={14} className="text-white" />
+            <span className="text-white text-[12px] font-bold">Crie sua vitrine gratis</span>
+            <span className="text-white/60 text-[11px]">maview.app</span>
+          </Link>
+        </div>
+      )}
+
       {/* ── Footer ── */}
       {!rd.hideWatermark && (
-        <footer className="relative z-10 flex justify-center pb-6">
+        <footer className="relative z-10 flex justify-center pb-16">
           <Link to="/"
             className="flex items-center gap-1.5 px-4 py-2 rounded-full transition-opacity duration-150 hover:opacity-80"
             style={{ background: t.card, border: `1px solid ${t.border}` }}

@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import {
@@ -6,7 +6,7 @@ import {
   Copy, Check, ExternalLink,
   QrCode, X, Download, MessageCircle, Clock,
   Sparkles, Package, Link2, Star, Image, FileText,
-  Trophy, Share2, BarChart3,
+  Trophy, Share2, BarChart3, PartyPopper,
 } from "lucide-react";
 
 /* ── localStorage ──────────────────────────────────────────── */
@@ -107,6 +107,41 @@ const DashboardHome = () => {
   const doneCount = steps.filter(s => s.done).length;
   const nextStep = steps.find(s => !s.done);
 
+  /* ── Animated health counter ── */
+  const [animatedHealth, setAnimatedHealth] = useState(0);
+  const prevHealthRef = useRef(0);
+  const [milestone, setMilestone] = useState<number | null>(null);
+
+  useEffect(() => {
+    const from = prevHealthRef.current;
+    const to = health;
+    if (from === to) { setAnimatedHealth(to); return; }
+
+    const duration = 800;
+    const start = performance.now();
+    const step = (now: number) => {
+      const t = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+      setAnimatedHealth(Math.round(from + (to - from) * eased));
+      if (t < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+
+    // Milestone celebrations
+    if (to >= 50 && from < 50) setMilestone(50);
+    else if (to >= 80 && from < 80) setMilestone(80);
+    else if (to >= 100 && from < 100) setMilestone(100);
+
+    prevHealthRef.current = to;
+  }, [health]);
+
+  // Auto-dismiss milestone
+  useEffect(() => {
+    if (milestone === null) return;
+    const t = setTimeout(() => setMilestone(null), 3500);
+    return () => clearTimeout(t);
+  }, [milestone]);
+
   const products = ((cfg.products as { active: boolean; emoji?: string; title?: string; price?: string }[]) || []).filter(p => p.active);
   const links = ((cfg.links as { title?: string; url?: string; icon?: string; active?: boolean; type?: string }[]) || []);
   const testimonials = ((cfg.testimonials as { name?: string; text?: string; stars?: number }[]) || []);
@@ -145,7 +180,7 @@ const DashboardHome = () => {
   };
 
   return (
-    <div className={`max-w-[1100px] mx-auto px-4 md:px-8 py-8 md:py-10 transition-opacity duration-500 ${visible ? "opacity-100" : "opacity-0"}`}>
+    <div className={`max-w-[1100px] mx-auto px-4 md:px-8 py-8 md:py-10 page-enter transition-opacity duration-500 ${visible ? "opacity-100" : "opacity-0"}`}>
 
       {/* ── Greeting ── */}
       <div className="mb-6" style={{ animation: "fadeSlideUp 0.4s ease both" }}>
@@ -208,7 +243,7 @@ const DashboardHome = () => {
                         style={{ transition: "stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)" }} />
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-[22px] font-extrabold text-[hsl(var(--dash-text))] leading-none">{health}</span>
+                      <span className="text-[22px] font-extrabold text-[hsl(var(--dash-text))] leading-none tabular-nums">{animatedHealth}</span>
                       <span className="text-[9px] text-[hsl(var(--dash-text-muted))] font-medium mt-0.5">/100</span>
                     </div>
                   </div>
@@ -529,6 +564,30 @@ const DashboardHome = () => {
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl btn-primary-gradient text-[13px] font-semibold w-full justify-center">
               <Download size={14} /> Baixar PNG
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Milestone celebration popup ── */}
+      {milestone !== null && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50"
+          style={{ animation: "fadeSlideUp 0.4s ease both" }}>
+          <div className="glass-card rounded-2xl px-6 py-4 shadow-2xl flex items-center gap-3 border-primary/20">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center celebrate">
+              {milestone === 100 ? <Trophy size={20} className="text-amber-500" /> : <PartyPopper size={20} className="text-primary" />}
+            </div>
+            <div>
+              <p className="text-[hsl(var(--dash-text))] text-sm font-bold">
+                {milestone === 100 ? "Vitrine perfeita!" : milestone === 80 ? "Quase lá!" : "Meio caminho!"}
+              </p>
+              <p className="text-[hsl(var(--dash-text-muted))] text-xs">
+                {milestone === 100
+                  ? "Sua vitrine está 100% completa — hora de crescer!"
+                  : milestone === 80
+                    ? "80% completa — Analytics desbloqueado!"
+                    : "50% completa — continue assim!"}
+              </p>
+            </div>
           </div>
         </div>
       )}

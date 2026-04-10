@@ -1,0 +1,19 @@
+{
+  "name": "Maview — Sua vitrine digital",
+  "short_name": "Maview",
+  "description": "Link na bio + Loja digital gratis para criadores de conteudo",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#080612",
+  "theme_color": "#7C3AED",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "lang": "pt-BR"
+}

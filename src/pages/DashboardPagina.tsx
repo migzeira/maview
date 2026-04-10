@@ -9,7 +9,11 @@ import {
   Play, Smile, Search, Camera, MoreHorizontal,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { initialLoad, saveWithSync, onSyncStatus, type VitrineConfig as SyncVitrineConfig } from "@/lib/vitrine-sync";
+import { useHistory } from "@/hooks/useHistory";
 import DesignTab from "@/components/DesignTab";
+import OnboardingWizard from "@/components/OnboardingWizard";
+import { Undo2, Redo2 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -418,37 +422,6 @@ function generateBlocks(cfg: VitrineConfig): VitrineBlock[] {
   return blocks;
 }
 
-// ── Onboarding Steps ──────────────────────────────────────────────────────
-
-const ONBOARDING_STEPS = [
-  {
-    title: "Seu perfil",
-    description: "Adicione foto, nome e bio para que visitantes te conheçam",
-    icon: <User size={24} className="text-primary" />,
-    tab: "perfil" as TabId,
-  },
-  {
-    title: "Primeiro produto",
-    description: "Crie seu primeiro produto e comece a faturar",
-    icon: <Package size={24} className="text-primary" />,
-    tab: "vitrine" as TabId,
-    action: "product",
-  },
-  {
-    title: "Seus links",
-    description: "Conecte Instagram, YouTube e outras redes",
-    icon: <Link2 size={24} className="text-primary" />,
-    tab: "vitrine" as TabId,
-    action: "link",
-  },
-  {
-    title: "Prova social",
-    description: "Depoimentos aumentam conversão em até 72%",
-    icon: <Star size={24} className="text-primary" />,
-    tab: "vitrine" as TabId,
-    action: "testimonial",
-  },
-];
 
 // ── Profile Hero Card ──────────────────────────────────────────────────────
 
@@ -824,6 +797,7 @@ const DashboardPagina = () => {
   const [copyToastVisible, setCopyToastVisible] = useState(false);
   const [copyToastText, setCopyToastText] = useState("URL copiada!");
   const [showMobilePreview, setShowMobilePreview] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const toastTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const copyToastTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -864,7 +838,55 @@ const DashboardPagina = () => {
 
   // Onboarding
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [onboardingStep, setOnboardingStep] = useState(0);
+
+  // Undo/Redo history
+  const configHistoryRef = useRef<VitrineConfig[]>([]);
+  const configFutureRef = useRef<VitrineConfig[]>([]);
+  const skipHistoryRef = useRef(false);
+  const canUndoConfig = configHistoryRef.current.length > 0;
+  const canRedoConfig = configFutureRef.current.length > 0;
+
+  const pushConfigHistory = useCallback((prev: VitrineConfig) => {
+    if (skipHistoryRef.current) { skipHistoryRef.current = false; return; }
+    configHistoryRef.current = [...configHistoryRef.current.slice(-49), prev];
+    configFutureRef.current = [];
+  }, []);
+
+  const handleUndo = useCallback(() => {
+    if (configHistoryRef.current.length === 0) return;
+    const prev = configHistoryRef.current[configHistoryRef.current.length - 1];
+    configHistoryRef.current = configHistoryRef.current.slice(0, -1);
+    setConfig(current => {
+      configFutureRef.current = [...configFutureRef.current, current];
+      skipHistoryRef.current = true;
+      saveWithSync(prev as unknown as SyncVitrineConfig);
+      return prev;
+    });
+  }, []);
+
+  const handleRedo = useCallback(() => {
+    if (configFutureRef.current.length === 0) return;
+    const next = configFutureRef.current[configFutureRef.current.length - 1];
+    configFutureRef.current = configFutureRef.current.slice(0, -1);
+    setConfig(current => {
+      configHistoryRef.current = [...configHistoryRef.current, current];
+      skipHistoryRef.current = true;
+      saveWithSync(next as unknown as SyncVitrineConfig);
+      return next;
+    });
+  }, []);
+
+  // Keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const mod = e.metaKey || e.ctrlKey;
+      if (!mod) return;
+      if (e.key === "z" && !e.shiftKey) { e.preventDefault(); handleUndo(); }
+      if ((e.key === "z" && e.shiftKey) || e.key === "y") { e.preventDefault(); handleRedo(); }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [handleUndo, handleRedo]);
 
   // AI
   const [aiLoading, setAiLoading] = useState(false);
@@ -901,9 +923,11 @@ const DashboardPagina = () => {
   // ── Load ──────────────────────────────────────────────────────────────────
 
   useEffect(() => {
+    const unsub = onSyncStatus(setSyncStatus);
     (async () => {
-      const stored = localStorage.getItem(LS_KEY);
-      const base: VitrineConfig = stored ? { ...DEFAULT_CONFIG, ...JSON.parse(stored) } : { ...DEFAULT_CONFIG };
+      // Load from Supabase (merges with localStorage automatically)
+      const remote = await initialLoad();
+      const base: VitrineConfig = { ...DEFAULT_CONFIG, ...remote };
       // Migrate: imageUrl → images array
       let migrated = false;
       base.products = base.products.map(p => {
@@ -940,6 +964,7 @@ const DashboardPagina = () => {
         setShowOnboarding(true);
       }
     })();
+    return unsub;
   }, []);
 
   // ── Auto-save with toast ──────────────────────────────────────────────────
@@ -959,21 +984,23 @@ const DashboardPagina = () => {
 
   const updateConfig = useCallback(<K extends keyof VitrineConfig>(key: K, value: VitrineConfig[K]) => {
     setConfig(prev => {
+      pushConfigHistory(prev);
       const next = { ...prev, [key]: value };
-      localStorage.setItem(LS_KEY, JSON.stringify(next));
+      saveWithSync(next as unknown as SyncVitrineConfig);
       return next;
     });
     showSavedToast();
-  }, [showSavedToast]);
+  }, [showSavedToast, pushConfigHistory]);
 
   const setConfigAndSave = useCallback((updater: (prev: VitrineConfig) => VitrineConfig) => {
     setConfig(prev => {
+      pushConfigHistory(prev);
       const next = updater(prev);
-      localStorage.setItem(LS_KEY, JSON.stringify(next));
+      saveWithSync(next as unknown as SyncVitrineConfig);
       return next;
     });
     showSavedToast();
-  }, [showSavedToast]);
+  }, [showSavedToast, pushConfigHistory]);
 
   // ── Block helpers ─────────────────────────────────────────────────────────
 
@@ -1283,14 +1310,6 @@ const DashboardPagina = () => {
   const completeOnboarding = () => {
     setShowOnboarding(false);
     setConfigAndSave(prev => ({ ...prev, onboardingDone: true }));
-  };
-
-  const handleOnboardingAction = (step: typeof ONBOARDING_STEPS[0]) => {
-    setActiveTab(step.tab);
-    if (step.action === "product") openAddProduct();
-    else if (step.action === "link") openAddLink();
-    else if (step.action === "testimonial") openAddTestimonial();
-    completeOnboarding();
   };
 
   const leftPanelRef = useRef<HTMLDivElement>(null);
@@ -1819,90 +1838,40 @@ const DashboardPagina = () => {
 
       {/* ═══════════════ ONBOARDING WIZARD ═══════════════ */}
       {showOnboarding && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={completeOnboarding} />
-          <div className="relative glass-card rounded-3xl p-6 md:p-8 max-w-lg w-full shadow-2xl animate-in zoom-in-95 duration-300">
-            <button onClick={completeOnboarding}
-              className="absolute top-4 right-4 p-2 rounded-full text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] transition-all">
-              <X size={18} />
-            </button>
-
-            {/* Progress dots */}
-            <div className="flex items-center justify-center gap-2 mb-6">
-              {ONBOARDING_STEPS.map((_, i) => (
-                <div key={i} className={`h-1.5 rounded-full transition-all duration-300 ${
-                  i === onboardingStep ? "w-8 bg-primary" : i < onboardingStep ? "w-4 bg-primary/50" : "w-4 bg-[hsl(var(--dash-border))]"
-                }`} />
-              ))}
-            </div>
-
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
-                {ONBOARDING_STEPS[onboardingStep].icon}
-              </div>
-              <h2 className="text-[hsl(var(--dash-text))] text-xl font-bold mb-2">
-                {onboardingStep === 0 ? "Bem-vindo ao Maview!" : ONBOARDING_STEPS[onboardingStep].title}
-              </h2>
-              <p className="text-[hsl(var(--dash-text-muted))] text-sm">
-                {onboardingStep === 0
-                  ? "Vamos montar sua vitrine em 4 passos simples"
-                  : ONBOARDING_STEPS[onboardingStep].description
-                }
-              </p>
-            </div>
-
-            {/* Steps overview */}
-            {onboardingStep === 0 && (
-              <div className="space-y-2 mb-6">
-                {ONBOARDING_STEPS.map((step, i) => (
-                  <div key={i} className="flex items-center gap-3 rounded-xl p-3 bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))]">
-                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      {step.icon}
-                    </div>
-                    <div>
-                      <p className="text-[hsl(var(--dash-text))] text-[13px] font-medium">{step.title}</p>
-                      <p className="text-[hsl(var(--dash-text-subtle))] text-[11px]">{step.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="flex gap-3">
-              {onboardingStep > 0 && (
-                <button onClick={() => setOnboardingStep(s => s - 1)}
-                  className="flex-1 text-sm py-3 rounded-xl border border-[hsl(var(--dash-border))] text-[hsl(var(--dash-text-muted))] hover:bg-[hsl(var(--dash-surface-2))] transition-all font-medium">
-                  Voltar
-                </button>
-              )}
-              {onboardingStep < ONBOARDING_STEPS.length - 1 ? (
-                <button onClick={() => setOnboardingStep(s => s + 1)}
-                  className="flex-1 btn-primary-gradient text-sm py-3 rounded-xl font-semibold flex items-center justify-center gap-2">
-                  {onboardingStep === 0 ? "Começar" : "Próximo"} <ArrowRight size={14} />
-                </button>
-              ) : (
-                <button onClick={() => handleOnboardingAction(ONBOARDING_STEPS[onboardingStep])}
-                  className="flex-1 btn-primary-gradient text-sm py-3 rounded-xl font-semibold flex items-center justify-center gap-2">
-                  Vamos lá! <Zap size={14} />
-                </button>
-              )}
-            </div>
-
-            <button onClick={completeOnboarding}
-              className="w-full text-center text-[hsl(var(--dash-text-subtle))] text-[11px] mt-4 hover:text-primary transition-colors">
-              Pular e montar sozinho
-            </button>
-          </div>
-        </div>
+        <OnboardingWizard
+          displayName={config.displayName}
+          username={config.username}
+          bio={config.bio}
+          avatarUrl={config.avatarUrl}
+          theme={config.theme}
+          onUpdate={(key, value) => updateConfig(key as keyof VitrineConfig, value)}
+          onSelectTheme={(id) => updateConfig("theme", id as ThemeId)}
+          onComplete={completeOnboarding}
+        />
       )}
 
       {/* Header */}
-      <div className="mb-5 space-y-1">
-        <h1 className="text-2xl md:text-[28px] font-bold text-[hsl(var(--dash-text))] tracking-tight">Minha Vitrine</h1>
-        <p className="text-[hsl(var(--dash-text-muted))] text-[14px] flex items-center gap-2">
-          <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${subtitleComplete ? "bg-emerald-400 animate-pulse" : "bg-amber-400 animate-pulse"}`} />
-          {subtitleText}
-        </p>
+      <div className="mb-5 flex items-start justify-between">
+        <div className="space-y-1">
+          <h1 className="text-2xl md:text-[28px] font-bold text-[hsl(var(--dash-text))] tracking-tight">Minha Vitrine</h1>
+          <p className="text-[hsl(var(--dash-text-muted))] text-[14px] flex items-center gap-2">
+            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${subtitleComplete ? "bg-emerald-400 animate-pulse" : "bg-amber-400 animate-pulse"}`} />
+            {subtitleText}
+          </p>
+        </div>
+        {/* Undo / Redo */}
+        <div className="flex items-center gap-1">
+          <button onClick={handleUndo} disabled={!canUndoConfig}
+            className="p-2 rounded-xl text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] disabled:opacity-30 disabled:cursor-default transition-all"
+            title="Desfazer (Ctrl+Z)">
+            <Undo2 size={16} />
+          </button>
+          <button onClick={handleRedo} disabled={!canRedoConfig}
+            className="p-2 rounded-xl text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] disabled:opacity-30 disabled:cursor-default transition-all"
+            title="Refazer (Ctrl+Y)">
+            <Redo2 size={16} />
+          </button>
+        </div>
       </div>
 
       {/* Profile Hero Card */}
@@ -3406,10 +3375,19 @@ const DashboardPagina = () => {
               </div>
             )}
 
-            {/* Auto-save toast */}
-            <div className={`absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-[12px] font-medium shadow-sm transition-all duration-300 pointer-events-none whitespace-nowrap ${toastVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}>
-              <Check size={13} className="text-emerald-500" />
-              Alterações salvas
+            {/* Auto-save toast with cloud sync */}
+            <div className={`absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-medium shadow-sm transition-all duration-300 pointer-events-none whitespace-nowrap ${
+              toastVisible || syncStatus === "saving"
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-2"
+            } ${syncStatus === "error" ? "bg-red-50 border border-red-100 text-red-700" : syncStatus === "saving" ? "bg-blue-50 border border-blue-100 text-blue-700" : "bg-emerald-50 border border-emerald-100 text-emerald-700"}`}>
+              {syncStatus === "saving" ? (
+                <><div className="w-3 h-3 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin" /> Salvando na nuvem...</>
+              ) : syncStatus === "error" ? (
+                <><AlertCircle size={13} className="text-red-500" /> Erro ao salvar — tentando novamente</>
+              ) : (
+                <><Check size={13} className="text-emerald-500" /> Salvo na nuvem ☁️</>
+              )}
             </div>
 
           </div>

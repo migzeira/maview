@@ -26,10 +26,29 @@ const DashboardIA = lazy(() => import("./pages/DashboardIA.tsx"));
 
 const queryClient = new QueryClient();
 
-/* ── Loading spinner (shown while chunks load) ── */
+/* ── Loading skeleton (shown while chunks load) ── */
 const LoadingFallback = () => (
-  <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--dash-bg))]">
-    <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+  <div className="min-h-screen bg-[hsl(var(--dash-bg))] px-4 md:px-8 py-8">
+    <div className="max-w-[1100px] mx-auto space-y-6">
+      <div className="space-y-2">
+        <div className="skeleton w-48 h-8" />
+        <div className="skeleton w-64 h-4" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
+        <div className="space-y-4">
+          <div className="skeleton w-full h-48 rounded-2xl" />
+          <div className="skeleton w-full h-32 rounded-2xl" />
+          <div className="grid grid-cols-3 gap-3">
+            <div className="skeleton w-full h-20 rounded-xl" />
+            <div className="skeleton w-full h-20 rounded-xl" />
+            <div className="skeleton w-full h-20 rounded-xl" />
+          </div>
+        </div>
+        <div className="hidden lg:block">
+          <div className="skeleton w-full h-[520px] rounded-[2.8rem]" />
+        </div>
+      </div>
+    </div>
   </div>
 );
 

@@ -7,7 +7,7 @@ import FloatingAIButton from "./FloatingAIButton";
 import {
   Home, FileText, BarChart3, Sparkles, Settings,
   LogOut, ExternalLink, Copy, Check, ChevronLeft, ChevronRight, Menu,
-  TrendingUp, Zap, X, ArrowUpRight,
+  TrendingUp, Zap, X, ArrowUpRight, Sun, Moon,
 } from "lucide-react";
 
 // ── Navigation ─────────────────────────────────────────────────────────────
@@ -74,6 +74,7 @@ const DashboardLayout = ({ children }: Props) => {
   const [copied, setCopied] = useState(false);
   const [health, setHealth] = useState({ score: 0, missing: [] as string[] });
   const [proWaitlist, setProWaitlist] = useState(() => localStorage.getItem("maview_pro_waitlist") === "1");
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("maview_dark") === "1");
 
   // Read username from vitrine config (most reliable) or fall back to auth
   const authUsername = user?.user_metadata?.username || user?.email?.split("@")[0] || "usuario";
@@ -107,6 +108,12 @@ const DashboardLayout = ({ children }: Props) => {
   useEffect(() => {
     setHealth(getHealthFromStorage());
   }, [location.pathname]);
+
+  // Dark mode toggle
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", darkMode);
+    localStorage.setItem("maview_dark", darkMode ? "1" : "0");
+  }, [darkMode]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -225,6 +232,17 @@ const DashboardLayout = ({ children }: Props) => {
 
         {/* Bottom nav */}
         {NAV_BOTTOM.map(item => renderNavItem(item))}
+
+        {/* Dark mode toggle */}
+        <button
+          onClick={() => setDarkMode(d => !d)}
+          className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-150 hover:bg-[hsl(var(--dash-accent))] ${collapsed ? "justify-center" : ""}`}
+          style={{ color: "hsl(var(--dash-text-muted))" }}
+          title={darkMode ? "Modo claro" : "Modo escuro"}
+        >
+          {darkMode ? <Sun size={16} /> : <Moon size={16} />}
+          {!collapsed && <span>{darkMode ? "Modo claro" : "Modo escuro"}</span>}
+        </button>
       </nav>
 
       {/* ── Bottom section: Profile + CTA ── */}

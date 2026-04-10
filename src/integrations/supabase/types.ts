@@ -50,6 +50,99 @@ export type Database = {
         }
         Relationships: []
       }
+      vitrines: {
+        Row: {
+          id: string
+          user_id: string
+          username: string
+          display_name: string | null
+          bio: string | null
+          avatar_url: string | null
+          whatsapp: string | null
+          theme: string
+          design: Json
+          products: Json
+          links: Json
+          testimonials: Json
+          blocks: Json
+          published: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          username: string
+          display_name?: string | null
+          bio?: string | null
+          avatar_url?: string | null
+          whatsapp?: string | null
+          theme?: string
+          design?: Json
+          products?: Json
+          links?: Json
+          testimonials?: Json
+          blocks?: Json
+          published?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          username?: string
+          display_name?: string | null
+          bio?: string | null
+          avatar_url?: string | null
+          whatsapp?: string | null
+          theme?: string
+          design?: Json
+          products?: Json
+          links?: Json
+          testimonials?: Json
+          blocks?: Json
+          published?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          id: string
+          vitrine_id: string | null
+          event_type: string
+          referrer: string | null
+          country: string | null
+          city: string | null
+          device: string | null
+          metadata: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          vitrine_id?: string | null
+          event_type: string
+          referrer?: string | null
+          country?: string | null
+          city?: string | null
+          device?: string | null
+          metadata?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          vitrine_id?: string | null
+          event_type?: string
+          referrer?: string | null
+          country?: string | null
+          city?: string | null
+          device?: string | null
+          metadata?: Json
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

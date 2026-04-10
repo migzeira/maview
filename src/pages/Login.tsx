@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { checkUsername as checkUsernameAvail } from "@/lib/vitrine-sync";
 import { toast } from "sonner";
 
 type Mode = "login" | "signup" | "forgot" | "verify";
@@ -48,11 +49,11 @@ const FEATURES = [
   },
 ];
 
-const STATS = [
-  { icon: Users,       value: "+2.000", label: "criadores ativos" },
-  { icon: TrendingUp,  value: "+340%",  label: "média de cliques a mais" },
-  { icon: DollarSign,  value: "R$0",    label: "taxa por venda" },
-  { icon: Sparkles,    value: "∞",      label: "temas personalizáveis" },
+const DEFAULT_STATS = [
+  { icon: Users,       valueFn: (c: number | null) => c ? `+${c.toLocaleString("pt-BR")}` : "+2.000", label: "criadores ativos" },
+  { icon: TrendingUp,  valueFn: () => "+340%",  label: "média de cliques a mais" },
+  { icon: DollarSign,  valueFn: () => "R$0",    label: "taxa por venda" },
+  { icon: Sparkles,    valueFn: () => "∞",      label: "temas personalizáveis" },
 ];
 
 const TESTIMONIALS_ROW1 = [
@@ -206,13 +207,22 @@ const Login = () => {
   const [notification, setNotification] = useState<{ name: string; action: string; avatar: string } | null>(null);
   const [onlineCount] = useState(() => Math.floor(Math.random() * 30) + 38);
   const [resendCooldown, setResendCooldown] = useState(0);
-  const [slotsLeft, setSlotsLeft] = useState(() => Math.floor(Math.random() * 14) + 11); // 11-24
+  const [slotsLeft, setSlotsLeft] = useState(() => {
+    const saved = sessionStorage.getItem("maview_slots");
+    return saved ? parseInt(saved, 10) : Math.floor(Math.random() * 14) + 11;
+  });
   const [slotPulse, setSlotPulse] = useState(false);
   const slotRef = useRef<HTMLSpanElement>(null);
+  const [showExitPopup, setShowExitPopup] = useState(false);
+  const [realUserCount, setRealUserCount] = useState<number | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) navigate("/dashboard");
+    });
+    // Fetch real user count
+    supabase.from("vitrines").select("*", { count: "exact", head: true }).then(({ count }) => {
+      if (count !== null && count > 0) setRealUserCount(count);
     });
   }, [navigate]);
 
@@ -246,6 +256,25 @@ const Login = () => {
     return () => clearTimeout(t);
   }, []);
 
+  // Persist slotsLeft in sessionStorage
+  useEffect(() => {
+    sessionStorage.setItem("maview_slots", String(slotsLeft));
+  }, [slotsLeft]);
+
+  // Exit intent detection (desktop only)
+  useEffect(() => {
+    if (sessionStorage.getItem("maview_exit_shown")) return;
+    const handler = (e: MouseEvent) => {
+      if (e.clientY < 5) {
+        setShowExitPopup(true);
+        sessionStorage.setItem("maview_exit_shown", "1");
+        document.removeEventListener("mouseleave", handler);
+      }
+    };
+    document.addEventListener("mouseleave", handler);
+    return () => document.removeEventListener("mouseleave", handler);
+  }, []);
+
   const clearError = () => setError("");
   const switchMode = (next: Mode) => { clearError(); setPassword(""); setConfirmPassword(""); setUsernameStatus("idle"); setMode(next); };
 
@@ -255,8 +284,21 @@ const Login = () => {
     if (!clean) { setUsernameStatus("idle"); return; }
     if (!isValidUsername(clean)) { setUsernameStatus("invalid"); return; }
     setUsernameStatus("checking");
-    await new Promise((r) => setTimeout(r, 600));
-    setUsernameStatus("available");
+    try {
+      // Check both vitrines table and profiles table for uniqueness
+      const [vitrineResult, profileResult] = await Promise.all([
+        checkUsernameAvail(clean),
+        supabase.from("profiles").select("username").eq("username", clean).maybeSingle(),
+      ]);
+      if (vitrineResult === "taken" || profileResult.data) {
+        setUsernameStatus("taken");
+      } else {
+        setUsernameStatus("available");
+      }
+    } catch {
+      // On error, allow signup (will fail server-side if taken)
+      setUsernameStatus("available");
+    }
   }, []);
 
   useEffect(() => {
@@ -424,7 +466,7 @@ const Login = () => {
                   <span className="text-amber-500 text-xs font-bold ml-1">4.9</span>
                 </div>
                 <p className="text-sm text-maview-muted">
-                  <span className="text-maview-text font-bold">+2.000</span> criadores já usam
+                  <span className="text-maview-text font-bold">+{realUserCount ? realUserCount.toLocaleString("pt-BR") : "2.000"}</span> criadores já usam
                 </p>
               </div>
             </div>
@@ -810,13 +852,13 @@ const Login = () => {
       {/* ══════════ STATS BAR ══════════ */}
       <div className="relative z-10 border-t border-maview-border bg-white">
         <div className="max-w-5xl mx-auto px-8 py-6 grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {STATS.map(({ icon: Icon, value, label }) => (
+          {DEFAULT_STATS.map(({ icon: Icon, valueFn, label }) => (
             <div key={label} className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-maview-purple-soft border border-maview-purple/15 flex items-center justify-center flex-shrink-0">
                 <Icon size={16} className="text-maview-purple" />
               </div>
               <div>
-                <p className="text-maview-text font-extrabold text-lg leading-none">{value}</p>
+                <p className="text-maview-text font-extrabold text-lg leading-none">{valueFn(realUserCount)}</p>
                 <p className="text-maview-muted text-xs mt-0.5">{label}</p>
               </div>
             </div>
@@ -839,7 +881,7 @@ const Login = () => {
             </span>
           </h2>
           <p className="text-maview-muted text-base max-w-lg mx-auto">
-            Mais de <strong className="text-maview-text">2.000 criadores</strong> usam o Maview para vender mais, aparecer mais e trabalhar menos.
+            Mais de <strong className="text-maview-text">{realUserCount ? realUserCount.toLocaleString("pt-BR") : "2.000"} criadores</strong> usam o Maview para vender mais, aparecer mais e trabalhar menos.
           </p>
         </div>
 
@@ -859,6 +901,109 @@ const Login = () => {
           </button>
         </div>
       </div>
+
+      {/* ══════════ COMPARATIVO COM CONCORRENTES ══════════ */}
+      <div className="relative z-10 py-16 px-6 border-t border-maview-border">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-maview-text mb-3 tracking-tight">
+              Por que escolher o{" "}
+              <span className="bg-gradient-to-r from-maview-purple to-violet-500 bg-clip-text text-transparent">Maview</span>?
+            </h2>
+            <p className="text-maview-muted text-base">Comparativo honesto com os maiores do mercado.</p>
+          </div>
+
+          <div className="overflow-hidden rounded-2xl border border-maview-border shadow-sm">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-maview-surface">
+                  <th className="text-left px-4 py-3 text-maview-muted font-medium text-xs">Recurso</th>
+                  <th className="px-4 py-3 text-center">
+                    <span className="bg-gradient-to-r from-maview-purple to-violet-500 bg-clip-text text-transparent font-extrabold text-sm">Maview</span>
+                  </th>
+                  <th className="px-4 py-3 text-center text-maview-muted font-medium text-xs">Linktree</th>
+                  <th className="px-4 py-3 text-center text-maview-muted font-medium text-xs">Stan Store</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ["Preço",               "Grátis",   "$5-24/mês",  "$29-99/mês"],
+                  ["Taxa por venda",      "0%",       "2.9%",       "0%"],
+                  ["Temas personalizáveis","19+",      "Limitados",  "1 layout"],
+                  ["Efeitos animados",    "40+",      "0",          "0"],
+                  ["Booking nativo",      "true",     "false",      "true"],
+                  ["IA integrada",        "true",     "false",      "false"],
+                  ["Design Packs 1 clique","16",      "0",          "0"],
+                  ["Google Fonts",        "24+",      "Limitado",   "0"],
+                  ["Suporte em PT-BR",    "true",     "false",      "false"],
+                ].map(([feature, maview, linktree, stan], i) => (
+                  <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-maview-surface/50"}>
+                    <td className="px-4 py-2.5 text-maview-text font-medium text-xs">{feature}</td>
+                    <td className="px-4 py-2.5 text-center">
+                      {maview === "true" ? <Check size={16} className="mx-auto text-emerald-500" />
+                        : maview === "false" ? <X size={16} className="mx-auto text-red-400" />
+                        : <span className="font-bold text-maview-purple text-xs">{maview}</span>}
+                    </td>
+                    <td className="px-4 py-2.5 text-center">
+                      {linktree === "true" ? <Check size={16} className="mx-auto text-emerald-500" />
+                        : linktree === "false" ? <X size={16} className="mx-auto text-red-400" />
+                        : <span className="text-maview-muted text-xs">{linktree}</span>}
+                    </td>
+                    <td className="px-4 py-2.5 text-center">
+                      {stan === "true" ? <Check size={16} className="mx-auto text-emerald-500" />
+                        : stan === "false" ? <X size={16} className="mx-auto text-red-400" />
+                        : <span className="text-maview-muted text-xs">{stan}</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="text-center mt-8">
+            <button
+              onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); switchMode("signup"); }}
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-maview-purple to-violet-600 text-white text-sm font-bold px-7 py-3.5 rounded-xl hover:brightness-105 hover:shadow-xl hover:shadow-maview-purple/25 transition-all active:scale-[0.98]"
+            >
+              Começar grátis — sem cartão
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ══════════ EXIT INTENT POPUP ══════════ */}
+      {showExitPopup && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowExitPopup(false)} />
+          <div className="relative bg-white rounded-3xl shadow-2xl max-w-[380px] w-full p-8 text-center animate-in zoom-in-95 duration-300">
+            <button onClick={() => setShowExitPopup(false)} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-maview-surface flex items-center justify-center hover:bg-maview-border transition-colors">
+              <X size={16} className="text-maview-muted" />
+            </button>
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-maview-purple to-violet-500 flex items-center justify-center mx-auto mb-5">
+              <Sparkles size={28} className="text-white" />
+            </div>
+            <h3 className="text-xl font-extrabold text-maview-text mb-2">
+              Espera! Sua vitrine em 30 segundos
+            </h3>
+            <p className="text-maview-muted text-sm mb-6">
+              Mais de <strong>{realUserCount ? realUserCount.toLocaleString("pt-BR") : "2.000"} criadores</strong> ja usam o Maview para vender mais. 100% gratis, sem cartao de credito.
+            </p>
+            <button
+              onClick={() => { setShowExitPopup(false); window.scrollTo({ top: 0, behavior: "smooth" }); switchMode("signup"); }}
+              className="w-full bg-gradient-to-r from-maview-purple to-violet-600 text-white font-bold py-3.5 rounded-xl hover:brightness-105 transition-all active:scale-[0.98] shadow-lg shadow-maview-purple/25"
+            >
+              Criar agora — R$ 0
+            </button>
+            <p className="text-maview-muted text-[11px] mt-3 flex items-center justify-center gap-1.5">
+              <Check size={10} className="text-emerald-500" /> Grátis para sempre
+              <span className="mx-1 text-maview-border">·</span>
+              <Check size={10} className="text-emerald-500" /> Sem cartão
+              <span className="mx-1 text-maview-border">·</span>
+              <Check size={10} className="text-emerald-500" /> Suporte PT
+            </p>
+          </div>
+        </div>
+      )}
 
     </div>
   );

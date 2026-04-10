@@ -149,3 +149,123 @@
   from { transform: translateY(100%); opacity: 0; }
   to   { transform: translateY(0);    opacity: 1; }
 }
+
+/* ── Micro-interactions: world-class feel ── */
+@keyframes confetti-burst {
+  0% { transform: scale(0); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+/* Skeleton shimmer loader */
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg,
+    hsl(var(--dash-surface)) 25%,
+    hsl(var(--dash-surface-2)) 50%,
+    hsl(var(--dash-surface)) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+/* Interactive button micro-interactions */
+.btn-interactive {
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+.btn-interactive:hover {
+  transform: scale(1.02);
+}
+.btn-interactive:active {
+  transform: scale(0.97);
+}
+
+/* Card hover elevation */
+.card-hover {
+  transition: border-color 0.2s ease, box-shadow 0.25s ease, transform 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 30px -8px hsla(260, 30%, 20%, 0.12);
+}
+
+/* Page transition */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.page-enter {
+  animation: page-enter 0.3s ease-out both;
+}
+
+/* Tab underline slide */
+@keyframes tab-slide {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* Number count up animation */
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.count-up { animation: count-up 0.4s ease-out both; }
+
+/* Celebration pulse */
+@keyframes celebrate {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.15); }
+  50% { transform: scale(1.05); }
+}
+.celebrate { animation: celebrate 0.6s ease-out; }
+
+/* Scroll reveal */
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dark mode variables */
+.dark {
+  --dash-bg: 260 20% 8%;
+  --dash-surface: 260 18% 12%;
+  --dash-surface-2: 260 16% 15%;
+  --dash-border: 260 15% 18%;
+  --dash-border-subtle: 260 12% 14%;
+  --dash-purple: 263 90% 58%;
+  --dash-purple-glow: 263 90% 58%;
+  --dash-purple-light: 263 80% 65%;
+  --dash-accent: 263 30% 16%;
+  --dash-accent-fg: 263 90% 70%;
+  --dash-text: 260 10% 92%;
+  --dash-text-secondary: 260 10% 70%;
+  --dash-text-muted: 260 10% 50%;
+  --dash-text-subtle: 260 8% 40%;
+}
+
+/* Infinite scroll for testimonials */
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes scroll-reverse {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+.animate-scroll { animation: scroll 40s linear infinite; }
+.animate-scroll-reverse { animation: scroll-reverse 40s linear infinite; }
+
+/* Confetti fall animation */
+@keyframes confetti-fall {
+  0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+  100% { transform: translateY(600px) rotate(720deg) scale(0.3); opacity: 0; }
+}
+
+/* Page route transition */
+.route-enter {
+  animation: page-enter 0.25s ease-out both;
+}
