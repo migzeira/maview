@@ -169,6 +169,12 @@ const THEMES: { id: ThemeId; label: string; bg: string; accent: string; accent2:
   { id: "indigo",      label: "Índigo",       bg: "#06050f", accent: "#6366f1", accent2: "#a78bfa" },
   { id: "slate",       label: "Grafite",      bg: "#0c0e12", accent: "#94a3b8", accent2: "#cbd5e1" },
   { id: "wine",        label: "Vinho",        bg: "#100408", accent: "#be185d", accent2: "#e11d48" },
+  // ── Light themes ──
+  { id: "white",       label: "Branco",       bg: "#f8f9fa", accent: "#6366f1", accent2: "#8b5cf6" },
+  { id: "cream",       label: "Creme",        bg: "#faf7f2", accent: "#d97706", accent2: "#b45309" },
+  // ── Bold themes ──
+  { id: "pure-black",  label: "Preto Puro",   bg: "#000000", accent: "#ffffff", accent2: "#a0a0a0" },
+  { id: "bold-red",    label: "Vermelho",     bg: "#0a0000", accent: "#ff3333", accent2: "#ff6666" },
   // ── Custom (user-defined colors) ──
   { id: "custom",      label: "Personalizado", bg: "#080612", accent: "#a855f7", accent2: "#ec4899" },
 ];

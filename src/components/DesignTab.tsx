@@ -110,6 +110,13 @@ const BG_EFFECTS: { id: string; label: string; desc: string; category: string }[
   { id: "fog", label: "Névoa", desc: "Névoa suave em movimento", category: "atmosphere" },
   { id: "smoke", label: "Fumaça", desc: "Fumaça lenta e atmosférica", category: "atmosphere" },
   { id: "clouds", label: "Nuvens", desc: "Nuvens passando lentamente", category: "atmosphere" },
+  // Motion — NEW animated effects with real visible movement
+  { id: "ocean-waves", label: "Ondas", desc: "Ondas do oceano em movimento", category: "motion" },
+  { id: "orbit-circles", label: "Órbitas", desc: "Círculos orbitando em loop", category: "motion" },
+  { id: "ripple-rings", label: "Ondulações", desc: "Anéis se expandindo do centro", category: "motion" },
+  { id: "morph-blobs", label: "Blobs", desc: "Formas orgânicas que se transformam", category: "motion" },
+  { id: "orbit-rings", label: "Anéis Girando", desc: "Anéis concêntricos com pontos orbitando", category: "motion" },
+  { id: "neon-lines", label: "Linhas Neon", desc: "Linhas luminosas ondulando", category: "motion" },
 ];
 
 const EFFECT_CATEGORIES = [
@@ -120,6 +127,7 @@ const EFFECT_CATEGORIES = [
   { key: "wave", label: "Ondas" },
   { key: "tech", label: "Tech" },
   { key: "atmosphere", label: "Atmosfera" },
+  { key: "motion", label: "Movimento" },
 ];
 
 const GOOGLE_FONTS = [
@@ -177,6 +185,7 @@ interface DesignPack {
   id: string;
   label: string;
   desc: string;
+  category: "dark" | "light" | "animated" | "minimal" | "bold";
   preview: { bg: string; accent: string; accent2: string };
   config: {
     theme: string;
@@ -184,11 +193,21 @@ interface DesignPack {
   };
 }
 
+const PACK_CATEGORIES = [
+  { key: "all", label: "Todos" },
+  { key: "animated", label: "Animados" },
+  { key: "dark", label: "Dark" },
+  { key: "light", label: "Claros" },
+  { key: "minimal", label: "Minimal" },
+  { key: "bold", label: "Bold" },
+];
+
 const DESIGN_PACKS: DesignPack[] = [
   {
     id: "minimal-clean",
     label: "Minimal",
     desc: "Limpo e moderno",
+    category: "minimal",
     preview: { bg: "#0c0e12", accent: "#94a3b8", accent2: "#cbd5e1" },
     config: {
       theme: "slate",
@@ -205,6 +224,7 @@ const DESIGN_PACKS: DesignPack[] = [
     id: "neon-bold",
     label: "Neon",
     desc: "Vibrante e ousado",
+    category: "bold",
     preview: { bg: "#0a0010", accent: "#ff2d95", accent2: "#ff6ec7" },
     config: {
       theme: "neon-pink",
@@ -221,6 +241,7 @@ const DESIGN_PACKS: DesignPack[] = [
     id: "luxury-dark",
     label: "Luxury",
     desc: "Elegante e sofisticado",
+    category: "dark",
     preview: { bg: "#080612", accent: "#a855f7", accent2: "#ec4899" },
     config: {
       theme: "dark-purple",
@@ -237,6 +258,7 @@ const DESIGN_PACKS: DesignPack[] = [
     id: "tech-future",
     label: "Tech",
     desc: "Futurista e digital",
+    category: "dark",
     preview: { bg: "#05080f", accent: "#60a5fa", accent2: "#818cf8" },
     config: {
       theme: "midnight",
@@ -253,6 +275,7 @@ const DESIGN_PACKS: DesignPack[] = [
     id: "nature-organic",
     label: "Nature",
     desc: "Orgânico e natural",
+    category: "dark",
     preview: { bg: "#050f05", accent: "#4ade80", accent2: "#34d399" },
     config: {
       theme: "forest",
@@ -269,6 +292,7 @@ const DESIGN_PACKS: DesignPack[] = [
     id: "sunset-vibes",
     label: "Sunset",
     desc: "Quente e envolvente",
+    category: "animated",
     preview: { bg: "#0f0805", accent: "#f97316", accent2: "#ef4444" },
     config: {
       theme: "sunset",
@@ -285,6 +309,7 @@ const DESIGN_PACKS: DesignPack[] = [
     id: "gold-premium",
     label: "Gold",
     desc: "Premium e exclusivo",
+    category: "bold",
     preview: { bg: "#0c0a04", accent: "#eab308", accent2: "#d97706" },
     config: {
       theme: "gold",
@@ -301,6 +326,7 @@ const DESIGN_PACKS: DesignPack[] = [
     id: "ocean-calm",
     label: "Ocean",
     desc: "Calmo e confiante",
+    category: "animated",
     preview: { bg: "#020c14", accent: "#06b6d4", accent2: "#22d3ee" },
     config: {
       theme: "ocean",
@@ -317,6 +343,7 @@ const DESIGN_PACKS: DesignPack[] = [
     id: "wine-elegance",
     label: "Wine",
     desc: "Refinado e marcante",
+    category: "dark",
     preview: { bg: "#100408", accent: "#be185d", accent2: "#e11d48" },
     config: {
       theme: "wine",
@@ -333,6 +360,7 @@ const DESIGN_PACKS: DesignPack[] = [
     id: "arctic-ice",
     label: "Arctic",
     desc: "Frio e impactante",
+    category: "animated",
     preview: { bg: "#050a10", accent: "#38bdf8", accent2: "#7dd3fc" },
     config: {
       theme: "arctic",
@@ -349,6 +377,7 @@ const DESIGN_PACKS: DesignPack[] = [
     id: "coral-creative",
     label: "Coral",
     desc: "Criativo e divertido",
+    category: "bold",
     preview: { bg: "#0f0808", accent: "#fb923c", accent2: "#f472b6" },
     config: {
       theme: "coral",
@@ -365,6 +394,7 @@ const DESIGN_PACKS: DesignPack[] = [
     id: "indigo-deep",
     label: "Indigo",
     desc: "Profundo e misterioso",
+    category: "animated",
     preview: { bg: "#06050f", accent: "#6366f1", accent2: "#a78bfa" },
     config: {
       theme: "indigo",
@@ -381,6 +411,7 @@ const DESIGN_PACKS: DesignPack[] = [
     id: "emerald-pro",
     label: "Emerald",
     desc: "Profissional e clean",
+    category: "minimal",
     preview: { bg: "#021a0f", accent: "#10b981", accent2: "#6ee7b7" },
     config: {
       theme: "emerald",
@@ -397,6 +428,7 @@ const DESIGN_PACKS: DesignPack[] = [
     id: "rose-romantic",
     label: "Rose",
     desc: "Delicado e atraente",
+    category: "animated",
     preview: { bg: "#100509", accent: "#f43f5e", accent2: "#fb7185" },
     config: {
       theme: "rose",
@@ -413,6 +445,7 @@ const DESIGN_PACKS: DesignPack[] = [
     id: "lavender-dream",
     label: "Lavender",
     desc: "Suave e inspirador",
+    category: "dark",
     preview: { bg: "#0c0a14", accent: "#c084fc", accent2: "#a78bfa" },
     config: {
       theme: "lavender",
@@ -429,6 +462,7 @@ const DESIGN_PACKS: DesignPack[] = [
     id: "crimson-power",
     label: "Crimson",
     desc: "Forte e poderoso",
+    category: "bold",
     preview: { bg: "#120508", accent: "#dc2626", accent2: "#f87171" },
     config: {
       theme: "crimson",
@@ -438,6 +472,165 @@ const DESIGN_PACKS: DesignPack[] = [
         fontHeading: "Bebas Neue", fontBody: "Poppins",
         profileShape: "hexagon", profileBorder: false, profileSize: 96,
         accentColor: "#dc2626", accentColor2: "#f87171",
+      },
+    },
+  },
+  /* ── NEW: Animated motion packs ── */
+  {
+    id: "waves-ocean",
+    label: "Ondas",
+    desc: "Ondas do oceano em movimento",
+    category: "animated",
+    preview: { bg: "#020c14", accent: "#06b6d4", accent2: "#22d3ee" },
+    config: {
+      theme: "ocean",
+      design: {
+        bgType: "effect", bgEffect: "ocean-waves", bgColor: "#020c14",
+        buttonShape: "pill", buttonFill: "solid", buttonShadow: "md", buttonRadius: 12,
+        fontHeading: "Montserrat", fontBody: "DM Sans",
+        profileShape: "circle", profileBorder: true, profileBorderColor: "#06b6d4", profileSize: 92,
+        accentColor: "#06b6d4", accentColor2: "#22d3ee",
+      },
+    },
+  },
+  {
+    id: "orbits",
+    label: "Órbitas",
+    desc: "Círculos girando em loop",
+    category: "animated",
+    preview: { bg: "#06050f", accent: "#6366f1", accent2: "#a78bfa" },
+    config: {
+      theme: "indigo",
+      design: {
+        bgType: "effect", bgEffect: "orbit-circles", bgColor: "#06050f",
+        buttonShape: "soft", buttonFill: "glass", buttonShadow: "glow", buttonRadius: 14,
+        fontHeading: "Sora", fontBody: "Inter",
+        profileShape: "circle", profileBorder: false, profileSize: 92,
+        accentColor: "#6366f1", accentColor2: "#a78bfa",
+      },
+    },
+  },
+  {
+    id: "blobs-morph",
+    label: "Blobs",
+    desc: "Formas orgânicas em transformação",
+    category: "animated",
+    preview: { bg: "#0c0a14", accent: "#c084fc", accent2: "#a78bfa" },
+    config: {
+      theme: "lavender",
+      design: {
+        bgType: "effect", bgEffect: "morph-blobs", bgColor: "#0c0a14",
+        buttonShape: "soft", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 16,
+        fontHeading: "Outfit", fontBody: "Nunito",
+        profileShape: "rounded", profileBorder: false, profileSize: 88,
+        accentColor: "#c084fc", accentColor2: "#a78bfa",
+      },
+    },
+  },
+  {
+    id: "rings-orbit",
+    label: "Anéis",
+    desc: "Anéis girando com pontos orbitais",
+    category: "animated",
+    preview: { bg: "#05080f", accent: "#60a5fa", accent2: "#818cf8" },
+    config: {
+      theme: "midnight",
+      design: {
+        bgType: "effect", bgEffect: "orbit-rings", bgColor: "#05080f",
+        buttonShape: "rounded", buttonFill: "outline", buttonShadow: "glow", buttonRadius: 12,
+        fontHeading: "Space Grotesk", fontBody: "Inter",
+        profileShape: "circle", profileBorder: true, profileBorderColor: "#60a5fa", profileSize: 96,
+        accentColor: "#60a5fa", accentColor2: "#818cf8",
+      },
+    },
+  },
+  {
+    id: "neon-flow",
+    label: "Neon Flow",
+    desc: "Linhas neon ondulando",
+    category: "animated",
+    preview: { bg: "#0a0010", accent: "#ff2d95", accent2: "#ff6ec7" },
+    config: {
+      theme: "neon-pink",
+      design: {
+        bgType: "effect", bgEffect: "neon-lines", bgColor: "#0a0010",
+        buttonShape: "pill", buttonFill: "solid", buttonShadow: "glow", buttonRadius: 12,
+        fontHeading: "Bebas Neue", fontBody: "Space Grotesk",
+        profileShape: "circle", profileBorder: true, profileBorderColor: "#ff2d95", profileSize: 96,
+        accentColor: "#ff2d95", accentColor2: "#ff6ec7",
+      },
+    },
+  },
+  /* ── NEW: Light / White / Black theme packs ── */
+  {
+    id: "clean-white",
+    label: "Branco",
+    desc: "Clean e luminoso",
+    category: "light",
+    preview: { bg: "#f8f9fa", accent: "#6366f1", accent2: "#8b5cf6" },
+    config: {
+      theme: "white",
+      design: {
+        bgType: "solid", bgColor: "#f8f9fa", bgEffect: "",
+        buttonShape: "pill", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 12,
+        fontHeading: "Inter", fontBody: "DM Sans",
+        profileShape: "circle", profileBorder: false, profileSize: 88,
+        accentColor: "#6366f1", accentColor2: "#8b5cf6",
+        textColor: "#111827", subtextColor: "rgba(17,24,39,0.65)",
+        cardBg: "#ffffff", cardBorder: "rgba(0,0,0,0.08)",
+      },
+    },
+  },
+  {
+    id: "warm-cream",
+    label: "Creme",
+    desc: "Quente e acolhedor",
+    category: "light",
+    preview: { bg: "#faf7f2", accent: "#d97706", accent2: "#b45309" },
+    config: {
+      theme: "cream",
+      design: {
+        bgType: "solid", bgColor: "#faf7f2", bgEffect: "",
+        buttonShape: "soft", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 14,
+        fontHeading: "Playfair Display", fontBody: "Lora",
+        profileShape: "circle", profileBorder: true, profileBorderColor: "#d97706", profileSize: 92,
+        accentColor: "#d97706", accentColor2: "#b45309",
+        textColor: "#1c1917", subtextColor: "rgba(28,25,23,0.60)",
+        cardBg: "#ffffff", cardBorder: "rgba(0,0,0,0.06)",
+      },
+    },
+  },
+  {
+    id: "pure-black",
+    label: "Preto Puro",
+    desc: "Minimalista e contrastante",
+    category: "minimal",
+    preview: { bg: "#000000", accent: "#ffffff", accent2: "#a0a0a0" },
+    config: {
+      theme: "pure-black",
+      design: {
+        bgType: "solid", bgColor: "#000000", bgEffect: "",
+        buttonShape: "square", buttonFill: "outline", buttonShadow: "none", buttonRadius: 4,
+        fontHeading: "Space Grotesk", fontBody: "JetBrains Mono",
+        profileShape: "square", profileBorder: true, profileBorderColor: "#ffffff", profileSize: 88,
+        accentColor: "#ffffff", accentColor2: "#a0a0a0",
+      },
+    },
+  },
+  {
+    id: "bold-red",
+    label: "Vermelho",
+    desc: "Agressivo e chamativo",
+    category: "bold",
+    preview: { bg: "#0a0000", accent: "#ff3333", accent2: "#ff6666" },
+    config: {
+      theme: "bold-red",
+      design: {
+        bgType: "effect", bgEffect: "ripple-rings", bgColor: "#0a0000",
+        buttonShape: "pill", buttonFill: "solid", buttonShadow: "glow", buttonRadius: 12,
+        fontHeading: "Bebas Neue", fontBody: "Poppins",
+        profileShape: "circle", profileBorder: true, profileBorderColor: "#ff3333", profileSize: 96,
+        accentColor: "#ff3333", accentColor2: "#ff6666",
       },
     },
   },
@@ -594,6 +787,12 @@ function getEffectPreviewStyle(effectId: string, accent: string): React.CSSPrope
     case "fog": return { background: `linear-gradient(135deg, transparent, rgba(255,255,255,0.04) 40%, transparent 70%)` };
     case "smoke": return { background: `radial-gradient(ellipse at 40% 60%, rgba(255,255,255,0.05), transparent 60%)` };
     case "clouds": return { background: `radial-gradient(ellipse at 30% 40%, rgba(255,255,255,0.06) 0%, transparent 50%), radial-gradient(ellipse at 70% 60%, rgba(255,255,255,0.04) 0%, transparent 50%)` };
+    case "ocean-waves": return { background: `linear-gradient(180deg, transparent 50%, ${a}15 70%, ${a}08 90%, transparent)` };
+    case "orbit-circles": return { background: `radial-gradient(circle at 50% 50%, transparent 30%, ${a}10 32%, transparent 34%), radial-gradient(circle at 50% 50%, transparent 45%, ${a}08 47%, transparent 49%)` };
+    case "ripple-rings": return { background: `radial-gradient(circle, transparent 20%, ${a}10 22%, transparent 24%), radial-gradient(circle, transparent 35%, ${a}08 37%, transparent 39%)` };
+    case "morph-blobs": return { background: `radial-gradient(ellipse at 30% 40%, ${a}20 0%, transparent 50%), radial-gradient(ellipse at 70% 60%, #ec489915 0%, transparent 50%)` };
+    case "orbit-rings": return { background: `radial-gradient(circle, transparent 30%, ${a}08 31%, transparent 32%), radial-gradient(circle, transparent 45%, ${a}06 46%, transparent 47%), radial-gradient(circle, transparent 60%, ${a}04 61%, transparent 62%)` };
+    case "neon-lines": return { backgroundImage: `linear-gradient(0deg, transparent 45%, ${a}15 50%, transparent 55%), linear-gradient(0deg, transparent 65%, #ec489910 70%, transparent 75%)` };
     default: return {};
   }
 }
@@ -666,6 +865,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   const currentTheme = themes.find(t => t.id === config.theme) ?? themes[0];
   const [fontFilter, setFontFilter] = useState<string>("all");
   const [effectFilter, setEffectFilter] = useState<string>("all");
+  const [packFilter, setPackFilter] = useState<string>("all");
   const bgImageInputRef = useRef<HTMLInputElement>(null);
   const bgVideoInputRef = useRef<HTMLInputElement>(null);
 
@@ -762,9 +962,28 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
           )}
         </div>
 
-        {/* Pack grid — 16 templates */}
+        {/* Category filter */}
+        <div className="flex gap-1.5 flex-wrap">
+          {PACK_CATEGORIES.map(cat => (
+            <button key={cat.key} onClick={() => setPackFilter(cat.key)}
+              className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all ${
+                packFilter === cat.key
+                  ? "bg-primary/15 text-primary border border-primary/30"
+                  : "text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] border border-transparent"
+              }`}>
+              {cat.label}
+              {cat.key !== "all" && (
+                <span className="ml-1 text-[8px] opacity-60">
+                  {DESIGN_PACKS.filter(p => p.category === cat.key).length}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Pack grid */}
         <div className="grid grid-cols-2 gap-2.5">
-          {DESIGN_PACKS.map(pack => {
+          {DESIGN_PACKS.filter(p => packFilter === "all" || p.category === packFilter).map(pack => {
             const isActive = config.theme === pack.config.theme
               && d.fontHeading === (pack.config.design.fontHeading || "Inter")
               && d.bgEffect === (pack.config.design.bgEffect || "");
@@ -926,7 +1145,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
 
       {/* ═══════════ SECTION 2: Background ═══════════ */}
       {/* ═══════════ SECTION 2: Background ═══════════ */}
-      <SectionCard title="Fundo" icon={<Layers size={14} />} desc="Cor sólida, degradê, imagem, vídeo, padrão ou efeito animado" step={3}>
+      <SectionCard title="Fundo" icon={<Layers size={14} />} defaultOpen={false} desc="Refine o fundo do pack escolhido" step={3}>
         {/* BG Type selector */}
         <div className="flex gap-1.5 pt-2 flex-wrap">
           {([
@@ -1193,7 +1412,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
       </SectionCard>
 
       {/* ═══════════ SECTION 3: Colors ═══════════ */}
-      <SectionCard title="Cores" icon={<Palette size={14} />} desc="Ajuste as cores da sua identidade visual" step={4}>
+      <SectionCard title="Cores" icon={<Palette size={14} />} defaultOpen={false} desc="Ajuste fino das cores" step={4}>
         <div className="space-y-3 pt-2">
           <div className="grid grid-cols-2 gap-3">
             <ColorPicker value={d.accentColor || currentTheme.accent} onChange={v => { setDesign("accentColor", v); updateConfig("theme", "custom"); }} label="Cor principal" />
@@ -1228,7 +1447,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
       </SectionCard>
 
       {/* ═══════════ SECTION 4: Button Styles ═══════════ */}
-      <SectionCard title="Estilo dos botões" icon={<Square size={14} />} desc="Formato, preenchimento e sombra — afeta todos os CTAs" step={5}>
+      <SectionCard title="Estilo dos botões" icon={<Square size={14} />} defaultOpen={false} desc="Formato, preenchimento e sombra" step={5}>
         <div className="space-y-4 pt-2">
           {/* Shape */}
           <div>

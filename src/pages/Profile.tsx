@@ -114,6 +114,10 @@ const THEMES: Record<string, {
   "slate":       { bg: "#0c0e12", accent: "#94a3b8", accent2: "#cbd5e1", card: "#1a1e28", text: "#f8fafc", sub: "rgba(248,250,252,0.80)", border: "rgba(148,163,184,0.28)" },
   "wine":        { bg: "#100408", accent: "#be185d", accent2: "#e11d48", card: "#200a14", text: "#fff0f6", sub: "rgba(255,240,246,0.80)", border: "rgba(190,24,93,0.28)"    },
   "custom":      { bg: "#080612", accent: "#a855f7", accent2: "#ec4899", card: "#13102a", text: "#f8f5ff", sub: "rgba(248,245,255,0.80)", border: "rgba(168,85,247,0.28)" },
+  "white":       { bg: "#f8f9fa", accent: "#6366f1", accent2: "#8b5cf6", card: "#ffffff", text: "#111827", sub: "rgba(17,24,39,0.65)", border: "rgba(0,0,0,0.08)" },
+  "cream":       { bg: "#faf7f2", accent: "#d97706", accent2: "#b45309", card: "#ffffff", text: "#1c1917", sub: "rgba(28,25,23,0.60)", border: "rgba(0,0,0,0.06)" },
+  "pure-black":  { bg: "#000000", accent: "#ffffff", accent2: "#a0a0a0", card: "#0a0a0a", text: "#ffffff", sub: "rgba(255,255,255,0.70)", border: "rgba(255,255,255,0.12)" },
+  "bold-red":    { bg: "#0a0000", accent: "#ff3333", accent2: "#ff6666", card: "#1a0505", text: "#fff5f5", sub: "rgba(255,245,245,0.80)", border: "rgba(255,51,51,0.25)" },
 };
 
 /* ─── Background patterns (SVG) ─────────────────────────────── */
@@ -249,6 +253,11 @@ function injectEffectStyles() {
     @keyframes mv-gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
     @keyframes mv-wave { 0% { transform: translateX(0) scaleY(1); } 50% { transform: translateX(-25%) scaleY(1.2); } 100% { transform: translateX(-50%) scaleY(1); } }
     @keyframes mv-fog { 0%,100% { transform: translateX(-10%) scale(1.1); opacity: 0.04; } 50% { transform: translateX(10%) scale(1); opacity: 0.07; } }
+    @keyframes mv-orbit { 0% { transform: rotate(0deg) translateX(var(--orbit-r)) rotate(0deg); } 100% { transform: rotate(360deg) translateX(var(--orbit-r)) rotate(-360deg); } }
+    @keyframes mv-ripple { 0% { transform: scale(0.3); opacity: 0.5; } 100% { transform: scale(2.5); opacity: 0; } }
+    @keyframes mv-sway { 0%,100% { transform: translateX(0) scaleX(1); } 25% { transform: translateX(8%) scaleX(1.04); } 75% { transform: translateX(-8%) scaleX(0.96); } }
+    @keyframes mv-morph { 0%,100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; } 25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; } 50% { border-radius: 50% 60% 30% 60% / 30% 50% 70% 50%; } 75% { border-radius: 40% 60% 70% 30% / 60% 40% 30% 70%; } }
+    @keyframes mv-orbit-ring { 0% { transform: translate(-50%,-50%) rotate(0deg); } 100% { transform: translate(-50%,-50%) rotate(360deg); } }
     .mv-aurora { animation: mv-aurora 12s ease-in-out infinite; }
     .mv-pulse { animation: mv-pulse 4s ease-in-out infinite; }
     .mv-float { animation: mv-float 8s ease-in-out infinite; }
@@ -258,6 +267,11 @@ function injectEffectStyles() {
     .mv-gradient-anim { background-size: 200% 200%; animation: mv-gradient 8s ease infinite; }
     .mv-wave { animation: mv-wave 12s linear infinite; }
     .mv-fog { animation: mv-fog 15s ease-in-out infinite; }
+    .mv-orbit { animation: mv-orbit var(--orbit-dur, 10s) linear infinite; }
+    .mv-ripple { animation: mv-ripple 4s ease-out infinite; }
+    .mv-sway { animation: mv-sway 8s ease-in-out infinite; }
+    .mv-morph { animation: mv-morph 12s ease-in-out infinite; }
+    .mv-orbit-ring { animation: mv-orbit-ring var(--ring-dur, 20s) linear infinite; }
   `;
   document.head.appendChild(style);
 }
@@ -428,6 +442,121 @@ function EffectLayer({ effectId, accent, accent2 }: { effectId: string; accent: 
           <div className="absolute w-[100%] h-[25%] top-[50%] left-0 mv-drift" style={{ background: `radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.03), transparent 50%)`, filter: "blur(25px)", animationDelay: "-12s" }} />
         </div>
       );
+    /* ── NEW: Animated motion effects ── */
+    case "ocean-waves":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+          {[0, 1, 2].map(i => (
+            <div key={i} className="absolute w-[250%] left-[-75%] mv-sway" style={{
+              height: `${100 + i * 40}px`, bottom: `${i * 25}px`,
+              background: `linear-gradient(180deg, transparent, ${accent}${12 - i * 3})`,
+              borderRadius: "40% 40% 0 0",
+              animationDelay: `${i * -2.5}s`,
+              animationDuration: `${7 + i * 2}s`,
+            }} />
+          ))}
+        </div>
+      );
+    case "orbit-circles": {
+      const orbs = [
+        { r: 80, size: 10, dur: 8, color: accent, opacity: 0.4 },
+        { r: 130, size: 7, dur: 12, color: accent2, opacity: 0.3 },
+        { r: 60, size: 5, dur: 6, color: accent, opacity: 0.25 },
+        { r: 160, size: 8, dur: 16, color: accent2, opacity: 0.2 },
+        { r: 100, size: 6, dur: 10, color: accent, opacity: 0.35 },
+      ];
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1]">
+          {orbs.map((o, i) => (
+            <div key={i} className="absolute top-1/2 left-1/2 mv-orbit" style={{
+              width: o.size, height: o.size, borderRadius: "50%",
+              background: o.color, opacity: o.opacity,
+              "--orbit-r": `${o.r}px`, "--orbit-dur": `${o.dur}s`,
+              animationDelay: `${i * -1.5}s`,
+            } as React.CSSProperties} />
+          ))}
+        </div>
+      );
+    }
+    case "ripple-rings": {
+      const rings = [0, 1, 2, 3];
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1]">
+          {rings.map(i => (
+            <div key={i} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full mv-ripple" style={{
+              width: 120, height: 120,
+              border: `1.5px solid ${accent}30`,
+              animationDelay: `${i * 1}s`,
+              animationDuration: "4s",
+            }} />
+          ))}
+        </div>
+      );
+    }
+    case "morph-blobs":
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+          <div className="absolute w-[300px] h-[300px] top-[10%] left-[5%] mv-morph" style={{
+            background: `radial-gradient(circle, ${accent}18, transparent 70%)`, filter: "blur(40px)",
+          }} />
+          <div className="absolute w-[250px] h-[250px] bottom-[15%] right-[5%] mv-morph" style={{
+            background: `radial-gradient(circle, ${accent2}15, transparent 70%)`, filter: "blur(40px)",
+            animationDelay: "-4s",
+          }} />
+          <div className="absolute w-[200px] h-[200px] top-[45%] left-[30%] mv-morph" style={{
+            background: `radial-gradient(circle, ${accent}12, transparent 70%)`, filter: "blur(50px)",
+            animationDelay: "-8s",
+          }} />
+        </div>
+      );
+    case "orbit-rings": {
+      const ringData = [
+        { size: 200, dur: 20, border: accent, opacity: 0.15 },
+        { size: 300, dur: 28, border: accent2, opacity: 0.1 },
+        { size: 400, dur: 36, border: accent, opacity: 0.07 },
+      ];
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1]">
+          {ringData.map((r, i) => (
+            <div key={i} className="absolute top-1/2 left-1/2 rounded-full mv-orbit-ring" style={{
+              width: r.size, height: r.size,
+              border: `1px solid ${r.border}`,
+              opacity: r.opacity,
+              "--ring-dur": `${r.dur}s`,
+              animationDirection: i % 2 === 0 ? "normal" : "reverse",
+            } as React.CSSProperties}>
+              {/* Orbiting dot on ring */}
+              <div className="absolute rounded-full" style={{
+                width: 6, height: 6, top: -3, left: "50%", marginLeft: -3,
+                background: r.border, opacity: 0.6,
+              }} />
+            </div>
+          ))}
+        </div>
+      );
+    }
+    case "neon-lines": {
+      const lines = Array.from({ length: 6 }, (_, i) => ({
+        top: 10 + i * 16,
+        delay: i * -2,
+        dur: 6 + (i % 3) * 2,
+        color: i % 2 === 0 ? accent : accent2,
+        width: 40 + (i % 3) * 20,
+      }));
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
+          {lines.map((l, i) => (
+            <div key={i} className="absolute h-[1px] mv-sway" style={{
+              width: `${l.width}%`, left: `${(100 - l.width) / 2}%`, top: `${l.top}%`,
+              background: `linear-gradient(90deg, transparent, ${l.color}25, ${l.color}40, ${l.color}25, transparent)`,
+              boxShadow: `0 0 8px ${l.color}15`,
+              animationDelay: `${l.delay}s`,
+              animationDuration: `${l.dur}s`,
+            }} />
+          ))}
+        </div>
+      );
+    }
     default:
       return null;
   }
@@ -633,18 +762,23 @@ const SocialProofToast = ({ accent, products }: { accent: string; products?: Pro
       }}
     >
       <div
-        className="flex items-center gap-3 px-4 py-3.5 rounded-2xl"
+        className="flex items-center gap-3 px-4 py-3.5 rounded-2xl backdrop-blur-md"
         style={{
-          background: "rgba(8,5,18,0.97)",
-          border: `1px solid ${accent}40`,
-          boxShadow: `0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)`,
+          background: "rgba(8,5,18,0.95)",
+          border: `1px solid ${accent}35`,
+          boxShadow: `0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.05)`,
         }}
       >
-        <div
-          className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold"
-          style={{ background: `${accent}30`, color: accent }}
-        >
-          {current.name[0]}
+        <div className="relative flex-shrink-0">
+          <div
+            className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold"
+            style={{ background: `${accent}30`, color: accent }}
+          >
+            {current.name[0]}
+          </div>
+          <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-green-500 border-2 border-[#080512] flex items-center justify-center">
+            <Check size={7} className="text-white" />
+          </div>
         </div>
         <div className="min-w-0">
           <p className="text-white text-[12px] font-bold leading-snug truncate">
@@ -688,6 +822,28 @@ const CountdownBadge = ({ accent }: { accent: string }) => {
     >
       <Clock size={9} /> {time}
     </span>
+  );
+};
+
+/* ──────────────────────────────────────────────────────────────── */
+/*  👀 VIEWERS — "X pessoas vendo agora"                           */
+/* ──────────────────────────────────────────────────────────────── */
+const ViewersBadge = ({ accent }: { accent: string }) => {
+  const [count, setCount] = useState(() => 12 + Math.floor(Math.random() * 25));
+  useEffect(() => {
+    const t = setInterval(() => {
+      setCount(c => Math.max(5, c + Math.floor(Math.random() * 5) - 2));
+    }, 8000);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <div className="flex items-center gap-1.5 text-[11px] font-semibold" style={{ color: `${accent}cc` }}>
+      <span className="relative flex h-2 w-2">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: "#22c55e" }} />
+        <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: "#22c55e" }} />
+      </span>
+      {count} pessoas vendo agora
+    </div>
   );
 };
 
@@ -1170,7 +1326,12 @@ const ProfilePage = () => {
 
             <h1 className="text-[22px] font-extrabold mb-1 text-center tracking-tight" style={{ color: t.text, fontFamily: `'${rd.fontHeading}', sans-serif` }}>{profile.displayName}</h1>
             <p className="text-[13px] font-semibold mb-2" style={{ color: t.accent }}>@{profile.username}</p>
-            {profile.bio && <p className="text-[14px] text-center leading-relaxed max-w-[300px] mb-5 line-clamp-3" style={{ color: t.sub, fontFamily: `'${rd.fontBody}', sans-serif` }}>{profile.bio}</p>}
+            {profile.bio && <p className="text-[14px] text-center leading-relaxed max-w-[300px] mb-3 line-clamp-3" style={{ color: t.sub, fontFamily: `'${rd.fontBody}', sans-serif` }}>{profile.bio}</p>}
+
+            {/* Viewers badge — social proof */}
+            <div className="mb-4">
+              <ViewersBadge accent={t.accent} />
+            </div>
 
             {/* Stats */}
             {profile.stats && (
@@ -1290,6 +1451,13 @@ const ProfilePage = () => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap mb-0.5">
                             <p className="text-[15px] font-bold leading-snug line-clamp-2" style={{ color: t.text, fontFamily: `'${rd.fontHeading}', sans-serif` }}>{product.title}</p>
+                            {/* Auto "Mais vendido" badge on first product */}
+                            {i === 0 && profile.products.length > 1 && !product.badge && (
+                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 flex items-center gap-0.5"
+                                style={{ background: `${t.accent}20`, color: t.accent, border: `1px solid ${t.accent}30` }}>
+                                <Flame size={8} /> Mais vendido
+                              </span>
+                            )}
                             {product.badge && (
                               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: `${t.accent}22`, color: t.accent, border: `1px solid ${t.accent}30` }}>
                                 {product.badge}
@@ -1432,15 +1600,18 @@ const ProfilePage = () => {
           href={`https://wa.me/${profile.whatsapp}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="fixed bottom-[72px] right-4 z-50 flex items-center gap-2.5 px-5 py-3 rounded-full shadow-2xl transition-all duration-200 hover:scale-105 active:scale-95"
+          className="fixed bottom-[72px] right-4 z-50 flex items-center gap-2.5 px-5 py-3.5 rounded-full shadow-2xl transition-all duration-200 hover:scale-105 active:scale-95 group"
           style={{
             background: "#25d366",
-            boxShadow: "0 6px 24px rgba(37,211,102,0.35)",
+            boxShadow: "0 6px 24px rgba(37,211,102,0.40), 0 0 0 3px rgba(37,211,102,0.15)",
             color: "#fff",
           }}
         >
-          <MessageCircle size={18} className="fill-white" />
-          <span className="text-[13px] font-bold">Chamar no WhatsApp</span>
+          <span className="relative">
+            <MessageCircle size={18} className="fill-white" />
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-white animate-ping" />
+          </span>
+          <span className="text-[13px] font-bold">Falar agora</span>
         </a>
       )}
 
