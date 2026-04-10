@@ -3,6 +3,7 @@ import {
   Check, ChevronDown, Palette, Image, Video, Type, Square, Circle,
   Sparkles, Eye, Sliders, Upload, X, Play, Globe, Zap, Hexagon,
   PaintBucket, Droplets, Sun, Moon, Layers, Grid3X3, Wand2, Info,
+  LayoutTemplate, Link2,
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -168,6 +169,226 @@ const ACCENT_COLORS: string[] = [
   "#a855f7", "#ec4899", "#f43f5e", "#f97316", "#f59e0b", "#eab308",
   "#4ade80", "#10b981", "#06b6d4", "#3b82f6", "#6366f1", "#8b5cf6",
 ];
+
+/* ═══════════════════════════════════════════════════════════════════
+   Design Packs — one-click complete designs
+   ═══════════════════════════════════════════════════════════════════ */
+interface DesignPack {
+  id: string;
+  label: string;
+  desc: string;
+  preview: { bg: string; accent: string; accent2: string };
+  config: {
+    theme: string;
+    design: Partial<DesignConfig>;
+  };
+}
+
+const DESIGN_PACKS: DesignPack[] = [
+  {
+    id: "minimal-clean",
+    label: "Minimal",
+    desc: "Limpo e moderno",
+    preview: { bg: "#0c0e12", accent: "#94a3b8", accent2: "#cbd5e1" },
+    config: {
+      theme: "slate",
+      design: {
+        bgType: "solid", bgColor: "#0c0e12", bgEffect: "",
+        buttonShape: "pill", buttonFill: "outline", buttonShadow: "none", buttonRadius: 12,
+        fontHeading: "Inter", fontBody: "DM Sans",
+        profileShape: "circle", profileBorder: false, profileSize: 88,
+        accentColor: "#94a3b8", accentColor2: "#cbd5e1",
+      },
+    },
+  },
+  {
+    id: "neon-bold",
+    label: "Neon",
+    desc: "Vibrante e ousado",
+    preview: { bg: "#0a0010", accent: "#ff2d95", accent2: "#ff6ec7" },
+    config: {
+      theme: "neon-pink",
+      design: {
+        bgType: "effect", bgEffect: "aurora", bgColor: "#0a0010",
+        buttonShape: "pill", buttonFill: "glass", buttonShadow: "glow", buttonRadius: 12,
+        fontHeading: "Bebas Neue", fontBody: "Space Grotesk",
+        profileShape: "circle", profileBorder: true, profileBorderColor: "#ff2d95", profileSize: 96,
+        accentColor: "#ff2d95", accentColor2: "#ff6ec7",
+      },
+    },
+  },
+  {
+    id: "luxury-dark",
+    label: "Luxury",
+    desc: "Elegante e sofisticado",
+    preview: { bg: "#080612", accent: "#a855f7", accent2: "#ec4899" },
+    config: {
+      theme: "dark-purple",
+      design: {
+        bgType: "gradient", bgGradient: ["#080612", "#1a0a2e"] as [string, string], bgGradientDir: "to-b",
+        buttonShape: "soft", buttonFill: "solid", buttonShadow: "md", buttonRadius: 14,
+        fontHeading: "Playfair Display", fontBody: "Lora",
+        profileShape: "circle", profileBorder: true, profileBorderColor: "#a855f7", profileSize: 96,
+        accentColor: "#a855f7", accentColor2: "#ec4899",
+      },
+    },
+  },
+  {
+    id: "tech-future",
+    label: "Tech",
+    desc: "Futurista e digital",
+    preview: { bg: "#05080f", accent: "#60a5fa", accent2: "#818cf8" },
+    config: {
+      theme: "midnight",
+      design: {
+        bgType: "effect", bgEffect: "matrix-grid", bgColor: "#05080f",
+        buttonShape: "square", buttonFill: "glass", buttonShadow: "glow", buttonRadius: 6,
+        fontHeading: "Space Grotesk", fontBody: "JetBrains Mono",
+        profileShape: "hexagon", profileBorder: false, profileSize: 92,
+        accentColor: "#60a5fa", accentColor2: "#818cf8",
+      },
+    },
+  },
+  {
+    id: "nature-organic",
+    label: "Nature",
+    desc: "Orgânico e natural",
+    preview: { bg: "#050f05", accent: "#4ade80", accent2: "#34d399" },
+    config: {
+      theme: "forest",
+      design: {
+        bgType: "gradient", bgGradient: ["#050f05", "#0a2a1a"] as [string, string], bgGradientDir: "to-b",
+        buttonShape: "soft", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 16,
+        fontHeading: "Outfit", fontBody: "Nunito",
+        profileShape: "rounded", profileBorder: false, profileSize: 88,
+        accentColor: "#4ade80", accentColor2: "#34d399",
+      },
+    },
+  },
+  {
+    id: "sunset-vibes",
+    label: "Sunset",
+    desc: "Quente e envolvente",
+    preview: { bg: "#0f0805", accent: "#f97316", accent2: "#ef4444" },
+    config: {
+      theme: "sunset",
+      design: {
+        bgType: "effect", bgEffect: "gradient-flow", bgColor: "#0f0805",
+        buttonShape: "pill", buttonFill: "solid", buttonShadow: "md", buttonRadius: 12,
+        fontHeading: "Poppins", fontBody: "DM Sans",
+        profileShape: "circle", profileBorder: true, profileBorderColor: "#f97316", profileSize: 92,
+        accentColor: "#f97316", accentColor2: "#ef4444",
+      },
+    },
+  },
+  {
+    id: "gold-premium",
+    label: "Gold",
+    desc: "Premium e exclusivo",
+    preview: { bg: "#0c0a04", accent: "#eab308", accent2: "#d97706" },
+    config: {
+      theme: "gold",
+      design: {
+        bgType: "effect", bgEffect: "ambient-glow", bgColor: "#0c0a04",
+        buttonShape: "soft", buttonFill: "solid", buttonShadow: "glow", buttonRadius: 12,
+        fontHeading: "DM Serif Display", fontBody: "Manrope",
+        profileShape: "circle", profileBorder: true, profileBorderColor: "#eab308", profileSize: 96,
+        accentColor: "#eab308", accentColor2: "#d97706",
+      },
+    },
+  },
+  {
+    id: "ocean-calm",
+    label: "Ocean",
+    desc: "Calmo e confiante",
+    preview: { bg: "#020c14", accent: "#06b6d4", accent2: "#22d3ee" },
+    config: {
+      theme: "ocean",
+      design: {
+        bgType: "effect", bgEffect: "wave-layers", bgColor: "#020c14",
+        buttonShape: "rounded", buttonFill: "glass", buttonShadow: "sm", buttonRadius: 14,
+        fontHeading: "Montserrat", fontBody: "Urbanist",
+        profileShape: "circle", profileBorder: false, profileSize: 88,
+        accentColor: "#06b6d4", accentColor2: "#22d3ee",
+      },
+    },
+  },
+];
+
+/* ═══════════════════════════════════════════════════════════════════
+   Auto Font Pairing — maps heading fonts to ideal body fonts
+   ═══════════════════════════════════════════════════════════════════ */
+const FONT_PAIRS: Record<string, string> = {
+  "Inter": "DM Sans",
+  "Poppins": "DM Sans",
+  "Montserrat": "Urbanist",
+  "Outfit": "Nunito",
+  "DM Sans": "Inter",
+  "Space Grotesk": "JetBrains Mono",
+  "Nunito": "Outfit",
+  "Rubik": "Manrope",
+  "Manrope": "Rubik",
+  "Plus Jakarta Sans": "DM Sans",
+  "Urbanist": "Montserrat",
+  "Sora": "Inter",
+  "Playfair Display": "Lora",
+  "Lora": "Playfair Display",
+  "Merriweather": "DM Sans",
+  "DM Serif Display": "Manrope",
+  "Cormorant Garamond": "Montserrat",
+  "Bebas Neue": "Space Grotesk",
+  "Righteous": "Urbanist",
+  "Pacifico": "Poppins",
+  "Satisfy": "Outfit",
+  "Dancing Script": "DM Sans",
+  "JetBrains Mono": "Space Grotesk",
+  "Fira Code": "Inter",
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   Auto Color Harmony — generates complementary colors from a single accent
+   ═══════════════════════════════════════════════════════════════════ */
+function hexToHsl(hex: string): [number, number, number] {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, s = 0;
+  const l = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+    else if (max === g) h = ((b - r) / d + 2) / 6;
+    else h = ((r - g) / d + 4) / 6;
+  }
+  return [h * 360, s * 100, l * 100];
+}
+
+function hslToHex(h: number, s: number, l: number): string {
+  h = ((h % 360) + 360) % 360;
+  s = Math.max(0, Math.min(100, s)) / 100;
+  l = Math.max(0, Math.min(100, l)) / 100;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n: number) => {
+    const k = (n + h / 30) % 12;
+    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+    return Math.round(255 * Math.max(0, Math.min(1, color))).toString(16).padStart(2, "0");
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+function generateHarmony(accentHex: string) {
+  const [h, s, l] = hexToHsl(accentHex);
+  return {
+    accent2: hslToHex(h + 30, s * 0.9, l + 5),        // analogous shift
+    bgColor: hslToHex(h, Math.min(s * 0.3, 20), 3),    // very dark version
+    cardBg: hslToHex(h, Math.min(s * 0.25, 15), 7),    // slightly lighter
+    cardBorder: `rgba(${parseInt(accentHex.slice(1, 3), 16)},${parseInt(accentHex.slice(3, 5), 16)},${parseInt(accentHex.slice(5, 7), 16)},0.28)`,
+    textColor: hslToHex(h, Math.min(s * 0.15, 10), 97), // near-white
+    subtextColor: `rgba(${parseInt(hslToHex(h, Math.min(s * 0.15, 10), 97).slice(1, 3), 16)},${parseInt(hslToHex(h, Math.min(s * 0.15, 10), 97).slice(3, 5), 16)},${parseInt(hslToHex(h, Math.min(s * 0.15, 10), 97).slice(5, 7), 16)},0.80)`,
+  };
+}
 
 /* ═══════════════════════════════════════════════════════════════════
    Helpers
@@ -349,6 +570,44 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
 
   const accent = d.accentColor || currentTheme.accent;
 
+  /* ── Apply a complete Design Pack ── */
+  const applyPack = useCallback((pack: DesignPack) => {
+    updateConfig("theme", pack.config.theme);
+    const prev = config.design || {};
+    updateConfig("design", { ...prev, ...pack.config.design });
+    // Load fonts
+    if (pack.config.design.fontHeading) loadFont(pack.config.design.fontHeading);
+    if (pack.config.design.fontBody) loadFont(pack.config.design.fontBody);
+  }, [config.design, updateConfig]);
+
+  /* ── Auto Font Pairing: when heading changes, suggest body ── */
+  const applyFontPair = useCallback((headingFont: string) => {
+    setDesign("fontHeading", headingFont);
+    loadFont(headingFont);
+    const paired = FONT_PAIRS[headingFont];
+    if (paired) {
+      setDesign("fontBody", paired);
+      loadFont(paired);
+    }
+  }, [setDesign]);
+
+  /* ── Auto Color Harmony: generates full palette from 1 color ── */
+  const applyAutoHarmony = useCallback((accentHex: string) => {
+    const harmony = generateHarmony(accentHex);
+    const prev = config.design || {};
+    updateConfig("theme", "custom");
+    updateConfig("design", {
+      ...prev,
+      accentColor: accentHex,
+      accentColor2: harmony.accent2,
+      bgColor: harmony.bgColor,
+      cardBg: harmony.cardBg,
+      cardBorder: harmony.cardBorder,
+      textColor: harmony.textColor,
+      subtextColor: harmony.subtextColor,
+    });
+  }, [config.design, updateConfig]);
+
   return (
     <div className="space-y-5 pb-28">
 
@@ -370,6 +629,111 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         </div>
         <div className="h-px bg-gradient-to-r from-transparent via-[hsl(var(--dash-border-subtle))] to-transparent" />
       </div>
+
+      {/* ═══════════ DESIGN PACKS — one click complete design ═══════════ */}
+      <SectionCard title="Design Packs" icon={<LayoutTemplate size={14} />} defaultOpen={true}
+        desc="Templates completos — tema, fundo, botões, fontes e mais com 1 clique">
+        <div className="grid grid-cols-2 gap-2.5 pt-2">
+          {DESIGN_PACKS.map(pack => {
+            const isActive = config.theme === pack.config.theme
+              && d.fontHeading === (pack.config.design.fontHeading || "Inter")
+              && d.bgEffect === (pack.config.design.bgEffect || "");
+            return (
+              <Tooltip key={pack.id} text={`Aplicar pack "${pack.label}" — ${pack.desc}`}>
+                <button onClick={() => applyPack(pack)}
+                  className={`relative rounded-xl overflow-hidden text-left transition-all group ${
+                    isActive ? "ring-2 ring-primary scale-[1.02] shadow-lg shadow-primary/20" : "ring-1 ring-white/10 hover:ring-primary/40 hover:scale-[1.01]"
+                  }`}>
+                  {/* Preview bar */}
+                  <div className="h-[44px] relative" style={{ background: pack.preview.bg }}>
+                    <div className="absolute inset-0" style={{
+                      background: `linear-gradient(135deg, ${pack.preview.accent}15, transparent 50%, ${pack.preview.accent2}10)`,
+                    }} />
+                    <div className="absolute bottom-2 left-3 flex gap-1.5">
+                      <div className="w-3.5 h-3.5 rounded-full" style={{ background: pack.preview.accent }} />
+                      <div className="w-3.5 h-3.5 rounded-full" style={{ background: pack.preview.accent2 }} />
+                    </div>
+                    {/* Mini button preview */}
+                    <div className="absolute bottom-2 right-3 px-2 py-0.5 text-[7px] font-bold text-white/90 rounded"
+                      style={{
+                        background: `${pack.preview.accent}90`,
+                        borderRadius: pack.config.design.buttonShape === "pill" ? "999px" : pack.config.design.buttonShape === "square" ? "3px" : "6px",
+                        border: pack.config.design.buttonFill === "outline" ? `1px solid ${pack.preview.accent}` : "none",
+                        backgroundColor: pack.config.design.buttonFill === "outline" ? "transparent" : `${pack.preview.accent}90`,
+                        color: pack.config.design.buttonFill === "outline" ? pack.preview.accent : "white",
+                      }}>
+                      CTA
+                    </div>
+                    {isActive && (
+                      <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                        <Check size={8} className="text-white" />
+                      </div>
+                    )}
+                  </div>
+                  <div className={`px-3 py-2 ${isActive ? "bg-primary/10" : "bg-[hsl(var(--dash-surface-2))]"}`}>
+                    <p className={`text-[11px] font-bold ${isActive ? "text-primary" : "text-[hsl(var(--dash-text))]"}`}
+                      style={{ fontFamily: `"${pack.config.design.fontHeading}", sans-serif` }}>
+                      {pack.label}
+                    </p>
+                    <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] leading-tight mt-0.5">
+                      {pack.desc} · {pack.config.design.fontHeading}
+                    </p>
+                  </div>
+                </button>
+              </Tooltip>
+            );
+          })}
+        </div>
+      </SectionCard>
+
+      {/* ═══════════ AUTO HARMONY — generate full palette from 1 color ═══════════ */}
+      <SectionCard title="Cores automáticas" icon={<Wand2 size={14} />} defaultOpen={false}
+        desc="Escolha 1 cor e gere a paleta completa automaticamente">
+        <div className="space-y-3 pt-2">
+          <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">
+            Clique em uma cor para gerar fundo, cards, texto e cor secundária automaticamente
+          </p>
+          <div className="grid grid-cols-6 gap-2">
+            {ACCENT_COLORS.map(c => (
+              <Tooltip key={`auto-${c}`} text={`Gerar paleta a partir de ${c.toUpperCase()}`}>
+                <button onClick={() => applyAutoHarmony(c)}
+                  className="w-8 h-8 rounded-lg ring-1 ring-white/10 hover:ring-white/40 hover:scale-110 transition-all relative group"
+                  style={{ background: c }}>
+                  <Wand2 size={10} className="text-white/0 group-hover:text-white/80 transition-all absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                </button>
+              </Tooltip>
+            ))}
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="relative w-8 h-8 rounded-lg overflow-hidden cursor-pointer ring-1 ring-white/10 hover:ring-white/30 transition-all flex-shrink-0">
+              <input type="color" value={accent} onChange={e => applyAutoHarmony(e.target.value)}
+                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
+              <div className="w-full h-full flex items-center justify-center" style={{ background: accent }}>
+                <Wand2 size={12} className="text-white/60" />
+              </div>
+            </label>
+            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Ou escolha qualquer cor personalizada</p>
+          </div>
+          {/* Preview of generated palette */}
+          <div className="p-3 rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))]">
+            <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] mb-2">Paleta gerada</p>
+            <div className="flex gap-1.5 items-center">
+              {[
+                { c: d.bgColor || currentTheme.bg, l: "BG" },
+                { c: d.cardBg || "#13102a", l: "Card" },
+                { c: d.accentColor || currentTheme.accent, l: "Accent" },
+                { c: d.accentColor2 || currentTheme.accent2, l: "Sec" },
+                { c: d.textColor || "#f8f5ff", l: "Text" },
+              ].map((item, i) => (
+                <div key={i} className="flex flex-col items-center gap-1">
+                  <div className="w-6 h-6 rounded-lg ring-1 ring-white/10" style={{ background: item.c }} />
+                  <span className="text-[7px] text-[hsl(var(--dash-text-subtle))]">{item.l}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </SectionCard>
 
       {/* ═══════════ SECTION 1: Theme Presets (quick start) ═══════════ */}
       <SectionCard title="Tema base" icon={<Sliders size={14} />} defaultOpen={true} desc="Escolha um ponto de partida e personalize depois" step={1}>
@@ -899,17 +1263,26 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
           </div>
 
           <div>
-            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mb-1.5">Fonte do título</p>
+            <div className="flex items-center justify-between mb-1.5">
+              <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Fonte do título</p>
+              <Tooltip text="Ao escolher uma fonte de título, a fonte do corpo é pareada automaticamente">
+                <span className="flex items-center gap-1 text-[9px] text-primary/60 font-medium">
+                  <Link2 size={9} /> Auto-pair
+                </span>
+              </Tooltip>
+            </div>
             <div className="grid grid-cols-2 gap-1.5 max-h-[160px] overflow-y-auto pr-1">
               {GOOGLE_FONTS.filter(f => fontFilter === "all" || f.category === fontFilter).map(f => {
                 const isActive = d.fontHeading === f.name;
+                const pairedBody = FONT_PAIRS[f.name];
                 return (
-                  <Tooltip key={f.name} text={`Título: "${f.name}" — ${f.category}`}>
-                    <button onClick={() => { setDesign("fontHeading", f.name); loadFont(f.name); }}
+                  <Tooltip key={f.name} text={`Título: "${f.name}"${pairedBody ? ` → Corpo: "${pairedBody}"` : ""}`}>
+                    <button onClick={() => applyFontPair(f.name)}
                       className={`px-3 py-2 rounded-xl text-left text-[12px] font-medium transition-all w-full ${
                         isActive ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text))] border border-transparent hover:border-primary/20"
                       }`} style={{ fontFamily: `"${f.name}", sans-serif` }}>
                       {f.name}
+                      {pairedBody && <span className="block text-[8px] mt-0.5 opacity-50">→ {pairedBody}</span>}
                     </button>
                   </Tooltip>
                 );
