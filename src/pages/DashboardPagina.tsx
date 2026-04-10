@@ -6,7 +6,7 @@ import {
   MessageCircle, Clock, ChevronDown, ChevronUp, Eye, X, Copy, ExternalLink,
   Sparkles, Calendar, Settings, Layout, GripVertical, AlertCircle,
   TrendingUp, Zap, ArrowRight, CheckCircle2, Circle, Image, Type, Video,
-  Play, Smile, Search, Camera, Minus, MoreHorizontal, Diamond, Waves,
+  Play, Smile, Search, Camera, MoreHorizontal,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import DesignTab from "@/components/DesignTab";
@@ -523,7 +523,7 @@ const ProfileHeroCard = ({ config, onUpdate, onEditProfile, onHealthAction, onCo
 
   const copyLink = () => {
     if (!profileUrl) return;
-    navigator.clipboard.writeText(profileUrl);
+    navigator.clipboard.writeText(profileUrl).catch(() => {});
     setCopied(true);
     onCopyToast?.("Link copiado com sucesso!");
     setTimeout(() => setCopied(false), 2000);
@@ -843,7 +843,7 @@ const DashboardPagina = () => {
   const profileUrl = config.username ? `${window.location.origin}/${config.username.replace(/^@/, "")}` : null;
   const copyLink = () => {
     if (!profileUrl) return;
-    navigator.clipboard.writeText(profileUrl);
+    navigator.clipboard.writeText(profileUrl).catch(() => {});
     setCopied(true);
     showCopyToast("Link copiado com sucesso!");
     setTimeout(() => setCopied(false), 2000);
@@ -1980,7 +1980,7 @@ const DashboardPagina = () => {
                       )}
 
                       {/* Add media buttons — always visible */}
-                      <div className={`grid ${(!productForm.images || productForm.images.length === 0) && !productForm.video ? "grid-cols-3" : "grid-cols-3"} gap-2`}>
+                      <div className="grid grid-cols-3 gap-2">
                         <button onClick={() => productImageInputRef.current?.click()}
                           className="rounded-xl border border-dashed border-[hsl(var(--dash-border))] hover:border-primary/50 bg-[hsl(var(--dash-surface))] hover:bg-primary/5 transition-all py-3 flex flex-col items-center gap-1.5 cursor-pointer group/btn">
                           <div className="w-8 h-8 rounded-lg bg-primary/8 flex items-center justify-center group-hover/btn:bg-primary/15 transition-colors">
@@ -2571,7 +2571,7 @@ const DashboardPagina = () => {
 
                     <div>
                       <label className={labelCls}>Nome</label>
-                      <input type="text" className={inputCls} placeholder="João Silva"
+                      <input type="text" className={inputCls} placeholder="João Silva" maxLength={50} required
                         value={testimonialForm.name}
                         onChange={e => setTestimonialForm(f => ({ ...f, name: e.target.value }))} />
                     </div>
@@ -2977,7 +2977,7 @@ const DashboardPagina = () => {
                         <div className="flex items-center">
                           <span className="flex-shrink-0 rounded-l-xl border border-r-0 border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] text-sm px-3 py-2.5 select-none font-mono">@</span>
                           <input type="text" className={`${inputCls} rounded-l-none`} placeholder="seunome"
-                            value={config.username}
+                            value={config.username} maxLength={30}
                             onChange={e => updateConfig("username", e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))} />
                         </div>
                       </div>
@@ -3091,7 +3091,7 @@ const DashboardPagina = () => {
                   <div className="flex items-center">
                     <span className="flex-shrink-0 rounded-l-xl border border-r-0 border-[hsl(var(--dash-border))] bg-emerald-500/10 text-emerald-600 text-sm font-semibold px-3 py-2.5 select-none">+55</span>
                     <input ref={whatsappInputRef} type="tel" className={`${inputCls} rounded-l-none`} placeholder="11999999999"
-                      value={config.whatsapp}
+                      value={config.whatsapp} maxLength={11}
                       onChange={e => updateConfig("whatsapp", e.target.value.replace(/\D/g, ""))} />
                   </div>
                   <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] leading-relaxed">
@@ -3262,7 +3262,7 @@ const DashboardPagina = () => {
                                 <img src={config.avatarUrl} alt="" className="w-full h-full object-cover" />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center text-[8px] font-bold text-white"
-                                  style={{ background: `linear-gradient(135deg,${pAccent},${pAccent2})` }}>
+                                  style={{ background: pAccent }}>
                                   {(config.displayName || "?")[0]}
                                 </div>
                               )}

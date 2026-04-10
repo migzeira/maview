@@ -654,8 +654,10 @@ const useCountdown = (initialSeconds: number) => {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 };
 
+const countdownSeed = 5400 + Math.floor((Date.now() / 86400000) % 1 * 3600); // fixed per day session
+
 const CountdownBadge = ({ accent }: { accent: string }) => {
-  const time = useCountdown(5400 + Math.floor(Math.random() * 3600)); // 1.5–2.5h
+  const time = useCountdown(countdownSeed);
   return (
     <span
       className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
@@ -684,7 +686,6 @@ const useStagger = (count: number, baseDelay = 180, step = 70) => {
 /* ──────────────────────────────────────────────────────────────── */
 const MiniVideoPlayer = ({ src, accent }: { src: string; accent: string }) => {
   const [playing, setPlaying] = useState(false);
-  const videoRef = useState<HTMLVideoElement | null>(null);
   return (
     <div className="relative w-full aspect-video rounded-xl overflow-hidden cursor-pointer group/vid"
       onClick={() => {
@@ -1009,8 +1010,10 @@ const ProfilePage = () => {
 
   const handleShare = async () => {
     const url = window.location.href;
-    if (navigator.share) { await navigator.share({ title: profile?.displayName, url }); }
-    else { await navigator.clipboard.writeText(url); setCopied(true); setCopyToastVisible(true); setTimeout(() => { setCopied(false); setCopyToastVisible(false); }, 2500); }
+    try {
+      if (navigator.share) { await navigator.share({ title: profile?.displayName, url }); }
+      else { await navigator.clipboard.writeText(url); setCopied(true); setCopyToastVisible(true); setTimeout(() => { setCopied(false); setCopyToastVisible(false); }, 2500); }
+    } catch { /* user cancelled or clipboard failed */ }
   };
 
   /* Loading */
@@ -1116,13 +1119,13 @@ const ProfilePage = () => {
                       borderRadius: profileBorderRadius(rd.profileShape),
                       clipPath: profileClip(rd.profileShape),
                       background: t.accent,
-                    }}>{profile.displayName[0]}</div>
+                    }}>{(profile.displayName || "?")[0]}</div>
               }
             </div>
 
             <h1 className="text-xl font-bold mb-0.5 text-center" style={{ color: t.text, fontFamily: `'${rd.fontHeading}', sans-serif` }}>{profile.displayName}</h1>
-            <p className="text-[13px] font-medium mb-2" style={{ color: t.accent }}>@{profile.username}</p>
-            {profile.bio && <p className="text-[13px] text-center leading-relaxed max-w-[280px] mb-4" style={{ color: t.sub }}>{profile.bio}</p>}
+            <p className="text-[12px] font-medium mb-2" style={{ color: t.accent }}>@{profile.username}</p>
+            {profile.bio && <p className="text-[12.5px] text-center leading-relaxed max-w-[280px] mb-4 line-clamp-3" style={{ color: t.sub }}>{profile.bio}</p>}
 
             {/* Stats */}
             {profile.stats && (
@@ -1157,7 +1160,7 @@ const ProfilePage = () => {
                   ].map(s => (
                     <div key={s.key}
                       className="w-10 h-10 rounded-full flex items-center justify-center"
-                      style={{ background: `${t.accent}08`, border: `1px solid ${t.accent}12`, color: `${t.accent}30` }}>
+                      style={{ background: `${t.accent}10`, border: `1px solid ${t.accent}18`, color: `${t.accent}50` }}>
                       {s.icon}
                     </div>
                   ))
@@ -1235,13 +1238,13 @@ const ProfilePage = () => {
                       >
                         <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center text-2xl flex-shrink-0" style={{ background: `${t.accent}12` }}>
                           {coverImg
-                            ? <img src={coverImg} alt={product.title} className="w-full h-full object-cover" />
+                            ? <img src={coverImg} alt={product.title} className="w-full h-full object-cover" loading="lazy" />
                             : product.emoji
                           }
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                            <p className="text-[13.5px] font-bold leading-snug" style={{ color: t.text }}>{product.title}</p>
+                            <p className="text-[14px] font-bold leading-snug line-clamp-2" style={{ color: t.text }}>{product.title}</p>
                             {product.badge && (
                               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: `${t.accent}22`, color: t.accent, border: `1px solid ${t.accent}30` }}>
                                 {product.badge}
@@ -1258,7 +1261,7 @@ const ProfilePage = () => {
                           {product.description && <p className="text-[11.5px] truncate" style={{ color: t.sub }}>{product.description}</p>}
                           {product.price && (
                             <div className="flex items-center gap-2 mt-1">
-                              <span className="text-[14px] font-extrabold" style={{ color: t.accent }}>{product.price}</span>
+                              <span className="text-[13px] font-bold" style={{ color: t.accent }}>{product.price}</span>
                               {product.originalPrice && <span className="text-[11px] line-through" style={{ color: t.sub }}>{product.originalPrice}</span>}
                             </div>
                           )}
@@ -1313,13 +1316,13 @@ const ProfilePage = () => {
                       ))}
                     </div>
                     {/* Quote */}
-                    <p className="text-[12.5px] leading-relaxed mb-3 italic" style={{ color: t.sub }}>
+                    <p className="text-[13px] leading-relaxed mb-3 italic" style={{ color: t.sub }}>
                       "{item.text}"
                     </p>
                     {/* Screenshot do depoimento real */}
                     {item.screenshotUrl && (
                       <img src={item.screenshotUrl} alt="Print do depoimento"
-                        className="w-full rounded-lg mb-3 object-contain max-h-48 border border-white/10" />
+                        className="w-full rounded-lg mb-3 object-contain max-h-48 border border-white/10" loading="lazy" />
                     )}
                     {/* Author */}
                     <div className="flex items-center gap-2.5">
@@ -1332,7 +1335,7 @@ const ProfilePage = () => {
                         </div>
                       )}
                       <div>
-                        <p className="text-[12px] font-bold leading-none" style={{ color: t.text }}>{item.name}</p>
+                        <p className="text-[13px] font-bold leading-none" style={{ color: t.text }}>{item.name}</p>
                         {item.role && <p className="text-[10.5px] mt-0.5" style={{ color: t.sub }}>{item.role}</p>}
                       </div>
                     </div>
@@ -1354,7 +1357,7 @@ const ProfilePage = () => {
                   const Icon = getIcon(link.icon);
                   return (
                     <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
-                      className="group flex items-center gap-3.5 w-full px-4 py-3.5 font-medium text-[13px] active:scale-[0.98]"
+                      className="group flex items-center gap-3.5 w-full px-4 py-3.5 font-medium text-[13.5px] active:scale-[0.98]"
                       style={{
                         ...buttonStyles(rd), color: t.text,
                         opacity: linkStagger[i] ? 1 : 0,
@@ -1392,7 +1395,7 @@ const ProfilePage = () => {
           }}
         >
           <MessageCircle size={17} className="fill-white" />
-          <span className="text-[12.5px] font-bold">Falar comigo</span>
+          <span className="text-[12.5px] font-bold">Chamar no WhatsApp</span>
         </a>
       )}
 
