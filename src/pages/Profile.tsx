@@ -1279,8 +1279,7 @@ const ProfilePage = () => {
         </div>
       )}
 
-      {/* 🔥 Social Proof Toast */}
-      <SocialProofToast accent={t.accent} products={profile.products} />
+      {/* Social Proof Toast — disabled (too intrusive) */}
 
       {/* Copy toast */}
       <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-2 px-5 py-2.5 rounded-full shadow-lg transition-all duration-300 pointer-events-none ${copyToastVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3"}`}
