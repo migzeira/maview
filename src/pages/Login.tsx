@@ -3,7 +3,7 @@ import {
   Eye, EyeOff, ArrowLeft, Check, X,
   Link2, Star, Zap, ShoppingBag, BarChart3,
   TrendingUp, Users, DollarSign, Sparkles, Timer, Flame,
-  Instagram, Palette, Globe,
+  Instagram, Palette, Globe, Sun, Moon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -85,7 +85,7 @@ const SIGNUP_NOTIFICATIONS = [
 const TestimonialCard = ({ name, role, text, badge, avatar }: {
   name: string; role: string; text: string; badge: string; avatar: string;
 }) => (
-  <div className="flex-shrink-0 w-[280px] bg-white border border-maview-border rounded-2xl p-5 mx-2 shadow-sm hover:shadow-md hover:border-maview-purple/30 transition-all duration-300">
+  <div className="flex-shrink-0 w-[280px] bg-white dark:bg-[hsl(260,30%,9%)] border border-maview-border rounded-2xl p-5 mx-2 shadow-sm hover:shadow-md hover:border-maview-purple/30 dark:shadow-[0_2px_12px_-3px_rgba(124,58,237,0.1)] transition-all duration-300">
     <div className="flex items-start justify-between mb-4">
       <div className="flex items-center gap-0.5">
         {[...Array(5)].map((_, i) => <Star key={i} size={12} className="text-amber-400 fill-amber-400" />)}
@@ -212,6 +212,13 @@ const Login = () => {
     return saved ? parseInt(saved, 10) : Math.floor(Math.random() * 14) + 11;
   });
   const [slotPulse, setSlotPulse] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("maview_dark") === "1");
+
+  // Sync dark mode class
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", darkMode);
+    localStorage.setItem("maview_dark", darkMode ? "1" : "0");
+  }, [darkMode]);
   const slotRef = useRef<HTMLSpanElement>(null);
   const [showExitPopup, setShowExitPopup] = useState(false);
   const [realUserCount, setRealUserCount] = useState<number | null>(null);
@@ -363,12 +370,10 @@ const Login = () => {
     invalid:   <span className="text-amber-600">Mín. 3 caracteres — letras, números e hífen</span>,
   }[usernameStatus];
 
-  const inputClass = "w-full h-11 px-4 rounded-xl bg-white border border-maview-border text-maview-text text-sm placeholder:text-maview-muted/60 outline-none transition-all focus:border-maview-purple focus:ring-2 focus:ring-maview-purple/10 shadow-sm";
+  const inputClass = "w-full h-11 px-4 rounded-xl bg-white dark:bg-[hsl(260,25%,12%)] border border-maview-border dark:border-[hsl(260,20%,18%)] text-maview-text text-sm placeholder:text-maview-muted/60 outline-none transition-all focus:border-maview-purple focus:ring-2 focus:ring-maview-purple/10 shadow-sm dark:shadow-none";
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden" style={{
-      background: "radial-gradient(ellipse at 70% 0%, #ede9fe 0%, #f3f0ff 30%, #f8f5ff 60%, #faf8ff 100%)",
-    }}>
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-[radial-gradient(ellipse_at_70%_0%,#ede9fe_0%,#f3f0ff_30%,#f8f5ff_60%,#faf8ff_100%)] dark:bg-[radial-gradient(ellipse_at_70%_0%,hsl(260,50%,8%)_0%,hsl(260,40%,6%)_30%,hsl(260,45%,4%)_60%,hsl(260,45%,3%)_100%)]">
 
       {/* ── Grid overlay ── */}
       <div className="absolute inset-0 pointer-events-none select-none" style={{
@@ -379,13 +384,22 @@ const Login = () => {
         backgroundSize: "48px 48px",
         maskImage: "radial-gradient(ellipse at 60% 40%, black 20%, transparent 80%)",
       }} />
+      {/* ── Dark mode grid (brighter purple lines) ── */}
+      <div className="absolute inset-0 pointer-events-none select-none hidden dark:block" style={{
+        backgroundImage: `
+          linear-gradient(rgba(124,58,237,0.08) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(124,58,237,0.08) 1px, transparent 1px)
+        `,
+        backgroundSize: "48px 48px",
+        maskImage: "radial-gradient(ellipse at 60% 40%, black 20%, transparent 80%)",
+      }} />
 
       {/* ── Animated wave background ── */}
       <AnimatedWaves />
 
       {/* ── Notification pop-up ── */}
       <div className={`fixed bottom-6 left-6 z-50 transition-all duration-500 ${notification ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"}`}>
-        <div className="flex items-center gap-3 bg-white border border-maview-border rounded-2xl px-4 py-3 shadow-xl shadow-maview-purple/10 max-w-[280px]">
+        <div className="flex items-center gap-3 bg-white dark:bg-[hsl(260,30%,10%)] border border-maview-border rounded-2xl px-4 py-3 shadow-xl shadow-maview-purple/10 dark:shadow-maview-purple/20 max-w-[280px]">
           <img src={notification?.avatar} alt="" className="w-9 h-9 rounded-full object-cover border-2 border-maview-purple/20 flex-shrink-0" />
           <div className="min-w-0">
             <p className="text-maview-text text-xs font-semibold truncate">{notification?.name}</p>
@@ -394,6 +408,15 @@ const Login = () => {
           <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
         </div>
       </div>
+
+      {/* ── Dark mode toggle (top-right) ── */}
+      <button
+        onClick={() => setDarkMode(d => !d)}
+        className="fixed top-4 right-4 z-50 p-2.5 rounded-xl bg-white/80 dark:bg-[hsl(260,30%,12%)]/80 border border-maview-border backdrop-blur-sm hover:bg-white dark:hover:bg-[hsl(260,30%,15%)] transition-all shadow-sm"
+        aria-label={darkMode ? "Modo claro" : "Modo escuro"}
+      >
+        {darkMode ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} className="text-maview-purple" />}
+      </button>
 
       {/* ══════════ SPLIT SECTION ══════════ */}
       <div className="flex flex-1 relative z-10">
@@ -574,7 +597,7 @@ const Login = () => {
 
             {/* ══ VERIFY EMAIL SCREEN ══ */}
             {mode === "verify" && (
-              <div className="bg-white rounded-[24px] border border-maview-border p-8 sm:p-10 shadow-xl shadow-maview-purple/[0.07] text-center relative overflow-hidden">
+              <div className="bg-white dark:bg-[hsl(260,30%,9%)] rounded-[24px] border border-maview-border p-8 sm:p-10 shadow-xl shadow-maview-purple/[0.07] dark:shadow-maview-purple/[0.15] text-center relative overflow-hidden">
                 <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent pointer-events-none" />
 
                 {/* Icon */}
@@ -635,7 +658,7 @@ const Login = () => {
             </div>
 
             {/* Card */}
-            <div className="relative bg-white rounded-[24px] border border-maview-border p-6 sm:p-10 shadow-xl shadow-maview-purple/[0.07] overflow-hidden">
+            <div className="relative bg-white dark:bg-[hsl(260,30%,9%)] rounded-[24px] border border-maview-border p-6 sm:p-10 shadow-xl shadow-maview-purple/[0.07] dark:shadow-maview-purple/[0.15] overflow-hidden">
               {/* Top accent line */}
               <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-transparent via-maview-purple to-transparent pointer-events-none" />
 
@@ -712,7 +735,7 @@ const Login = () => {
                       </div>
                       <input type="text" placeholder="seunome" value={username}
                         onChange={(e) => { setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "")); clearError(); }}
-                        className={`w-full h-11 pl-[108px] pr-10 rounded-xl bg-white border text-maview-text text-sm placeholder:text-maview-muted/50 outline-none transition-all shadow-sm focus:ring-2 ${
+                        className={`w-full h-11 pl-[108px] pr-10 rounded-xl bg-white dark:bg-[hsl(260,25%,12%)] border text-maview-text text-sm placeholder:text-maview-muted/50 outline-none transition-all shadow-sm dark:shadow-none focus:ring-2 ${
                           usernameStatus === "available"
                             ? "border-emerald-400 focus:ring-emerald-100"
                             : usernameStatus === "taken" || usernameStatus === "invalid"
@@ -824,7 +847,7 @@ const Login = () => {
                     <div className="flex-1 h-px bg-maview-border" />
                   </div>
                   <button type="button" onClick={handleGoogle}
-                    className="w-full h-11 rounded-xl bg-white border border-maview-border text-maview-text text-sm font-semibold flex items-center justify-center gap-2.5 transition-all hover:bg-maview-surface hover:border-maview-purple/30 hover:shadow-sm active:scale-[0.98] shadow-sm"
+                    className="w-full h-11 rounded-xl bg-white dark:bg-[hsl(260,25%,12%)] border border-maview-border text-maview-text text-sm font-semibold flex items-center justify-center gap-2.5 transition-all hover:bg-maview-surface hover:border-maview-purple/30 hover:shadow-sm active:scale-[0.98] shadow-sm dark:shadow-none"
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24">
                       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
@@ -850,7 +873,7 @@ const Login = () => {
       </div>
 
       {/* ══════════ STATS BAR ══════════ */}
-      <div className="relative z-10 border-t border-maview-border bg-white">
+      <div className="relative z-10 border-t border-maview-border bg-white dark:bg-[hsl(260,30%,7%)]">
         <div className="max-w-5xl mx-auto px-8 py-6 grid grid-cols-2 lg:grid-cols-4 gap-6">
           {DEFAULT_STATS.map(({ icon: Icon, valueFn, label }) => (
             <div key={label} className="flex items-center gap-3">
@@ -870,7 +893,7 @@ const Login = () => {
       <div className="relative z-10 py-16 border-t border-maview-border bg-maview-surface">
 
         <div className="text-center mb-10 px-6">
-          <div className="inline-flex items-center gap-2 bg-white border border-maview-border rounded-full px-4 py-1.5 mb-4 shadow-sm">
+          <div className="inline-flex items-center gap-2 bg-white dark:bg-[hsl(260,30%,10%)] border border-maview-border rounded-full px-4 py-1.5 mb-4 shadow-sm dark:shadow-none">
             <Star size={12} className="text-amber-400 fill-amber-400" />
             <span className="text-xs font-bold text-maview-purple tracking-wide uppercase">Histórias reais</span>
           </div>
@@ -937,7 +960,7 @@ const Login = () => {
                   ["Google Fonts",        "24+",      "Limitado",   "0"],
                   ["Suporte em PT-BR",    "true",     "false",      "false"],
                 ].map(([feature, maview, linktree, stan], i) => (
-                  <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-maview-surface/50"}>
+                  <tr key={i} className={i % 2 === 0 ? "bg-white dark:bg-[hsl(260,30%,9%)]" : "bg-maview-surface/50"}>
                     <td className="px-4 py-2.5 text-maview-text font-medium text-xs">{feature}</td>
                     <td className="px-4 py-2.5 text-center">
                       {maview === "true" ? <Check size={16} className="mx-auto text-emerald-500" />
@@ -975,7 +998,7 @@ const Login = () => {
       {showExitPopup && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center px-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowExitPopup(false)} />
-          <div className="relative bg-white rounded-3xl shadow-2xl max-w-[380px] w-full p-8 text-center animate-in zoom-in-95 duration-300">
+          <div className="relative bg-white dark:bg-[hsl(260,30%,9%)] rounded-3xl shadow-2xl dark:shadow-[0_8px_40px_-8px_rgba(124,58,237,0.2)] max-w-[380px] w-full p-8 text-center animate-in zoom-in-95 duration-300">
             <button onClick={() => setShowExitPopup(false)} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-maview-surface flex items-center justify-center hover:bg-maview-border transition-colors">
               <X size={16} className="text-maview-muted" />
             </button>
