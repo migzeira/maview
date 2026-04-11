@@ -1,0 +1,2 @@
+Lovable sync trigger — 2026-04-11T23:55:00Z
+This file triggers a Lovable rebuild after GitHub push.
