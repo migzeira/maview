@@ -232,20 +232,6 @@ export async function trackEvent(
     metadata,
   };
 
-  // Use sendBeacon for non-blocking (with fetch fallback)
-  if (navigator.sendBeacon) {
-    // sendBeacon can't set auth headers, so use fetch for authenticated inserts
-    // But events policy allows anonymous inserts, so we can use a direct POST
-    const url = `https://vvpthwzbwvpxddzqucuw.supabase.co/rest/v1/events`;
-    const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
-    const headers = new Headers({
-      "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2cHRod3pid3ZweGRkenF1Y3V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0OTA5NDUsImV4cCI6MjA5MTA2Njk0NX0.Yx44DL_-0dNB0NhkIEowsMZPECp5hP8TyVYDsZG8nYI",
-      "Content-Type": "application/json",
-      "Prefer": "return=minimal",
-    });
-    // sendBeacon doesn't support custom headers, fallback to fetch
-    fetch(url, { method: "POST", headers, body: JSON.stringify(payload), keepalive: true }).catch(() => {});
-  } else {
-    supabase.from("events").insert(payload).then(() => {});
-  }
+  // Use supabase client for non-blocking insert (anon key from client config)
+  supabase.from("events").insert(payload).then(() => {}).catch(() => {});
 }

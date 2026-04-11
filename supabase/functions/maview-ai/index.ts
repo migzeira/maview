@@ -1,9 +1,19 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+const ALLOWED_ORIGINS = [
+  "https://maview.lovable.app",
+  "https://maview.app",
+  "http://localhost:8080",
+];
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("origin") || "";
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  };
+}
 
 const SYSTEM_PROMPT = `Você é a IA Maview, assistente especializado para criadores de conteúdo e empreendedores digitais brasileiros.
 
@@ -23,17 +33,31 @@ Sempre termine com uma dica prática ou próximo passo quando relevante.`;
 serve(async (req) => {
   // CORS preflight
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers: getCorsHeaders(req) });
   }
 
   try {
     const { message, history = [] } = await req.json();
 
+    // Input validation
+    if (!message || typeof message !== "string" || message.length > 5000) {
+      return new Response(
+        JSON.stringify({ text: "Mensagem inválida. Máximo 5000 caracteres." }),
+        { status: 400, headers: { ...getCorsHeaders(req), "Content-Type": "application/json" } }
+      );
+    }
+    if (!Array.isArray(history) || history.length > 10) {
+      return new Response(
+        JSON.stringify({ text: "Histórico inválido." }),
+        { status: 400, headers: { ...getCorsHeaders(req), "Content-Type": "application/json" } }
+      );
+    }
+
     const apiKey = Deno.env.get("OPENAI_API_KEY");
     if (!apiKey) {
       return new Response(
         JSON.stringify({ error: "OPENAI_API_KEY not configured", text: "⚠️ Chave da API OpenAI não configurada. Adicione OPENAI_API_KEY nas variáveis de ambiente do Supabase." }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 200, headers: { ...getCorsHeaders(req), "Content-Type": "application/json" } }
       );
     }
 
@@ -71,14 +95,14 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ text }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { headers: { ...getCorsHeaders(req), "Content-Type": "application/json" } }
     );
 
   } catch (error) {
     console.error("maview-ai error:", error);
     return new Response(
-      JSON.stringify({ text: `Erro ao processar: ${error instanceof Error ? error.message : "Erro desconhecido"}` }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ text: "Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente." }),
+      { status: 500, headers: { ...getCorsHeaders(req), "Content-Type": "application/json" } }
     );
   }
 });

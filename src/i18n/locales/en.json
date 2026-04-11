@@ -1,0 +1,82 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "back": "Back",
+    "next": "Next",
+    "close": "Close",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "search": "Search",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "or": "or"
+  },
+  "auth": {
+    "login": "Sign in",
+    "signup": "Create account",
+    "logout": "Sign out",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "name": "Full name",
+    "username": "Your link",
+    "forgotPassword": "Forgot password?",
+    "resetPassword": "Reset password",
+    "googleLogin": "Continue with Google",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "emailSent": "Email sent! Check your inbox.",
+    "passwordMin": "Minimum 8 characters with letters and numbers",
+    "usernameAvailable": "is available!",
+    "usernameTaken": "Already in use",
+    "usernameInvalid": "Min. 3 characters — letters, numbers and hyphens"
+  },
+  "dashboard": {
+    "home": "Home",
+    "myVitrine": "My Vitrine",
+    "analytics": "Analytics",
+    "ai": "AI Maview",
+    "settings": "Settings",
+    "appearance": "Appearance",
+    "monetization": "Monetization",
+    "products": "Products",
+    "sales": "Sales",
+    "audience": "Audience",
+    "automations": "Automations",
+    "blocks": "Blocks"
+  },
+  "vitrine": {
+    "addLink": "Add link",
+    "addProduct": "Add product",
+    "noLinks": "No links yet. Add your first!",
+    "noProducts": "No products yet.",
+    "preview": "Preview",
+    "publish": "Publish",
+    "share": "Share",
+    "copyLink": "Copy link",
+    "qrCode": "QR Code"
+  },
+  "settings": {
+    "profile": "Profile",
+    "domain": "Custom domain",
+    "integrations": "Integrations",
+    "notifications": "Notifications",
+    "newSale": "New sale",
+    "newLead": "New lead",
+    "dailySummary": "Daily visit summary",
+    "weeklyEmail": "Weekly performance email"
+  },
+  "errors": {
+    "generic": "An error occurred. Try again.",
+    "network": "Connection error. Check your internet.",
+    "unauthorized": "Session expired. Please sign in again.",
+    "somethingWrong": "Something went wrong",
+    "reload": "Reload page"
+  }
+}

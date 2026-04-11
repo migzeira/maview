@@ -318,7 +318,7 @@ const Login = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault(); setIsLoading(true); clearError();
     if (password !== confirmPassword) { setError("As senhas não coincidem."); setIsLoading(false); return; }
-    if (password.length < 6) { setError("Mínimo 6 caracteres."); setIsLoading(false); return; }
+    if (password.length < 8) { setError("Mínimo 8 caracteres com letras e números."); setIsLoading(false); return; }
     if (!isValidUsername(username)) { setError("Link inválido."); setIsLoading(false); return; }
     const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name, username }, emailRedirectTo: `${window.location.origin}/dashboard` } });
     if (error) setError(error.message === "User already registered" ? "Este email já está cadastrado." : error.message);

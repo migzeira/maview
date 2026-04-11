@@ -1,7 +1,11 @@
 import { describe, it, expect } from "vitest";
 
-describe("example", () => {
-  it("should pass", () => {
+describe("Maview", () => {
+  it("project name is defined", () => {
+    expect("Maview").toBeTruthy();
+  });
+
+  it("environment is test", () => {
     expect(true).toBe(true);
   });
 });
