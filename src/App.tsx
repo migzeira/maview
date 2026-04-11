@@ -82,7 +82,7 @@ const App = () => (
             <Route path="/dashboard/blocos" element={<DashboardPage><DashboardBlocos /></DashboardPage>} />
             <Route path="/dashboard/ia" element={<DashboardPage><DashboardIA /></DashboardPage>} />
             <Route path="/:username" element={<ProfilePage />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL \"*\" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
