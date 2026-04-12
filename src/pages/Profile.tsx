@@ -8,7 +8,10 @@ import {
 } from "lucide-react";
 
 import logoSrc from "@/assets/maview-logo.png";
-import { fetchByUsername, trackEvent } from "@/lib/vitrine-sync";
+import { fetchByUsername, trackEvent, submitLead } from "@/lib/vitrine-sync";
+import { Mail } from "lucide-react";
+import PixCheckoutModal from "@/components/PixCheckoutModal";
+import MercadoPagoCheckout from "@/components/MercadoPagoCheckout";
 
 /* ─── Types ───────────────────────────────────────────────────── */
 type ThemeId = "dark-purple" | "midnight" | "forest" | "rose" | "amber" | "ocean"
@@ -1362,6 +1365,12 @@ const ProfilePage = () => {
   const [copyToastVisible, setCopyToastVisible] = useState(false);
   const [heroVis, setHeroVis]   = useState(false);
   const [bookingProduct, setBookingProduct] = useState<ProductItem | null>(null);
+  const [pixCheckoutProduct, setPixCheckoutProduct] = useState<ProductItem | null>(null);
+
+  /* Email capture */
+  const [captureEmail, setCaptureEmail] = useState("");
+  const [emailCaptured, setEmailCaptured] = useState(false);
+  const [emailSubmitting, setEmailSubmitting] = useState(false);
 
   const productStagger     = useStagger(10, 220, 80);
   const linkStagger        = useStagger(10, 380, 55);
@@ -1480,6 +1489,95 @@ const ProfilePage = () => {
     }
     return () => { document.title = "Maview — Sua vitrine digital"; };
   }, [profile]);
+
+  /* ── Inject GA + Meta Pixel tracking scripts ── */
+  useEffect(() => {
+    if (!profile?.design) return;
+    const d = profile.design as any;
+    // Google Analytics
+    if (d.gaId && typeof d.gaId === "string" && d.gaId.startsWith("G-")) {
+      const existing = document.querySelector(`script[src*="gtag/js?id=${d.gaId}"]`);
+      if (!existing) {
+        const s = document.createElement("script");
+        s.async = true;
+        s.src = `https://www.googletagmanager.com/gtag/js?id=${d.gaId}`;
+        document.head.appendChild(s);
+        const s2 = document.createElement("script");
+        s2.textContent = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${d.gaId}');`;
+        document.head.appendChild(s2);
+      }
+    }
+    // Meta Pixel
+    if (d.metaPixelId && typeof d.metaPixelId === "string") {
+      const existing = document.querySelector('script[data-meta-pixel]');
+      if (!existing) {
+        const s = document.createElement("script");
+        s.setAttribute("data-meta-pixel", "true");
+        s.textContent = `!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${d.metaPixelId}');fbq('track','PageView');`;
+        document.head.appendChild(s);
+      }
+    }
+  }, [profile?.design]);
+
+  /* ── Dynamic JSON-LD structured data ── */
+  useEffect(() => {
+    if (!profile) return;
+    const existing = document.querySelector('script[data-maview-jsonld]');
+    if (existing) existing.remove();
+
+    const personSchema: any = {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": profile.displayName || profile.username,
+      "url": `https://maview.lovable.app/${profile.username}`,
+      "description": profile.bio || "",
+    };
+    if (profile.avatar) personSchema.image = profile.avatar;
+
+    const schemas: any[] = [personSchema];
+
+    if (profile.products && profile.products.length > 0) {
+      profile.products.forEach((p: any) => {
+        if (!p.price) return;
+        const priceNum = String(p.price).replace(/[^\d.,]/g, "").replace(",", ".");
+        schemas.push({
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": p.title,
+          "description": p.description || p.title,
+          "image": p.images?.[0] || p.imageUrl || "",
+          "offers": {
+            "@type": "Offer",
+            "price": priceNum,
+            "priceCurrency": "BRL",
+            "availability": "https://schema.org/InStock",
+            "seller": { "@type": "Person", "name": profile.displayName || profile.username },
+          },
+        });
+      });
+    }
+
+    const s = document.createElement("script");
+    s.type = "application/ld+json";
+    s.setAttribute("data-maview-jsonld", "true");
+    s.textContent = JSON.stringify(schemas);
+    document.head.appendChild(s);
+
+    return () => { s.remove(); };
+  }, [profile]);
+
+  /* ── Email capture handler ── */
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!captureEmail || !profile?.username) return;
+    setEmailSubmitting(true);
+    const ok = await submitLead(profile.username, captureEmail);
+    setEmailSubmitting(false);
+    if (ok) {
+      setEmailCaptured(true);
+      trackEvent(profile.username, "lead_capture", { email: captureEmail });
+    }
+  };
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -1675,15 +1773,26 @@ const ProfilePage = () => {
                   const bookingUsesModal = isBooking && (bookingChannel === "whatsapp" || bookingChannel === "google");
                   const bookingDirectUrl = isBooking && (bookingChannel === "calendly" || bookingChannel === "external") ? product.bookingUrl : undefined;
 
-                  const handleClick = bookingUsesModal
+                  // Payment checkout: MP token (real payments) or PIX key (QR fallback)
+                  const designAny = profile.design as any;
+                  const hasMpToken = !!(designAny?.mercadoPagoToken);
+                  const hasPixKey = !!(designAny?.pixKey);
+                  const isPixEligible = !isBooking && !isNone && (hasMpToken || hasPixKey) && product.price;
+
+                  const handleClick = isPixEligible
+                    ? (e: React.MouseEvent) => { e.preventDefault(); setPixCheckoutProduct(product); trackEvent(profile.username, "click_product", { productId: product.id, title: product.title }); }
+                    : bookingUsesModal
                     ? (e: React.MouseEvent) => { e.preventDefault(); setBookingProduct(product); }
                     : undefined;
 
-                  const Wrapper = (isNone && !isBooking) ? "div"
+                  const Wrapper = isPixEligible ? "button"
+                    : (isNone && !isBooking) ? "div"
                     : bookingUsesModal ? "button"
                     : bookingDirectUrl ? "a"
                     : isBooking ? "div" : "a";
-                  const wrapperProps = bookingUsesModal
+                  const wrapperProps = isPixEligible
+                    ? { onClick: handleClick }
+                    : bookingUsesModal
                     ? { onClick: handleClick }
                     : bookingDirectUrl
                       ? { href: bookingDirectUrl, target: "_blank", rel: "noopener noreferrer" }
@@ -1917,6 +2026,76 @@ const ProfilePage = () => {
           onClose={() => setBookingProduct(null)}
         />
       )}
+
+      {/* ── Email Capture Form ── */}
+      {!emailCaptured && (
+        <div className="relative z-10 max-w-md mx-auto px-4 pb-6">
+          <form onSubmit={handleEmailSubmit}
+            className="flex gap-2 p-1.5 rounded-2xl"
+            style={{ background: t.card, border: `1px solid ${t.border}` }}
+          >
+            <div className="flex items-center gap-2 flex-1 pl-3">
+              <Mail size={16} style={{ color: t.sub, opacity: 0.6 }} />
+              <input
+                type="email"
+                required
+                placeholder="Seu melhor email"
+                value={captureEmail}
+                onChange={e => setCaptureEmail(e.target.value)}
+                className="flex-1 bg-transparent text-sm outline-none placeholder:opacity-50"
+                style={{ color: t.text }}
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={emailSubmitting}
+              className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.97] disabled:opacity-50"
+              style={{ background: `linear-gradient(135deg, ${t.accent}, ${t.accent2 || t.accent})` }}
+            >
+              {emailSubmitting ? "..." : "Inscrever"}
+            </button>
+          </form>
+        </div>
+      )}
+      {emailCaptured && (
+        <div className="relative z-10 max-w-md mx-auto px-4 pb-6">
+          <div className="flex items-center justify-center gap-2 p-4 rounded-2xl"
+            style={{ background: t.card, border: `1px solid ${t.border}` }}>
+            <Check size={16} style={{ color: "#10b981" }} />
+            <span className="text-sm font-medium" style={{ color: t.text }}>Email cadastrado com sucesso!</span>
+          </div>
+        </div>
+      )}
+
+      {/* ── Payment Checkout Modal ── */}
+      {pixCheckoutProduct && (profile.design as any)?.mercadoPagoToken ? (
+        <MercadoPagoCheckout
+          product={pixCheckoutProduct}
+          sellerAccessToken={(profile.design as any).mercadoPagoToken}
+          accent={t.accent}
+          accent2={t.accent2}
+          bg={t.bg}
+          card={t.card}
+          text={t.text}
+          sub={t.sub}
+          border={t.border}
+          onClose={() => setPixCheckoutProduct(null)}
+        />
+      ) : pixCheckoutProduct && (profile.design as any)?.pixKey ? (
+        <PixCheckoutModal
+          product={pixCheckoutProduct}
+          pixKey={(profile.design as any).pixKey}
+          sellerName={profile.displayName || profile.username}
+          accent={t.accent}
+          accent2={t.accent2}
+          bg={t.bg}
+          card={t.card}
+          text={t.text}
+          sub={t.sub}
+          border={t.border}
+          onClose={() => setPixCheckoutProduct(null)}
+        />
+      ) : null}
 
       {/* ── CTA flutuante — viral loop (visitantes nao logados) ── */}
       {!rd.hideWatermark && (

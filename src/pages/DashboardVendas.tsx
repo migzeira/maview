@@ -1,147 +1,210 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   DollarSign, TrendingUp, ShoppingCart, Package,
-  ArrowUpRight, ArrowDownRight, Filter, Download,
-  Calendar, CreditCard,
+  Filter, Download, CreditCard, Calendar,
 } from "lucide-react";
+import { fetchOrders, type Order } from "@/lib/vitrine-sync";
 
-interface Order {
-  id: string;
-  product: string;
-  customer: string;
-  email: string;
-  amount: string;
-  status: "pago" | "pendente" | "reembolsado";
-  date: string;
-  method: string;
+type StatusFilter = "todas" | "approved" | "pending" | "rejected";
+type PeriodFilter = "7d" | "30d" | "90d";
+
+const STATUS_LABEL: Record<string, string> = {
+  approved: "Aprovado",
+  pending: "Pendente",
+  rejected: "Rejeitado",
+};
+
+const STATUS_STYLE: Record<string, string> = {
+  approved: "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100",
+  pending: "bg-amber-50 text-amber-600 ring-1 ring-amber-100",
+  rejected: "bg-red-50 text-red-500 ring-1 ring-red-100",
+};
+
+const METHOD_LABEL: Record<string, string> = {
+  pix: "PIX",
+  credit_card: "Cartão",
+  boleto: "Boleto",
+};
+
+const PERIOD_LABEL: Record<PeriodFilter, string> = {
+  "7d": "7 dias",
+  "30d": "30 dias",
+  "90d": "90 dias",
+};
+
+const PERIOD_MS: Record<PeriodFilter, number> = {
+  "7d": 7 * 86400000,
+  "30d": 30 * 86400000,
+  "90d": 90 * 86400000,
+};
+
+function formatBRL(cents: number): string {
+  return (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-const SAMPLE_ORDERS: Order[] = [
-  { id: "MV-001", product: "Ebook: Guia do Criador", customer: "Maria Silva", email: "maria@email.com", amount: "R$ 29,90", status: "pago", date: "Hoje, 14:32", method: "Pix" },
-  { id: "MV-002", product: "Template Notion", customer: "João Santos", email: "joao@email.com", amount: "R$ 19,90", status: "pago", date: "Hoje, 11:05", method: "Cartão" },
-  { id: "MV-003", product: "Curso Instagram Pro", customer: "Ana Costa", email: "ana@email.com", amount: "R$ 97,00", status: "pendente", date: "Ontem, 20:18", method: "Pix" },
-  { id: "MV-004", product: "Ebook: Guia do Criador", customer: "Pedro Lima", email: "pedro@email.com", amount: "R$ 29,90", status: "reembolsado", date: "2 dias atrás", method: "Cartão" },
-];
-
-const STATS = [
-  { label: "Receita total", value: "R$ 1.247,00", change: "+12%", up: true, icon: DollarSign, accent: "emerald" },
-  { label: "Vendas do mês", value: "34", change: "+8%", up: true, icon: ShoppingCart, accent: "blue" },
-  { label: "Ticket médio", value: "R$ 36,67", change: "+3%", up: true, icon: TrendingUp, accent: "amber" },
-  { label: "Pedidos pendentes", value: "2", change: "", up: false, icon: Package, accent: "purple" },
-];
-
-const accentMap: Record<string, { icon: string; bg: string; ring: string }> = {
-  emerald: { icon: "text-emerald-600", bg: "bg-emerald-50", ring: "ring-emerald-100" },
-  blue: { icon: "text-blue-600", bg: "bg-blue-50", ring: "ring-blue-100" },
-  amber: { icon: "text-amber-600", bg: "bg-amber-50", ring: "ring-amber-100" },
-  purple: { icon: "text-primary", bg: "bg-[hsl(var(--dash-accent))]", ring: "ring-primary/10" },
-};
-
-const statusStyles: Record<string, string> = {
-  pago: "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100",
-  pendente: "bg-amber-50 text-amber-600 ring-1 ring-amber-100",
-  reembolsado: "bg-red-50 text-red-500 ring-1 ring-red-100",
-};
+function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "Agora";
+  if (mins < 60) return `${mins}min`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h atrás`;
+  const days = Math.floor(hrs / 24);
+  return days === 1 ? "Ontem" : `${days}d atrás`;
+}
 
 const DashboardVendas = () => {
-  const [filter, setFilter] = useState<"todas" | "pago" | "pendente" | "reembolsado">("todas");
-  const filtered = filter === "todas" ? SAMPLE_ORDERS : SAMPLE_ORDERS.filter(o => o.status === filter);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("todas");
+  const [periodFilter, setPeriodFilter] = useState<PeriodFilter>("30d");
+
+  useEffect(() => { loadData(); }, []);
+
+  async function loadData() {
+    setLoading(true);
+    const data = await fetchOrders();
+    setOrders(data);
+    setLoading(false);
+  }
+
+  // Derived data
+  const periodOrders = useMemo(() => {
+    const cutoff = Date.now() - PERIOD_MS[periodFilter];
+    return orders.filter(o => new Date(o.created_at).getTime() >= cutoff);
+  }, [orders, periodFilter]);
+
+  const filteredOrders = useMemo(() => {
+    if (statusFilter === "todas") return periodOrders;
+    return periodOrders.filter(o => o.payment_status === statusFilter);
+  }, [periodOrders, statusFilter]);
+
+  const approved = useMemo(() => orders.filter(o => o.payment_status === "approved"), [orders]);
+  const totalReceita = useMemo(() => approved.reduce((s, o) => s + o.amount, 0), [approved]);
+  const ticketMedio = approved.length > 0 ? totalReceita / approved.length : 0;
+  const last7 = useMemo(() => {
+    const cutoff = Date.now() - 7 * 86400000;
+    return approved.filter(o => new Date(o.created_at).getTime() >= cutoff).length;
+  }, [approved]);
+
+  const stats = [
+    { label: "Total vendas", value: approved.length, icon: ShoppingCart, color: "text-emerald-600", bg: "bg-emerald-50", ring: "ring-emerald-100" },
+    { label: "Receita total", value: formatBRL(totalReceita), icon: DollarSign, color: "text-primary", bg: "bg-[hsl(var(--dash-accent))]", ring: "ring-primary/10" },
+    { label: "Ticket médio", value: formatBRL(ticketMedio), icon: TrendingUp, color: "text-amber-600", bg: "bg-amber-50", ring: "ring-amber-100" },
+    { label: "Últimos 7 dias", value: last7, icon: Package, color: "text-blue-600", bg: "bg-blue-50", ring: "ring-blue-100" },
+  ];
+
+  const handleExportCSV = () => {
+    if (!filteredOrders.length) return;
+    const csv = "Produto,Valor,Status,Método,Comprador,Email,Data\n" + filteredOrders.map(o =>
+      `"${o.product_title}",${(o.amount / 100).toFixed(2)},${STATUS_LABEL[o.payment_status] || o.payment_status},${METHOD_LABEL[o.payment_method || ""] || o.payment_method || ""},${o.buyer_name || ""},${o.buyer_email || ""},${new Date(o.created_at).toLocaleDateString("pt-BR")}`
+    ).join("\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    a.download = `maview-vendas-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+  };
 
   return (
     <div className="max-w-[1100px] mx-auto px-4 md:px-8 py-8 md:py-10 space-y-8">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="space-y-1.5">
           <h1 className="text-2xl md:text-[28px] font-bold text-[hsl(var(--dash-text))] tracking-tight">Vendas</h1>
           <p className="text-[hsl(var(--dash-text-muted))] text-[15px]">Acompanhe suas receitas e pedidos</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 text-[13px] text-[hsl(var(--dash-text-secondary))] font-medium transition-all">
-          <Download size={14} /> Exportar
-        </button>
+        {filteredOrders.length > 0 && (
+          <button onClick={handleExportCSV} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 text-[13px] text-[hsl(var(--dash-text-secondary))] font-medium transition-all">
+            <Download size={14} /> Exportar CSV
+          </button>
+        )}
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-        {STATS.map(({ label, value, change, up, icon: Icon, accent }) => {
-          const a = accentMap[accent];
-          return (
-            <div key={label} className="glass-card-hover rounded-2xl p-5 md:p-6">
-              <div className={`w-10 h-10 rounded-xl ${a.bg} ring-1 ${a.ring} flex items-center justify-center mb-4`}>
-                <Icon size={18} className={a.icon} />
-              </div>
-              <p className="text-[26px] font-bold text-[hsl(var(--dash-text))] tracking-tight leading-none">{value}</p>
-              <div className="flex items-center gap-2 mt-1.5">
-                <p className="text-[13px] text-[hsl(var(--dash-text-muted))]">{label}</p>
-                {change && (
-                  <span className={`text-xs font-medium flex items-center gap-0.5 ${up ? "text-emerald-600" : "text-red-500"}`}>
-                    {up ? <ArrowUpRight size={11} /> : <ArrowDownRight size={11} />} {change}
-                  </span>
-                )}
-              </div>
+        {stats.map(({ label, value, icon: Icon, color, bg, ring }) => (
+          <div key={label} className={`glass-card-hover rounded-2xl p-5 md:p-6 ${loading ? "animate-pulse" : ""}`}>
+            <div className={`w-10 h-10 rounded-xl ${bg} ring-1 ${ring} flex items-center justify-center mb-4`}>
+              <Icon size={18} className={color} />
             </div>
-          );
-        })}
-      </div>
-
-      {/* Revenue chart placeholder */}
-      <div className="glass-card rounded-2xl p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-[hsl(var(--dash-text))] font-semibold text-[15px]">Receita mensal</h2>
-          <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[hsl(var(--dash-surface-2))] text-xs text-[hsl(var(--dash-text-muted))] font-medium">
-              <Calendar size={12} /> Últimos 30 dias
-            </button>
+            <p className="text-[26px] font-bold text-[hsl(var(--dash-text))] tracking-tight leading-none">{loading ? "—" : value}</p>
+            <p className="text-[13px] text-[hsl(var(--dash-text-muted))] mt-1.5">{label}</p>
           </div>
-        </div>
-        <div className="h-48 flex items-center justify-center rounded-xl bg-[hsl(var(--dash-surface-2))] border border-dashed border-[hsl(var(--dash-border))]">
-          <div className="text-center">
-            <TrendingUp size={32} className="mx-auto mb-2 text-primary/20" />
-            <p className="text-[hsl(var(--dash-text-subtle))] text-sm">Gráfico de receita disponível em breve</p>
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* Orders table */}
       <div className="glass-card rounded-2xl overflow-hidden">
-        <div className="flex items-center justify-between p-5 border-b border-[hsl(var(--dash-border-subtle))]">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-5 border-b border-[hsl(var(--dash-border-subtle))]">
           <h2 className="text-[hsl(var(--dash-text))] font-semibold text-[15px]">Pedidos recentes</h2>
-          <div className="flex items-center gap-1.5">
-            <Filter size={13} className="text-[hsl(var(--dash-text-subtle))]" />
-            {(["todas", "pago", "pendente", "reembolsado"] as const).map(f => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  filter === f
-                    ? "bg-[hsl(var(--dash-accent))] text-primary"
-                    : "text-[hsl(var(--dash-text-subtle))] hover:bg-[hsl(var(--dash-surface-2))]"
-                }`}
-              >
-                {f.charAt(0).toUpperCase() + f.slice(1)}
-              </button>
-            ))}
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Period filter */}
+            <div className="flex items-center gap-1.5">
+              <Calendar size={13} className="text-[hsl(var(--dash-text-subtle))]" />
+              {(Object.keys(PERIOD_LABEL) as PeriodFilter[]).map(p => (
+                <button
+                  key={p}
+                  onClick={() => setPeriodFilter(p)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    periodFilter === p
+                      ? "bg-[hsl(var(--dash-accent))] text-primary"
+                      : "text-[hsl(var(--dash-text-subtle))] hover:bg-[hsl(var(--dash-surface-2))]"
+                  }`}
+                >
+                  {PERIOD_LABEL[p]}
+                </button>
+              ))}
+            </div>
+            {/* Status filter */}
+            <div className="flex items-center gap-1.5">
+              <Filter size={13} className="text-[hsl(var(--dash-text-subtle))]" />
+              {(["todas", "approved", "pending", "rejected"] as const).map(f => (
+                <button
+                  key={f}
+                  onClick={() => setStatusFilter(f)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    statusFilter === f
+                      ? "bg-[hsl(var(--dash-accent))] text-primary"
+                      : "text-[hsl(var(--dash-text-subtle))] hover:bg-[hsl(var(--dash-surface-2))]"
+                  }`}
+                >
+                  {f === "todas" ? "Todas" : STATUS_LABEL[f]}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="divide-y divide-[hsl(var(--dash-border-subtle))]">
-          {filtered.map(order => (
-            <div key={order.id} className="flex items-center gap-4 px-5 py-4 hover:bg-[hsl(var(--dash-surface-2))]/50 transition-colors">
-              <div className="w-9 h-9 rounded-xl bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center flex-shrink-0">
-                <CreditCard size={15} className="text-primary" />
+        {filteredOrders.length === 0 && !loading ? (
+          <div className="p-12 text-center">
+            <ShoppingCart size={36} className="mx-auto mb-3 text-primary/20" />
+            <p className="text-[hsl(var(--dash-text-subtle))] text-sm font-medium">Nenhuma venda ainda</p>
+            <p className="text-[hsl(var(--dash-text-subtle))] text-xs mt-1">Suas vendas aparecerão aqui quando começarem a chegar</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-[hsl(var(--dash-border-subtle))]">
+            {filteredOrders.map(order => (
+              <div key={order.id} className="flex items-center gap-4 px-5 py-4 hover:bg-[hsl(var(--dash-surface-2))]/50 transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center flex-shrink-0">
+                  <CreditCard size={15} className="text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[hsl(var(--dash-text))] text-[13px] font-medium truncate">{order.product_title}</p>
+                  <p className="text-[hsl(var(--dash-text-subtle))] text-xs mt-0.5">
+                    {order.buyer_name || order.buyer_email || "—"} · {METHOD_LABEL[order.payment_method || ""] || order.payment_method || "—"}
+                  </p>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <p className="text-[hsl(var(--dash-text))] text-sm font-semibold tabular-nums">{formatBRL(order.amount)}</p>
+                  <p className="text-[hsl(var(--dash-text-subtle))] text-xs mt-0.5">{timeAgo(order.created_at)}</p>
+                </div>
+                <span className={`text-xs px-2.5 py-1 rounded-full font-medium flex-shrink-0 ${STATUS_STYLE[order.payment_status] || "bg-gray-50 text-gray-500 ring-1 ring-gray-100"}`}>
+                  {STATUS_LABEL[order.payment_status] || order.payment_status}
+                </span>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[hsl(var(--dash-text))] text-[13px] font-medium truncate">{order.product}</p>
-                <p className="text-[hsl(var(--dash-text-subtle))] text-xs mt-0.5">{order.customer} · {order.method}</p>
-              </div>
-              <div className="text-right flex-shrink-0">
-                <p className="text-[hsl(var(--dash-text))] text-sm font-semibold tabular-nums">{order.amount}</p>
-                <p className="text-[hsl(var(--dash-text-subtle))] text-xs mt-0.5">{order.date}</p>
-              </div>
-              <span className={`text-xs px-2.5 py-1 rounded-full font-medium flex-shrink-0 ${statusStyles[order.status]}`}>
-                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-              </span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

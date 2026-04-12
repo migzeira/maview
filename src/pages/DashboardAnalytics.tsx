@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { Eye, MousePointer, TrendingUp, Smartphone, Monitor, Globe, ArrowUpRight, ArrowDownRight, Minus, Calendar } from "lucide-react";
+import { Eye, MousePointer, TrendingUp, Smartphone, Monitor, Globe, ArrowUpRight, ArrowDownRight, Minus, Calendar, Download } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, BarChart, Bar } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -175,6 +175,21 @@ const DashboardAnalytics = () => {
     <div className={`skeleton ${className}`} />
   );
 
+  const handleExportCSV = () => {
+    if (!events.length) return;
+    const header = "Tipo,Data,Referrer,Device,Metadata\n";
+    const rows = events.map(e =>
+      `${e.event_type},${new Date(e.created_at).toLocaleString("pt-BR")},${e.referrer || ""},${e.device || ""},${JSON.stringify(e.metadata || {}).replace(/,/g, ";")}`
+    ).join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `maview-analytics-${period}-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const PERIODS: { id: Period; label: string }[] = [
     { id: "7d", label: "7 dias" },
     { id: "30d", label: "30 dias" },
@@ -189,7 +204,15 @@ const DashboardAnalytics = () => {
           <h1 className="text-2xl md:text-[28px] font-bold text-[hsl(var(--dash-text))] tracking-tight">Analytics</h1>
           <p className="text-[hsl(var(--dash-text-muted))] text-[14px]">Acompanhe o desempenho da sua vitrine</p>
         </div>
-        {/* Period selector */}
+        {/* Period selector + Export */}
+        <div className="flex items-center gap-2">
+        <button
+          onClick={handleExportCSV}
+          disabled={!events.length}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text-secondary))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 disabled:opacity-40"
+        >
+          <Download size={12} /> CSV
+        </button>
         <div className="flex items-center gap-1 p-1 glass-card rounded-xl">
           {PERIODS.map(p => (
             <button key={p.id} onClick={() => setPeriod(p.id)}
@@ -201,6 +224,7 @@ const DashboardAnalytics = () => {
               {p.label}
             </button>
           ))}
+        </div>
         </div>
       </div>
 

@@ -3,19 +3,13 @@ import {
   Settings, User, Globe, Link2, Bell, Shield, Check, Save,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { saveWithSync, loadLocal } from "@/lib/vitrine-sync";
 
 const TABS = [
   { id: "perfil",       label: "Perfil",       icon: User     },
   { id: "dominio",      label: "Domínio",       icon: Globe    },
   { id: "integracoes",  label: "Integrações",   icon: Link2    },
   { id: "notificacoes", label: "Notificações",  icon: Bell     },
-];
-
-const INTEGRATIONS = [
-  { name: "Stripe",            desc: "Pagamentos e assinaturas",         connected: false },
-  { name: "Google Analytics",  desc: "Métricas avançadas",               connected: false },
-  { name: "Pixel do Facebook", desc: "Rastreamento de conversões",        connected: false },
-  { name: "Webhook",           desc: "Integre com qualquer ferramenta",  connected: false },
 ];
 
 const LS_KEY = "maview_vitrine_config";
@@ -40,6 +34,14 @@ const DashboardConfiguracoes = () => {
   const [saving, setSaving]           = useState(false);
   const [saved, setSaved]             = useState(false);
 
+  /* ── Integration state ── */
+  const [gaId, setGaId] = useState("");
+  const [metaPixelId, setMetaPixelId] = useState("");
+  const [webhookUrl, setWebhookUrl] = useState("");
+  const [pixKey, setPixKey] = useState("");
+  const [mpToken, setMpToken] = useState("");
+  const [integSaved, setIntegSaved] = useState("");
+
   /* ── Notif toggles ── */
   const [notifs, setNotifs] = useState({
     venda: true, lead: true, visitas: false, email: false,
@@ -52,6 +54,13 @@ const DashboardConfiguracoes = () => {
     if (cfg.username)    setUsername(cfg.username);
     if (cfg.bio)         setBio(cfg.bio);
     if (cfg.avatarUrl)   setAvatarUrl(cfg.avatarUrl);
+
+    const design = (cfg.design || {}) as Record<string, unknown>;
+    if (design.gaId) setGaId(design.gaId as string);
+    if (design.metaPixelId) setMetaPixelId(design.metaPixelId as string);
+    if (design.webhookUrl) setWebhookUrl(design.webhookUrl as string);
+    if (design.pixKey) setPixKey(design.pixKey as string);
+    if (design.mercadoPagoToken) setMpToken(design.mercadoPagoToken as string);
 
     // Load email from Supabase session
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -81,6 +90,17 @@ const DashboardConfiguracoes = () => {
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2200);
+  };
+
+  const saveIntegration = (key: string, value: string) => {
+    const cfg = loadVitrine();
+    const design = (cfg.design || {}) as Record<string, unknown>;
+    design[key] = value;
+    cfg.design = design;
+    saveVitrine(cfg);
+    saveWithSync(cfg);
+    setIntegSaved(key);
+    setTimeout(() => setIntegSaved(""), 2000);
   };
 
   const initials = displayName
@@ -228,23 +248,36 @@ const DashboardConfiguracoes = () => {
 
       {/* ── INTEGRAÇÕES ── */}
       {activeTab === "integracoes" && (
-        <div className="space-y-2">
-          {INTEGRATIONS.map(int => (
-            <div key={int.name} className="glass-card-hover flex items-center gap-4 rounded-2xl p-5">
-              <div className="w-10 h-10 rounded-xl bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center flex-shrink-0">
-                <Link2 size={16} className="text-primary" />
+        <div className="space-y-3">
+          {[
+            { key: "gaId", label: "Google Analytics", desc: "Métricas avançadas de visitantes", placeholder: "G-XXXXXXXXXX", value: gaId, set: setGaId },
+            { key: "metaPixelId", label: "Meta Pixel (Facebook)", desc: "Rastreamento de conversões do Facebook/Instagram Ads", placeholder: "123456789012345", value: metaPixelId, set: setMetaPixelId },
+            { key: "webhookUrl", label: "Webhook", desc: "Receba notificações em tempo real", placeholder: "https://seu-webhook.com/api", value: webhookUrl, set: setWebhookUrl },
+            { key: "pixKey", label: "Chave PIX", desc: "Receba pagamentos via PIX na vitrine", placeholder: "email@exemplo.com, CPF ou telefone", value: pixKey, set: setPixKey },
+            { key: "mercadoPagoToken", label: "Mercado Pago Access Token", desc: "Pagamentos reais via PIX e cartao pelo Mercado Pago", placeholder: "APP_USR-...", value: mpToken, set: setMpToken },
+          ].map(({ key, label, desc, placeholder, value, set }) => (
+            <div key={key} className="glass-card-hover rounded-2xl p-5">
+              <div className="flex items-center gap-4 mb-3">
+                <div className="w-10 h-10 rounded-xl bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Link2 size={16} className="text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-[hsl(var(--dash-text))] text-[13px] font-medium">{label}</p>
+                  <p className="text-[hsl(var(--dash-text-subtle))] text-xs">{desc}</p>
+                </div>
+                {value && <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100 font-medium">Conectado</span>}
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[hsl(var(--dash-text))] text-[13px] font-medium">{int.name}</p>
-                <p className="text-[hsl(var(--dash-text-subtle))] text-xs mt-0.5">{int.desc}</p>
+              <div className="flex gap-2">
+                <input
+                  className="flex-1 px-3 py-2 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] text-[hsl(var(--dash-text))] text-xs focus:outline-none focus:ring-1 focus:ring-primary/20"
+                  placeholder={placeholder}
+                  value={value}
+                  onChange={e => set(e.target.value)}
+                />
+                <button onClick={() => saveIntegration(key, value)} className="px-3 py-2 rounded-xl bg-primary text-white text-xs font-medium hover:opacity-90 transition-all">
+                  {integSaved === key ? "Salvo!" : "Salvar"}
+                </button>
               </div>
-              <button className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
-                int.connected
-                  ? "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100"
-                  : "bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text-secondary))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30"
-              }`}>
-                {int.connected ? "Conectado" : "Conectar"}
-              </button>
             </div>
           ))}
         </div>

@@ -1,5 +1,16 @@
 import { supabase } from "@/integrations/supabase/client";
 
+/* ── Client-side rate limiter ────────────────────────── */
+const rateLimitStore: Record<string, number[]> = {};
+function isRateLimited(key: string, maxRequests: number, windowMs: number): boolean {
+  const now = Date.now();
+  if (!rateLimitStore[key]) rateLimitStore[key] = [];
+  rateLimitStore[key] = rateLimitStore[key].filter(t => now - t < windowMs);
+  if (rateLimitStore[key].length >= maxRequests) return true;
+  rateLimitStore[key].push(now);
+  return false;
+}
+
 const LS_KEY = "maview_vitrine_config";
 
 export interface VitrineConfig {
@@ -207,12 +218,99 @@ export async function uploadImage(
   return urlData.publicUrl;
 }
 
+/* ── Submit lead (email capture on public profile) ──── */
+export async function submitLead(
+  vitrineUsername: string,
+  email: string,
+  name?: string,
+  source: string = "profile",
+): Promise<boolean> {
+  // Rate limit: max 5 leads per minute per session
+  if (isRateLimited("lead_submit", 5, 60_000)) return false;
+
+  const { data: vitrine } = await supabase
+    .from("vitrines")
+    .select("id")
+    .eq("username", vitrineUsername)
+    .maybeSingle();
+  if (!vitrine) return false;
+  const { error } = await supabase.from("leads").insert({
+    vitrine_id: vitrine.id,
+    email,
+    name: name || null,
+    source,
+  });
+  if (error && error.code !== "23505") return false;
+
+  // Fire webhook if configured
+  const { data: vitrineData } = await supabase
+    .from("vitrines").select("design").eq("id", vitrine.id).maybeSingle();
+  const webhookUrl = (vitrineData?.design as any)?.webhookUrl;
+  if (webhookUrl) {
+    fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ event: "new_lead", email, name, source, timestamp: new Date().toISOString() }),
+    }).catch(() => {});
+  }
+
+  return true;
+}
+
+/* ── Fetch leads for current user's vitrine ──────────── */
+export async function fetchLeads(): Promise<Array<{
+  id: string; email: string; name: string | null; source: string; created_at: string;
+}>> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user) return [];
+  const { data: vitrine } = await supabase
+    .from("vitrines").select("id").eq("user_id", session.user.id).maybeSingle();
+  if (!vitrine) return [];
+  const { data, error } = await supabase
+    .from("leads").select("id, email, name, source, created_at")
+    .eq("vitrine_id", vitrine.id).order("created_at", { ascending: false }).limit(100);
+  if (error || !data) return [];
+  return data;
+}
+
+/* ── Fetch orders for current user's vitrine ────────── */
+export interface Order {
+  id: string;
+  payment_id: string | null;
+  payment_status: string;
+  payment_method: string | null;
+  product_title: string;
+  amount: number;
+  buyer_email: string | null;
+  buyer_name: string | null;
+  created_at: string;
+}
+
+export async function fetchOrders(): Promise<Order[]> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user) return [];
+  const { data: vitrine } = await supabase
+    .from("vitrines").select("id").eq("user_id", session.user.id).maybeSingle();
+  if (!vitrine) return [];
+  const { data, error } = await supabase
+    .from("orders")
+    .select("id, payment_id, payment_status, payment_method, product_title, amount, buyer_email, buyer_name, created_at")
+    .eq("vitrine_id", vitrine.id)
+    .order("created_at", { ascending: false })
+    .limit(100);
+  if (error || !data) return [];
+  return data as Order[];
+}
+
 /* ── Track analytics event ─────────────────────────── */
 export async function trackEvent(
   vitrineUsername: string,
   eventType: string,
   metadata: Record<string, unknown> = {},
 ) {
+  // Rate limit: max 30 events per minute per session
+  if (isRateLimited("track_event", 30, 60_000)) return;
+
   // Lookup vitrine_id by username
   const { data: vitrine } = await supabase
     .from("vitrines")

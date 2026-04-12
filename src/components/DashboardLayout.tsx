@@ -115,6 +115,20 @@ const DashboardLayout = ({ children }: Props) => {
     localStorage.setItem("maview_dark", darkMode ? "1" : "0");
   }, [darkMode]);
 
+  // SEO: noindex for dashboard pages
+  useEffect(() => {
+    let meta = document.querySelector('meta[name="robots"]') as HTMLMetaElement;
+    if (meta) meta.content = "noindex, nofollow";
+    else {
+      meta = document.createElement("meta");
+      meta.name = "robots";
+      meta.content = "noindex, nofollow";
+      document.head.appendChild(meta);
+    }
+    document.title = "Maview — Link na bio + Loja digital gratis para criadores";
+    return () => { if (meta) meta.content = "index, follow"; };
+  }, []);
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/login");
