@@ -1,0 +1,82 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "add": "Adicionar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "close": "Fechar",
+    "copy": "Copiar",
+    "copied": "Copiado!",
+    "search": "Buscar",
+    "confirm": "Confirmar",
+    "yes": "Sim",
+    "no": "Não",
+    "or": "ou"
+  },
+  "auth": {
+    "login": "Entrar",
+    "signup": "Criar conta",
+    "logout": "Sair",
+    "email": "Email",
+    "password": "Senha",
+    "confirmPassword": "Confirmar senha",
+    "name": "Nome completo",
+    "username": "Seu link",
+    "forgotPassword": "Esqueceu a senha?",
+    "resetPassword": "Redefinir senha",
+    "googleLogin": "Continuar com Google",
+    "noAccount": "Não tem conta?",
+    "hasAccount": "Já tem conta?",
+    "emailSent": "Email enviado! Verifique sua caixa de entrada.",
+    "passwordMin": "Mínimo 8 caracteres com letras e números",
+    "usernameAvailable": "está disponível!",
+    "usernameTaken": "Já está em uso",
+    "usernameInvalid": "Mín. 3 caracteres — letras, números e hífen"
+  },
+  "dashboard": {
+    "home": "Home",
+    "myVitrine": "Minha Vitrine",
+    "analytics": "Analytics",
+    "ai": "IA Maview",
+    "settings": "Configurações",
+    "appearance": "Aparência",
+    "monetization": "Monetização",
+    "products": "Produtos",
+    "sales": "Vendas",
+    "audience": "Audiência",
+    "automations": "Automações",
+    "blocks": "Blocos"
+  },
+  "vitrine": {
+    "addLink": "Adicionar link",
+    "addProduct": "Adicionar produto",
+    "noLinks": "Nenhum link ainda. Adicione o primeiro!",
+    "noProducts": "Nenhum produto ainda.",
+    "preview": "Pré-visualização",
+    "publish": "Publicar",
+    "share": "Compartilhar",
+    "copyLink": "Copiar link",
+    "qrCode": "QR Code"
+  },
+  "settings": {
+    "profile": "Perfil",
+    "domain": "Domínio personalizado",
+    "integrations": "Integrações",
+    "notifications": "Notificações",
+    "newSale": "Nova venda",
+    "newLead": "Novo lead",
+    "dailySummary": "Resumo diário de visitas",
+    "weeklyEmail": "Email semanal de performance"
+  },
+  "errors": {
+    "generic": "Ocorreu um erro. Tente novamente.",
+    "network": "Erro de conexão. Verifique sua internet.",
+    "unauthorized": "Sessão expirada. Faça login novamente.",
+    "somethingWrong": "Algo deu errado",
+    "reload": "Recarregar página"
+  }
+}
