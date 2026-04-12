@@ -247,16 +247,6 @@ const DashboardLayout = ({ children }: Props) => {
         {/* Bottom nav */}
         {NAV_BOTTOM.map(item => renderNavItem(item))}
 
-        {/* Dark mode toggle */}
-        <button
-          onClick={() => setDarkMode(d => !d)}
-          className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-150 hover:bg-[hsl(var(--dash-accent))] ${collapsed ? "justify-center" : ""}`}
-          style={{ color: "hsl(var(--dash-text-muted))" }}
-          title={darkMode ? "Modo claro" : "Modo escuro"}
-        >
-          {darkMode ? <Sun size={16} /> : <Moon size={16} />}
-          {!collapsed && <span>{darkMode ? "Modo claro" : "Modo escuro"}</span>}
-        </button>
       </nav>
 
       {/* ── Bottom section: Profile + CTA ── */}
@@ -392,6 +382,13 @@ const DashboardLayout = ({ children }: Props) => {
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setDarkMode(d => !d)}
+              className="p-2 rounded-lg text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] transition-all"
+              title={darkMode ? "Modo claro" : "Modo escuro"}
+            >
+              {darkMode ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
             <button
               onClick={openVitrine}
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg btn-primary-gradient text-[12px] font-medium transition-transform active:scale-95"
