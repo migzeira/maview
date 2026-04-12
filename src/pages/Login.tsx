@@ -96,7 +96,7 @@ const TestimonialCard = ({ name, role, text, badge, avatar }: {
     </div>
     <p className="text-maview-text/70 text-sm leading-relaxed mb-5">"{text}"</p>
     <div className="flex items-center gap-2.5">
-      <img src={avatar} alt={name} className="w-9 h-9 rounded-full object-cover border-2 border-maview-purple/20 flex-shrink-0" />
+      <img src={avatar} alt={name} className="w-9 h-9 rounded-full object-cover border-2 border-maview-purple/20 flex-shrink-0" loading="lazy" decoding="async" />
       <div>
         <p className="text-maview-text text-xs font-semibold">{name}</p>
         <p className="text-maview-muted text-xs">{role}</p>
@@ -892,7 +892,7 @@ const Login = () => {
       </div>
 
       {/* ══════════ TESTIMONIALS ══════════ */}
-      <div className="relative z-10 py-16 border-t border-maview-border bg-maview-surface">
+      <div className="relative z-10 py-16 border-t border-maview-border bg-maview-surface content-lazy">
 
         <div className="text-center mb-10 px-6">
           <div className="inline-flex items-center gap-2 bg-white dark:bg-[hsl(260,30%,10%)] border border-maview-border rounded-full px-4 py-1.5 mb-4 shadow-sm dark:shadow-none">
