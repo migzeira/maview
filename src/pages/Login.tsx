@@ -85,7 +85,7 @@ const SIGNUP_NOTIFICATIONS = [
 const TestimonialCard = ({ name, role, text, badge, avatar }: {
   name: string; role: string; text: string; badge: string; avatar: string;
 }) => (
-  <div className="flex-shrink-0 w-[280px] bg-white dark:bg-[hsl(260,30%,9%)] border border-maview-border rounded-2xl p-5 mx-2 shadow-sm hover:shadow-md hover:border-maview-purple/30 dark:shadow-[0_2px_12px_-3px_rgba(124,58,237,0.1)] transition-all duration-300">
+  <div className="flex-shrink-0 w-full sm:w-[280px] bg-white dark:bg-[hsl(260,30%,9%)] border border-maview-border rounded-2xl p-5 mx-2 shadow-sm hover:shadow-md hover:border-maview-purple/30 dark:shadow-[0_2px_12px_-3px_rgba(124,58,237,0.1)] transition-all duration-300">
     <div className="flex items-start justify-between mb-4">
       <div className="flex items-center gap-0.5">
         {[...Array(5)].map((_, i) => <Star key={i} size={12} className="text-amber-400 fill-amber-400" />)}

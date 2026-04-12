@@ -12,6 +12,7 @@ import { fetchByUsername, trackEvent, submitLead } from "@/lib/vitrine-sync";
 import { Mail } from "lucide-react";
 import PixCheckoutModal from "@/components/PixCheckoutModal";
 import MercadoPagoCheckout from "@/components/MercadoPagoCheckout";
+import SEO from "@/components/SEO";
 
 /* ─── Types ───────────────────────────────────────────────────── */
 type ThemeId = "dark-purple" | "midnight" | "forest" | "rose" | "amber" | "ocean"
@@ -1620,6 +1621,14 @@ const ProfilePage = () => {
   const onHoverOut = (el: HTMLElement) => { el.style.borderColor = t.border; el.style.boxShadow = "none"; };
 
   return (
+    <>
+      <SEO
+        title={profile.displayName || profile.username}
+        description={profile.bio || `Vitrine digital de ${profile.displayName || profile.username} no Maview`}
+        image={profile.avatar}
+        username={profile.username}
+        type="profile"
+      />
     <div className="min-h-screen flex flex-col relative" style={{ ...bgCss(rd), fontFamily: `'${rd.fontBody}', sans-serif` }}>
 
       {/* ── BG layers: video / image / pattern / overlay ── */}
@@ -2130,6 +2139,7 @@ const ProfilePage = () => {
         </footer>
       )}
     </div>
+    </>
   );
 };
 

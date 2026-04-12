@@ -290,7 +290,7 @@ const DashboardLayout = ({ children }: Props) => {
               onClick={() => { setProWaitlist(true); localStorage.setItem("maview_pro_waitlist", "1"); }}
               disabled={proWaitlist}
               className={`w-full text-[11px] font-semibold py-1.5 rounded-lg transition-colors ${
-                proWaitlist ? "bg-emerald-500 text-white cursor-default" : "bg-primary text-white hover:bg-primary/90"
+                proWaitlist ? "bg-emerald-500 text-white cursor-not-allowed opacity-60" : "bg-primary text-white hover:bg-primary/90"
               }`}>
               {proWaitlist ? "✓ Na lista de espera" : "Entrar na lista de espera"}
             </button>
@@ -309,6 +309,7 @@ const DashboardLayout = ({ children }: Props) => {
               onClick={handleLogout}
               className="p-1.5 rounded-lg text-[hsl(var(--dash-text-subtle))] hover:text-red-400 hover:bg-red-50 transition-all flex-shrink-0"
               title="Sair"
+              aria-label="Sair da conta"
             >
               <LogOut size={13} />
             </button>
@@ -322,6 +323,7 @@ const DashboardLayout = ({ children }: Props) => {
         <button
           onClick={() => setCollapsed(!collapsed)}
           className="flex items-center justify-center w-full py-2 rounded-xl text-[hsl(var(--dash-text-subtle))] hover:text-primary hover:bg-[hsl(var(--dash-surface-2))] transition-all"
+          aria-label={collapsed ? "Expandir sidebar" : "Recolher sidebar"}
         >
           {collapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
         </button>
@@ -369,7 +371,7 @@ const DashboardLayout = ({ children }: Props) => {
         {/* Top bar */}
         <header className="h-14 flex items-center justify-between px-4 md:px-6 border-b border-[hsl(var(--dash-border-subtle))] flex-shrink-0 bg-[hsl(var(--dash-surface))]/80 backdrop-blur-xl z-10">
           <div className="flex items-center gap-3">
-            <button onClick={() => setMobileOpen(true)} className="md:hidden text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))] transition-colors">
+            <button onClick={() => setMobileOpen(true)} className="md:hidden text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))] transition-colors" aria-label="Abrir menu">
               <Menu size={20} />
             </button>
             <button
@@ -379,6 +381,7 @@ const DashboardLayout = ({ children }: Props) => {
               {profileUrl}
               {copied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} className="opacity-40" />}
             </button>
+
           </div>
 
           <div className="flex items-center gap-2">
@@ -386,12 +389,14 @@ const DashboardLayout = ({ children }: Props) => {
               onClick={() => setDarkMode(d => !d)}
               className="p-2 rounded-lg text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] transition-all"
               title={darkMode ? "Modo claro" : "Modo escuro"}
+              aria-label={darkMode ? "Ativar modo claro" : "Ativar modo escuro"}
             >
               {darkMode ? <Sun size={16} /> : <Moon size={16} />}
             </button>
             <button
               onClick={openVitrine}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg btn-primary-gradient text-[12px] font-medium transition-transform active:scale-95"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg btn-primary-gradient text-[13px] font-medium transition-transform active:scale-95"
+              aria-label="Ver vitrine"
             >
               <ExternalLink size={12} />
               <span className="hidden sm:inline">Ver vitrine</span>
