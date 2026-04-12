@@ -933,7 +933,20 @@ const DashboardPagina = () => {
     (async () => {
       // Load from Supabase (merges with localStorage automatically)
       const remote = await initialLoad();
-      const base: VitrineConfig = { ...DEFAULT_CONFIG, ...remote };
+      const base: VitrineConfig = {
+        ...DEFAULT_CONFIG,
+        ...remote,
+        // Ensure arrays/strings are never null/undefined (Supabase JSONB can return null)
+        displayName: remote?.displayName ?? DEFAULT_CONFIG.displayName,
+        username: remote?.username ?? DEFAULT_CONFIG.username,
+        bio: remote?.bio ?? DEFAULT_CONFIG.bio,
+        avatarUrl: remote?.avatarUrl ?? DEFAULT_CONFIG.avatarUrl,
+        whatsapp: remote?.whatsapp ?? DEFAULT_CONFIG.whatsapp,
+        products: remote?.products ?? DEFAULT_CONFIG.products,
+        links: remote?.links ?? DEFAULT_CONFIG.links,
+        testimonials: remote?.testimonials ?? DEFAULT_CONFIG.testimonials,
+        blocks: remote?.blocks ?? DEFAULT_CONFIG.blocks,
+      };
       // Migrate: imageUrl → images array
       let migrated = false;
       base.products = base.products.map(p => {
