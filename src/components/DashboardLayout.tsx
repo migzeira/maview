@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import MaviewLogo from "./MaviewLogo";
 import FloatingAIButton from "./FloatingAIButton";
+import AmbientGlow from "./AmbientGlow";
 import {
   Home, FileText, BarChart3, Sparkles, Settings,
   LogOut, ExternalLink, Copy, Check, ChevronLeft, ChevronRight, Menu,
@@ -334,7 +335,8 @@ const DashboardLayout = ({ children }: Props) => {
   // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-[hsl(var(--dash-bg))] flex">
+    <div className="min-h-screen bg-[hsl(var(--dash-bg))] flex relative">
+      <AmbientGlow />
       {/* Skip to content — accessibility */}
       <a href="#main-content" className="skip-to-content">Pular para o conteúdo</a>
 

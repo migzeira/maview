@@ -68,6 +68,9 @@ interface DesignConfig {
   profileBorderColor: string;
   profileSize: number;     // 64-120 px
 
+  // Layout
+  layout?: "stack" | "cards" | "grid" | "bento" | "magazine" | "minimal";
+
   // Effects
   hideWatermark: boolean;
 }

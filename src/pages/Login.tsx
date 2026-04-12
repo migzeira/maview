@@ -13,6 +13,7 @@ import { toast } from "sonner";
 type Mode = "login" | "signup" | "forgot" | "verify";
 
 import MaviewLogo from "@/components/MaviewLogo";
+import MeshGradientBg from "@/components/MeshGradientBg";
 
 /* ─── Static data ─────────────────────────────────────────────── */
 
@@ -373,24 +374,18 @@ const Login = () => {
   const inputClass = "w-full h-11 px-4 rounded-xl bg-white dark:bg-[hsl(260,25%,12%)] border border-maview-border dark:border-[hsl(260,20%,18%)] text-maview-text text-sm placeholder:text-maview-muted/60 outline-none transition-all focus:border-maview-purple focus:ring-2 focus:ring-maview-purple/10 shadow-sm dark:shadow-none";
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden bg-[radial-gradient(ellipse_at_70%_0%,#ede9fe_0%,#f3f0ff_30%,#f8f5ff_60%,#faf8ff_100%)] dark:bg-[radial-gradient(ellipse_at_70%_0%,hsl(260,50%,8%)_0%,hsl(260,40%,6%)_30%,hsl(260,45%,4%)_60%,hsl(260,45%,3%)_100%)]">
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
       {/* Skip to content — accessibility */}
       <a href="#login-form" className="skip-to-content">Pular para o formulário</a>
 
-      {/* ── Grid overlay ── */}
-      <div className="absolute inset-0 pointer-events-none select-none" style={{
+      {/* ── Interactive mesh gradient background ── */}
+      <MeshGradientBg dark={darkMode} />
+
+      {/* ── Grid overlay (on top of mesh) ── */}
+      <div className="absolute inset-0 pointer-events-none select-none z-[1]" style={{
         backgroundImage: `
-          linear-gradient(rgba(109,40,217,0.045) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(109,40,217,0.045) 1px, transparent 1px)
-        `,
-        backgroundSize: "48px 48px",
-        maskImage: "radial-gradient(ellipse at 60% 40%, black 20%, transparent 80%)",
-      }} />
-      {/* ── Dark mode grid (brighter purple lines) ── */}
-      <div className="absolute inset-0 pointer-events-none select-none hidden dark:block" style={{
-        backgroundImage: `
-          linear-gradient(rgba(124,58,237,0.08) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(124,58,237,0.08) 1px, transparent 1px)
+          linear-gradient(rgba(109,40,217,0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(109,40,217,0.035) 1px, transparent 1px)
         `,
         backgroundSize: "48px 48px",
         maskImage: "radial-gradient(ellipse at 60% 40%, black 20%, transparent 80%)",
@@ -697,18 +692,34 @@ const Login = () => {
                 </p>
               </div>
 
-              {/* Scarcity banner */}
+              {/* Scarcity banner — signup: strong urgency */}
               {mode === "signup" && (
-                <div className="flex items-center gap-2.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl px-4 py-3 mb-5">
-                  <Flame size={14} className="text-orange-500 flex-shrink-0 animate-pulse" />
-                  <p className="text-amber-800 text-xs font-medium flex-1">
-                    <span className="font-bold">Beta gratuito</span> — apenas{" "}
-                    <span ref={slotRef} className={`font-extrabold text-orange-600 text-sm ${slotPulse ? "slot-pulse inline-block" : ""}`}>
-                      {slotsLeft}
-                    </span>
-                    {" "}vagas restantes hoje.
+                <div className="relative flex items-center gap-2.5 bg-gradient-to-r from-red-50 via-amber-50 to-orange-50 dark:from-red-950/30 dark:via-amber-950/20 dark:to-orange-950/20 border border-red-200 dark:border-red-800/40 rounded-xl px-4 py-3 mb-5 animate-pulse-urgency">
+                  <div className="w-7 h-7 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center flex-shrink-0">
+                    <Flame size={14} className="text-red-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-red-800 dark:text-red-300 text-xs font-bold">
+                      🔥 Últimas vagas do Beta gratuito
+                    </p>
+                    <p className="text-amber-700 dark:text-amber-400 text-[11px] mt-0.5">
+                      Apenas{" "}
+                      <span ref={slotRef} className={`font-extrabold text-red-600 dark:text-red-400 text-sm ${slotPulse ? "slot-pulse inline-block" : ""}`}>
+                        {slotsLeft}
+                      </span>
+                      {" "}vagas — depois será pago
+                    </p>
+                  </div>
+                  <Timer size={14} className="text-red-400 flex-shrink-0" />
+                </div>
+              )}
+              {/* Soft trigger — login mode */}
+              {mode === "login" && (
+                <div className="flex items-center justify-center gap-2 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/30 rounded-xl px-4 py-2.5 mb-5">
+                  <Sparkles size={12} className="text-emerald-500" />
+                  <p className="text-emerald-700 dark:text-emerald-400 text-xs font-medium">
+                    <span className="font-bold">{realUserCount ? realUserCount.toLocaleString("pt-BR") : "2.000"}+</span> criadores já estão usando
                   </p>
-                  <Timer size={12} className="text-amber-500 flex-shrink-0" />
                 </div>
               )}
 
