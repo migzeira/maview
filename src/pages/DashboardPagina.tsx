@@ -1889,12 +1889,14 @@ const DashboardPagina = () => {
         <div className="flex items-center gap-1">
           <button onClick={handleUndo} disabled={!canUndoConfig}
             className="p-2 rounded-xl text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] disabled:opacity-30 disabled:cursor-default transition-all"
-            title="Desfazer (Ctrl+Z)">
+            title="Desfazer (Ctrl+Z)"
+            aria-label="Desfazer última alteração">
             <Undo2 size={16} />
           </button>
           <button onClick={handleRedo} disabled={!canRedoConfig}
             className="p-2 rounded-xl text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] disabled:opacity-30 disabled:cursor-default transition-all"
-            title="Refazer (Ctrl+Y)">
+            title="Refazer (Ctrl+Y)"
+            aria-label="Refazer alteração">
             <Redo2 size={16} />
           </button>
         </div>

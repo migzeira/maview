@@ -374,6 +374,8 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden bg-[radial-gradient(ellipse_at_70%_0%,#ede9fe_0%,#f3f0ff_30%,#f8f5ff_60%,#faf8ff_100%)] dark:bg-[radial-gradient(ellipse_at_70%_0%,hsl(260,50%,8%)_0%,hsl(260,40%,6%)_30%,hsl(260,45%,4%)_60%,hsl(260,45%,3%)_100%)]">
+      {/* Skip to content — accessibility */}
+      <a href="#login-form" className="skip-to-content">Pular para o formulário</a>
 
       {/* ── Grid overlay ── */}
       <div className="absolute inset-0 pointer-events-none select-none" style={{
@@ -710,7 +712,7 @@ const Login = () => {
                 </div>
               )}
 
-              <form onSubmit={onSubmit} className="space-y-4">
+              <form id="login-form" onSubmit={onSubmit} className="space-y-4">
 
                 {/* Name */}
                 {mode === "signup" && (
@@ -776,7 +778,7 @@ const Login = () => {
                       <input type={showPassword ? "text" : "password"} placeholder="••••••••" value={password}
                         onChange={(e) => { setPassword(e.target.value); clearError(); }}
                         className={`${inputClass} pr-11`} required minLength={mode === "signup" ? 6 : undefined} />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-maview-muted hover:text-maview-text transition-colors">
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-maview-muted hover:text-maview-text transition-colors" aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}>
                         {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                       </button>
                     </div>
@@ -791,7 +793,7 @@ const Login = () => {
                       <input type={showConfirmPassword ? "text" : "password"} placeholder="••••••••" value={confirmPassword}
                         onChange={(e) => { setConfirmPassword(e.target.value); clearError(); }}
                         className={`${inputClass} pr-11`} required />
-                      <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-maview-muted hover:text-maview-text transition-colors">
+                      <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-maview-muted hover:text-maview-text transition-colors" aria-label={showConfirmPassword ? "Ocultar confirmação de senha" : "Mostrar confirmação de senha"}>
                         {showConfirmPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                       </button>
                     </div>

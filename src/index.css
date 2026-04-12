@@ -66,11 +66,52 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground leading-relaxed;
+    @apply bg-background text-foreground leading-relaxed antialiased;
+    -webkit-tap-highlight-color: transparent;
   }
   /* Global focus states for accessibility */
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-primary;
+    outline-style: solid;
+  }
+  /* Skip to content link — accessibility */
+  .skip-to-content {
+    @apply sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[99999]
+           focus:px-4 focus:py-2 focus:rounded-lg focus:bg-primary focus:text-white
+           focus:text-sm focus:font-semibold focus:shadow-lg;
+  }
+
+  /* ── Semantic typography scale ── */
+  .text-caption  { @apply text-[10px] leading-tight; }
+  .text-label    { @apply text-[11px] leading-snug; }
+  .text-detail   { @apply text-xs leading-normal; }   /* 12px */
+  .text-body-sm  { @apply text-[13px] leading-relaxed; }
+  .text-body     { @apply text-sm leading-relaxed; }   /* 14px */
+  .text-subtitle { @apply text-base leading-normal; }  /* 16px */
+  .text-heading  { @apply text-lg leading-snug; }      /* 18px */
+  .text-title    { @apply text-xl leading-tight; }     /* 20px */
+  .text-display  { @apply text-2xl leading-tight tracking-tight; }
+}
+
+/* ── Accessibility: reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .wave-slow, .wave-mid, .wave-fast, .wave-rev,
+  .fade-in-up, .shimmer, .skeleton, .animate-scroll,
+  .animate-scroll-reverse, .animate-pulse, .slot-pulse {
+    animation: none !important;
+  }
+}
+
+/* ── Touch target minimum size ── */
+@layer utilities {
+  .touch-target {
+    @apply min-w-[44px] min-h-[44px] flex items-center justify-center;
   }
 }
 

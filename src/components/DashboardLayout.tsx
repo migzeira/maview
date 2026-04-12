@@ -231,7 +231,7 @@ const DashboardLayout = ({ children }: Props) => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 pt-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-3 pt-4 space-y-1 overflow-y-auto" aria-label="Menu principal">
         {/* Home */}
         {NAV_TOP.map(item => renderNavItem(item))}
 
@@ -260,10 +260,10 @@ const DashboardLayout = ({ children }: Props) => {
               className="flex items-center gap-3 px-3 py-3 rounded-xl bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/10 hover:border-primary/25 transition-all group">
               {healthRing}
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-semibold text-[hsl(var(--dash-text))]">
+                <p className="text-label font-semibold text-[hsl(var(--dash-text))]">
                   {health.score < 30 ? "Monte sua página" : health.score < 70 ? "Quase lá!" : "Últimos ajustes"}
                 </p>
-                <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] truncate">
+                <p className="text-caption text-[hsl(var(--dash-text-subtle))] truncate">
                   {health.missing.length > 0
                     ? `Falta: ${health.missing.slice(0, 2).join(", ")}${health.missing.length > 2 ? "..." : ""}`
                     : "Finalizando..."
@@ -278,18 +278,18 @@ const DashboardLayout = ({ children }: Props) => {
           <div className="rounded-xl bg-[hsl(var(--dash-text))] p-3.5">
             <div className="flex items-center gap-1.5 mb-1.5">
               <Zap size={12} className="text-amber-400" />
-              <span className="text-[10px] font-bold text-amber-400">Pro</span>
+              <span className="text-caption font-bold text-amber-400">Pro</span>
             </div>
-            <p className="text-[hsl(var(--dash-bg))] text-[12px] font-semibold leading-tight mb-1">
+            <p className="text-[hsl(var(--dash-bg))] text-detail font-semibold mb-1">
               Domínio próprio + analytics
             </p>
-            <p className="text-[hsl(var(--dash-bg))]/60 text-[10px] mb-2.5">
+            <p className="text-[hsl(var(--dash-bg))]/60 text-caption mb-2.5">
               Remova "maview.app" do link
             </p>
             <button
               onClick={() => { setProWaitlist(true); localStorage.setItem("maview_pro_waitlist", "1"); }}
               disabled={proWaitlist}
-              className={`w-full text-[11px] font-semibold py-1.5 rounded-lg transition-colors ${
+              className={`w-full text-label font-semibold py-1.5 rounded-lg transition-colors ${
                 proWaitlist ? "bg-emerald-500 text-white cursor-not-allowed opacity-60" : "bg-primary text-white hover:bg-primary/90"
               }`}>
               {proWaitlist ? "✓ Na lista de espera" : "Entrar na lista de espera"}
@@ -298,12 +298,12 @@ const DashboardLayout = ({ children }: Props) => {
 
           {/* Profile mini-card */}
           <div className="flex items-center gap-2.5 px-2 py-1">
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-[11px] font-bold flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-label font-bold flex-shrink-0">
               {initials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[12px] font-semibold text-[hsl(var(--dash-text))] truncate">{displayName}</p>
-              <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] font-mono truncate">@{username}</p>
+              <p className="text-detail font-semibold text-[hsl(var(--dash-text))] truncate">{displayName}</p>
+              <p className="text-caption text-[hsl(var(--dash-text-subtle))] font-mono truncate">@{username}</p>
             </div>
             <button
               onClick={handleLogout}
@@ -335,12 +335,14 @@ const DashboardLayout = ({ children }: Props) => {
 
   return (
     <div className="min-h-screen bg-[hsl(var(--dash-bg))] flex">
+      {/* Skip to content — accessibility */}
+      <a href="#main-content" className="skip-to-content">Pular para o conteúdo</a>
 
       {/* ── Copy toast ── */}
       <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-[9999] flex items-center gap-2 px-5 py-2.5 rounded-full shadow-lg transition-all duration-300 pointer-events-none ${copied ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3"}`}
         style={{ background: "hsl(var(--primary))", color: "#fff" }}>
         <Check size={14} />
-        <span className="text-[13px] font-semibold">Link copiado com sucesso!</span>
+        <span className="text-body-sm font-semibold">Link copiado com sucesso!</span>
       </div>
       {/* Desktop sidebar */}
       <aside
@@ -358,7 +360,7 @@ const DashboardLayout = ({ children }: Props) => {
       {/* Mobile sidebar overlay */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setMobileOpen(false)} role="button" aria-label="Fechar menu" tabIndex={0} onKeyDown={(e) => e.key === "Escape" && setMobileOpen(false)} />
           <aside className="absolute left-0 top-0 bottom-0 w-[280px] bg-[hsl(var(--dash-surface))] border-r border-[hsl(var(--dash-border-subtle))] shadow-2xl"
             style={{ animation: "slideRight 0.2s ease" }}>
             <SidebarContent />
@@ -371,12 +373,12 @@ const DashboardLayout = ({ children }: Props) => {
         {/* Top bar */}
         <header className="h-14 flex items-center justify-between px-4 md:px-6 border-b border-[hsl(var(--dash-border-subtle))] flex-shrink-0 bg-[hsl(var(--dash-surface))]/80 backdrop-blur-xl z-10">
           <div className="flex items-center gap-3">
-            <button onClick={() => setMobileOpen(true)} className="md:hidden text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))] transition-colors" aria-label="Abrir menu">
+            <button onClick={() => setMobileOpen(true)} className="md:hidden p-2 -ml-2 touch-target text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))] transition-colors" aria-label="Abrir menu">
               <Menu size={20} />
             </button>
             <button
               onClick={copyLink}
-              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 transition-all text-[12px] text-[hsl(var(--dash-text-muted))] font-mono"
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 transition-all text-detail text-[hsl(var(--dash-text-muted))] font-mono"
             >
               {profileUrl}
               {copied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} className="opacity-40" />}
@@ -387,7 +389,7 @@ const DashboardLayout = ({ children }: Props) => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setDarkMode(d => !d)}
-              className="p-2 rounded-lg text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] transition-all"
+              className="p-2 rounded-lg touch-target text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] transition-all"
               title={darkMode ? "Modo claro" : "Modo escuro"}
               aria-label={darkMode ? "Ativar modo claro" : "Ativar modo escuro"}
             >
@@ -404,7 +406,7 @@ const DashboardLayout = ({ children }: Props) => {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto bg-[hsl(var(--dash-bg))]">
+        <main id="main-content" className="flex-1 overflow-y-auto bg-[hsl(var(--dash-bg))]" role="main">
           {children}
         </main>
         <FloatingAIButton />

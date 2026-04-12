@@ -1686,7 +1686,7 @@ const ProfilePage = () => {
               )}
               {profile.avatar
                 ? <img src={profile.avatar} alt={profile.displayName}
-                    className="relative object-cover z-10"
+                    className="relative object-cover z-10" loading="eager"
                     style={{
                       width: rd.profileSize, height: rd.profileSize,
                       borderRadius: profileBorderRadius(rd.profileShape),
@@ -1930,7 +1930,7 @@ const ProfilePage = () => {
                     {/* Author */}
                     <div className="flex items-center gap-2.5">
                       {item.avatar ? (
-                        <img src={item.avatar} alt={item.name} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                        <img src={item.avatar} alt={item.name} className="w-7 h-7 rounded-full object-cover flex-shrink-0" loading="lazy" />
                       ) : (
                         <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-white"
                           style={{ background: t.accent }}>
