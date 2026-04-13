@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
-  Eye, EyeOff, ArrowLeft, Check, X,
+  Eye, EyeOff, ArrowLeft, Check, X, ChevronDown,
   Link2, Star, Zap, ShoppingBag, BarChart3,
   TrendingUp, Users, DollarSign, Sparkles, Timer, Flame,
   Instagram, Palette, Globe, Sun, Moon,
@@ -58,19 +58,27 @@ const DEFAULT_STATS = [
 ];
 
 const TESTIMONIALS_ROW1 = [
-  { name: "Ana Beatriz",    role: "Criadora de conteúdo", text: "Com o Maview vendo cursos e tenho meu link bio num lugar só. Triplicou minhas vendas!", badge: "+3x vendas",      avatar: "https://i.pravatar.cc/64?img=47" },
-  { name: "Lucas Ferreira", role: "Designer freelancer",  text: "Personalizei meu tema em minutos. Nenhum concorrente oferece essa liberdade.",           badge: "100% meu estilo", avatar: "https://i.pravatar.cc/64?img=11" },
-  { name: "Camila Torres",  role: "Influenciadora",       text: "Meus seguidores adoram a página. Parece profissional de verdade.",                        badge: "+40% cliques",    avatar: "https://i.pravatar.cc/64?img=45" },
-  { name: "Rafael Costa",   role: "Coach digital",        text: "Vendo sessões de coaching direto pelo Maview. Zero complicação e zero taxa.",             badge: "Sem taxas",       avatar: "https://i.pravatar.cc/64?img=12" },
-  { name: "Juliana Melo",   role: "Fotógrafa",            text: "Portfólio, loja e contato em um link só. Meus clientes chegam perguntando como fiz.",     badge: "+5x alcance",     avatar: "https://i.pravatar.cc/64?img=49" },
+  { name: "Ana Beatriz",    role: "Criadora de conteúdo", text: "Com o Maview vendo cursos e tenho meu link bio num lugar só. Triplicou minhas vendas!", badge: "+3x vendas",      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=64&h=64&fit=crop&crop=face" },
+  { name: "Lucas Ferreira", role: "Designer freelancer",  text: "Personalizei meu tema em minutos. Nenhum concorrente oferece essa liberdade.",           badge: "100% meu estilo", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face" },
+  { name: "Camila Torres",  role: "Influenciadora",       text: "Meus seguidores adoram a página. Parece profissional de verdade.",                        badge: "+40% cliques",    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face" },
+  { name: "Rafael Costa",   role: "Coach digital",        text: "Vendo sessões de coaching direto pelo Maview. Zero complicação e zero taxa.",             badge: "Sem taxas",       avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face" },
+  { name: "Juliana Melo",   role: "Fotógrafa",            text: "Portfólio, loja e contato em um link só. Meus clientes chegam perguntando como fiz.",     badge: "+5x alcance",     avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=64&h=64&fit=crop&crop=face" },
 ];
 
 const TESTIMONIALS_ROW2 = [
-  { name: "Pedro Alves",   role: "Músico independente", text: "Vendo meus beats direto pelo link. O analytics me mostrou o que converte.",                 badge: "+60% insights",     avatar: "https://i.pravatar.cc/64?img=15" },
-  { name: "Marina Silva",  role: "Nutricionista",       text: "Antes usava 3 ferramentas separadas. Agora só o Maview. Economizei tempo e dinheiro.",      badge: "3 ferramentas → 1", avatar: "https://i.pravatar.cc/64?img=48" },
-  { name: "Bruno Nunes",   role: "Empreendedor",        text: "O tema ficou exatamente com a identidade da minha marca. Incrível diferencial.",             badge: "Marca forte",       avatar: "https://i.pravatar.cc/64?img=17" },
-  { name: "Fernanda Lima", role: "Professora online",   text: "Meus alunos me encontram fácil pelo link personalizado. Simples e eficiente.",               badge: "+80% acessos",      avatar: "https://i.pravatar.cc/64?img=44" },
-  { name: "Thiago Rocha",  role: "Streamer",            text: "Centralizo doações, produtos e redes sociais no meu Maview. Engajamento dobrou.",            badge: "+2x engajamento",   avatar: "https://i.pravatar.cc/64?img=20" },
+  { name: "Pedro Alves",   role: "Músico independente", text: "Vendo meus beats direto pelo link. O analytics me mostrou o que converte.",                 badge: "+60% insights",     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=64&h=64&fit=crop&crop=face" },
+  { name: "Marina Silva",  role: "Nutricionista",       text: "Antes usava 3 ferramentas separadas. Agora só o Maview. Economizei tempo e dinheiro.",      badge: "3 ferramentas → 1", avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=64&h=64&fit=crop&crop=face" },
+  { name: "Bruno Nunes",   role: "Empreendedor",        text: "O tema ficou exatamente com a identidade da minha marca. Incrível diferencial.",             badge: "Marca forte",       avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=64&h=64&fit=crop&crop=face" },
+  { name: "Fernanda Lima", role: "Professora online",   text: "Meus alunos me encontram fácil pelo link personalizado. Simples e eficiente.",               badge: "+80% acessos",      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=64&h=64&fit=crop&crop=face" },
+  { name: "Thiago Rocha",  role: "Streamer",            text: "Centralizo doações, produtos e redes sociais no meu Maview. Engajamento dobrou.",            badge: "+2x engajamento",   avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=64&h=64&fit=crop&crop=face" },
+];
+
+const FAQ_ITEMS = [
+  { q: "O Maview é realmente grátis?", a: "Sim, 100% grátis. Sem período de teste, sem cartão de crédito. Você cria sua vitrine e começa a usar agora mesmo." },
+  { q: "Preciso de cartão de crédito?", a: "Não. Você cria sua conta apenas com email e senha. Sem cobrança nenhuma." },
+  { q: "Posso vender produtos pela vitrine?", a: "Sim! Você pode vender produtos digitais, físicos, serviços e sessões de coaching — e o Maview cobra 0% de taxa por venda." },
+  { q: "Como personalizo minha página?", a: "No painel, escolha entre 20+ temas, 40+ efeitos animados e 24+ fontes. Tudo com 1 clique — sem código, sem complicação." },
+  { q: "O Maview cobra taxa por venda?", a: "Não. O Maview cobra 0% de taxa. O valor da venda é 100% seu. Cobramos apenas pela futura versão Pro (opcional)." },
 ];
 
 const SIGNUP_NOTIFICATIONS = [
@@ -426,7 +434,7 @@ const Login = () => {
             <div className="flex items-center gap-3 mb-14">
               <MaviewLogo size={40} />
               <span className="text-maview-text text-2xl font-extrabold tracking-tight">Maview</span>
-              <span className="ml-1 text-[10px] font-bold text-maview-purple bg-maview-purple-soft border border-maview-purple/20 px-2.5 py-0.5 rounded-full uppercase tracking-widest">Beta</span>
+              <span className="ml-1 text-[11px] font-bold text-maview-purple bg-maview-purple-soft border border-maview-purple/20 px-2.5 py-0.5 rounded-full uppercase tracking-widest">Beta</span>
             </div>
 
             {/* Headline */}
@@ -457,7 +465,7 @@ const Login = () => {
                     <div className="flex items-center gap-2">
                       <p className="text-maview-text text-sm font-semibold leading-tight">{label}</p>
                       {badge && (
-                        <span className="text-[10px] font-extrabold text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full flex-shrink-0">
+                        <span className="text-[11px] font-extrabold text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full flex-shrink-0">
                           {badge} taxa
                         </span>
                       )}
@@ -475,9 +483,15 @@ const Login = () => {
             {/* Social proof */}
             <div className="flex items-center gap-4 pt-8 border-t border-maview-border">
               <div className="flex -space-x-2.5">
-                {[11, 44, 15, 47, 20].map((img) => (
-                  <img key={img} src={`https://i.pravatar.cc/64?img=${img}`} alt="creator"
-                    className="w-9 h-9 rounded-full border-2 border-maview-bg object-cover" />
+                {[
+                  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=64&h=64&fit=crop&crop=face",
+                  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face",
+                  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=64&h=64&fit=crop&crop=face",
+                  "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face",
+                  "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=64&h=64&fit=crop&crop=face",
+                ].map((src, i) => (
+                  <img key={i} src={src} alt="creator"
+                    className="w-9 h-9 rounded-full border-2 border-maview-bg object-cover" loading="lazy" />
                 ))}
               </div>
               <div>
@@ -529,12 +543,12 @@ const Login = () => {
 
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-[13px] font-bold leading-tight">Seu Nome</p>
-                      <p className="text-violet-400/80 text-[10px] font-mono mt-0.5 truncate">
+                      <p className="text-violet-400/80 text-[11px] font-mono mt-0.5 truncate">
                         maview.app/<span className="text-violet-300">seunome</span>
                       </p>
                     </div>
 
-                    <span className="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-500/25 px-2 py-0.5 rounded-full flex-shrink-0">
+                    <span className="text-[11px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-500/25 px-2 py-0.5 rounded-full flex-shrink-0">
                       ● Ativo
                     </span>
                   </div>
@@ -555,7 +569,7 @@ const Login = () => {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-white/85 text-xs font-semibold leading-none">{label}</p>
-                          <p className="text-white/30 text-[10px] mt-0.5">{sub}</p>
+                          <p className="text-white/30 text-[11px] mt-0.5">{sub}</p>
                         </div>
                         <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
                           style={{ background: `${color}15` }}>
@@ -569,10 +583,10 @@ const Login = () => {
                   <div className="mt-4 pt-3 border-t border-white/[0.05] flex items-center justify-between">
                     <div className="flex items-center gap-1.5" style={{ opacity: 0.25 }}>
                       <MaviewLogo size={11} />
-                      <span className="text-white text-[10px]">maview.app</span>
+                      <span className="text-white text-[11px]">maview.app</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-emerald-400/60 text-[10px] font-semibold">✦ Grátis para sempre</span>
+                      <span className="text-emerald-400/60 text-[11px] font-semibold">✦ Grátis para sempre</span>
                     </div>
                   </div>
                 </div>
@@ -780,7 +794,7 @@ const Login = () => {
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-semibold text-maview-text-sub block">Senha</label>
                       {mode === "login" && (
-                        <button type="button" onClick={() => switchMode("forgot")} className="text-xs text-maview-purple hover:text-maview-purple-dark font-medium transition-colors">
+                        <button type="button" onClick={() => switchMode("forgot")} className="text-xs text-maview-purple hover:text-maview-purple-dark font-medium transition-colors py-2 px-1 -mr-1 min-h-[44px] flex items-center">
                           Esqueceu?
                         </button>
                       )}
@@ -1006,6 +1020,89 @@ const Login = () => {
           </div>
         </div>
       </div>
+
+      {/* ══════════ FAQ ══════════ */}
+      <div className="relative z-10 py-16 px-6 border-t border-maview-border bg-maview-surface">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-maview-text mb-3 tracking-tight">
+              Perguntas{" "}
+              <span className="bg-gradient-to-r from-maview-purple to-violet-500 bg-clip-text text-transparent">frequentes</span>
+            </h2>
+            <p className="text-maview-muted text-base">Tudo que você precisa saber antes de começar.</p>
+          </div>
+
+          <div className="space-y-3">
+            {FAQ_ITEMS.map(({ q, a }, i) => (
+              <details key={i} className="group rounded-2xl border border-maview-border bg-white dark:bg-[hsl(260,30%,9%)] shadow-sm overflow-hidden">
+                <summary className="flex items-center justify-between gap-3 px-5 py-4 cursor-pointer select-none hover:bg-maview-surface/50 transition-colors min-h-[52px]">
+                  <span className="text-maview-text text-sm font-semibold">{q}</span>
+                  <ChevronDown size={16} className="text-maview-muted group-open:rotate-180 transition-transform flex-shrink-0" />
+                </summary>
+                <div className="px-5 pb-4 border-t border-maview-border/50">
+                  <p className="text-maview-muted text-sm leading-relaxed pt-3">{a}</p>
+                </div>
+              </details>
+            ))}
+          </div>
+
+          <div className="text-center mt-10">
+            <button
+              onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); switchMode("signup"); }}
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-maview-purple to-violet-600 text-white text-sm font-bold px-7 py-3.5 rounded-xl hover:brightness-105 hover:shadow-xl hover:shadow-maview-purple/25 transition-all active:scale-[0.98]"
+            >
+              <Zap size={15} className="fill-white" />
+              Criar minha vitrine grátis
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ══════════ FOOTER ══════════ */}
+      <footer className="relative z-10 border-t border-maview-border bg-white dark:bg-[hsl(260,30%,7%)]">
+        <div className="max-w-5xl mx-auto px-6 py-10">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
+            {/* Brand */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <MaviewLogo size={28} />
+                <span className="text-maview-text text-lg font-extrabold tracking-tight">Maview</span>
+              </div>
+              <p className="text-maview-muted text-sm leading-relaxed">
+                Sua vitrine digital profissional. Link na bio, loja e booking — tudo em um só lugar.
+              </p>
+            </div>
+
+            {/* Links */}
+            <div>
+              <p className="text-maview-text text-sm font-bold mb-3">Produto</p>
+              <div className="space-y-2">
+                <button onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); switchMode("signup"); }} className="block text-maview-muted text-sm hover:text-maview-purple transition-colors">Criar vitrine grátis</button>
+                <span className="block text-maview-muted text-sm">Temas e design</span>
+                <span className="block text-maview-muted text-sm">Analytics</span>
+                <span className="block text-maview-muted text-sm">IA Maview</span>
+              </div>
+            </div>
+
+            {/* Legal */}
+            <div>
+              <p className="text-maview-text text-sm font-bold mb-3">Suporte</p>
+              <div className="space-y-2">
+                <span className="block text-maview-muted text-sm hover:text-maview-purple cursor-pointer transition-colors">Termos de Uso</span>
+                <span className="block text-maview-muted text-sm hover:text-maview-purple cursor-pointer transition-colors">Política de Privacidade</span>
+                <a href="mailto:suporte@maview.app" className="block text-maview-muted text-sm hover:text-maview-purple transition-colors">suporte@maview.app</a>
+                <a href="https://instagram.com/maview.app" target="_blank" rel="noopener noreferrer" className="block text-maview-muted text-sm hover:text-maview-purple transition-colors">@maview.app</a>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom */}
+          <div className="pt-6 border-t border-maview-border flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-maview-muted text-xs">&copy; {new Date().getFullYear()} Maview. Todos os direitos reservados.</p>
+            <p className="text-maview-muted text-xs">Feito com 💜 no Brasil</p>
+          </div>
+        </div>
+      </footer>
 
       {/* ══════════ EXIT INTENT POPUP ══════════ */}
       {showExitPopup && (

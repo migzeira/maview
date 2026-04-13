@@ -1616,6 +1616,26 @@ const ProfilePage = () => {
   const socialLinks  = profile.links.filter(l => l.active && l.isSocial);
   const regularLinks = profile.links.filter(l => l.active && !l.isSocial);
 
+  /* Empty vitrine detection — show elegant empty state */
+  const isVitrineEmpty = !profile.bio && profile.products.length === 0 && profile.links.length === 0 && profile.testimonials.length === 0 && !profile.avatar;
+  if (isVitrineEmpty) return (
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center relative" style={{ background: "linear-gradient(160deg, #0d0a1e 0%, #080612 50%, #0a0520 100%)" }}>
+      <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 50% 30%, rgba(168,85,247,0.08) 0%, transparent 60%)" }} />
+      <div className="relative z-10 max-w-sm mx-auto">
+        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 border border-violet-500/20 flex items-center justify-center mx-auto mb-6">
+          <span className="text-3xl font-bold text-violet-400/60">{(profile.displayName || profile.username || "?")[0]?.toUpperCase()}</span>
+        </div>
+        <h1 className="text-white text-xl font-bold mb-2">@{profile.username}</h1>
+        <p className="text-white/40 text-sm mb-2">Esta vitrine está sendo preparada.</p>
+        <p className="text-white/25 text-xs mb-8">Em breve terá conteúdo incrível por aqui.</p>
+        <Link to="/" className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-white text-sm font-bold transition-all hover:brightness-110 hover:shadow-xl hover:shadow-violet-500/20" style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7)" }}>
+          <Sparkles size={14} /> Crie sua própria vitrine grátis
+        </Link>
+        <p className="text-white/20 text-xs mt-6">maview.app</p>
+      </div>
+    </div>
+  );
+
   /* Hover helpers */
   const onHoverIn  = (el: HTMLElement) => { el.style.borderColor = `${t.accent}55`; el.style.boxShadow = `0 8px 32px ${t.accent}18`; };
   const onHoverOut = (el: HTMLElement) => { el.style.borderColor = t.border; el.style.boxShadow = "none"; };
@@ -1707,10 +1727,12 @@ const ProfilePage = () => {
             <p className="text-[13px] font-semibold mb-2" style={{ color: t.accent }}>@{profile.username}</p>
             {profile.bio && <p className="text-[14px] text-center leading-relaxed max-w-[300px] mb-3 line-clamp-3" style={{ color: t.sub, fontFamily: `'${rd.fontBody}', sans-serif` }}>{profile.bio}</p>}
 
-            {/* Viewers badge — social proof */}
-            <div className="mb-4">
-              <ViewersBadge accent={t.accent} />
-            </div>
+            {/* Viewers badge — only show when vitrine has real content */}
+            {(profile.products.length > 0 || regularLinks.length > 0) && (
+              <div className="mb-4">
+                <ViewersBadge accent={t.accent} />
+              </div>
+            )}
 
             {/* Stats */}
             {profile.stats && (
