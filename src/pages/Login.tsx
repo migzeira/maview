@@ -505,90 +505,101 @@ const Login = () => {
               </div>
             </div>
 
-            {/* Live profile preview card */}
+            {/* ── Phone mockup showing a real vitrine ── */}
             <div className="mt-8">
-              {/* Label row — sem sobreposição */}
               <div className="flex items-center justify-between mb-3 px-1">
-                <span className="text-maview-muted text-xs font-medium">Prévia da sua vitrine:</span>
+                <span className="text-maview-muted text-xs font-medium">Assim fica sua vitrine:</span>
                 <div className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-emerald-600 text-xs font-bold">Ao vivo em minutos</span>
+                  <span className="text-emerald-600 text-xs font-bold">Pronta em minutos</span>
                 </div>
               </div>
 
-              {/* Card */}
-              <div className="rounded-2xl overflow-hidden border border-violet-900/60"
-                style={{ background: "linear-gradient(160deg, #1a0e38 0%, #0d0a1e 100%)", boxShadow: "0 20px 60px rgba(109,40,217,0.22), 0 4px 20px rgba(0,0,0,0.4)" }}>
+              {/* Phone frame */}
+              <div className="relative mx-auto" style={{ width: 220, perspective: "1000px" }}>
+                {/* Glow behind phone */}
+                <div className="absolute -inset-6 rounded-[3rem] pointer-events-none" style={{ background: "radial-gradient(ellipse, rgba(139,92,246,0.15) 0%, transparent 70%)" }} />
 
-                {/* Top accent bar */}
-                <div className="h-[3px]" style={{ background: "linear-gradient(90deg, transparent, #8B5CF6 40%, #A78BFA 60%, transparent)" }} />
+                <div className="relative rounded-[2.2rem] overflow-hidden border-[3px] border-white/10 shadow-2xl"
+                  style={{ aspectRatio: "9/18", background: "linear-gradient(160deg, #1a0e38 0%, #080612 50%, #0a0520 100%)", boxShadow: "0 25px 80px rgba(109,40,217,0.30), 0 8px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)" }}>
 
-                <div className="px-5 pt-5 pb-4">
+                  {/* Status bar */}
+                  <div className="flex items-center justify-between px-5 pt-3 pb-1">
+                    <span className="text-white/40 text-[9px] font-medium">9:41</span>
+                    <div className="w-16 h-[3px] rounded-full bg-white/15" />
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-2 rounded-sm border border-white/30" />
+                    </div>
+                  </div>
 
-                  {/* Profile header */}
-                  <div className="flex items-center gap-3 mb-4">
-                    {/* Avatar — fundo preto com borda roxa */}
-                    <div className="relative flex-shrink-0">
-                      <div className="w-13 h-13 rounded-2xl flex items-center justify-center"
-                        style={{
-                          width: 52, height: 52,
-                          background: "#000000",
-                          border: "2px solid rgba(139,92,246,0.6)",
-                          boxShadow: "0 0 16px rgba(139,92,246,0.45), inset 0 0 12px rgba(109,40,217,0.15)",
-                        }}>
-                        <MaviewLogo size={28} />
+                  {/* Content */}
+                  <div className="px-4 pt-4 pb-5 flex flex-col items-center">
+                    {/* Avatar */}
+                    <div className="relative mb-2">
+                      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face"
+                        alt="" className="w-14 h-14 rounded-full object-cover border-2 border-violet-500/50" style={{ boxShadow: "0 0 20px rgba(139,92,246,0.3)" }} loading="lazy" />
+                      <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-[#0d0a1e]" />
+                    </div>
+                    <p className="text-white text-xs font-bold">Ana Beatriz</p>
+                    <p className="text-violet-400/70 text-[9px] mb-1">@anabeatriz</p>
+                    <p className="text-white/40 text-[8px] text-center mb-3 leading-relaxed">Designer & criadora de conteúdo</p>
+
+                    {/* Social icons */}
+                    <div className="flex gap-1.5 mb-3">
+                      {[Instagram, Globe, Star].map((Icon, i) => (
+                        <div key={i} className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "rgba(139,92,246,0.15)", border: "1px solid rgba(139,92,246,0.25)" }}>
+                          <Icon size={9} className="text-violet-400" />
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Links */}
+                    <div className="w-full space-y-1.5 mb-3">
+                      {[
+                        { label: "Meu portfólio", color: "#C084FC" },
+                        { label: "Agende uma call", color: "#34D399" },
+                      ].map(({ label, color }) => (
+                        <div key={label} className="w-full py-2 rounded-xl text-center text-[9px] font-semibold text-white/80"
+                          style={{ background: `${color}12`, border: `1px solid ${color}20` }}>
+                          {label}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Products */}
+                    <div className="w-full">
+                      <p className="text-violet-400/60 text-[8px] font-bold uppercase tracking-wider mb-1.5">Produtos</p>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {[
+                          { title: "Ebook Design", price: "R$ 47", color: "#a855f7" },
+                          { title: "Mentoria 1:1", price: "R$ 197", color: "#ec4899" },
+                        ].map(({ title, price, color }) => (
+                          <div key={title} className="rounded-lg p-1.5" style={{ background: `${color}08`, border: `1px solid ${color}15` }}>
+                            <div className="w-full h-8 rounded mb-1" style={{ background: `${color}10` }} />
+                            <p className="text-white/70 text-[7px] font-semibold truncate">{title}</p>
+                            <p className="text-[8px] font-bold" style={{ color }}>{price}</p>
+                          </div>
+                        ))}
                       </div>
-                      <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-400 border-[2.5px] border-[#0d0a1e]" />
                     </div>
 
-                    <div className="flex-1 min-w-0">
-                      <p className="text-white text-[13px] font-bold leading-tight">Seu Nome</p>
-                      <p className="text-violet-400/80 text-[11px] font-mono mt-0.5 truncate">
-                        maview.app/<span className="text-violet-300">seunome</span>
-                      </p>
-                    </div>
-
-                    <span className="text-[11px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-500/25 px-2 py-0.5 rounded-full flex-shrink-0">
-                      ● Ativo
-                    </span>
-                  </div>
-
-                  {/* Links */}
-                  <div className="space-y-1.5">
-                    {[
-                      { icon: Instagram,   label: "Instagram",           sub: "2.4k seguidores", color: "#C084FC" },
-                      { icon: ShoppingBag, label: "Minha Loja",          sub: "0% de taxa",       color: "#34D399" },
-                      { icon: Globe,       label: "Meu Website",         sub: "portfólio",        color: "#60A5FA" },
-                    ].map(({ icon: Icon, label, sub, color }) => (
-                      <div key={label}
-                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
-                        style={{ background: "rgba(255,255,255,0.035)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <div className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0"
-                          style={{ background: `${color}15`, border: `1px solid ${color}25` }}>
-                          <Icon size={13} style={{ color }} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-white/85 text-xs font-semibold leading-none">{label}</p>
-                          <p className="text-white/30 text-[11px] mt-0.5">{sub}</p>
-                        </div>
-                        <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ background: `${color}15` }}>
-                          <div className="w-1 h-1 rounded-full" style={{ background: color }} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Footer */}
-                  <div className="mt-4 pt-3 border-t border-white/[0.05] flex items-center justify-between">
-                    <div className="flex items-center gap-1.5" style={{ opacity: 0.25 }}>
-                      <MaviewLogo size={11} />
-                      <span className="text-white text-[11px]">maview.app</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-emerald-400/60 text-[11px] font-semibold">✦ Grátis para sempre</span>
+                    {/* Maview branding */}
+                    <div className="flex items-center gap-1 mt-3 opacity-30">
+                      <MaviewLogo size={8} />
+                      <span className="text-white text-[7px]">maview.app</span>
                     </div>
                   </div>
+                </div>
+
+                {/* Floating badges around phone */}
+                <div className="absolute -right-3 top-[18%] bg-white dark:bg-[hsl(260,30%,12%)] rounded-xl px-2.5 py-1.5 shadow-lg border border-maview-border animate-[ambient-float_4s_ease-in-out_infinite]">
+                  <p className="text-[9px] font-bold text-emerald-600">+3x vendas</p>
+                </div>
+                <div className="absolute -left-4 top-[55%] bg-white dark:bg-[hsl(260,30%,12%)] rounded-xl px-2.5 py-1.5 shadow-lg border border-maview-border animate-[ambient-float_5s_ease-in-out_infinite_1s]">
+                  <p className="text-[9px] font-bold text-violet-600">40+ efeitos</p>
+                </div>
+                <div className="absolute -right-2 bottom-[18%] bg-white dark:bg-[hsl(260,30%,12%)] rounded-xl px-2.5 py-1.5 shadow-lg border border-maview-border animate-[ambient-float_6s_ease-in-out_infinite_2s]">
+                  <p className="text-[9px] font-bold text-amber-600">0% taxa</p>
                 </div>
               </div>
             </div>
