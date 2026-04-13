@@ -82,11 +82,48 @@ const FAQ_ITEMS = [
 ];
 
 const SIGNUP_NOTIFICATIONS = [
-  { name: "Gabriela M.", action: "acabou de criar sua vitrine", avatar: "https://i.pravatar.cc/64?img=23" },
-  { name: "Carlos R.",   action: "fez sua primeira venda",      avatar: "https://i.pravatar.cc/64?img=13" },
-  { name: "Beatriz S.",  action: "personalizou seu link bio",   avatar: "https://i.pravatar.cc/64?img=25" },
-  { name: "Felipe N.",   action: "acabou de criar sua vitrine", avatar: "https://i.pravatar.cc/64?img=16" },
-  { name: "Larissa T.",  action: "recebeu 200 cliques hoje",    avatar: "https://i.pravatar.cc/64?img=39" },
+  { name: "Gabriela M.", action: "acabou de criar sua vitrine", avatar: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=64&h=64&fit=crop&crop=face" },
+  { name: "Carlos R.",   action: "fez sua primeira venda",      avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=64&h=64&fit=crop&crop=face" },
+  { name: "Beatriz S.",  action: "personalizou seu link bio",   avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=64&h=64&fit=crop&crop=face" },
+  { name: "Felipe N.",   action: "acabou de criar sua vitrine", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=64&h=64&fit=crop&crop=face" },
+  { name: "Larissa T.",  action: "recebeu 200 cliques hoje",    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=64&h=64&fit=crop&crop=face" },
+];
+
+/* ─── Template gallery (vitrine demos) ────────────────────────── */
+
+const TEMPLATE_GALLERY = [
+  {
+    name: "Criadora de Conteúdo",
+    theme: { bg: "#080612", accent: "#a855f7", accent2: "#ec4899" },
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face",
+    displayName: "Mariana Silva",
+    bio: "Criadora digital & mentora",
+    items: ["Mentoria 1:1 — R$197", "Ebook Redes Sociais — R$47", "Instagram", "YouTube"],
+  },
+  {
+    name: "Coach & Consultor",
+    theme: { bg: "#021a0f", accent: "#10b981", accent2: "#6ee7b7" },
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face",
+    displayName: "Rafael Costa",
+    bio: "Coach de carreira & negócios",
+    items: ["Sessão Estratégica — R$297", "Curso Online — R$197", "LinkedIn", "WhatsApp"],
+  },
+  {
+    name: "Artista & Designer",
+    theme: { bg: "#0a0010", accent: "#ff2d95", accent2: "#ff6ec7" },
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&fit=crop&crop=face",
+    displayName: "Julia Melo",
+    bio: "Design gráfico & ilustração",
+    items: ["Portfolio", "Pacote de Logos — R$350", "Behance", "Dribbble"],
+  },
+  {
+    name: "Fitness & Saúde",
+    theme: { bg: "#0f0a00", accent: "#f59e0b", accent2: "#fcd34d" },
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
+    displayName: "Lucas Ferreira",
+    bio: "Personal trainer certificado",
+    items: ["Plano Treino 12 sem — R$97", "Consultoria Nutri — R$147", "Instagram", "TikTok"],
+  },
 ];
 
 /* ─── Testimonial card ────────────────────────────────────────── */
@@ -1028,6 +1065,53 @@ const Login = () => {
             >
               Começar grátis — sem cartão
             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ══════════ TEMPLATE GALLERY ══════════ */}
+      <div className="relative z-10 py-16 px-6 border-t border-maview-border">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-maview-text mb-3 tracking-tight">
+              Comece com um{" "}
+              <span className="bg-gradient-to-r from-maview-purple to-violet-500 bg-clip-text text-transparent">template pronto</span>
+            </h2>
+            <p className="text-maview-muted text-base max-w-lg mx-auto">
+              Escolha um estilo, personalize em 1 minuto e publique. Sem começar do zero.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {TEMPLATE_GALLERY.map((tpl, i) => (
+              <button
+                key={i}
+                onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); switchMode("signup"); }}
+                className="group relative bg-white dark:bg-[hsl(260,30%,9%)] border border-maview-border rounded-2xl overflow-hidden hover:border-maview-purple/40 hover:shadow-xl hover:shadow-maview-purple/10 transition-all duration-300"
+              >
+                {/* Mini phone preview */}
+                <div className="aspect-[9/14] rounded-t-xl overflow-hidden" style={{ background: tpl.theme.bg }}>
+                  <div className="flex flex-col items-center pt-6 px-3">
+                    <img src={tpl.avatar} alt="" className="w-10 h-10 rounded-full object-cover mb-2" style={{ boxShadow: `0 0 0 2px ${tpl.theme.accent}40` }} />
+                    <p className="text-white text-[11px] font-bold">{tpl.displayName}</p>
+                    <p className="text-[10px] mb-3" style={{ color: tpl.theme.accent }}>@{tpl.displayName.toLowerCase().replace(/\s/g, "")}</p>
+
+                    {tpl.items.slice(0, 3).map((item, j) => (
+                      <div key={j} className="w-full rounded-lg border px-2.5 py-1.5 mb-1.5 text-center"
+                        style={{ borderColor: tpl.theme.accent + "30", background: tpl.theme.accent + "08" }}>
+                        <span className="text-[9px] text-white/80 truncate block">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Label */}
+                <div className="px-3 py-3 text-center">
+                  <p className="text-maview-text text-xs font-bold">{tpl.name}</p>
+                  <p className="text-maview-muted text-[10px] mt-0.5 group-hover:text-maview-purple transition-colors">Usar este template →</p>
+                </div>
+              </button>
+            ))}
           </div>
         </div>
       </div>
