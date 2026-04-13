@@ -211,19 +211,19 @@ const DashboardHome = () => {
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <button onClick={copyLink}
-                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 transition-all text-[hsl(var(--dash-text-secondary))]">
+                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 btn-interactive text-[hsl(var(--dash-text-secondary))]">
                   <Share2 size={16} className="text-primary" />
-                  <span className="text-[10px] font-medium">Compartilhar</span>
+                  <span className="text-[11px] font-medium">Compartilhar</span>
                 </button>
-                <Link to="/dashboard/audiencia"
-                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 transition-all text-[hsl(var(--dash-text-secondary))]">
+                <Link to="/dashboard/analytics"
+                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 btn-interactive text-[hsl(var(--dash-text-secondary))]">
                   <BarChart3 size={16} className="text-primary" />
-                  <span className="text-[10px] font-medium">Analytics</span>
+                  <span className="text-[11px] font-medium">Analytics</span>
                 </Link>
                 <Link to="/dashboard/pagina"
-                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 transition-all text-[hsl(var(--dash-text-secondary))]">
+                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 btn-interactive text-[hsl(var(--dash-text-secondary))]">
                   <FileText size={16} className="text-primary" />
-                  <span className="text-[10px] font-medium">Editar</span>
+                  <span className="text-[11px] font-medium">Editar</span>
                 </Link>
               </div>
             </div>
@@ -244,7 +244,7 @@ const DashboardHome = () => {
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                       <span className="text-[22px] font-extrabold text-[hsl(var(--dash-text))] leading-none tabular-nums">{animatedHealth}</span>
-                      <span className="text-[9px] text-[hsl(var(--dash-text-muted))] font-medium mt-0.5">/100</span>
+                      <span className="text-[10px] text-[hsl(var(--dash-text-muted))] font-medium mt-0.5">/100</span>
                     </div>
                   </div>
                 </div>
@@ -272,7 +272,7 @@ const DashboardHome = () => {
                           {step.label}
                         </span>
                         {!step.done && (
-                          <span className="text-[10px] text-[hsl(var(--dash-text-muted))] hidden sm:inline">+{step.points}pts</span>
+                          <span className="text-[11px] text-[hsl(var(--dash-text-muted))] hidden sm:inline">+{step.points}pts</span>
                         )}
                         {!step.done && <ArrowRight size={11} className="text-[hsl(var(--dash-text-muted))] group-hover:text-primary group-hover:translate-x-0.5 transition-all flex-shrink-0" />}
                       </Link>
@@ -320,7 +320,7 @@ const DashboardHome = () => {
 
               <div className="flex gap-2">
                 <button onClick={() => setShowQR(true)}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 text-[12px] text-[hsl(var(--dash-text-secondary))] font-medium transition-all">
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 text-[12px] text-[hsl(var(--dash-text-secondary))] font-medium btn-interactive">
                   <QrCode size={14} /> QR Code
                 </button>
                 <a href={profileUrl} target="_blank" rel="noopener noreferrer"
@@ -334,19 +334,19 @@ const DashboardHome = () => {
           {/* ── Quick stats (inline, not big cards) ── */}
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: "Produtos", val: products.length, icon: Package, color: "text-violet-500", bg: "bg-violet-50" },
-              { label: "Links", val: links.length, icon: Link2, color: "text-blue-500", bg: "bg-blue-50" },
-              { label: "Depoimentos", val: testimonials.length, icon: Star, color: "text-amber-500", bg: "bg-amber-50" },
+              { label: "Produtos", val: products.length, icon: Package, color: "text-violet-500", bg: "bg-violet-500/10" },
+              { label: "Links", val: links.length, icon: Link2, color: "text-blue-500", bg: "bg-blue-500/10" },
+              { label: "Depoimentos", val: testimonials.length, icon: Star, color: "text-amber-500", bg: "bg-amber-500/10" },
             ].map(({ label, val, icon: Icon, color, bg }) => (
               <Link key={label} to="/dashboard/pagina"
-                className="glass-card rounded-xl p-3.5 hover:shadow-sm hover:scale-[1.02] transition-all group">
+                className="glass-card card-hover rounded-xl p-3.5 group">
                 <div className="flex items-center gap-2.5">
                   <div className={`w-8 h-8 rounded-lg ${bg} flex items-center justify-center flex-shrink-0`}>
                     <Icon size={14} className={color} />
                   </div>
                   <div>
                     <p className="text-[18px] font-bold text-[hsl(var(--dash-text))] leading-none">{val}</p>
-                    <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mt-0.5">{label}</p>
+                    <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] mt-0.5">{label}</p>
                   </div>
                 </div>
               </Link>
@@ -355,7 +355,7 @@ const DashboardHome = () => {
 
           {/* ── IA teaser (subtle, not overwhelming) ── */}
           <Link to="/dashboard/ia"
-            className="glass-card rounded-2xl p-4 flex items-center gap-4 group hover:shadow-md hover:border-fuchsia-200 transition-all">
+            className="glass-card card-hover rounded-2xl p-4 flex items-center gap-4 group hover:border-fuchsia-200">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-fuchsia-500/15 to-violet-500/15 border border-fuchsia-200/50 flex items-center justify-center flex-shrink-0">
               <Sparkles size={18} className="text-fuchsia-500" />
             </div>
@@ -383,7 +383,7 @@ const DashboardHome = () => {
                 style={{ aspectRatio: "9/16" }}>
                 {/* Status bar */}
                 <div className="flex items-center justify-between px-6 pt-3 pb-1 flex-shrink-0" style={{ background: theme.bg }}>
-                  <span className="text-[10px] font-semibold" style={{ color: "rgba(255,255,255,0.7)" }}>9:41</span>
+                  <span className="text-[11px] font-semibold" style={{ color: "rgba(255,255,255,0.7)" }}>9:41</span>
                   <div className="flex items-center gap-1">
                     <div className="flex gap-[2px] items-end">
                       {[3, 4, 5, 6].map(h => (
@@ -422,10 +422,10 @@ const DashboardHome = () => {
                       </div>
                       <p className="font-bold text-[12px] text-white">{(cfg.displayName as string) || displayName || "Seu Nome"}</p>
                       {(cfg.username || username) && (
-                        <p className="text-[10px] mt-0.5" style={{ color: theme.accent }}>@{(cfg.username as string) || username}</p>
+                        <p className="text-[11px] mt-0.5" style={{ color: theme.accent }}>@{(cfg.username as string) || username}</p>
                       )}
                       {cfg.bio && (
-                        <p className="text-[9px] text-center mt-1 px-3 line-clamp-2" style={{ color: "rgba(220,220,220,0.8)" }}>
+                        <p className="text-[10px] text-center mt-1 px-3 line-clamp-2" style={{ color: "rgba(220,220,220,0.8)" }}>
                           {cfg.bio as string}
                         </p>
                       )}
@@ -441,8 +441,8 @@ const DashboardHome = () => {
                             <div key={block.id} className="flex items-center gap-2 rounded-xl border p-2 mb-1.5"
                               style={{ borderColor: theme.accent + "30", background: theme.accent + "0a" }}>
                               <span className="text-[11px] flex-shrink-0">{p.emoji || "📦"}</span>
-                              <span className="text-[9px] font-semibold text-white flex-1 truncate">{p.title}</span>
-                              {p.price && <span className="text-[9px] font-bold" style={{ color: theme.accent }}>{p.price}</span>}
+                              <span className="text-[10px] font-semibold text-white flex-1 truncate">{p.title}</span>
+                              {p.price && <span className="text-[10px] font-bold" style={{ color: theme.accent }}>{p.price}</span>}
                             </div>
                           );
                         }
@@ -452,7 +452,7 @@ const DashboardHome = () => {
                           return (
                             <div key={block.id} className="flex items-center gap-2 rounded-xl border p-2 mb-1.5"
                               style={{ borderColor: theme.accent + "25", background: theme.accent + "08" }}>
-                              <span className="text-[9px] truncate" style={{ color: "rgba(200,200,200,0.8)" }}>{l.title || l.url}</span>
+                              <span className="text-[10px] truncate" style={{ color: "rgba(200,200,200,0.8)" }}>{l.title || l.url}</span>
                             </div>
                           );
                         }
@@ -462,8 +462,8 @@ const DashboardHome = () => {
                           return (
                             <div key={block.id} className="rounded-xl border p-2 mb-1.5"
                               style={{ borderColor: theme.accent + "20", background: theme.accent + "08" }}>
-                              <p className="text-[9px] italic line-clamp-1" style={{ color: "rgba(200,200,200,0.85)" }}>"{t.text}"</p>
-                              <p className="text-[8px] mt-0.5 font-semibold" style={{ color: theme.accent }}>— {t.name}</p>
+                              <p className="text-[10px] italic line-clamp-1" style={{ color: "rgba(200,200,200,0.85)" }}>"{t.text}"</p>
+                              <p className="text-[10px] mt-0.5 font-semibold" style={{ color: theme.accent }}>— {t.name}</p>
                             </div>
                           );
                         }
@@ -471,7 +471,7 @@ const DashboardHome = () => {
                           return (
                             <div key={block.id} className="flex items-center gap-2 mb-1.5">
                               <div className="flex-1 h-px" style={{ background: theme.accent + "30" }} />
-                              <span className="text-[8px] font-bold uppercase tracking-wider" style={{ color: theme.accent + "90" }}>{block.title}</span>
+                              <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: theme.accent + "90" }}>{block.title}</span>
                               <div className="flex-1 h-px" style={{ background: theme.accent + "30" }} />
                             </div>
                           );
@@ -484,21 +484,21 @@ const DashboardHome = () => {
                           <div key={i} className="flex items-center gap-2 rounded-xl border p-2 mb-1.5"
                             style={{ borderColor: theme.accent + "30", background: theme.accent + "0a" }}>
                             <span className="text-[11px]">{p.emoji || "📦"}</span>
-                            <span className="text-[9px] font-semibold text-white flex-1 truncate">{p.title}</span>
-                            {p.price && <span className="text-[9px] font-bold" style={{ color: theme.accent }}>{p.price}</span>}
+                            <span className="text-[10px] font-semibold text-white flex-1 truncate">{p.title}</span>
+                            {p.price && <span className="text-[10px] font-bold" style={{ color: theme.accent }}>{p.price}</span>}
                           </div>
                         )) : (
                           <div className="rounded-xl border border-dashed p-3 mb-2 flex flex-col items-center gap-1"
                             style={{ borderColor: "rgba(255,255,255,0.1)" }}>
                             <Package size={12} style={{ color: "rgba(255,255,255,0.35)" }} />
-                            <p className="text-[9px]" style={{ color: "rgba(255,255,255,0.35)" }}>Adicione produtos</p>
+                            <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.35)" }}>Adicione produtos</p>
                           </div>
                         )}
 
                         {links.slice(0, 2).map((l, i) => (
                           <div key={i} className="rounded-xl border p-2 mb-1.5 text-center"
                             style={{ borderColor: theme.accent + "25", background: theme.accent + "08" }}>
-                            <span className="text-[9px]" style={{ color: "rgba(200,200,200,0.8)" }}>{l.title || l.url}</span>
+                            <span className="text-[10px]" style={{ color: "rgba(200,200,200,0.8)" }}>{l.title || l.url}</span>
                           </div>
                         ))}
                       </>
@@ -507,13 +507,13 @@ const DashboardHome = () => {
                     {/* Empty state */}
                     {products.length === 0 && links.length === 0 && blocks.length === 0 && (
                       <div className="text-center py-4 opacity-50">
-                        <p className="text-[9px]" style={{ color: "#aaa" }}>Adicione itens à sua vitrine</p>
+                        <p className="text-[10px]" style={{ color: "#aaa" }}>Adicione itens à sua vitrine</p>
                       </div>
                     )}
 
                     {/* Footer */}
                     <div className="pt-4 pb-2 text-center">
-                      <p className="text-[8px]" style={{ color: "#555" }}>Criado com maview.app</p>
+                      <p className="text-[10px]" style={{ color: "#555" }}>Criado com maview.app</p>
                     </div>
                   </div>
                 </div>
@@ -530,7 +530,7 @@ const DashboardHome = () => {
 
             {/* Below preview */}
             <div className="mt-3 text-center">
-              <p className="text-[hsl(var(--dash-text-subtle))] text-[10px]">
+              <p className="text-[hsl(var(--dash-text-subtle))] text-[11px]">
                 Atualiza em tempo real ao editar
               </p>
             </div>

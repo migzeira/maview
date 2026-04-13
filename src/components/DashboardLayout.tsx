@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
@@ -27,7 +27,7 @@ const NAV_TOP: NavItem[] = [
 
 const NAV_MAIN: NavItem[] = [
   { path: "/dashboard/pagina", label: "Minha Vitrine", icon: FileText },
-  { path: "/dashboard/audiencia", label: "Analytics", icon: BarChart3 },
+  { path: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
   { path: "/dashboard/ia", label: "IA Maview", icon: Sparkles, badge: "Novo" },
 ];
 
@@ -58,6 +58,22 @@ function getHealthFromStorage(): { score: number; missing: string[] } {
     return { score: 0, missing: [] };
   }
 }
+
+// ── Route transition wrapper ──────────────────────────────────────────────
+
+const RouteTransition = ({ children, locationKey }: { children: React.ReactNode; locationKey: string }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const prevKey = useRef(locationKey);
+  useEffect(() => {
+    if (prevKey.current !== locationKey && ref.current) {
+      ref.current.classList.remove("route-enter");
+      void ref.current.offsetWidth; // force reflow
+      ref.current.classList.add("route-enter");
+      prevKey.current = locationKey;
+    }
+  }, [locationKey]);
+  return <div ref={ref} className="route-enter">{children}</div>;
+};
 
 // ── Component ──────────────────────────────────────────────────────────────
 
@@ -207,7 +223,7 @@ const DashboardLayout = ({ children }: Props) => {
             <span className="flex-1 truncate">{item.label}</span>
             {showHealth && health.score < 100 && healthRing}
             {item.badge && (
-              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-primary text-white leading-none">
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-primary text-white leading-none">
                 {item.badge}
               </span>
             )}
@@ -409,7 +425,9 @@ const DashboardLayout = ({ children }: Props) => {
         </header>
 
         <main id="main-content" className="flex-1 overflow-y-auto bg-[hsl(var(--dash-bg))]" role="main">
-          {children}
+          <RouteTransition locationKey={location.pathname}>
+            {children}
+          </RouteTransition>
         </main>
         <FloatingAIButton />
       </div>
