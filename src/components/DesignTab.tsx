@@ -23,49 +23,82 @@ function PhoneMockup({ pack, isActive, onClick }: { pack: DesignPack; isActive: 
   const { bg, accent, accent2 } = pack.preview;
   const dd = pack.config.design;
   const ref = REFERENCE_PROFILES[pack.refIdx % REFERENCE_PROFILES.length];
+  const hasCover = !!ref.coverImage;
   const isLight = bg.startsWith("#f") || bg.startsWith("#e") || bg === "#ffffff";
-  const textC = isLight ? "#111" : "#fff";
-  const subC = isLight ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.55)";
+  const textC = dd.textColor || (isLight ? "#111" : "#fff");
+  const subC = dd.subtextColor || (isLight ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.55)");
   const btnR = dd.buttonShape === "pill" ? "999px" : dd.buttonShape === "square" ? "3px" : "8px";
   const pR = dd.profileShape === "circle" ? "9999px" : dd.profileShape === "rounded" ? "20%" : dd.profileShape === "square" ? "6px" : "0";
   const pClip = dd.profileShape === "hexagon" ? "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" : undefined;
+  const hasProductImages = ref.products.some(p => p.image);
 
   return (
     <button onClick={onClick} className={`flex-shrink-0 flex flex-col items-center gap-2.5 transition-all duration-300 ${isActive ? "scale-[1.06]" : "opacity-75 hover:opacity-100 hover:scale-[1.02]"}`} style={{ width: 150 }}>
       <div className={`relative w-[140px] rounded-[22px] overflow-hidden shadow-2xl transition-all duration-300 ${isActive ? "ring-[3px] ring-primary ring-offset-2 ring-offset-[hsl(var(--dash-bg))] shadow-primary/20" : "ring-1 ring-white/10"}`}
         style={{ aspectRatio: "9/17.5" }}>
+        {/* Background layer */}
         <div className="absolute inset-0" style={{ background: dd.bgType === "gradient" ? `linear-gradient(to bottom, ${(dd.bgGradient as [string, string])?.[0] || bg}, ${(dd.bgGradient as [string, string])?.[1] || bg})` : bg }}>
+          {dd.bgType === "image" && dd.bgImageUrl && (
+            <img src={dd.bgImageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" />
+          )}
+          {dd.bgType === "image" && dd.bgOverlay && (
+            <div className="absolute inset-0" style={{ background: `${bg}`, opacity: (dd.bgOverlay || 0) / 100 }} />
+          )}
           {dd.bgEffect && <div className="absolute inset-0 opacity-70 overflow-hidden">{getEffectPreviewElements(dd.bgEffect, accent)}</div>}
         </div>
-        <div className="relative flex flex-col items-center pt-7 pb-3 px-2.5 h-full" style={{ fontFamily: `"${dd.fontHeading || "Inter"}", sans-serif` }}>
-          <div className="w-11 h-11 mb-1.5 flex-shrink-0 overflow-hidden" style={{ borderRadius: pR, clipPath: pClip, border: dd.profileBorder ? `2px solid ${dd.profileBorderColor || accent}` : "1px solid rgba(255,255,255,0.1)" }}>
-            <img src={ref.avatar} alt="" className="w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" />
-          </div>
-          <p className="text-[9px] font-bold leading-tight text-center mb-0.5" style={{ color: textC }}>{ref.name}</p>
-          <p className="text-[6.5px] leading-tight text-center mb-2" style={{ color: subC }}>{ref.bio}</p>
-          <div className="flex gap-1 mb-2.5">
+
+        <div className="relative flex flex-col items-center h-full" style={{ fontFamily: `"${dd.fontHeading || "Inter"}", sans-serif` }}>
+          {/* Cover image */}
+          {hasCover ? (
+            <>
+              <div className="w-full h-[55px] flex-shrink-0 relative overflow-hidden">
+                <img src={ref.coverImage} alt="" className="w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" />
+                <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 40%, ${bg}CC)` }} />
+              </div>
+              <div className="-mt-5 w-11 h-11 mb-1 flex-shrink-0 overflow-hidden z-10 ring-2" style={{ borderRadius: pR, clipPath: pClip, border: dd.profileBorder ? `2px solid ${dd.profileBorderColor || accent}` : "none", ringColor: bg }}>
+                <img src={ref.avatar} alt="" className="w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" />
+              </div>
+            </>
+          ) : (
+            <div className="pt-7 w-11 h-11 mb-1.5 flex-shrink-0 overflow-hidden" style={{ borderRadius: pR, clipPath: pClip, border: dd.profileBorder ? `2px solid ${dd.profileBorderColor || accent}` : "1px solid rgba(255,255,255,0.1)" }}>
+              <img src={ref.avatar} alt="" className="w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" />
+            </div>
+          )}
+
+          <p className="text-[9px] font-bold leading-tight text-center mb-0.5 px-2" style={{ color: textC }}>{ref.name}</p>
+          <p className="text-[6px] leading-tight text-center mb-1.5 px-2 line-clamp-2" style={{ color: subC }}>{ref.bio}</p>
+          <div className="flex gap-1 mb-2">
             {ref.socials.map((_, i) => (
               <div key={i} className="w-3 h-3 rounded-full" style={{ background: `${accent}35`, border: `0.5px solid ${accent}50` }} />
             ))}
           </div>
-          <div className="w-full space-y-1 mb-2">
-            {ref.links.map((link, i) => (
-              <div key={i} className="h-[18px] w-full flex items-center justify-center" style={{
+          <div className="w-full space-y-1 mb-1.5 px-2.5">
+            {ref.links.slice(0, hasCover ? 1 : 2).map((link, i) => (
+              <div key={i} className="h-[16px] w-full flex items-center justify-center" style={{
                 borderRadius: btnR,
                 background: dd.buttonFill === "outline" ? "transparent" : dd.buttonFill === "glass" ? `${accent}12` : `${accent}18`,
                 border: dd.buttonFill === "outline" ? `0.8px solid ${accent}50` : dd.buttonFill === "glass" ? `0.5px solid ${accent}25` : "none",
                 boxShadow: dd.buttonShadow === "glow" ? `0 0 6px ${accent}25` : "none",
               }}>
-                <span className="text-[6px] font-medium" style={{ color: dd.buttonFill === "outline" ? accent : textC }}>{link}</span>
+                <span className="text-[5.5px] font-medium" style={{ color: dd.buttonFill === "outline" ? accent : textC }}>{link}</span>
               </div>
             ))}
           </div>
-          <div className="flex gap-1 w-full mt-auto">
+          <div className="flex gap-1 w-full mt-auto pb-2.5 px-2">
             {ref.products.map((prod, i) => (
-              <div key={i} className="flex-1 rounded-lg p-1" style={{ background: `${i === 0 ? accent : accent2}10`, border: `0.5px solid ${i === 0 ? accent : accent2}20` }}>
-                <div className="w-full h-5 rounded mb-0.5" style={{ background: `${i === 0 ? accent : accent2}12` }} />
-                <p className="text-[5px] font-semibold truncate" style={{ color: textC }}>{prod.title}</p>
-                <p className="text-[5px] font-bold" style={{ color: accent }}>{prod.price}</p>
+              <div key={i} className="flex-1 rounded-lg overflow-hidden" style={{
+                background: dd.cardBg || `${i === 0 ? accent : accent2}10`,
+                border: `0.5px solid ${dd.cardBorder || `${i === 0 ? accent : accent2}20`}`,
+              }}>
+                {prod.image ? (
+                  <img src={prod.image} alt="" className="w-full h-[22px] object-cover" crossOrigin="anonymous" loading="lazy" />
+                ) : (
+                  <div className="w-full h-[16px]" style={{ background: `${i === 0 ? accent : accent2}12` }} />
+                )}
+                <div className="p-0.5 px-1">
+                  <p className="text-[5px] font-semibold truncate" style={{ color: textC }}>{prod.title}</p>
+                  <p className="text-[5px] font-bold" style={{ color: accent }}>{prod.price}</p>
+                </div>
               </div>
             ))}
           </div>
