@@ -1667,12 +1667,7 @@ const ProfilePage = () => {
         <div className="fixed inset-0 pointer-events-none z-[1]" style={{ background: `rgba(0,0,0,${rd.bgOverlay / 100})` }} />
       )}
 
-      {/* ── Ambient BG glow — subtle, only on solid bg ── */}
-      {rd.bgType === "solid" && (
-        <div className="fixed inset-0 pointer-events-none overflow-hidden z-[2]" aria-hidden>
-          <div className="absolute top-[-120px] left-1/2 -translate-x-1/2 w-[500px] h-[300px] rounded-full blur-[120px] opacity-10" style={{ background: t.accent }} />
-        </div>
-      )}
+      {/* Ambient glow removed — too distracting */}
 
       {/* Social Proof Toast — disabled (too intrusive) */}
 
@@ -2077,48 +2072,7 @@ const ProfilePage = () => {
         />
       )}
 
-      {/* ── Email Capture Form ── */}
-      {!emailCaptured && (
-        <div className="relative z-10 max-w-md mx-auto px-4 pb-6">
-          <p className="text-center text-[12px] font-medium mb-2" style={{ color: t.sub }}>
-            Receba novidades e ofertas exclusivas
-          </p>
-          <form onSubmit={handleEmailSubmit}
-            className="flex gap-2 p-1.5 rounded-2xl"
-            style={{ background: t.card, border: `1px solid ${t.border}` }}
-          >
-            <div className="flex items-center gap-2 flex-1 pl-3">
-              <Mail size={16} style={{ color: t.sub, opacity: 0.5 }} />
-              <input
-                type="email"
-                required
-                placeholder="Seu melhor email"
-                value={captureEmail}
-                onChange={e => setCaptureEmail(e.target.value)}
-                className="flex-1 bg-transparent text-sm outline-none placeholder:opacity-40"
-                style={{ color: t.text }}
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={emailSubmitting}
-              className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.97] disabled:opacity-50"
-              style={{ background: `linear-gradient(135deg, ${t.accent}, ${t.accent2 || t.accent})` }}
-            >
-              {emailSubmitting ? "..." : "Inscrever"}
-            </button>
-          </form>
-        </div>
-      )}
-      {emailCaptured && (
-        <div className="relative z-10 max-w-md mx-auto px-4 pb-6">
-          <div className="flex items-center justify-center gap-2 p-4 rounded-2xl"
-            style={{ background: t.card, border: `1px solid ${t.border}` }}>
-            <Check size={16} style={{ color: "#10b981" }} />
-            <span className="text-sm font-medium" style={{ color: t.text }}>Email cadastrado com sucesso!</span>
-          </div>
-        </div>
-      )}
+      {/* Email capture removed */}
 
       {/* ── Payment Checkout Modal ── */}
       {pixCheckoutProduct && (profile.design as any)?.mercadoPagoToken ? (
@@ -2151,34 +2105,16 @@ const ProfilePage = () => {
         />
       ) : null}
 
-      {/* ── CTA flutuante — viral loop (visitantes nao logados) ── */}
-      {!rd.hideWatermark && (
-        <div className="fixed bottom-0 inset-x-0 z-50 pointer-events-none flex justify-center pb-3 px-4">
-          <Link to={`/login?ref=profile&from=${profile.username}`}
-            className="pointer-events-auto flex items-center gap-2 px-5 py-2.5 rounded-full shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl"
-            style={{
-              background: "linear-gradient(135deg, #7c3aed, #a855f7)",
-              border: "1px solid rgba(255,255,255,0.15)",
-              boxShadow: "0 8px 32px rgba(124,58,237,0.4)",
-            }}
-          >
-            <Sparkles size={14} className="text-white" />
-            <span className="text-white text-[12px] font-bold">Crie sua vitrine gratis</span>
-            <span className="text-white/60 text-[11px]">maview.app</span>
-          </Link>
-        </div>
-      )}
-
       {/* ── Footer ── */}
       {!rd.hideWatermark && (
-        <footer className="relative z-10 flex justify-center pb-16">
+        <footer className="relative z-10 flex justify-center pb-10 pt-4">
           <Link to="/"
             className="flex items-center gap-1.5 px-4 py-2 rounded-full transition-opacity duration-150 hover:opacity-80"
             style={{ background: t.card, border: `1px solid ${t.border}` }}
           >
             <img src={logoSrc} alt="Maview" className="w-3.5 h-3.5 object-contain opacity-85" />
             <span className="text-[10px] font-medium" style={{ color: t.sub }}>
-              maview.app
+              feito por maview.app
             </span>
           </Link>
         </footer>
