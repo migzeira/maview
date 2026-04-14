@@ -2,36 +2,8 @@ import React, { useState, useRef, useEffect, memo } from "react";
 import { Check } from "lucide-react";
 import { BG_EFFECTS, EFFECT_CATEGORIES } from "./constants";
 
-/* ── Inject keyframes once ────────────────────────── */
-let _injected = false;
-function injectEffectKeyframes() {
-  if (_injected) return;
-  _injected = true;
-  const style = document.createElement("style");
-  style.textContent = `
-    @keyframes mv-prev-aurora { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
-    @keyframes mv-prev-glow { 0%,100%{opacity:0.5;transform:scale(1)} 50%{opacity:0.9;transform:scale(1.15)} }
-    @keyframes mv-prev-pulse { 0%,100%{transform:scale(1);opacity:0.4} 50%{transform:scale(1.3);opacity:0.8} }
-    @keyframes mv-prev-drift { 0%{transform:translate(0,0)} 25%{transform:translate(15%,-10%)} 50%{transform:translate(-10%,5%)} 75%{transform:translate(5%,15%)} 100%{transform:translate(0,0)} }
-    @keyframes mv-prev-spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
-    @keyframes mv-prev-wave { 0%,100%{transform:translateX(0) scaleY(1)} 50%{transform:translateX(-10%) scaleY(1.2)} }
-    @keyframes mv-prev-flicker { 0%{opacity:0.3} 10%{opacity:0.5} 20%{opacity:0.2} 30%{opacity:0.6} 40%{opacity:0.3} 50%{opacity:0.7} 60%{opacity:0.4} 70%{opacity:0.5} 80%{opacity:0.3} 90%{opacity:0.6} 100%{opacity:0.3} }
-    @keyframes mv-prev-rise { 0%{transform:translateY(100%) scale(0.5);opacity:0} 50%{opacity:0.6} 100%{transform:translateY(-20%) scale(1);opacity:0} }
-    @keyframes mv-prev-ripple { 0%{transform:scale(0.3);opacity:0.7} 100%{transform:scale(2.5);opacity:0} }
-    @keyframes mv-prev-morph { 0%,100%{border-radius:60% 40% 30% 70%/60% 30% 70% 40%} 50%{border-radius:30% 60% 70% 40%/50% 60% 30% 60%} }
-    @keyframes mv-prev-sweep { 0%{transform:translateX(-100%) rotate(-45deg)} 100%{transform:translateX(200%) rotate(-45deg)} }
-    @keyframes mv-prev-orbit { 0%{transform:rotate(0deg) translateX(30%) rotate(0deg)} 100%{transform:rotate(360deg) translateX(30%) rotate(-360deg)} }
-    @keyframes mv-prev-hue { 0%{filter:hue-rotate(0deg)} 100%{filter:hue-rotate(360deg)} }
-    @keyframes mv-prev-grid-pulse { 0%,100%{opacity:0.15} 50%{opacity:0.4} }
-    @keyframes mv-prev-scan { 0%{top:-20%} 100%{top:120%} }
-    @keyframes mv-prev-breathe { 0%,100%{transform:scale(1);opacity:0.3} 50%{transform:scale(1.1);opacity:0.6} }
-  `;
-  document.head.appendChild(style);
-}
-
 /* ── Effect preview renderer ──────────────────────── */
 export function getEffectPreviewElements(effectId: string, a: string): React.ReactNode {
-  injectEffectKeyframes();
   a = a || "#a855f7";
 
   const effects: Record<string, () => React.ReactNode> = {

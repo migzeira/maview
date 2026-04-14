@@ -109,38 +109,7 @@ const ProfileHeroCard = ({ config, onUpdate, onEditProfile, onHealthAction, onCo
   useEffect(() => { setAvatarVal(config.avatarUrl); }, [config.avatarUrl]);
   useEffect(() => { if (editingName) nameInputRef.current?.focus(); }, [editingName]);
 
-  /* Inject preview animation keyframes once */
-  useEffect(() => {
-    if (document.getElementById("mvp-effect-styles")) return;
-    const s = document.createElement("style");
-    s.id = "mvp-effect-styles";
-    s.textContent = `
-      @keyframes mvp-aurora{0%,100%{transform:translateX(-20%) rotate(0deg)}50%{transform:translateX(20%) rotate(3deg)}}
-      @keyframes mvp-pulse{0%,100%{opacity:.15;transform:scale(1)}50%{opacity:.35;transform:scale(1.08)}}
-      @keyframes mvp-gradient{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-      @keyframes mvp-drift{0%{transform:translate(0,0) scale(1)}25%{transform:translate(8%,4%) scale(1.04)}50%{transform:translate(-4%,8%) scale(.96)}75%{transform:translate(-8%,-4%) scale(1.02)}100%{transform:translate(0,0) scale(1)}}
-      @keyframes mvp-float{0%,100%{transform:translateY(0) translateX(0)}33%{transform:translateY(-10px) translateX(6px)}66%{transform:translateY(6px) translateX(-4px)}}
-      @keyframes mvp-twinkle{0%,100%{opacity:.3}50%{opacity:.8}}
-      @keyframes mvp-sway{0%,100%{transform:translateX(0) scaleX(1)}25%{transform:translateX(8%) scaleX(1.04)}75%{transform:translateX(-8%) scaleX(.96)}}
-      @keyframes mvp-wave-ud{0%,100%{transform:translateY(0) scaleY(1)}30%{transform:translateY(-25px) scaleY(1.15)}60%{transform:translateY(10px) scaleY(.9)}85%{transform:translateY(-8px) scaleY(1.05)}}
-      @keyframes mvp-orbit{0%{transform:rotate(0deg) translateX(var(--orbit-r,30px)) rotate(0deg)}100%{transform:rotate(360deg) translateX(var(--orbit-r,30px)) rotate(-360deg)}}
-      @keyframes mvp-ripple{0%{transform:scale(.3);opacity:.6}100%{transform:scale(3);opacity:0}}
-      @keyframes mvp-morph{0%,100%{border-radius:60% 40% 30% 70%/60% 30% 70% 40%;transform:translate(-50%,-50%) scale(1)}25%{border-radius:30% 60% 70% 40%/50% 60% 30% 60%;transform:translate(-50%,-50%) scale(1.08)}50%{border-radius:50% 60% 30% 60%/30% 50% 70% 50%;transform:translate(-50%,-50%) scale(.95)}75%{border-radius:40% 60% 70% 30%/60% 40% 30% 70%;transform:translate(-50%,-50%) scale(1.05)}}
-      @keyframes mvp-spin{0%{transform:translate(-50%,-50%) rotate(0deg)}100%{transform:translate(-50%,-50%) rotate(360deg)}}
-      @keyframes mvp-hue{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
-      @keyframes mvp-sweep{0%{transform:translateX(-100%) skewX(-15deg)}100%{transform:translateX(300%) skewX(-15deg)}}
-      @keyframes mvp-breathe{0%,100%{transform:scale(1);opacity:.25}50%{transform:scale(1.2);opacity:.55}}
-      @keyframes mvp-rise{0%{transform:translateY(100%) scale(.5);opacity:0}30%{opacity:.7}70%{opacity:.5}100%{transform:translateY(-120%) scale(1);opacity:0}}
-      @keyframes mvp-neon-scan{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
-      @keyframes mvp-wave-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-      @keyframes mvp-globe-spin{from{transform:rotateY(0deg)}to{transform:rotateY(360deg)}}
-      @keyframes mvp-vortex-pro{0%{transform:translate(-50%,-50%) rotate(0) scale(1)}50%{transform:translate(-50%,-50%) rotate(180deg) scale(1.08)}100%{transform:translate(-50%,-50%) rotate(360deg) scale(1)}}
-      @keyframes mvp-dash-chase{to{stroke-dashoffset:-160}}
-      @keyframes mvp-flicker{0%,100%{opacity:.04}10%{opacity:.08}30%{opacity:.1}50%{opacity:.05}70%{opacity:.08}90%{opacity:.04}}
-      @keyframes mvp-slide-diag{0%{background-position:0% 0%}100%{background-position:100% 100%}}
-    `;
-    document.head.appendChild(s);
-  }, []);
+
 
   const saveName = () => {
     if (nameVal.trim()) onUpdate("displayName", nameVal.trim());

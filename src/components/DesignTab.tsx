@@ -107,7 +107,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
 
   const applyPack = useCallback((pack: DesignPack) => {
     updateConfig("theme", pack.config.theme);
-    updateConfig("design", { ...(config.design || {}), ...pack.config.design });
+    updateConfig("design", { ...pack.config.design });
     if (pack.config.design.fontHeading) loadFont(pack.config.design.fontHeading);
     if (pack.config.design.fontBody) loadFont(pack.config.design.fontBody);
     setInteracted(prev => new Set(prev).add(1));
