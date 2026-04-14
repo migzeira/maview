@@ -5,7 +5,7 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { ColorPicker, Section } from "./utils";
+import { ColorPicker, Section, getContrastColors } from "./utils";
 import EffectThumbnailGrid from "./EffectThumbnailGrid";
 import {
   type DesignConfig, type BgType, type ButtonShape, type ButtonFill,
@@ -20,9 +20,10 @@ interface AdvancedDrawerProps {
   currentTheme: ThemeDef;
   accent: string;
   setDesign: (key: keyof DesignConfig, value: any) => void;
+  onBgColorChange: (color: string) => void;
 }
 
-function AdvancedContent({ design: d, currentTheme, accent, setDesign }: Omit<AdvancedDrawerProps, "open" | "onOpenChange">) {
+function AdvancedContent({ design: d, currentTheme, accent, setDesign, onBgColorChange }: Omit<AdvancedDrawerProps, "open" | "onOpenChange">) {
   const bgImageInputRef = useRef<HTMLInputElement>(null);
   const bgVideoInputRef = useRef<HTMLInputElement>(null);
   const inputCls = "w-full rounded-xl border border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text))] text-sm px-3.5 py-2.5 placeholder:text-[hsl(var(--dash-text-subtle))] focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary/40 transition-all";
@@ -44,10 +45,10 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign }: Omit<Ad
 
         {d.bgType === "solid" && (
           <div className="space-y-3">
-            <ColorPicker value={d.bgColor || currentTheme.bg} onChange={v => { setDesign("bgColor", v); }} label="Cor de fundo" />
+            <ColorPicker value={d.bgColor || currentTheme.bg} onChange={v => onBgColorChange(v)} label="Cor de fundo" />
             <div className="grid grid-cols-6 gap-2">
               {SOLID_COLORS.map(c => (
-                <button key={c} onClick={() => { setDesign("bgColor", c); }}
+                <button key={c} onClick={() => onBgColorChange(c)}
                   className={`w-8 h-8 rounded-lg ring-1 transition-all hover:scale-110 ${(d.bgColor || currentTheme.bg) === c ? "ring-2 ring-primary" : "ring-white/10"}`} style={{ background: c }} />
               ))}
             </div>
@@ -104,7 +105,7 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign }: Omit<Ad
 
         {d.bgType === "pattern" && (
           <div className="space-y-3">
-            <ColorPicker value={d.bgColor || currentTheme.bg} onChange={v => { setDesign("bgColor", v); }} label="Cor base" />
+            <ColorPicker value={d.bgColor || currentTheme.bg} onChange={v => onBgColorChange(v)} label="Cor base" />
             <div className="grid grid-cols-4 gap-1.5">
               {BG_PATTERNS.map(p => (
                 <button key={p.id} onClick={() => setDesign("bgPattern", p.id)}
@@ -172,6 +173,11 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign }: Omit<Ad
       {/* ── Cores avancadas ── */}
       <Section title="Cores avancadas" icon={<Palette size={14} />}>
         <div className="space-y-3 pt-2">
+          <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] -mb-1">Cor de destaque (username, precos, links, icones)</p>
+          <div className="grid grid-cols-2 gap-3">
+            <ColorPicker value={d.accentColor || accent} onChange={v => setDesign("accentColor", v)} label="Destaque 1" />
+            <ColorPicker value={d.accentColor2 || accent} onChange={v => setDesign("accentColor2", v)} label="Destaque 2" />
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <ColorPicker value={d.textColor || "#f8f5ff"} onChange={v => setDesign("textColor", v)} label="Texto" />
             <ColorPicker value={d.subtextColor || "rgba(248,245,255,0.5)"} onChange={v => setDesign("subtextColor", v)} label="Subtexto" />

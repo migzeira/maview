@@ -17,16 +17,37 @@ export function hslToHex(h: number, s: number, l: number): string {
   return `#${f(0)}${f(8)}${f(4)}`;
 }
 
+/** Returns relative luminance (0–1). Values > 0.5 are "light". */
+export function getLuminance(hex: string): number {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const toLinear = (c: number) => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+}
+
+/** Returns appropriate text/subtext colors for a given background color. */
+export function getContrastColors(bgHex: string) {
+  const isLight = getLuminance(bgHex) > 0.18;
+  const textColor = isLight ? "#111827" : "#f8f5ff";
+  const subtextColor = isLight ? "rgba(17,24,39,0.65)" : "rgba(248,245,255,0.80)";
+  return { textColor, subtextColor };
+}
+
 export function generateHarmony(accentHex: string) {
-  const [h, s, l] = hexToHsl(accentHex);
-  const tw = hslToHex(h, Math.min(s * 0.15, 10), 97);
+  const [h, s] = hexToHsl(accentHex);
+  const accentLum = getLuminance(accentHex);
+  const isLightAccent = accentLum > 0.4;
+  const bgL = isLightAccent ? 96 : 3;
+  const bgColor = hslToHex(h, Math.min(s * 0.3, 20), bgL);
+  const { textColor, subtextColor } = getContrastColors(bgColor);
   return {
-    accent2: hslToHex(h + 30, s * 0.9, l + 5),
-    bgColor: hslToHex(h, Math.min(s * 0.3, 20), 3),
-    cardBg: hslToHex(h, Math.min(s * 0.25, 15), 7),
-    cardBorder: `rgba(${parseInt(accentHex.slice(1, 3), 16)},${parseInt(accentHex.slice(3, 5), 16)},${parseInt(accentHex.slice(5, 7), 16)},0.28)`,
-    textColor: tw,
-    subtextColor: `rgba(${parseInt(tw.slice(1, 3), 16)},${parseInt(tw.slice(3, 5), 16)},${parseInt(tw.slice(5, 7), 16)},0.80)`,
+    accent2: hslToHex(h + 30, s * 0.9, Math.min(accentLum > 0.5 ? 35 : 55, 70)),
+    bgColor,
+    cardBg: hslToHex(h, Math.min(s * 0.25, 15), isLightAccent ? 100 : 7),
+    cardBorder: `rgba(${parseInt(accentHex.slice(1, 3), 16)},${parseInt(accentHex.slice(3, 5), 16)},${parseInt(accentHex.slice(5, 7), 16)},${isLightAccent ? 0.12 : 0.28})`,
+    textColor,
+    subtextColor,
   };
 }
 

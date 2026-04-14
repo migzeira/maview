@@ -73,6 +73,9 @@ export interface DesignPack {
 }
 
 export const DESIGN_PACKS: DesignPack[] = [
+  { id: "pure-black", label: "Preto Puro", desc: "Minimalista e contrastante", category: "minimal", refIdx: 1,
+    preview: { bg: "#000000", accent: "#ffffff", accent2: "#a0a0a0" },
+    config: { theme: "pure-black", design: { bgType: "solid", bgColor: "#000000", bgEffect: "", buttonShape: "square", buttonFill: "outline", buttonShadow: "none", buttonRadius: 4, fontHeading: "Space Grotesk", fontBody: "JetBrains Mono", profileShape: "square", profileBorder: true, profileBorderColor: "#ffffff", profileSize: 88, accentColor: "#ffffff", accentColor2: "#a0a0a0" } } },
   { id: "luxury-dark", label: "Luxury", desc: "Elegante e sofisticado", category: "dark", refIdx: 0,
     preview: { bg: "#080612", accent: "#a855f7", accent2: "#ec4899" },
     config: { theme: "dark-purple", design: { bgType: "gradient", bgGradient: ["#080612", "#1a0a2e"], bgGradientDir: "to-b", buttonShape: "soft", buttonFill: "solid", buttonShadow: "md", buttonRadius: 14, fontHeading: "Playfair Display", fontBody: "Lora", profileShape: "circle", profileBorder: true, profileBorderColor: "#a855f7", profileSize: 96, accentColor: "#a855f7", accentColor2: "#ec4899" } } },
@@ -124,9 +127,6 @@ export const DESIGN_PACKS: DesignPack[] = [
   { id: "emerald-pro", label: "Emerald", desc: "Profissional e clean", category: "minimal", refIdx: 3,
     preview: { bg: "#021a0f", accent: "#10b981", accent2: "#6ee7b7" },
     config: { theme: "emerald", design: { bgType: "solid", bgColor: "#021a0f", bgEffect: "", buttonShape: "rounded", buttonFill: "outline", buttonShadow: "none", buttonRadius: 12, fontHeading: "Manrope", fontBody: "Rubik", profileShape: "circle", profileBorder: false, profileSize: 88, accentColor: "#10b981", accentColor2: "#6ee7b7" } } },
-  { id: "pure-black", label: "Preto Puro", desc: "Minimalista e contrastante", category: "minimal", refIdx: 1,
-    preview: { bg: "#000000", accent: "#ffffff", accent2: "#a0a0a0" },
-    config: { theme: "pure-black", design: { bgType: "solid", bgColor: "#000000", bgEffect: "", buttonShape: "square", buttonFill: "outline", buttonShadow: "none", buttonRadius: 4, fontHeading: "Space Grotesk", fontBody: "JetBrains Mono", profileShape: "square", profileBorder: true, profileBorderColor: "#ffffff", profileSize: 88, accentColor: "#ffffff", accentColor2: "#a0a0a0" } } },
   { id: "waves-ocean", label: "Ondas", desc: "Ondas em movimento", category: "animated", refIdx: 2,
     preview: { bg: "#020c14", accent: "#06b6d4", accent2: "#22d3ee" },
     config: { theme: "ocean", design: { bgType: "effect", bgEffect: "ocean-waves", bgColor: "#020c14", buttonShape: "pill", buttonFill: "solid", buttonShadow: "md", buttonRadius: 12, fontHeading: "Montserrat", fontBody: "DM Sans", profileShape: "circle", profileBorder: true, profileBorderColor: "#06b6d4", profileSize: 92, accentColor: "#06b6d4", accentColor2: "#22d3ee" } } },

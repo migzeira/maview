@@ -8,7 +8,7 @@ import {
   DESIGN_PACKS, PACK_CATEGORIES, REFERENCE_PROFILES,
   ACCENT_COLORS, GOOGLE_FONTS, FONT_PAIRS,
 } from "./design/constants";
-import { generateHarmony, extractColorsFromImage, loadFont } from "./design/utils";
+import { generateHarmony, extractColorsFromImage, loadFont, getContrastColors } from "./design/utils";
 import FontSelector from "./design/FontSelector";
 import AdvancedDrawer from "./design/AdvancedDrawer";
 import DesignWizardProgress from "./design/DesignWizardProgress";
@@ -127,6 +127,11 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
       bgColor: harmony.bgColor, cardBg: harmony.cardBg, cardBorder: harmony.cardBorder,
       textColor: harmony.textColor, subtextColor: harmony.subtextColor });
     setInteracted(prev => new Set(prev).add(2));
+  }, [config.design, updateConfig]);
+
+  const handleBgColorChange = useCallback((color: string) => {
+    const contrast = getContrastColors(color);
+    updateConfig("design", { ...(config.design || {}), bgColor: color, textColor: contrast.textColor, subtextColor: contrast.subtextColor });
   }, [config.design, updateConfig]);
 
   const autoThemeFromAvatar = useCallback(async () => {
@@ -269,6 +274,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         currentTheme={currentTheme}
         accent={accent}
         setDesign={setDesign}
+        onBgColorChange={handleBgColorChange}
       />
 
       {/* ═══════ SAVE BUTTON — fixed at bottom ═══════ */}
