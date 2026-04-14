@@ -173,9 +173,11 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, onBgColor
       {/* ── Cores avancadas ── */}
       <Section title="Cores avancadas" icon={<Palette size={14} />}>
         <div className="space-y-3 pt-2">
-          <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] -mb-1">Cor de destaque (username, precos, links, icones)</p>
+          <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] -mb-1">
+            {d.bgType === "effect" ? "Cor de destaque e da animacao (username, precos, links, icones, efeitos)" : "Cor de destaque (username, precos, links, icones)"}
+          </p>
           <div className="grid grid-cols-2 gap-3">
-            <ColorPicker value={d.accentColor || accent} onChange={v => setDesign("accentColor", v)} label="Destaque 1" />
+            <ColorPicker value={d.accentColor || accent} onChange={v => setDesign("accentColor", v)} label={d.bgType === "effect" ? "Animacao / Destaque" : "Destaque 1"} />
             <ColorPicker value={d.accentColor2 || accent} onChange={v => setDesign("accentColor2", v)} label="Destaque 2" />
           </div>
           <div className="grid grid-cols-2 gap-3">
