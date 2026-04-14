@@ -561,7 +561,7 @@ const ProfilePage = () => {
 
             {/* Primary WhatsApp CTA */}
             {profile.whatsapp && profile.products.length > 0 && (
-              <a href={`https://wa.me/55${profile.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"
+              <a href={`https://wa.me/${profile.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2.5 w-full py-4 rounded-2xl font-bold text-[15px] text-white transition-all hover:scale-[1.02] active:scale-[0.98] mt-4"
                 style={{ background: "#25d366", boxShadow: "0 4px 16px rgba(37,211,102,0.3)" }}
                 aria-label="Enviar mensagem no WhatsApp">
@@ -583,7 +583,7 @@ const ProfilePage = () => {
                   const isBooking = product.linkType === "booking";
                   const isNone = product.linkType === "none";
                   const productHref = isWhatsApp && product.url
-                    ? `https://wa.me/55${product.url}${product.whatsappMsg ? `?text=${encodeURIComponent(product.whatsappMsg)}` : ""}`
+                    ? `https://wa.me/${(product.url || "").replace(/\D/g, "")}${product.whatsappMsg ? `?text=${encodeURIComponent(product.whatsappMsg)}` : ""}`
                     : (isNone || isBooking) ? undefined : sanitizeUrl(product.url);
                   const ctaLabel = product.ctaText || (isBooking ? "Agendar" : isWhatsApp ? "WhatsApp" : product.price ? "Comprar" : "Ver mais");
                   const coverImg = product.images?.[0] || product.imageUrl;

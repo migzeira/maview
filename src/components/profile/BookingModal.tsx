@@ -72,12 +72,12 @@ const BookingModal = ({ product, whatsapp, accent, accent2, card, text, sub, bor
       if (whatsapp) {
         const msg = `Olá! Agendei via Google Calendar:\n\n📋 *${product.title}*\n📅 ${dateStr} às ${selectedTime}\n⏱️ Duração: ${durationLabel}${product.price ? `\n💰 ${product.price}` : ""}\n\nConfirmado no calendário!`;
         const phone = whatsapp.replace(/\D/g, "");
-        setTimeout(() => window.open(`https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`, "_blank"), 500);
+        setTimeout(() => window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank"), 500);
       }
     } else {
       const msg = `Olá! Gostaria de agendar:\n\n📋 *${product.title}*\n📅 ${dateStr} às ${selectedTime}\n⏱️ Duração: ${durationLabel}${product.price ? `\n💰 ${product.price}` : ""}\n\nPodemos confirmar?`;
       const phone = whatsapp.replace(/\D/g, "");
-      window.open(`https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`, "_blank");
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
     }
     onClose();
   };
