@@ -186,6 +186,12 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, onBgColor
             <ColorPicker value={d.cardBg || "#13102a"} onChange={v => setDesign("cardBg", v)} label="Fundo card" />
             <ColorPicker value={d.cardBorder || "rgba(168,85,247,0.18)"} onChange={v => setDesign("cardBorder", v)} label="Borda card" />
           </div>
+          <button onClick={() => { setDesign("cardBg", "transparent"); setDesign("cardBorder", "transparent"); }}
+            className={`w-full py-2 rounded-xl text-[10px] font-medium transition-all ${
+              d.cardBg === "transparent" ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent"
+            }`}>
+            Fundo transparente
+          </button>
         </div>
       </Section>
     </div>
