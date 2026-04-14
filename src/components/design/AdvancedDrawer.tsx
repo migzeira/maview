@@ -1,0 +1,221 @@
+import { useRef } from "react";
+import {
+  Layers, Square, Circle, Palette, Upload, X, Play,
+} from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { ColorPicker, Section } from "./utils";
+import EffectThumbnailGrid from "./EffectThumbnailGrid";
+import {
+  type DesignConfig, type BgType, type ButtonShape, type ButtonFill,
+  type ProfileShape, type ThemeDef,
+  BG_PATTERNS, SOLID_COLORS, GRADIENT_PRESETS,
+} from "./constants";
+
+interface AdvancedDrawerProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  design: DesignConfig;
+  currentTheme: ThemeDef;
+  accent: string;
+  setDesign: (key: keyof DesignConfig, value: any) => void;
+  setThemeCustom: () => void;
+}
+
+function AdvancedContent({ design: d, currentTheme, accent, setDesign, setThemeCustom }: Omit<AdvancedDrawerProps, "open" | "onOpenChange">) {
+  const bgImageInputRef = useRef<HTMLInputElement>(null);
+  const bgVideoInputRef = useRef<HTMLInputElement>(null);
+  const inputCls = "w-full rounded-xl border border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text))] text-sm px-3.5 py-2.5 placeholder:text-[hsl(var(--dash-text-subtle))] focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary/40 transition-all";
+
+  return (
+    <div className="space-y-4 px-1">
+      {/* ── Fundo ── */}
+      <Section title="Fundo" icon={<Layers size={14} />} defaultOpen>
+        <div className="flex gap-1.5 pt-2 flex-wrap">
+          {(["solid", "gradient", "image", "video", "pattern", "effect"] as BgType[]).map(type => (
+            <button key={type} onClick={() => setDesign("bgType", type)}
+              className={`flex-1 min-w-[50px] py-2 rounded-xl text-[10px] font-medium transition-all ${
+                d.bgType === type ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent"
+              }`}>
+              {type === "solid" ? "Cor" : type === "gradient" ? "Degrade" : type === "image" ? "Imagem" : type === "video" ? "Video" : type === "pattern" ? "Padrao" : "Efeito"}
+            </button>
+          ))}
+        </div>
+
+        {d.bgType === "solid" && (
+          <div className="space-y-3">
+            <ColorPicker value={d.bgColor || currentTheme.bg} onChange={v => { setDesign("bgColor", v); setThemeCustom(); }} label="Cor de fundo" />
+            <div className="grid grid-cols-6 gap-2">
+              {SOLID_COLORS.map(c => (
+                <button key={c} onClick={() => { setDesign("bgColor", c); setThemeCustom(); }}
+                  className={`w-8 h-8 rounded-lg ring-1 transition-all hover:scale-110 ${(d.bgColor || currentTheme.bg) === c ? "ring-2 ring-primary" : "ring-white/10"}`} style={{ background: c }} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {d.bgType === "gradient" && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <ColorPicker value={d.bgGradient[0]} onChange={v => { setDesign("bgGradient", [v, d.bgGradient[1]]); setThemeCustom(); }} label="Cor 1" />
+              <ColorPicker value={d.bgGradient[1]} onChange={v => { setDesign("bgGradient", [d.bgGradient[0], v]); setThemeCustom(); }} label="Cor 2" />
+            </div>
+            <div className="grid grid-cols-4 gap-1.5">
+              {GRADIENT_PRESETS.map(([c1, c2], i) => (
+                <button key={i} onClick={() => { setDesign("bgGradient", [c1, c2]); setThemeCustom(); }}
+                  className="h-7 rounded-lg ring-1 ring-white/10 hover:scale-105 transition-all" style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {d.bgType === "image" && (
+          <div className="space-y-3">
+            {d.bgImageUrl ? (
+              <div className="relative rounded-xl overflow-hidden h-28">
+                <img src={d.bgImageUrl} alt="" className="w-full h-full object-cover" />
+                <button onClick={() => setDesign("bgImageUrl", "")} className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-red-500 transition-colors"><X size={12} /></button>
+              </div>
+            ) : (
+              <button onClick={() => bgImageInputRef.current?.click()} className="w-full h-24 rounded-xl border-2 border-dashed border-[hsl(var(--dash-border))] flex flex-col items-center justify-center gap-1 text-[hsl(var(--dash-text-subtle))] hover:border-primary/40 transition-all">
+                <Upload size={18} /><span className="text-[10px]">Enviar imagem</span>
+              </button>
+            )}
+            <input type="file" ref={bgImageInputRef} accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (!f) return; const r = new FileReader(); r.onload = () => setDesign("bgImageUrl", r.result as string); r.readAsDataURL(f); e.target.value = ""; }} />
+            <input type="url" className={inputCls} placeholder="Ou cole URL..." value={d.bgImageUrl.startsWith("data:") ? "" : d.bgImageUrl} onChange={e => setDesign("bgImageUrl", e.target.value)} />
+          </div>
+        )}
+
+        {d.bgType === "video" && (
+          <div className="space-y-3">
+            {d.bgVideoUrl ? (
+              <div className="relative rounded-xl overflow-hidden h-28">
+                <video src={d.bgVideoUrl} autoPlay loop muted playsInline className="w-full h-full object-cover" />
+                <button onClick={() => setDesign("bgVideoUrl", "")} className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-red-500 transition-colors"><X size={12} /></button>
+              </div>
+            ) : (
+              <button onClick={() => bgVideoInputRef.current?.click()} className="w-full h-24 rounded-xl border-2 border-dashed border-[hsl(var(--dash-border))] flex flex-col items-center justify-center gap-1 text-[hsl(var(--dash-text-subtle))] hover:border-primary/40 transition-all">
+                <Play size={18} /><span className="text-[10px]">Enviar video (max 10MB)</span>
+              </button>
+            )}
+            <input type="file" ref={bgVideoInputRef} accept="video/mp4,video/webm" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (!f || f.size > 10485760) return; const r = new FileReader(); r.onload = () => setDesign("bgVideoUrl", r.result as string); r.readAsDataURL(f); e.target.value = ""; }} />
+          </div>
+        )}
+
+        {d.bgType === "pattern" && (
+          <div className="space-y-3">
+            <ColorPicker value={d.bgColor || currentTheme.bg} onChange={v => { setDesign("bgColor", v); setThemeCustom(); }} label="Cor base" />
+            <div className="grid grid-cols-4 gap-1.5">
+              {BG_PATTERNS.map(p => (
+                <button key={p.id} onClick={() => setDesign("bgPattern", p.id)}
+                  className={`py-2.5 rounded-xl text-[10px] font-medium transition-all ${d.bgPattern === p.id ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent"}`}>
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {d.bgType === "effect" && (
+          <EffectThumbnailGrid
+            currentEffect={d.bgEffect}
+            accentColor={accent}
+            bgColor={d.bgColor || currentTheme.bg}
+            onSelectEffect={id => { setDesign("bgEffect", id); setThemeCustom(); }}
+          />
+        )}
+      </Section>
+
+      {/* ── Botoes ── */}
+      <Section title="Botoes" icon={<Square size={14} />}>
+        <div className="space-y-3 pt-2">
+          <div className="grid grid-cols-4 gap-1.5">
+            {(["rounded", "pill", "square", "soft"] as ButtonShape[]).map(shape => (
+              <button key={shape} onClick={() => setDesign("buttonShape", shape)}
+                className={`py-2.5 rounded-xl text-[10px] font-medium transition-all ${d.buttonShape === shape ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent"}`}>
+                {shape === "rounded" ? "Arredondado" : shape === "pill" ? "Pilula" : shape === "square" ? "Quadrado" : "Suave"}
+              </button>
+            ))}
+          </div>
+          <div className="grid grid-cols-4 gap-1.5">
+            {(["solid", "outline", "glass", "ghost"] as ButtonFill[]).map(fill => (
+              <button key={fill} onClick={() => setDesign("buttonFill", fill)}
+                className={`py-2.5 rounded-xl text-[10px] font-medium transition-all ${d.buttonFill === fill ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent"}`}>
+                {fill === "solid" ? "Solido" : fill === "outline" ? "Contorno" : fill === "glass" ? "Vidro" : "Fantasma"}
+              </button>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      {/* ── Foto de perfil ── */}
+      <Section title="Foto de perfil" icon={<Circle size={14} />}>
+        <div className="space-y-3 pt-2">
+          <div className="grid grid-cols-4 gap-1.5">
+            {(["circle", "rounded", "square", "hexagon"] as ProfileShape[]).map(shape => (
+              <button key={shape} onClick={() => setDesign("profileShape", shape)}
+                className={`py-2.5 rounded-xl text-[9px] font-medium transition-all ${d.profileShape === shape ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent"}`}>
+                {shape === "circle" ? "Circulo" : shape === "rounded" ? "Arredondado" : shape === "square" ? "Quadrado" : "Hexagono"}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Borda colorida</p>
+            <button onClick={() => setDesign("profileBorder", !d.profileBorder)}
+              className={`relative w-9 h-5 rounded-full transition-colors ${d.profileBorder ? "bg-primary" : "bg-[hsl(var(--dash-border))]"}`}>
+              <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${d.profileBorder ? "left-[18px]" : "left-0.5"}`} />
+            </button>
+          </div>
+        </div>
+      </Section>
+
+      {/* ── Cores avancadas ── */}
+      <Section title="Cores avancadas" icon={<Palette size={14} />}>
+        <div className="space-y-3 pt-2">
+          <div className="grid grid-cols-2 gap-3">
+            <ColorPicker value={d.textColor || "#f8f5ff"} onChange={v => setDesign("textColor", v)} label="Texto" />
+            <ColorPicker value={d.subtextColor || "rgba(248,245,255,0.5)"} onChange={v => setDesign("subtextColor", v)} label="Subtexto" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <ColorPicker value={d.cardBg || "#13102a"} onChange={v => setDesign("cardBg", v)} label="Fundo card" />
+            <ColorPicker value={d.cardBorder || "rgba(168,85,247,0.18)"} onChange={v => setDesign("cardBorder", v)} label="Borda card" />
+          </div>
+        </div>
+      </Section>
+    </div>
+  );
+}
+
+export default function AdvancedDrawer(props: AdvancedDrawerProps) {
+  const { open, onOpenChange, ...contentProps } = props;
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+
+  if (isDesktop) {
+    return (
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent side="right" className="w-[420px] max-w-[90vw] overflow-y-auto bg-[hsl(var(--dash-bg))] border-[hsl(var(--dash-border-subtle))]">
+          <SheetHeader className="pb-2">
+            <SheetTitle className="text-[hsl(var(--dash-text))] text-[15px]">Personalizar mais</SheetTitle>
+            <SheetDescription className="text-[hsl(var(--dash-text-subtle))] text-[11px]">Fundo, botoes, foto e cores avancadas</SheetDescription>
+          </SheetHeader>
+          <AdvancedContent {...contentProps} />
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  return (
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerContent className="max-h-[85vh] bg-[hsl(var(--dash-bg))] border-[hsl(var(--dash-border-subtle))]">
+        <DrawerHeader className="pb-2">
+          <DrawerTitle className="text-[hsl(var(--dash-text))] text-[15px]">Personalizar mais</DrawerTitle>
+          <DrawerDescription className="text-[hsl(var(--dash-text-subtle))] text-[11px]">Fundo, botoes, foto e cores avancadas</DrawerDescription>
+        </DrawerHeader>
+        <div className="overflow-y-auto px-4 pb-6">
+          <AdvancedContent {...contentProps} />
+        </div>
+      </DrawerContent>
+    </Drawer>
+  );
+}

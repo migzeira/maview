@@ -9,7 +9,7 @@ import {
   Play, Smile, Search, Camera, MoreHorizontal,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { initialLoad, saveWithSync, onSyncStatus, uploadImage, retryPendingSync, type VitrineConfig as SyncVitrineConfig } from "@/lib/vitrine-sync";
+import { initialLoad, saveWithSync, forceSaveNow, onSyncStatus, uploadImage, retryPendingSync, type VitrineConfig as SyncVitrineConfig } from "@/lib/vitrine-sync";
 import { useHistory } from "@/hooks/useHistory";
 import DesignTab from "@/components/DesignTab";
 import OnboardingWizard from "@/components/OnboardingWizard";
@@ -662,6 +662,11 @@ const DashboardPagina = () => {
     });
     showSavedToast();
   }, [showSavedToast, pushConfigHistory]);
+
+  const handleForceSave = useCallback(async () => {
+    const ok = await forceSaveNow(config as unknown as SyncVitrineConfig);
+    return ok;
+  }, [config]);
 
   // ── Block helpers ─────────────────────────────────────────────────────────
 
@@ -1356,8 +1361,8 @@ const DashboardPagina = () => {
 
         {/* Scrollable screen content */}
         <div className="flex-1 overflow-y-auto relative" style={{ fontFamily: `'${pFontB}', sans-serif` }}>
-          {/* Effect overlay */}
-          {previewEffectOverlay}
+          {/* Effect overlay — crossfade on effect change */}
+          {previewEffectOverlay && <div key={d.bgEffect} className="animate-in fade-in duration-400">{previewEffectOverlay}</div>}
           {/* Ambient glow */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[200px] pointer-events-none" style={{ background: `radial-gradient(ellipse, ${pAccent}20, transparent 70%)` }} />
           <div className="p-5 relative z-10">
@@ -3192,7 +3197,7 @@ const DashboardPagina = () => {
                     {/* Mini phone mockup */}
                     <div className="flex-shrink-0 w-[140px] rounded-2xl overflow-hidden border-2 border-[hsl(var(--dash-text))]/30 shadow-lg">
                       <div className="overflow-hidden relative" style={{ ...previewBgStyle, height: 180, fontFamily: `'${pFontB}', sans-serif` }}>
-                        {previewEffectOverlay && <div className="absolute inset-0 pointer-events-none z-[1]">{previewEffectOverlay}</div>}
+                        {previewEffectOverlay && <div key={d.bgEffect} className="absolute inset-0 pointer-events-none z-[1] animate-in fade-in duration-400">{previewEffectOverlay}</div>}
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[80px] pointer-events-none" style={{ background: `radial-gradient(ellipse, ${pAccent}20, transparent 70%)` }} />
                         <div className="p-2.5 relative z-10">
                           <div className="flex flex-col items-center mb-2">
@@ -3242,6 +3247,7 @@ const DashboardPagina = () => {
                     themes={THEMES}
                     defaultDesign={DEFAULT_DESIGN}
                     updateConfig={updateConfig}
+                    onForceSave={handleForceSave}
                     highlightField={highlightField}
                     themeGridRef={themeGridRef}
                   />

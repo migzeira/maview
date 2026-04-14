@@ -1,377 +1,233 @@
-import { useState, useEffect } from "react";
-import { Palette, Type, Layout, Sun, Moon, Check } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { Check, AlertCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { initialLoad, saveWithSync, forceSaveNow, onSyncStatus, retryPendingSync, type VitrineConfig as SyncVitrineConfig } from "@/lib/vitrine-sync";
+import DesignTab from "@/components/DesignTab";
 
-const COLORS = [
-  { name: "Roxo", value: "#6D28D9" },
-  { name: "Azul", value: "#2563EB" },
-  { name: "Rosa", value: "#EC4899" },
-  { name: "Verde", value: "#059669" },
-  { name: "Laranja", value: "#EA580C" },
-  { name: "Vermelho", value: "#DC2626" },
-];
+import type { VitrineConfig, DesignConfig } from "@/types/vitrine";
+import { THEMES, DEFAULT_DESIGN, DEFAULT_CONFIG, LS_KEY } from "@/lib/vitrine-constants";
 
-const FONTS = [
-  { name: "Inter", sample: "Aa Bb Cc" },
-  { name: "Poppins", sample: "Aa Bb Cc" },
-  { name: "DM Sans", sample: "Aa Bb Cc" },
-  { name: "Space Grotesk", sample: "Aa Bb Cc" },
-];
+export default function DashboardAparencia() {
+  const [config, setConfig] = useState<VitrineConfig>(DEFAULT_CONFIG);
+  const [loading, setLoading] = useState(true);
+  const [syncStatus, setSyncStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [toastVisible, setToastVisible] = useState(false);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
-const LAYOUTS = [
-  { name: "Centralizado", desc: "Conteúdo alinhado ao centro" },
-  { name: "Cards", desc: "Blocos em formato de cards" },
-  { name: "Lista", desc: "Blocos em lista simples" },
-];
-
-const THEMES = [
-  {
-    id: "dark-purple" as const,
-    name: "Roxo Escuro",
-    accent: "#a855f7",
-    bg: "#1a0a2e",
-    surface: "#2d1a4a",
-    swatches: ["#a855f7", "#c084fc", "#7c3aed"],
-  },
-  {
-    id: "midnight" as const,
-    name: "Meia Noite",
-    accent: "#60a5fa",
-    bg: "#0a0f1e",
-    surface: "#1a2340",
-    swatches: ["#60a5fa", "#93c5fd", "#3b82f6"],
-  },
-  {
-    id: "forest" as const,
-    name: "Floresta",
-    accent: "#4ade80",
-    bg: "#071a0f",
-    surface: "#0f2d1a",
-    swatches: ["#4ade80", "#86efac", "#16a34a"],
-  },
-  {
-    id: "rose" as const,
-    name: "Rosa",
-    accent: "#f43f5e",
-    bg: "#1a0610",
-    surface: "#2d0f1e",
-    swatches: ["#f43f5e", "#fb7185", "#e11d48"],
-  },
-  {
-    id: "amber" as const,
-    name: "Âmbar",
-    accent: "#f59e0b",
-    bg: "#1a1000",
-    surface: "#2d1f00",
-    swatches: ["#f59e0b", "#fbbf24", "#d97706"],
-  },
-  {
-    id: "ocean" as const,
-    name: "Oceano",
-    accent: "#06b6d4",
-    bg: "#001a1f",
-    surface: "#002d35",
-    swatches: ["#06b6d4", "#22d3ee", "#0891b2"],
-  },
-] as const;
-
-type ThemeId = typeof THEMES[number]["id"];
-
-const LS_KEY = "maview_vitrine_config";
-
-const readThemeFromLS = (): ThemeId => {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      const valid = THEMES.find(t => t.id === parsed.theme);
-      if (valid) return valid.id;
-    }
-  } catch {
-    // ignore
-  }
-  return "dark-purple";
-};
-
-const saveThemeToLS = (theme: ThemeId) => {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    const config = raw ? JSON.parse(raw) : {};
-    config.theme = theme;
-    localStorage.setItem(LS_KEY, JSON.stringify(config));
-  } catch {
-    // ignore
-  }
-};
-
-const DashboardAparencia = () => {
-  const [selectedTheme, setSelectedTheme] = useState<ThemeId>("dark-purple");
-  const [savedToast, setSavedToast] = useState(false);
-  const [selectedColor, setSelectedColor] = useState("#6D28D9");
-  const [selectedFont, setSelectedFont] = useState("Inter");
-  const [selectedLayout, setSelectedLayout] = useState("Centralizado");
-  const [darkMode, setDarkMode] = useState(false);
-
-  // On mount: read stored theme
+  // ── Load config from Supabase ──
   useEffect(() => {
-    setSelectedTheme(readThemeFromLS());
+    const unsub = onSyncStatus(setSyncStatus);
+    (async () => {
+      await retryPendingSync();
+      const remote = await initialLoad();
+      const base: VitrineConfig = {
+        ...DEFAULT_CONFIG,
+        ...remote,
+        displayName: remote?.displayName ?? DEFAULT_CONFIG.displayName,
+        username: remote?.username ?? DEFAULT_CONFIG.username,
+        bio: remote?.bio ?? DEFAULT_CONFIG.bio,
+        avatarUrl: remote?.avatarUrl ?? DEFAULT_CONFIG.avatarUrl,
+        whatsapp: remote?.whatsapp ?? DEFAULT_CONFIG.whatsapp,
+        products: remote?.products ?? DEFAULT_CONFIG.products,
+        links: remote?.links ?? DEFAULT_CONFIG.links,
+        testimonials: remote?.testimonials ?? DEFAULT_CONFIG.testimonials,
+        blocks: remote?.blocks ?? DEFAULT_CONFIG.blocks,
+      };
+      setConfig(base);
+      setLoading(false);
+    })();
+    return unsub;
   }, []);
 
-  const handleSelectTheme = (themeId: ThemeId) => {
-    setSelectedTheme(themeId);
-    saveThemeToLS(themeId);
-    setSavedToast(true);
-    setTimeout(() => setSavedToast(false), 2000);
-  };
+  // ── Save helpers ──
+  const showSavedToast = useCallback(() => {
+    setToastVisible(true);
+    clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => setToastVisible(false), 2000);
+  }, []);
 
-  const activeTheme = THEMES.find(t => t.id === selectedTheme) ?? THEMES[0];
+  const updateConfig = useCallback(<K extends keyof VitrineConfig>(key: K, value: VitrineConfig[K]) => {
+    setConfig(prev => {
+      const next = { ...prev, [key]: value };
+      saveWithSync(next as unknown as SyncVitrineConfig);
+      return next;
+    });
+    showSavedToast();
+  }, [showSavedToast]);
+
+  const handleForceSave = useCallback(async () => {
+    const ok = await forceSaveNow(config as unknown as SyncVitrineConfig);
+    return ok;
+  }, [config]);
+
+  // ── Derived ──
+  const currentTheme = THEMES.find(t => t.id === config.theme) ?? THEMES[0];
+  const d: DesignConfig = { ...DEFAULT_DESIGN, ...config.design } as DesignConfig;
+
+  // ── Phone preview helpers ──
+  const pBg = d.bgColor || currentTheme.bg;
+  const pAccent = d.accentColor || currentTheme.accent;
+  const pAccent2 = d.accentColor2 || currentTheme.accent2;
+  const pFontH = d.fontHeading || "Inter";
+  const pFontB = d.fontBody || "Inter";
+  const pText = d.textColor || currentTheme.text;
+  const pSub = d.subtextColor || currentTheme.sub;
+  const pCard = d.cardBg || currentTheme.card;
+  const pBorder = d.cardBorder || currentTheme.border;
+  const pBtnR = d.buttonShape === "pill" ? 999 : d.buttonShape === "square" ? 4 : d.buttonShape === "soft" ? 16 : 12;
+  const pProfileR = d.profileShape === "circle" ? "9999px" : d.profileShape === "rounded" ? "20%" : d.profileShape === "square" ? "8px" : "0";
+  const pProfileClip = d.profileShape === "hexagon" ? "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" : undefined;
+  const pSize = d.profileSize || 88;
+
+  const previewBgStyle: React.CSSProperties = (() => {
+    switch (d.bgType) {
+      case "gradient": return { background: `linear-gradient(${d.bgGradientDir === "radial" ? "circle" : d.bgGradientDir?.replace("-", " ") || "to bottom"}, ${d.bgGradient?.[0] || pBg}, ${d.bgGradient?.[1] || pBg})` };
+      case "image": return d.bgImageUrl ? { backgroundImage: `url(${d.bgImageUrl})`, backgroundSize: "cover", backgroundPosition: "center" } : { background: pBg };
+      case "effect": return { background: pBg };
+      default: return { background: pBg };
+    }
+  })();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-[1100px] mx-auto px-4 md:px-8 py-8 md:py-10 space-y-8">
-      {/* Toast */}
-      {savedToast && (
-        <div className="fixed top-5 right-5 z-50 flex items-center gap-2 bg-emerald-500 text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg animate-fade-in">
-          <Check size={15} />
-          Tema salvo!
-        </div>
-      )}
-
-      <div className="space-y-1.5">
+    <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-8 md:py-10">
+      <div className="space-y-1.5 mb-8">
         <h1 className="text-2xl md:text-[28px] font-bold text-[hsl(var(--dash-text))] tracking-tight">Aparência</h1>
         <p className="text-[hsl(var(--dash-text-muted))] text-[15px]">Personalize o visual da sua página</p>
       </div>
 
-      {/* ── Tema da Vitrine ── */}
-      <div className="glass-card rounded-2xl p-6">
-        <div className="flex items-center gap-2.5 mb-5">
-          <div className="w-8 h-8 rounded-lg bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center">
-            <Palette size={15} className="text-primary" />
-          </div>
-          <div>
-            <h2 className="text-[hsl(var(--dash-text))] font-semibold text-[15px]">Tema da Vitrine</h2>
-            <p className="text-[hsl(var(--dash-text-subtle))] text-xs mt-0.5">Aparência escura aplicada na sua página pública</p>
-          </div>
+      <div className="flex gap-8">
+        {/* ── LEFT: Design editor ── */}
+        <div className="flex-1 min-w-0">
+          <DesignTab
+            config={config}
+            themes={THEMES}
+            defaultDesign={DEFAULT_DESIGN}
+            updateConfig={updateConfig}
+            onForceSave={handleForceSave}
+          />
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
-          {THEMES.map(theme => {
-            const isSelected = selectedTheme === theme.id;
-            return (
-              <button
-                key={theme.id}
-                onClick={() => handleSelectTheme(theme.id)}
-                className={`relative rounded-xl p-3 text-left transition-all duration-200 border-2 ${
-                  isSelected
-                    ? "border-violet-500 ring-2 ring-violet-500/30 scale-[1.02]"
-                    : "border-transparent hover:border-white/10 hover:scale-[1.01]"
-                }`}
-                style={{ backgroundColor: theme.bg }}
-              >
-                {isSelected && (
-                  <div
-                    className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: theme.accent }}
-                  >
-                    <Check size={11} className="text-white" />
+        {/* ── RIGHT: Live phone preview ── */}
+        <div className="hidden lg:block w-[340px] flex-shrink-0">
+          <div className="sticky top-8">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[hsl(var(--dash-text-subtle))] text-xs font-medium uppercase tracking-wider">Preview ao vivo</p>
+              <a href={`/${config.username}`} target="_blank" rel="noopener noreferrer"
+                className="text-[10px] text-primary hover:underline">
+                Abrir página
+              </a>
+            </div>
+
+            {/* Phone frame */}
+            <div className="rounded-[2.5rem] border-[3px] border-[hsl(var(--dash-border))] bg-black p-1.5 shadow-2xl">
+              {/* Status bar */}
+              <div className="flex items-center justify-between px-6 py-1.5 text-white/70 text-[10px]">
+                <span>9:41</span>
+                <div className="w-20 h-5 rounded-full bg-black" />
+                <span>●●●● ▐█</span>
+              </div>
+
+              {/* Screen */}
+              <div className="rounded-[2rem] overflow-hidden" style={{ height: 520 }}>
+                <div className="h-full overflow-y-auto relative" style={{ ...previewBgStyle, fontFamily: `'${pFontB}', sans-serif` }}>
+                  {/* Ambient glow */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[200px] pointer-events-none" style={{ background: `radial-gradient(ellipse, ${pAccent}20, transparent 70%)` }} />
+
+                  <div className="p-5 relative z-10">
+                    {/* Profile */}
+                    <div className="flex flex-col items-center mb-5">
+                      <div className="mb-2.5 overflow-hidden"
+                        style={{
+                          width: pSize, height: pSize, borderRadius: pProfileR, clipPath: pProfileClip,
+                          border: d.profileBorder ? `3px solid ${d.profileBorderColor || pAccent}` : "2px solid rgba(255,255,255,0.1)",
+                        }}>
+                        {config.avatarUrl ? (
+                          <img src={config.avatarUrl} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full" style={{ background: `linear-gradient(135deg, ${pAccent}40, ${pAccent2}40)` }} />
+                        )}
+                      </div>
+                      <p className="text-[15px] font-bold text-center" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif` }}>
+                        {config.displayName || "Seu Nome"}
+                      </p>
+                      <p className="text-[11px] mt-0.5 text-center" style={{ color: pSub }}>
+                        @{config.username || "usuario"}
+                      </p>
+                      {config.bio && (
+                        <p className="text-[10px] mt-1.5 text-center max-w-[200px] leading-relaxed" style={{ color: pSub }}>
+                          {config.bio}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Links */}
+                    {config.links?.filter(l => l.active).slice(0, 3).map((link, i) => (
+                      <div key={link.id || i} className="mb-2 p-3 rounded-xl text-center text-[11px] font-medium transition-all"
+                        style={{
+                          borderRadius: pBtnR,
+                          background: d.buttonFill === "outline" ? "transparent" : d.buttonFill === "glass" ? `${pAccent}12` : `${pAccent}18`,
+                          border: d.buttonFill === "outline" ? `1px solid ${pAccent}50` : d.buttonFill === "glass" ? `1px solid ${pAccent}20` : "1px solid transparent",
+                          color: d.buttonFill === "outline" ? pAccent : pText,
+                          boxShadow: d.buttonShadow === "glow" ? `0 0 12px ${pAccent}25` : d.buttonShadow === "md" ? "0 2px 8px rgba(0,0,0,0.15)" : "none",
+                        }}>
+                        {link.title || link.url || "Link"}
+                      </div>
+                    ))}
+
+                    {/* Products */}
+                    {config.products?.filter(p => p.active).slice(0, 2).map((prod, i) => (
+                      <div key={prod.id || i} className="mb-2 p-3 rounded-xl flex items-center gap-3"
+                        style={{ background: pCard, border: `1px solid ${pBorder}`, borderRadius: pBtnR }}>
+                        <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0" style={{ background: `${pAccent}15` }}>
+                          {prod.images?.[0] ? (
+                            <img src={prod.images[0]} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-lg">{prod.emoji || "📦"}</div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[11px] font-semibold truncate" style={{ color: pText }}>{prod.title || "Produto"}</p>
+                          <p className="text-[10px] font-bold" style={{ color: pAccent }}>
+                            {prod.price ? `R$ ${prod.price}` : ""}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Watermark */}
+                    <p className="text-center text-[8px] mt-4 opacity-40" style={{ color: pSub }}>Criado com maview.app</p>
                   </div>
-                )}
-                {/* Mini preview bar */}
-                <div
-                  className="w-full h-1.5 rounded-full mb-2.5 opacity-80"
-                  style={{ backgroundColor: theme.accent }}
-                />
-                {/* Swatches */}
-                <div className="flex gap-1 mb-2.5">
-                  {theme.swatches.map((s, i) => (
-                    <div
-                      key={i}
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: s }}
-                    />
-                  ))}
                 </div>
-                <p
-                  className="text-[11px] font-semibold"
-                  style={{ color: theme.accent }}
-                >
-                  {theme.name}
-                </p>
-                {/* Mini card preview */}
-                <div
-                  className="mt-2 rounded-lg p-1.5 border border-white/5"
-                  style={{ backgroundColor: theme.surface }}
-                >
-                  <div className="flex items-center gap-1.5">
-                    <div
-                      className="w-3 h-3 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: theme.accent }}
-                    />
-                    <div className="flex-1 h-1 rounded-full bg-white/20" />
-                  </div>
-                </div>
-              </button>
-            );
-          })}
+              </div>
+            </div>
+
+            <p className="text-center text-[10px] text-[hsl(var(--dash-text-subtle))] mt-2.5">Atualiza em tempo real ao editar</p>
+          </div>
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Settings */}
-        <div className="space-y-6">
-          {/* Colors */}
-          <div className="glass-card rounded-2xl p-6">
-            <div className="flex items-center gap-2.5 mb-5">
-              <div className="w-8 h-8 rounded-lg bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center">
-                <Palette size={15} className="text-primary" />
-              </div>
-              <h2 className="text-[hsl(var(--dash-text))] font-semibold text-[15px]">Cor principal</h2>
-            </div>
-            <div className="flex gap-3 flex-wrap">
-              {COLORS.map(c => (
-                <button
-                  key={c.value}
-                  onClick={() => setSelectedColor(c.value)}
-                  className={`w-12 h-12 rounded-xl transition-all duration-200 flex items-center justify-center ${
-                    selectedColor === c.value ? "ring-2 ring-offset-2 ring-primary scale-110" : "hover:scale-105"
-                  }`}
-                  style={{ backgroundColor: c.value }}
-                  title={c.name}
-                >
-                  {selectedColor === c.value && <Check size={16} className="text-white" />}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Typography */}
-          <div className="glass-card rounded-2xl p-6">
-            <div className="flex items-center gap-2.5 mb-5">
-              <div className="w-8 h-8 rounded-lg bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center">
-                <Type size={15} className="text-primary" />
-              </div>
-              <h2 className="text-[hsl(var(--dash-text))] font-semibold text-[15px]">Tipografia</h2>
-            </div>
-            <div className="space-y-2">
-              {FONTS.map(f => (
-                <button
-                  key={f.name}
-                  onClick={() => setSelectedFont(f.name)}
-                  className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
-                    selectedFont === f.name
-                      ? "border-primary/30 bg-[hsl(var(--dash-accent))]/50 ring-1 ring-primary/10"
-                      : "border-[hsl(var(--dash-border-subtle))] hover:border-[hsl(var(--dash-border))]"
-                  }`}
-                >
-                  <span className="text-[hsl(var(--dash-text))] text-[13px] font-medium">{f.name}</span>
-                  <span className="text-[hsl(var(--dash-text-subtle))] text-sm">{f.sample}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Layout */}
-          <div className="glass-card rounded-2xl p-6">
-            <div className="flex items-center gap-2.5 mb-5">
-              <div className="w-8 h-8 rounded-lg bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center">
-                <Layout size={15} className="text-primary" />
-              </div>
-              <h2 className="text-[hsl(var(--dash-text))] font-semibold text-[15px]">Layout da página</h2>
-            </div>
-            <div className="space-y-2">
-              {LAYOUTS.map(l => (
-                <button
-                  key={l.name}
-                  onClick={() => setSelectedLayout(l.name)}
-                  className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all text-left ${
-                    selectedLayout === l.name
-                      ? "border-primary/30 bg-[hsl(var(--dash-accent))]/50 ring-1 ring-primary/10"
-                      : "border-[hsl(var(--dash-border-subtle))] hover:border-[hsl(var(--dash-border))]"
-                  }`}
-                >
-                  <div>
-                    <p className="text-[hsl(var(--dash-text))] text-[13px] font-medium">{l.name}</p>
-                    <p className="text-[hsl(var(--dash-text-subtle))] text-xs mt-0.5">{l.desc}</p>
-                  </div>
-                  {selectedLayout === l.name && <Check size={16} className="text-primary flex-shrink-0" />}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Dark mode */}
-          <div className="glass-card rounded-2xl p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center">
-                  {darkMode ? <Moon size={15} className="text-primary" /> : <Sun size={15} className="text-primary" />}
-                </div>
-                <div>
-                  <h2 className="text-[hsl(var(--dash-text))] font-semibold text-[15px]">Modo da página</h2>
-                  <p className="text-[hsl(var(--dash-text-subtle))] text-xs">{darkMode ? "Dark mode ativado" : "Light mode ativado"}</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setDarkMode(!darkMode)}
-                className={`relative w-12 h-7 rounded-full transition-colors ${darkMode ? "bg-primary" : "bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border))]"}`}
-              >
-                <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-md transition-transform ${darkMode ? "translate-x-5" : "translate-x-0.5"}`} />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Live preview */}
-        <div className="hidden lg:block">
-          <div className="sticky top-8">
-            <p className="text-[hsl(var(--dash-text-subtle))] text-xs font-medium mb-3 uppercase tracking-wider">Pré-visualização</p>
-            <div className="rounded-[2.5rem] border-[3px] border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-surface))] p-3 shadow-xl">
-              <div className="flex justify-center mb-2">
-                <div className="w-20 h-5 rounded-full bg-[hsl(var(--dash-surface-2))]" />
-              </div>
-              <div
-                className="rounded-[1.8rem] min-h-[500px] p-5 space-y-4 overflow-hidden transition-colors duration-300"
-                style={{ backgroundColor: darkMode ? "#1a1a2e" : "#fafafa" }}
-              >
-                <div className="flex flex-col items-center mb-6">
-                  <div
-                    className="w-16 h-16 rounded-full mb-2.5 ring-2"
-                    style={{ background: `linear-gradient(135deg, ${selectedColor}, ${selectedColor}cc)`, boxShadow: `0 0 0 2px ${selectedColor}20` }}
-                  />
-                  <p className={`text-sm font-semibold ${darkMode ? "text-white" : "text-gray-900"}`} style={{ fontFamily: selectedFont }}>@usuario</p>
-                  <p className={`text-xs mt-0.5 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Minha vitrine digital</p>
-                </div>
-                {["Meu Instagram", "Ebook Premium", "Canal YouTube"].map(text => (
-                  <div
-                    key={text}
-                    className="flex items-center gap-3 rounded-xl border p-3.5 transition-all"
-                    style={{
-                      backgroundColor: darkMode ? "#2a2a3e" : "#ffffff",
-                      borderColor: darkMode ? "#3a3a4e" : "#e5e5e5",
-                    }}
-                  >
-                    <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                      style={{ backgroundColor: `${selectedColor}15` }}
-                    >
-                      <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: selectedColor }} />
-                    </div>
-                    <span className={`text-xs font-medium ${darkMode ? "text-white" : "text-gray-800"}`} style={{ fontFamily: selectedFont }}>
-                      {text}
-                    </span>
-                  </div>
-                ))}
-                <button
-                  className="w-full py-3 rounded-xl text-white text-xs font-semibold transition-all"
-                  style={{ background: `linear-gradient(135deg, ${selectedColor}, ${selectedColor}cc)` }}
-                >
-                  Comprar agora
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* ── Sync status toast ── */}
+      <div className={`fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-medium shadow-sm transition-all duration-300 pointer-events-none whitespace-nowrap z-50 ${
+        toastVisible || syncStatus === "saving"
+          ? "opacity-100 translate-y-0"
+          : "opacity-0 translate-y-2"
+      } ${syncStatus === "error" ? "bg-red-50 border border-red-100 text-red-700" : syncStatus === "saving" ? "bg-blue-50 border border-blue-100 text-blue-700" : "bg-emerald-50 border border-emerald-100 text-emerald-700"}`}>
+        {syncStatus === "saving" ? (
+          <><div className="w-3 h-3 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin" /> Salvando na nuvem...</>
+        ) : syncStatus === "error" ? (
+          <><AlertCircle size={13} className="text-red-500" /> Erro ao salvar — tentando novamente</>
+        ) : (
+          <><Check size={13} className="text-emerald-500" /> Salvo na nuvem</>
+        )}
       </div>
     </div>
   );
-};
-
-export default DashboardAparencia;
+}

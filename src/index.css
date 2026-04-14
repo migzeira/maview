@@ -525,6 +525,27 @@ input:focus, textarea:focus, select:focus {
   background: hsla(260, 20%, 60%, 0.15);
 }
 
+/* ── Design editor: effect thumbnail hover ── */
+.effect-thumb { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.effect-thumb:hover { transform: scale(1.05); box-shadow: 0 4px 20px rgba(0,0,0,0.35); }
+
+/* ── Design editor: wizard step completion pop ── */
+.wizard-step-done { animation: wizard-step-pop 0.4s ease; }
+@keyframes wizard-step-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+/* ── Design editor: celebration banner ── */
+.design-complete-banner { animation: design-complete-fade 5s ease both; }
+@keyframes design-complete-fade {
+  0% { opacity: 0; transform: translateY(10px); }
+  15% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-5px); }
+}
+
 /* ── Accessibility: respect user's motion preferences ── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

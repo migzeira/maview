@@ -188,6 +188,27 @@ export function saveWithSync(cfg: VitrineConfig) {
   }, 2000);
 }
 
+/* ── Force save immediately (for manual save button) ─── */
+export async function forceSaveNow(cfg: VitrineConfig): Promise<boolean> {
+  if (_debounceTimer) {
+    clearTimeout(_debounceTimer);
+    _debounceTimer = null;
+  }
+  saveLocal(cfg);
+  _notify("saving");
+  const ok = await pushToRemote(cfg);
+  if (ok) {
+    _pendingConfig = null;
+    _retryCount = 0;
+    _notify("saved");
+  } else {
+    _notify("error");
+    _pendingConfig = cfg;
+    scheduleRetry();
+  }
+  return ok;
+}
+
 /* ── Flush pending changes (for beforeunload) ────────── */
 export function flushSync() {
   if (_debounceTimer) {
