@@ -9,7 +9,7 @@ import {
   Play, Smile, Search, Camera, MoreHorizontal,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { initialLoad, saveWithSync, onSyncStatus, uploadImage, type VitrineConfig as SyncVitrineConfig } from "@/lib/vitrine-sync";
+import { initialLoad, saveWithSync, onSyncStatus, uploadImage, retryPendingSync, type VitrineConfig as SyncVitrineConfig } from "@/lib/vitrine-sync";
 import { useHistory } from "@/hooks/useHistory";
 import DesignTab from "@/components/DesignTab";
 import OnboardingWizard from "@/components/OnboardingWizard";
@@ -299,7 +299,7 @@ const ProfileHeroCard = ({ config, onUpdate, onEditProfile, onHealthAction, onCo
               </button>
             )}
           </div>
-          {config.username && <p className="text-[hsl(var(--dash-text-muted))] text-[12px] mb-1">@{config.username}</p>}
+          {config.username && <p className="text-[hsl(var(--dash-text-muted))] text-[12px] mb-1">{config.username.startsWith("@") ? config.username : `@${config.username}`}</p>}
           {config.bio && <p className="text-[hsl(var(--dash-text-subtle))] text-[11.5px] line-clamp-1 mb-2">{config.bio}</p>}
           {socialLinks.length > 0 && (
             <div className="flex items-center gap-1.5 mb-2.5">
@@ -418,6 +418,7 @@ const DashboardPagina = () => {
   const navigate = useNavigate();
 
   const [config, setConfig] = useState<VitrineConfig>(DEFAULT_CONFIG);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>("vitrine");
   const [toastVisible, setToastVisible] = useState(false);
   const [copyToastVisible, setCopyToastVisible] = useState(false);
@@ -436,6 +437,24 @@ const DashboardPagina = () => {
   // Product form
   const [productForm, setProductForm] = useState<ProductItem | null>(null);
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [aiGenLoading, setAiGenLoading] = useState<"title" | "desc" | null>(null);
+
+  const handleAiGenerate = async (field: "title" | "desc") => {
+    if (aiGenLoading || !productForm) return;
+    setAiGenLoading(field);
+    try {
+      const prompt = field === "title"
+        ? `Crie 1 título curto e persuasivo para um produto digital${productForm.description ? ` sobre: ${productForm.description}` : ""}. Máximo 50 caracteres. Só o título, sem aspas.`
+        : `Crie descrição de vendas persuasiva para: ${productForm.title || "produto digital"}. Máximo 150 caracteres. PT-BR. Só a descrição, sem aspas.`;
+      const { data, error } = await supabase.functions.invoke("maview-ai", { body: { message: prompt } });
+      if (!error && data?.text) {
+        const clean = data.text.replace(/^["']|["']$/g, "").trim();
+        if (field === "title") setProductForm(f => f ? { ...f, title: clean } : f);
+        else setProductForm(f => f ? { ...f, description: clean } : f);
+      }
+    } catch {}
+    setAiGenLoading(null);
+  };
 
   // Link form
   const [linkForm, setLinkForm] = useState<LinkItem | null>(null);
@@ -551,7 +570,9 @@ const DashboardPagina = () => {
   useEffect(() => {
     const unsub = onSyncStatus(setSyncStatus);
     (async () => {
-      // Load from Supabase (merges with localStorage automatically)
+      // Retry any pending sync from previous session
+      await retryPendingSync();
+      // Load from Supabase (source of truth, localStorage as cache)
       const remote = await initialLoad();
       const base: VitrineConfig = {
         ...DEFAULT_CONFIG,
@@ -598,6 +619,7 @@ const DashboardPagina = () => {
         }
       } catch { /* keep localStorage */ }
       setConfig(base);
+      setIsLoaded(true);
       // Show onboarding for first-time users
       if (!base.onboardingDone && (base.blocks || []).length === 0 && !base.products.length && !base.links.length) {
         setShowOnboarding(true);
@@ -885,6 +907,74 @@ const DashboardPagina = () => {
     setHeaderTitle(block.title || "");
     setHeaderSepStyle(block.separatorStyle || "line");
     setHeaderSepIcon(block.separatorIcon || "");
+  };
+
+  /* ── Embed state ── */
+  const [embedUrl, setEmbedUrl] = useState("");
+  const [editingEmbedBlockId, setEditingEmbedBlockId] = useState<string | null>(null);
+
+  function detectEmbedPlatform(url: string): "youtube" | "spotify" | "tiktok" | "soundcloud" | "custom" {
+    if (/youtube\.com|youtu\.be/i.test(url)) return "youtube";
+    if (/spotify\.com/i.test(url)) return "spotify";
+    if (/tiktok\.com/i.test(url)) return "tiktok";
+    if (/soundcloud\.com/i.test(url)) return "soundcloud";
+    return "custom";
+  }
+
+  function getEmbedUrl(url: string, platform: string): string {
+    if (platform === "youtube") {
+      const match = url.match(/(?:youtu\.be\/|v=)([\w-]+)/);
+      return match ? `https://www.youtube.com/embed/${match[1]}` : url;
+    }
+    if (platform === "spotify") {
+      // spotify.com/track/xxx → open.spotify.com/embed/track/xxx
+      return url.replace("open.spotify.com/", "open.spotify.com/embed/");
+    }
+    if (platform === "tiktok") {
+      const match = url.match(/video\/(\d+)/);
+      return match ? `https://www.tiktok.com/embed/v2/${match[1]}` : url;
+    }
+    return url;
+  }
+
+  const openAddEmbed = () => {
+    closeAllForms();
+    setActiveForm("embed");
+    setEmbedUrl("");
+    setEditingEmbedBlockId(null);
+  };
+
+  const openEditEmbed = (block: VitrineBlock) => {
+    closeAllForms();
+    setActiveForm("embed");
+    setEmbedUrl(block.embedUrl || "");
+    setEditingEmbedBlockId(block.id);
+  };
+
+  const saveEmbed = () => {
+    if (!embedUrl.trim()) return;
+    const platform = detectEmbedPlatform(embedUrl);
+    setConfigAndSave(prev => {
+      const next = { ...prev };
+      const blocks = [...(next.blocks || [])];
+      if (editingEmbedBlockId) {
+        const idx = blocks.findIndex(b => b.id === editingEmbedBlockId);
+        if (idx >= 0) {
+          blocks[idx] = { ...blocks[idx], embedUrl: embedUrl.trim(), embedPlatform: platform, title: platform === "custom" ? "Embed" : platform.charAt(0).toUpperCase() + platform.slice(1) };
+        }
+      } else {
+        blocks.push({
+          id: crypto.randomUUID(),
+          type: "embed",
+          embedUrl: embedUrl.trim(),
+          embedPlatform: platform,
+          title: platform === "custom" ? "Embed" : platform.charAt(0).toUpperCase() + platform.slice(1),
+        });
+      }
+      next.blocks = blocks;
+      return next;
+    });
+    closeAllForms();
   };
 
   // ── Save helpers ──────────────────────────────────────────────────────────
@@ -1243,9 +1333,9 @@ const DashboardPagina = () => {
   const phonePreview = (
     <div className="relative mx-auto" style={{ width: 310 }}>
       <div className="rounded-[2.8rem] border-[3px] border-[hsl(var(--dash-text))] overflow-hidden shadow-2xl flex flex-col"
-        style={{ aspectRatio: "9/16" }}>
+        style={{ aspectRatio: "9/16", ...previewBgStyle }}>
         {/* Status bar */}
-        <div className="flex items-center justify-between px-6 pt-3 pb-1 flex-shrink-0" style={{ background: pBg }}>
+        <div className="flex items-center justify-between px-6 pt-3 pb-1 flex-shrink-0">
           <span className="text-[10px] font-semibold" style={{ color: "rgba(255,255,255,0.7)" }}>9:41</span>
           <div className="flex items-center gap-1">
             <div className="flex gap-[2px] items-end">
@@ -1260,12 +1350,12 @@ const DashboardPagina = () => {
         </div>
 
         {/* Dynamic Island */}
-        <div className="flex justify-center pb-3 flex-shrink-0" style={{ background: pBg }}>
+        <div className="flex justify-center pb-3 flex-shrink-0">
           <div className="w-[88px] h-[26px] rounded-full bg-black" />
         </div>
 
         {/* Scrollable screen content */}
-        <div className="flex-1 overflow-y-auto relative" style={{ ...previewBgStyle, fontFamily: `'${pFontB}', sans-serif` }}>
+        <div className="flex-1 overflow-y-auto relative" style={{ fontFamily: `'${pFontB}', sans-serif` }}>
           {/* Effect overlay */}
           {previewEffectOverlay}
           {/* Ambient glow */}
@@ -1293,7 +1383,7 @@ const DashboardPagina = () => {
                 )}
               </div>
               <p className="font-bold text-sm" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif` }}>{config.displayName || "Seu Nome"}</p>
-              {config.username && <p className="text-xs mt-0.5" style={{ color: pAccent }}>@{config.username}</p>}
+              {config.username && <p className="text-xs mt-0.5" style={{ color: pAccent }}>{config.username.startsWith("@") ? config.username : `@${config.username}`}</p>}
               {config.bio && <p className="text-xs text-center mt-1.5 px-2 line-clamp-2" style={{ color: pSub }}>{config.bio}</p>}
               {config.whatsapp && (
                 <div className="flex items-center gap-1 mt-2 px-2.5 py-1 rounded-full" style={{ background: "#25d36618" }}>
@@ -1470,6 +1560,60 @@ const DashboardPagina = () => {
     </div>
   );
 
+  // ── Skeleton while loading ────────────────────────────────────────────────
+
+  if (!isLoaded) {
+    return (
+      <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-8 animate-pulse">
+        {/* Header skeleton */}
+        <div className="mb-5 flex items-start justify-between">
+          <div className="space-y-2">
+            <div className="h-7 w-48 bg-[hsl(var(--dash-border))] rounded-lg" />
+            <div className="h-4 w-32 bg-[hsl(var(--dash-border))] rounded-md" />
+          </div>
+          <div className="flex gap-2">
+            <div className="h-9 w-24 bg-[hsl(var(--dash-border))] rounded-xl" />
+            <div className="h-9 w-9 bg-[hsl(var(--dash-border))] rounded-xl" />
+          </div>
+        </div>
+        {/* Profile card skeleton */}
+        <div className="rounded-2xl border border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-surface))] p-5 mb-5">
+          <div className="flex items-start gap-4">
+            <div className="w-16 h-16 rounded-full bg-[hsl(var(--dash-border))]" />
+            <div className="flex-1 space-y-2">
+              <div className="h-5 w-40 bg-[hsl(var(--dash-border))] rounded-md" />
+              <div className="h-4 w-56 bg-[hsl(var(--dash-border))] rounded-md" />
+              <div className="h-3 w-24 bg-[hsl(var(--dash-border))] rounded-md" />
+            </div>
+          </div>
+        </div>
+        {/* Tabs skeleton */}
+        <div className="flex gap-2 mb-5">
+          {[1,2,3].map(i => <div key={i} className="h-10 w-28 bg-[hsl(var(--dash-border))] rounded-xl" />)}
+        </div>
+        {/* Content skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr,320px] gap-6">
+          <div className="space-y-4">
+            {[1,2,3].map(i => (
+              <div key={i} className="rounded-xl border border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-surface))] p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-[hsl(var(--dash-border))]" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-32 bg-[hsl(var(--dash-border))] rounded-md" />
+                    <div className="h-3 w-20 bg-[hsl(var(--dash-border))] rounded-md" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="hidden lg:block">
+            <div className="rounded-2xl border border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-surface))] h-[500px]" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
@@ -1580,6 +1724,7 @@ const DashboardPagina = () => {
                           { type: "link" as const, icon: <Link2 size={15} className="text-primary" />, label: "Link", desc: "Direcione para qualquer URL" },
                           { type: "testimonial" as const, icon: <Star size={15} className="text-primary" />, label: "Depoimento", desc: "Prova social" },
                           { type: "header" as const, icon: <Type size={15} className="text-[hsl(var(--dash-text-subtle))]" />, label: "Separador", desc: "Organize seções" },
+                          { type: "embed" as const, icon: <Play size={15} className="text-primary" />, label: "Embed", desc: "YouTube, Spotify, TikTok" },
                         ].map(opt => (
                           <button key={opt.type}
                             onClick={() => {
@@ -1588,6 +1733,7 @@ const DashboardPagina = () => {
                               else if (opt.type === "booking") openAddBooking();
                               else if (opt.type === "link") openAddLink();
                               else if (opt.type === "testimonial") openAddTestimonial();
+                              else if (opt.type === "embed") openAddEmbed();
                               else openAddHeader();
                             }}
                             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left hover:bg-[hsl(var(--dash-surface-2))] transition-all"
@@ -1810,7 +1956,15 @@ const DashboardPagina = () => {
 
                     {/* ═══ TITLE ═══ */}
                     <div>
-                      <label className={labelCls}>Título</label>
+                      <div className="flex items-center justify-between">
+                        <label className={labelCls}>Título</label>
+                        <button type="button" onClick={() => handleAiGenerate("title")}
+                          disabled={!!aiGenLoading}
+                          className="flex items-center gap-1 text-[10px] text-fuchsia-500 font-medium hover:text-fuchsia-600 disabled:opacity-50 transition-colors mb-1.5">
+                          <Sparkles size={10} className={aiGenLoading === "title" ? "animate-spin" : ""} />
+                          {aiGenLoading === "title" ? "Gerando..." : "Gerar com IA"}
+                        </button>
+                      </div>
                       <input type="text" className={inputCls} placeholder="Ex: Curso de Design Digital"
                         value={productForm.title}
                         onChange={e => setProductForm(f => f ? { ...f, title: e.target.value } : f)} />
@@ -1818,7 +1972,15 @@ const DashboardPagina = () => {
 
                     {/* ═══ DESCRIPTION ═══ */}
                     <div>
-                      <label className={labelCls}>Descrição <span className="text-[hsl(var(--dash-text-subtle))] font-normal">(opcional)</span></label>
+                      <div className="flex items-center justify-between">
+                        <label className={labelCls}>Descrição <span className="text-[hsl(var(--dash-text-subtle))] font-normal">(opcional)</span></label>
+                        <button type="button" onClick={() => handleAiGenerate("desc")}
+                          disabled={!!aiGenLoading || !productForm.title}
+                          className="flex items-center gap-1 text-[10px] text-fuchsia-500 font-medium hover:text-fuchsia-600 disabled:opacity-50 transition-colors mb-1.5">
+                          <Sparkles size={10} className={aiGenLoading === "desc" ? "animate-spin" : ""} />
+                          {aiGenLoading === "desc" ? "Gerando..." : "Gerar com IA"}
+                        </button>
+                      </div>
                       <input type="text" className={inputCls} placeholder="Uma frase sobre o que é"
                         value={productForm.description}
                         onChange={e => setProductForm(f => f ? { ...f, description: e.target.value } : f)} />
@@ -2105,6 +2267,34 @@ const DashboardPagina = () => {
                           <input type="text" className={inputCls} placeholder="OFERTA"
                             value={productForm.badge}
                             onChange={e => setProductForm(f => f ? { ...f, badge: e.target.value } : f)} />
+                        </div>
+
+                        {/* Cupom de desconto */}
+                        <div className="rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] p-3 space-y-2">
+                          <p className="text-[hsl(var(--dash-text))] text-xs font-semibold flex items-center gap-1">
+                            🏷️ Cupom de desconto <span className="text-[hsl(var(--dash-text-subtle))] font-normal">(opcional)</span>
+                          </p>
+                          <div className="grid grid-cols-2 gap-2">
+                            <input type="text" className={inputCls} placeholder="CODIGO10"
+                              value={(productForm as any).couponCode || ""}
+                              onChange={e => setProductForm(f => f ? { ...f, couponCode: e.target.value.toUpperCase().replace(/\s/g, "") } : f)} />
+                            <div className="flex items-center gap-1">
+                              <input type="text" className={`${inputCls} flex-1`} placeholder="10"
+                                value={(productForm as any).couponDiscount || ""}
+                                onChange={e => setProductForm(f => f ? { ...f, couponDiscount: parseInt(e.target.value.replace(/\D/g, "")) || 0 } : f)} />
+                              <select className={`${inputCls} w-16`}
+                                value={(productForm as any).couponType || "percent"}
+                                onChange={e => setProductForm(f => f ? { ...f, couponType: e.target.value } : f)}>
+                                <option value="percent">%</option>
+                                <option value="fixed">R$</option>
+                              </select>
+                            </div>
+                          </div>
+                          {(productForm as any).couponCode && (
+                            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">
+                              Compradores informam o código "{(productForm as any).couponCode}" para {(productForm as any).couponType === "fixed" ? `R$ ${(productForm as any).couponDiscount || 0} off` : `${(productForm as any).couponDiscount || 0}% off`}
+                            </p>
+                          )}
                         </div>
 
                         {/* Urgência */}
@@ -2443,6 +2633,42 @@ const DashboardPagina = () => {
 
                     <div className="flex gap-2 pt-1">
                       <button onClick={saveHeader} className="flex-1 btn-primary-gradient text-xs py-2 rounded-xl transition-transform active:scale-[0.97]">
+                        <Check size={13} className="inline mr-1" /> Salvar
+                      </button>
+                      <button onClick={closeAllForms}
+                        className="flex-1 text-xs py-2 rounded-xl border border-[hsl(var(--dash-border))] text-[hsl(var(--dash-text-muted))] hover:bg-[hsl(var(--dash-surface-2))] transition-all">
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Embed form */}
+                {activeForm === "embed" && (
+                  <div className="rounded-2xl border border-primary/20 bg-[hsl(var(--dash-accent))]/30 p-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
+                    <h3 className="text-[hsl(var(--dash-text))] text-sm font-semibold flex items-center gap-2">
+                      <Play size={15} className="text-primary" />
+                      {editingEmbedBlockId ? "Editar Embed" : "Novo Embed"}
+                    </h3>
+                    <p className="text-[hsl(var(--dash-text-subtle))] text-[11px]">
+                      Cole o link do YouTube, Spotify, TikTok ou SoundCloud
+                    </p>
+                    <div>
+                      <label className={labelCls}>URL do conteúdo</label>
+                      <input type="url" className={inputCls}
+                        placeholder="https://youtube.com/watch?v=... ou https://open.spotify.com/track/..."
+                        value={embedUrl}
+                        onChange={e => setEmbedUrl(e.target.value)} />
+                    </div>
+                    {embedUrl && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="text-[hsl(var(--dash-text-muted))]">Plataforma detectada:</span>
+                        <span className="text-primary font-semibold capitalize">{detectEmbedPlatform(embedUrl)}</span>
+                      </div>
+                    )}
+                    <div className="flex gap-2 pt-1">
+                      <button onClick={saveEmbed} disabled={!embedUrl.trim()}
+                        className="flex-1 btn-primary-gradient text-xs py-2 rounded-xl transition-transform active:scale-[0.97] disabled:opacity-50">
                         <Check size={13} className="inline mr-1" /> Salvar
                       </button>
                       <button onClick={closeAllForms}

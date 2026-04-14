@@ -5,10 +5,11 @@ import type { User } from "@supabase/supabase-js";
 import MaviewLogo from "./MaviewLogo";
 import FloatingAIButton from "./FloatingAIButton";
 import AmbientGlow from "./AmbientGlow";
+import NotificationCenter from "./NotificationCenter";
 import {
   Home, FileText, BarChart3, Sparkles, Settings,
   LogOut, ExternalLink, Copy, Check, ChevronLeft, ChevronRight, Menu,
-  TrendingUp, Zap, X, ArrowUpRight, Sun, Moon,
+  TrendingUp, Zap, X, ArrowUpRight, Sun, Moon, Users, DollarSign,
 } from "lucide-react";
 
 // ── Navigation ─────────────────────────────────────────────────────────────
@@ -27,7 +28,10 @@ const NAV_TOP: NavItem[] = [
 
 const NAV_MAIN: NavItem[] = [
   { path: "/dashboard/pagina", label: "Minha Vitrine", icon: FileText },
+  { path: "/dashboard/monetizacao", label: "Monetizacao", icon: DollarSign },
+  { path: "/dashboard/clientes", label: "Clientes", icon: Users },
   { path: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
+  { path: "/dashboard/automacoes", label: "Automacoes", icon: Zap },
   { path: "/dashboard/ia", label: "IA Maview", icon: Sparkles, badge: "Novo" },
 ];
 
@@ -405,6 +409,7 @@ const DashboardLayout = ({ children }: Props) => {
           </div>
 
           <div className="flex items-center gap-2">
+            <NotificationCenter />
             <button
               onClick={() => setDarkMode(d => !d)}
               className="p-2 rounded-lg touch-target text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] transition-all"

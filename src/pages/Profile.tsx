@@ -81,6 +81,13 @@ interface TestimonialItem {
   screenshotUrl?: string;
 }
 
+interface EmbedItem {
+  id: string;
+  url: string;
+  platform: "youtube" | "spotify" | "tiktok" | "soundcloud" | "custom";
+  title?: string;
+}
+
 interface ProfileData {
   username: string;
   displayName: string;
@@ -93,6 +100,7 @@ interface ProfileData {
   products: ProductItem[];
   testimonials?: TestimonialItem[];
   stats?: { label: string; value: string }[];
+  embeds?: EmbedItem[];
 }
 
 /* ─── Themes ──────────────────────────────────────────────────── */
@@ -1389,6 +1397,12 @@ const ProfilePage = () => {
           if (!p.images) return { ...p, images: [] };
           return p;
         });
+        // Extract embeds from blocks
+        const remoteBlocks = ((remote as any).blocks as any[]) || [];
+        const embeds: EmbedItem[] = remoteBlocks
+          .filter((b: any) => b.type === "embed" && b.embedUrl)
+          .map((b: any) => ({ id: b.id, url: b.embedUrl, platform: b.embedPlatform || "custom", title: b.title }));
+
         const dbProfile: ProfileData = {
           username: (remote.username || slug).replace(/^@/, ""),
           displayName: remote.displayName || slug,
@@ -1400,6 +1414,7 @@ const ProfilePage = () => {
           products: migratedProducts.filter((p: any) => p.active),
           links: ((remote.links as any[]) || []).filter((l: any) => l.active),
           testimonials: (remote.testimonials as any[]) || [],
+          embeds,
           stats: undefined,
         };
         setProfile(dbProfile);
@@ -1970,6 +1985,35 @@ const ProfilePage = () => {
             </section>
           )}
 
+          {/* ── EMBEDS (YouTube, Spotify, TikTok, SoundCloud) ── */}
+          {profile.embeds && profile.embeds.length > 0 && (
+            <section className="space-y-3">
+              {profile.embeds.map(embed => {
+                const getEmbedSrc = (url: string, platform: string) => {
+                  if (platform === "youtube") {
+                    const m = url.match(/(?:youtu\.be\/|v=)([\w-]+)/);
+                    return m ? `https://www.youtube.com/embed/${m[1]}` : null;
+                  }
+                  if (platform === "spotify") return url.replace("open.spotify.com/", "open.spotify.com/embed/");
+                  if (platform === "tiktok") {
+                    const m = url.match(/video\/(\d+)/);
+                    return m ? `https://www.tiktok.com/embed/v2/${m[1]}` : null;
+                  }
+                  if (platform === "soundcloud") return `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&auto_play=false&visual=true`;
+                  return null;
+                };
+                const src = getEmbedSrc(embed.url, embed.platform);
+                if (!src) return null;
+                const h = embed.platform === "youtube" ? "215" : embed.platform === "tiktok" ? "500" : embed.url?.includes("/track/") ? "80" : "152";
+                return (
+                  <div key={embed.id} className="rounded-2xl overflow-hidden" style={{ border: `1px solid ${t.border}` }}>
+                    <iframe src={src} width="100%" height={h} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{ border: "none" }} title={embed.title || embed.platform} />
+                  </div>
+                );
+              })}
+            </section>
+          )}
+
           {/* ── LINKS ── */}
           {regularLinks.length > 0 && (
             <section>
@@ -2103,6 +2147,7 @@ const ProfilePage = () => {
         <MercadoPagoCheckout
           product={pixCheckoutProduct}
           sellerAccessToken={(profile.design as any).mercadoPagoToken}
+          sellerUsername={profile.username}
           accent={t.accent}
           accent2={t.accent2}
           bg={t.bg}

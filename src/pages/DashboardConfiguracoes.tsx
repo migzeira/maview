@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Settings, User, Globe, Link2, Bell, Shield, Check, Save,
+  Upload, Camera, Clock, Sparkles, Loader2,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { saveWithSync, loadLocal } from "@/lib/vitrine-sync";
+import { initialLoad, loadLocal, saveWithSync, uploadImage } from "@/lib/vitrine-sync";
 
 const TABS = [
   { id: "perfil",       label: "Perfil",       icon: User     },
@@ -11,16 +12,6 @@ const TABS = [
   { id: "integracoes",  label: "Integrações",   icon: Link2    },
   { id: "notificacoes", label: "Notificações",  icon: Bell     },
 ];
-
-const LS_KEY = "maview_vitrine_config";
-
-function loadVitrine() {
-  try { return JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch { return {}; }
-}
-function saveVitrine(data: object) {
-  const existing = loadVitrine();
-  localStorage.setItem(LS_KEY, JSON.stringify({ ...existing, ...data }));
-}
 
 const DashboardConfiguracoes = () => {
   const [activeTab, setActiveTab] = useState("perfil");
@@ -34,6 +25,10 @@ const DashboardConfiguracoes = () => {
   const [saving, setSaving]           = useState(false);
   const [saved, setSaved]             = useState(false);
 
+  /* ── Avatar upload state ── */
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
   /* ── Integration state ── */
   const [gaId, setGaId] = useState("");
   const [metaPixelId, setMetaPixelId] = useState("");
@@ -42,49 +37,72 @@ const DashboardConfiguracoes = () => {
   const [mpToken, setMpToken] = useState("");
   const [integSaved, setIntegSaved] = useState("");
 
-  /* ── Notif toggles ── */
+  /* ── Notif toggles (persisted via design JSONB) ── */
   const [notifs, setNotifs] = useState({
     venda: true, lead: true, visitas: false, email: false,
   });
 
+  /* ── Domain waitlist state ── */
+  const [domainWaitlisted, setDomainWaitlisted] = useState(false);
+
   useEffect(() => {
-    // Load from localStorage
-    const cfg = loadVitrine();
-    if (cfg.displayName) setDisplayName(cfg.displayName);
-    if (cfg.username)    setUsername(cfg.username);
-    if (cfg.bio)         setBio(cfg.bio);
-    if (cfg.avatarUrl)   setAvatarUrl(cfg.avatarUrl);
+    (async () => {
+      // Load from Supabase (source of truth) via initialLoad
+      const cfg = await initialLoad();
 
-    const design = (cfg.design || {}) as Record<string, unknown>;
-    if (design.gaId) setGaId(design.gaId as string);
-    if (design.metaPixelId) setMetaPixelId(design.metaPixelId as string);
-    if (design.webhookUrl) setWebhookUrl(design.webhookUrl as string);
-    if (design.pixKey) setPixKey(design.pixKey as string);
-    if (design.mercadoPagoToken) setMpToken(design.mercadoPagoToken as string);
+      if (cfg.displayName) setDisplayName(cfg.displayName);
+      if (cfg.username)    setUsername(cfg.username);
+      if (cfg.bio)         setBio(cfg.bio);
+      if (cfg.avatarUrl)   setAvatarUrl(cfg.avatarUrl);
 
-    // Load email from Supabase session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+      const design = (cfg.design || {}) as Record<string, unknown>;
+      if (design.gaId) setGaId(design.gaId as string);
+      if (design.metaPixelId) setMetaPixelId(design.metaPixelId as string);
+      if (design.webhookUrl) setWebhookUrl(design.webhookUrl as string);
+      if (design.pixKey) setPixKey(design.pixKey as string);
+      if (design.mercadoPagoToken) setMpToken(design.mercadoPagoToken as string);
+
+      // Load notification prefs from design JSONB
+      const notifPrefs = design.notificationPrefs as Record<string, boolean> | undefined;
+      if (notifPrefs) {
+        setNotifs(prev => ({ ...prev, ...notifPrefs }));
+      }
+
+      // Load domain waitlist status
+      if (design.domainWaitlist) setDomainWaitlisted(true);
+
+      // Load email from Supabase session
+      const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         setEmail(session.user.email || "");
-        // Only pre-fill from session if localStorage doesn't have it
         if (!cfg.displayName) setDisplayName(session.user.user_metadata?.full_name || "");
         if (!cfg.username)    setUsername(session.user.user_metadata?.username || session.user.email?.split("@")[0] || "");
       }
-    });
+    })();
   }, []);
 
+  /* ── Save profile → Supabase via saveWithSync ── */
   const handleSave = async () => {
     setSaving(true);
-    // Save to localStorage
-    saveVitrine({ displayName, username, bio, avatarUrl });
 
-    // Update Supabase user metadata
+    // Read current full config, merge profile fields, save via sync
+    const current = loadLocal();
+    const merged = {
+      ...current,
+      displayName,
+      username: username.replace(/^@/, ""),
+      bio,
+      avatarUrl,
+    };
+    saveWithSync(merged);
+
+    // Also update Supabase user metadata
     try {
       await supabase.auth.updateUser({
-        data: { full_name: displayName, username },
+        data: { full_name: displayName, username: username.replace(/^@/, "") },
       });
     } catch {
-      // silent — localStorage already saved
+      // silent — vitrine sync already saved
     }
 
     setSaving(false);
@@ -92,15 +110,77 @@ const DashboardConfiguracoes = () => {
     setTimeout(() => setSaved(false), 2200);
   };
 
+  /* ── Avatar file upload ── */
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Imagem muito grande. Máximo 5MB.");
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      alert("Selecione um arquivo de imagem.");
+      return;
+    }
+
+    setUploading(true);
+
+    // Instant local preview
+    const previewUrl = URL.createObjectURL(file);
+    setAvatarUrl(previewUrl);
+
+    // Upload to Supabase Storage
+    const publicUrl = await uploadImage(file, "avatars");
+    if (publicUrl) {
+      setAvatarUrl(publicUrl);
+      // Save immediately to vitrine config
+      const current = loadLocal();
+      saveWithSync({ ...current, avatarUrl: publicUrl });
+    } else {
+      // Revert preview if upload failed
+      const current = loadLocal();
+      setAvatarUrl(current.avatarUrl || "");
+    }
+
+    setUploading(false);
+    // Clean up file input for re-upload
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  /* ── Integration save ── */
   const saveIntegration = (key: string, value: string) => {
-    const cfg = loadVitrine();
+    const cfg = loadLocal();
     const design = (cfg.design || {}) as Record<string, unknown>;
     design[key] = value;
     cfg.design = design;
-    saveVitrine(cfg);
     saveWithSync(cfg);
     setIntegSaved(key);
     setTimeout(() => setIntegSaved(""), 2000);
+  };
+
+  /* ── Notification toggle → persist in design JSONB ── */
+  const toggleNotif = (key: string) => {
+    const newNotifs = { ...notifs, [key]: !notifs[key as keyof typeof notifs] };
+    setNotifs(newNotifs);
+
+    // Persist to Supabase via design.notificationPrefs
+    const cfg = loadLocal();
+    const design = (cfg.design || {}) as Record<string, unknown>;
+    design.notificationPrefs = newNotifs;
+    cfg.design = design;
+    saveWithSync(cfg);
+  };
+
+  /* ── Domain waitlist ── */
+  const handleDomainWaitlist = () => {
+    const cfg = loadLocal();
+    const design = (cfg.design || {}) as Record<string, unknown>;
+    design.domainWaitlist = true;
+    cfg.design = design;
+    saveWithSync(cfg);
+    setDomainWaitlisted(true);
   };
 
   const initials = displayName
@@ -134,22 +214,49 @@ const DashboardConfiguracoes = () => {
       {/* ── PERFIL ── */}
       {activeTab === "perfil" && (
         <div className="glass-card rounded-2xl p-6 md:p-7 space-y-6">
-          {/* Avatar row */}
+          {/* Avatar row with REAL upload */}
           <div className="flex items-center gap-4">
-            <div className="relative w-16 h-16 rounded-full overflow-hidden ring-4 ring-primary/10 flex-shrink-0">
-              {avatarUrl ? (
+            <div
+              className="relative w-16 h-16 rounded-full overflow-hidden ring-4 ring-primary/10 flex-shrink-0 cursor-pointer group"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {uploading ? (
+                <div className="w-full h-full bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center">
+                  <Loader2 size={20} className="text-white animate-spin" />
+                </div>
+              ) : avatarUrl ? (
                 <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl font-bold">
                   {initials}
                 </div>
               )}
+              {/* Upload overlay */}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <Camera size={18} className="text-white" />
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                className="hidden"
+                onChange={handleAvatarUpload}
+              />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[hsl(var(--dash-text))] font-semibold text-[14px]">{displayName || "Seu nome"}</p>
               <p className="text-[hsl(var(--dash-text-subtle))] text-xs mt-0.5">{window.location.host}/{username?.replace(/^@/, "") || "usuario"}</p>
-              <div className="mt-2">
-                <label className="text-[hsl(var(--dash-text-subtle))] text-xs font-medium block mb-1">URL da foto</label>
+              <div className="mt-2 flex items-center gap-2">
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] text-[hsl(var(--dash-text-secondary))] hover:border-primary/30 transition-all disabled:opacity-50"
+                >
+                  <Upload size={12} /> {uploading ? "Enviando..." : "Enviar foto"}
+                </button>
+                <span className="text-[hsl(var(--dash-text-subtle))] text-[10px]">ou cole URL abaixo</span>
+              </div>
+              <div className="mt-1.5">
                 <input
                   type="url"
                   className="w-full px-3 py-1.5 rounded-lg bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] text-[hsl(var(--dash-text))] text-xs focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary/30 transition-all"
@@ -219,30 +326,48 @@ const DashboardConfiguracoes = () => {
         </div>
       )}
 
-      {/* ── DOMÍNIO ── */}
+      {/* ── DOMÍNIO — Coming Soon with Waitlist ── */}
       {activeTab === "dominio" && (
         <div className="glass-card rounded-2xl p-6 md:p-7 space-y-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-xl bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center">
               <Globe size={18} className="text-primary" />
             </div>
-            <div>
-              <h2 className="text-[hsl(var(--dash-text))] font-semibold text-[15px]">Domínio personalizado</h2>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <h2 className="text-[hsl(var(--dash-text))] font-semibold text-[15px]">Domínio personalizado</h2>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gradient-to-r from-primary to-secondary text-white">PRO</span>
+              </div>
               <p className="text-[hsl(var(--dash-text-subtle))] text-xs">Use seu próprio domínio na sua página</p>
             </div>
           </div>
-          <div>
-            <label className="text-[hsl(var(--dash-text-secondary))] text-xs font-medium mb-1.5 block">Seu domínio</label>
-            <input
-              className="w-full px-4 py-2.5 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] text-[hsl(var(--dash-text))] text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
-              placeholder="meusite.com.br"
-            />
+
+          <div className="text-center py-8">
+            <div className="w-16 h-16 rounded-2xl bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center mx-auto mb-4">
+              <Clock size={28} className="text-primary/60" />
+            </div>
+            <h3 className="text-[hsl(var(--dash-text))] font-semibold text-lg mb-1">Em breve</h3>
+            <p className="text-[hsl(var(--dash-text-muted))] text-sm max-w-sm mx-auto leading-relaxed">
+              Estamos construindo o suporte a domínios personalizados com SSL automático.
+              Cadastre-se na lista de espera para ser avisado quando estiver disponível.
+            </p>
+
+            <div className="mt-6 max-w-xs mx-auto">
+              {domainWaitlisted ? (
+                <div className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-100">
+                  <Check size={16} className="text-emerald-600" />
+                  <span className="text-sm font-medium text-emerald-700">Você será avisado!</span>
+                </div>
+              ) : (
+                <button
+                  onClick={handleDomainWaitlist}
+                  className="w-full flex items-center justify-center gap-2 btn-primary-gradient px-6 py-3 rounded-xl text-sm font-semibold transition-all active:scale-[0.98]"
+                >
+                  <Sparkles size={15} /> Avisar quando disponível
+                </button>
+              )}
+            </div>
           </div>
-          <div className="flex items-center gap-2 p-4 rounded-xl bg-amber-50 border border-amber-100">
-            <Shield size={16} className="text-amber-600 flex-shrink-0" />
-            <p className="text-xs text-amber-700">SSL automático incluso. Configure o CNAME para ativar.</p>
-          </div>
-          <button className="btn-primary-gradient px-6 py-2.5 rounded-xl text-sm font-semibold">Conectar domínio</button>
         </div>
       )}
 
@@ -254,7 +379,7 @@ const DashboardConfiguracoes = () => {
             { key: "metaPixelId", label: "Meta Pixel (Facebook)", desc: "Rastreamento de conversões do Facebook/Instagram Ads", placeholder: "123456789012345", value: metaPixelId, set: setMetaPixelId },
             { key: "webhookUrl", label: "Webhook", desc: "Receba notificações em tempo real", placeholder: "https://seu-webhook.com/api", value: webhookUrl, set: setWebhookUrl },
             { key: "pixKey", label: "Chave PIX", desc: "Receba pagamentos via PIX na vitrine", placeholder: "email@exemplo.com, CPF ou telefone", value: pixKey, set: setPixKey },
-            { key: "mercadoPagoToken", label: "Mercado Pago Access Token", desc: "Pagamentos reais via PIX e cartao pelo Mercado Pago", placeholder: "APP_USR-...", value: mpToken, set: setMpToken },
+            { key: "mercadoPagoToken", label: "Mercado Pago Access Token", desc: "Pagamentos reais via PIX e cartão pelo Mercado Pago", placeholder: "APP_USR-...", value: mpToken, set: setMpToken },
           ].map(({ key, label, desc, placeholder, value, set }) => (
             <div key={key} className="glass-card-hover rounded-2xl p-5">
               <div className="flex items-center gap-4 mb-3">
@@ -283,7 +408,7 @@ const DashboardConfiguracoes = () => {
         </div>
       )}
 
-      {/* ── NOTIFICAÇÕES ── */}
+      {/* ── NOTIFICAÇÕES — Persisted via design.notificationPrefs ── */}
       {activeTab === "notificacoes" && (
         <div className="glass-card rounded-2xl p-6 md:p-7 space-y-0 divide-y divide-[hsl(var(--dash-border-subtle))]">
           {[
@@ -298,7 +423,7 @@ const DashboardConfiguracoes = () => {
                 <p className="text-[hsl(var(--dash-text-subtle))] text-xs mt-0.5">{n.desc}</p>
               </div>
               <button
-                onClick={() => setNotifs(prev => ({ ...prev, [n.key]: !prev[n.key as keyof typeof prev] }))}
+                onClick={() => toggleNotif(n.key)}
                 className={`relative w-10 h-6 rounded-full transition-colors cursor-pointer flex-shrink-0 ${
                   notifs[n.key as keyof typeof notifs] ? "bg-primary" : "bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border))]"
                 }`}

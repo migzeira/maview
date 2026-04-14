@@ -84,6 +84,10 @@ export interface ProductItem {
   bookingUrl?: string;
   imageUrl?: string;
   videoUrl?: string;
+  /* Coupon/discount */
+  couponCode?: string;
+  couponDiscount?: number; // percentage (0-100) or fixed cents
+  couponType?: "percent" | "fixed";
 }
 
 export interface LinkItem {
@@ -110,13 +114,18 @@ export interface TestimonialItem {
 
 export type SeparatorStyle = "line" | "dots" | "gradient" | "stars" | "zigzag" | "diamond" | "wave" | "fade";
 
+export type EmbedPlatform = "youtube" | "spotify" | "tiktok" | "soundcloud" | "custom";
+
 export interface VitrineBlock {
   id: string;
-  type: "product" | "link" | "testimonial" | "header";
+  type: "product" | "link" | "testimonial" | "header" | "embed";
   refId?: string;
   title?: string;
   separatorStyle?: SeparatorStyle;
   separatorIcon?: string;
+  /* Embed-specific fields */
+  embedUrl?: string;
+  embedPlatform?: EmbedPlatform;
 }
 
 export interface VitrineConfig {
@@ -137,3 +146,83 @@ export interface VitrineConfig {
 export type TabId = "vitrine" | "perfil" | "design";
 
 export type HealthAction = "avatar" | "name-bio" | "theme" | "products" | "links" | "testimonials" | "whatsapp";
+
+/* ── Lead (from Supabase leads table) ── */
+export interface Lead {
+  id: string;
+  vitrine_id: string;
+  email: string;
+  name: string | null;
+  source: string | null;
+  created_at: string;
+}
+
+/* ── Order (from Supabase orders table) ── */
+export interface Order {
+  id: string;
+  vitrine_id: string;
+  product_title: string;
+  amount: number;
+  buyer_email: string | null;
+  buyer_name: string | null;
+  payment_status: string;
+  payment_method: string | null;
+  mp_payment_id: string | null;
+  created_at: string;
+  metadata?: Record<string, unknown>;
+}
+
+/* ── Automation ── */
+export type TriggerType = "compra" | "lead" | "visualizacao";
+export type ActionType = "email" | "liberar" | "redirecionar";
+
+export interface Automation {
+  id: string;
+  vitrine_id: string;
+  name: string;
+  trigger_type: TriggerType;
+  action_type: ActionType;
+  active: boolean;
+  description: string;
+  config: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+/* ── Notification Preferences (stored in design JSONB) ── */
+export interface NotificationPrefs {
+  email: boolean;
+  push: boolean;
+  sales: boolean;
+}
+
+/* ── Achievement ── */
+export interface Achievement {
+  id: string;
+  label: string;
+  desc: string;
+  icon: string;
+  unlockedAt?: string;
+}
+
+/* ── Email Queue Item ── */
+export interface EmailQueueItem {
+  id: string;
+  user_id: string | null;
+  email: string;
+  template: string;
+  template_data: Record<string, unknown>;
+  send_at: string;
+  sent: boolean;
+  sent_at: string | null;
+  created_at: string;
+}
+
+/* ── Extended DesignConfig with new fields ── */
+export interface DesignConfigExtended extends DesignConfig {
+  notificationPrefs?: NotificationPrefs;
+  domainWaitlist?: boolean;
+  achievements?: string[];
+  onboardingDone?: boolean;
+  integrations?: Record<string, unknown>;
+}

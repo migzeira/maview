@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Eye, EyeOff, ArrowLeft, Check, X, ChevronDown,
   Link2, Star, Zap, ShoppingBag, BarChart3,
-  TrendingUp, Users, DollarSign, Sparkles, Timer, Flame,
+  TrendingUp, Users, DollarSign, Sparkles,
   Instagram, Palette, Globe, Sun, Moon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -251,13 +251,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const [usernameStatus, setUsernameStatus] = useState<"idle"|"checking"|"available"|"taken"|"invalid">("idle");
   const [notification, setNotification] = useState<{ name: string; action: string; avatar: string } | null>(null);
-  const [onlineCount] = useState(() => Math.floor(Math.random() * 30) + 38);
   const [resendCooldown, setResendCooldown] = useState(0);
-  const [slotsLeft, setSlotsLeft] = useState(() => {
-    const saved = sessionStorage.getItem("maview_slots");
-    return saved ? parseInt(saved, 10) : Math.floor(Math.random() * 14) + 11;
-  });
-  const [slotPulse, setSlotPulse] = useState(false);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem("maview_dark") === "1");
 
   // Sync dark mode class
@@ -265,9 +259,9 @@ const Login = () => {
     document.documentElement.classList.toggle("dark", darkMode);
     localStorage.setItem("maview_dark", darkMode ? "1" : "0");
   }, [darkMode]);
-  const slotRef = useRef<HTMLSpanElement>(null);
   const [showExitPopup, setShowExitPopup] = useState(false);
   const [realUserCount, setRealUserCount] = useState<number | null>(null);
+  const [showStickyCTA, setShowStickyCTA] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -291,28 +285,6 @@ const Login = () => {
     return () => { clearTimeout(t); clearInterval(interval); };
   }, []);
 
-  // Contador de vagas — decrementa a cada 2-4 min (cria urgência)
-  useEffect(() => {
-    const decrement = () => {
-      setSlotsLeft((prev) => {
-        if (prev <= 3) return prev;
-        setSlotPulse(true);
-        setTimeout(() => setSlotPulse(false), 1500);
-        return prev - 1;
-      });
-    };
-    const randomMs = () => (Math.random() * 120000) + 90000; // 1.5–3.5 min
-    let t = setTimeout(function tick() {
-      decrement();
-      t = setTimeout(tick, randomMs());
-    }, randomMs());
-    return () => clearTimeout(t);
-  }, []);
-
-  // Persist slotsLeft in sessionStorage
-  useEffect(() => {
-    sessionStorage.setItem("maview_slots", String(slotsLeft));
-  }, [slotsLeft]);
 
   // Exit intent detection (desktop only)
   useEffect(() => {
@@ -327,6 +299,14 @@ const Login = () => {
     document.addEventListener("mouseleave", handler);
     return () => document.removeEventListener("mouseleave", handler);
   }, []);
+
+  // Sticky mobile CTA: show after scrolling past fold
+  useEffect(() => {
+    if (mode !== "login" && mode !== "signup") return;
+    const onScroll = () => setShowStickyCTA(window.scrollY > window.innerHeight * 0.6);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [mode]);
 
   const clearError = () => setError("");
   const switchMode = (next: Mode) => { clearError(); setPassword(""); setConfirmPassword(""); setUsernameStatus("idle"); setMode(next); };
@@ -375,7 +355,26 @@ const Login = () => {
     if (!isValidUsername(username)) { setError("Link inválido."); setIsLoading(false); return; }
     const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name, username }, emailRedirectTo: `${window.location.origin}/dashboard` } });
     if (error) setError(error.message === "User already registered" ? "Este email já está cadastrado." : error.message);
-    else { switchMode("verify"); }
+    else {
+      switchMode("verify");
+      // Fire-and-forget welcome email + enqueue nurture via Edge Function
+      // (uses service_role internally, safe before email verification)
+      supabase.functions.invoke("send-email", {
+        body: { to: email, template: "welcome" },
+      }).catch(() => {});
+      // Enqueue nurture D+1, D+3, D+7 via Edge Function
+      supabase.functions.invoke("send-email", {
+        body: {
+          action: "enqueue_nurture",
+          email,
+          templates: [
+            { template: "getting_started", delay_hours: 24 },
+            { template: "add_products", delay_hours: 72 },
+            { template: "first_week_report", delay_hours: 168 },
+          ],
+        },
+      }).catch(() => {});
+    }
     setIsLoading(false);
   };
 
@@ -649,9 +648,31 @@ const Login = () => {
           <div className="w-full max-w-[420px]">
 
             {/* Mobile logo */}
-            <div className="flex lg:hidden items-center gap-2.5 mb-10 justify-center">
+            <div className="flex lg:hidden items-center gap-2.5 mb-4 justify-center">
               <MaviewLogo size={34} />
               <span className="text-maview-text text-2xl font-extrabold tracking-tight">Maview</span>
+            </div>
+
+            {/* Mobile hero — context above form */}
+            <div className="lg:hidden mb-8 text-center">
+              <h1 className="text-maview-text text-xl sm:text-2xl font-extrabold leading-tight mb-2">
+                Sua vitrine digital.<br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-maview-purple to-fuchsia-500">Seu link. Sua renda.</span>
+              </h1>
+              <p className="text-maview-muted text-sm mb-4">
+                Produtos, links e agendamentos em uma página bonita — grátis.
+              </p>
+              <div className="flex items-center justify-center gap-3 flex-wrap">
+                <span className="inline-flex items-center gap-1.5 bg-maview-surface border border-maview-border rounded-full px-3 py-1 text-xs text-maview-muted">
+                  <Sparkles size={11} className="text-maview-purple" /> 40+ efeitos
+                </span>
+                <span className="inline-flex items-center gap-1.5 bg-maview-surface border border-maview-border rounded-full px-3 py-1 text-xs text-maview-muted">
+                  <TrendingUp size={11} className="text-emerald-500" /> Analytics real
+                </span>
+                <span className="inline-flex items-center gap-1.5 bg-maview-surface border border-maview-border rounded-full px-3 py-1 text-xs text-maview-muted">
+                  <DollarSign size={11} className="text-amber-500" /> 100% grátis
+                </span>
+              </div>
             </div>
 
             {/* ══ VERIFY EMAIL SCREEN ══ */}
@@ -709,12 +730,14 @@ const Login = () => {
 
             {/* Online counter + form card + termos — só mostra fora do verify */}
             {mode !== "verify" && <>
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-emerald-700 text-xs font-semibold">{onlineCount} pessoas online agora</span>
+            {realUserCount && realUserCount > 0 && (
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <div className="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/30 rounded-full px-3 py-1">
+                  <Users size={12} className="text-emerald-500" />
+                  <span className="text-emerald-700 dark:text-emerald-400 text-xs font-semibold">{realUserCount.toLocaleString("pt-BR")}+ criadores já usam o Maview</span>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Card */}
             <div className="relative bg-white dark:bg-[hsl(260,30%,9%)] rounded-[24px] border border-maview-border p-6 sm:p-10 shadow-xl shadow-maview-purple/[0.07] dark:shadow-maview-purple/[0.15] overflow-hidden">
@@ -754,25 +777,20 @@ const Login = () => {
                 </p>
               </div>
 
-              {/* Scarcity banner — signup: strong urgency */}
+              {/* Beta banner — signup */}
               {mode === "signup" && (
-                <div className="relative flex items-center gap-2.5 bg-gradient-to-r from-red-50 via-amber-50 to-orange-50 dark:from-red-950/30 dark:via-amber-950/20 dark:to-orange-950/20 border border-red-200 dark:border-red-800/40 rounded-xl px-4 py-3 mb-5 animate-pulse-urgency">
-                  <div className="w-7 h-7 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center flex-shrink-0">
-                    <Flame size={14} className="text-red-500" />
+                <div className="flex items-center gap-2.5 bg-gradient-to-r from-violet-50 via-purple-50 to-fuchsia-50 dark:from-violet-950/30 dark:via-purple-950/20 dark:to-fuchsia-950/20 border border-violet-200 dark:border-violet-800/40 rounded-xl px-4 py-3 mb-5">
+                  <div className="w-7 h-7 rounded-full bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center flex-shrink-0">
+                    <Sparkles size={14} className="text-violet-500" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-red-800 dark:text-red-300 text-xs font-bold">
-                      🔥 Últimas vagas do Beta gratuito
+                    <p className="text-violet-800 dark:text-violet-300 text-xs font-bold">
+                      Beta gratuito — acesso completo
                     </p>
-                    <p className="text-amber-700 dark:text-amber-400 text-[11px] mt-0.5">
-                      Apenas{" "}
-                      <span ref={slotRef} className={`font-extrabold text-red-600 dark:text-red-400 text-sm ${slotPulse ? "slot-pulse inline-block" : ""}`}>
-                        {slotsLeft}
-                      </span>
-                      {" "}vagas — depois será pago
+                    <p className="text-violet-600 dark:text-violet-400 text-[11px] mt-0.5">
+                      Todos os recursos premium, sem cobrança
                     </p>
                   </div>
-                  <Timer size={14} className="text-red-400 flex-shrink-0" />
                 </div>
               )}
               {/* Soft trigger — login mode */}
@@ -938,9 +956,9 @@ const Login = () => {
 
             <p className="text-center text-xs text-maview-muted mt-5">
               Ao continuar, você concorda com os{" "}
-              <span className="hover:text-maview-purple cursor-pointer transition-colors underline underline-offset-2">Termos de Uso</span>
+              <a href="/termos" className="hover:text-maview-purple transition-colors underline underline-offset-2">Termos de Uso</a>
               {" "}e a{" "}
-              <span className="hover:text-maview-purple cursor-pointer transition-colors underline underline-offset-2">Política de Privacidade</span>.
+              <a href="/privacidade" className="hover:text-maview-purple transition-colors underline underline-offset-2">Política de Privacidade</a>.
             </p>
             </>}
           </div>
@@ -1183,8 +1201,8 @@ const Login = () => {
             <div>
               <p className="text-maview-text text-sm font-bold mb-3">Suporte</p>
               <div className="space-y-2">
-                <span className="block text-maview-muted text-sm hover:text-maview-purple cursor-pointer transition-colors">Termos de Uso</span>
-                <span className="block text-maview-muted text-sm hover:text-maview-purple cursor-pointer transition-colors">Política de Privacidade</span>
+                <a href="/termos" className="block text-maview-muted text-sm hover:text-maview-purple transition-colors">Termos de Uso</a>
+                <a href="/privacidade" className="block text-maview-muted text-sm hover:text-maview-purple transition-colors">Política de Privacidade</a>
                 <a href="mailto:suporte@maview.app" className="block text-maview-muted text-sm hover:text-maview-purple transition-colors">suporte@maview.app</a>
                 <a href="https://instagram.com/maview.app" target="_blank" rel="noopener noreferrer" className="block text-maview-muted text-sm hover:text-maview-purple transition-colors">@maview.app</a>
               </div>
@@ -1230,6 +1248,19 @@ const Login = () => {
               <Check size={10} className="text-emerald-500" /> Suporte PT
             </p>
           </div>
+        </div>
+      )}
+
+      {/* ── Sticky mobile CTA (4.5) ── */}
+      {showStickyCTA && mode !== "verify" && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden p-3 pb-safe bg-gradient-to-t from-maview-bg via-maview-bg/95 to-transparent">
+          <button
+            onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); switchMode("signup"); }}
+            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-maview-purple to-maview-pink text-white text-sm font-bold shadow-lg shadow-maview-purple/25 flex items-center justify-center gap-2 active:scale-[0.97] transition-transform"
+          >
+            <Sparkles size={16} />
+            Criar minha vitrine gratis
+          </button>
         </div>
       )}
 

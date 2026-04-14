@@ -1,5 +1,6 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { initialLoad, loadLocal, saveWithSync, fetchLeads, fetchOrders } from "@/lib/vitrine-sync";
 import { Link } from "react-router-dom";
 import {
   CheckCircle2, Circle, ArrowRight,
@@ -7,13 +8,11 @@ import {
   QrCode, X, Download, MessageCircle, Clock,
   Sparkles, Package, Link2, Star, Image, FileText,
   Trophy, Share2, BarChart3, PartyPopper,
+  Lightbulb, Award, Flame, Zap, Heart, Eye,
+  TrendingUp, Users, ShoppingBag, Palette,
 } from "lucide-react";
 
-/* ── localStorage ──────────────────────────────────────────── */
-const LS_KEY = "maview_vitrine_config";
-function loadVitrine() {
-  try { return JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch { return {}; }
-}
+/* ── Config ─────────────────────────────────────────────────── */
 
 /* ── Health ─────────────────────────────────────────────────── */
 interface HealthStep {
@@ -48,14 +47,31 @@ function getGreeting() {
   return "Boa noite";
 }
 
-/* ── Theme map ─────────────────────────────────────────────── */
-const THEMES: Record<string, { bg: string; accent: string; accent2: string }> = {
-  "dark-purple": { bg: "#080612", accent: "#a855f7", accent2: "#ec4899" },
-  "midnight":    { bg: "#05080f", accent: "#60a5fa", accent2: "#818cf8" },
-  "forest":      { bg: "#050f05", accent: "#4ade80", accent2: "#34d399" },
-  "rose":        { bg: "#100509", accent: "#f43f5e", accent2: "#fb7185" },
-  "amber":       { bg: "#0f0a00", accent: "#f59e0b", accent2: "#fcd34d" },
-  "ocean":       { bg: "#020c14", accent: "#06b6d4", accent2: "#22d3ee" },
+/* ── Theme map (full, matches Profile.tsx) ─────────────────── */
+const THEMES: Record<string, { bg: string; accent: string; accent2: string; card: string; text: string; sub: string; border: string }> = {
+  "dark-purple": { bg: "#080612", accent: "#a855f7", accent2: "#ec4899", card: "#13102a", text: "#f8f5ff", sub: "rgba(248,245,255,0.80)", border: "rgba(168,85,247,0.28)" },
+  "midnight":    { bg: "#05080f", accent: "#60a5fa", accent2: "#818cf8", card: "#0d1524", text: "#f0f6ff", sub: "rgba(240,246,255,0.80)", border: "rgba(96,165,250,0.28)" },
+  "forest":      { bg: "#050f05", accent: "#4ade80", accent2: "#34d399", card: "#0a1a0a", text: "#f0fff4", sub: "rgba(240,255,244,0.80)", border: "rgba(74,222,128,0.28)" },
+  "rose":        { bg: "#100509", accent: "#f43f5e", accent2: "#fb7185", card: "#1e0912", text: "#fff0f3", sub: "rgba(255,240,243,0.80)", border: "rgba(244,63,94,0.28)" },
+  "amber":       { bg: "#0f0a00", accent: "#f59e0b", accent2: "#fcd34d", card: "#1f1500", text: "#fffbeb", sub: "rgba(255,251,235,0.80)", border: "rgba(245,158,11,0.28)" },
+  "ocean":       { bg: "#020c14", accent: "#06b6d4", accent2: "#22d3ee", card: "#051e30", text: "#ecfeff", sub: "rgba(236,254,255,0.80)", border: "rgba(6,182,212,0.28)" },
+  "neon-pink":   { bg: "#0a0010", accent: "#ff2d95", accent2: "#ff6ec7", card: "#1a0828", text: "#fff0f8", sub: "rgba(255,240,248,0.80)", border: "rgba(255,45,149,0.28)" },
+  "sunset":      { bg: "#0f0805", accent: "#f97316", accent2: "#ef4444", card: "#1f150a", text: "#fff7ed", sub: "rgba(255,247,237,0.80)", border: "rgba(249,115,22,0.28)" },
+  "lavender":    { bg: "#0c0a14", accent: "#c084fc", accent2: "#a78bfa", card: "#1a1530", text: "#f5f0ff", sub: "rgba(245,240,255,0.80)", border: "rgba(192,132,252,0.28)" },
+  "emerald":     { bg: "#021a0f", accent: "#10b981", accent2: "#6ee7b7", card: "#0a2a1a", text: "#ecfdf5", sub: "rgba(236,253,245,0.80)", border: "rgba(16,185,129,0.28)" },
+  "crimson":     { bg: "#120508", accent: "#dc2626", accent2: "#f87171", card: "#220a10", text: "#fff1f2", sub: "rgba(255,241,242,0.80)", border: "rgba(220,38,38,0.28)" },
+  "arctic":      { bg: "#050a10", accent: "#38bdf8", accent2: "#7dd3fc", card: "#0c1828", text: "#f0f9ff", sub: "rgba(240,249,255,0.80)", border: "rgba(56,189,248,0.28)" },
+  "gold":        { bg: "#0c0a04", accent: "#eab308", accent2: "#d97706", card: "#1c1808", text: "#fefce8", sub: "rgba(254,252,232,0.80)", border: "rgba(234,179,8,0.28)" },
+  "sage":        { bg: "#080c08", accent: "#84cc16", accent2: "#a3e635", card: "#121a12", text: "#f7fee7", sub: "rgba(247,254,231,0.80)", border: "rgba(132,204,22,0.28)" },
+  "coral":       { bg: "#0f0808", accent: "#fb923c", accent2: "#f472b6", card: "#1f1212", text: "#fff7ed", sub: "rgba(255,247,237,0.80)", border: "rgba(251,146,60,0.28)" },
+  "indigo":      { bg: "#06050f", accent: "#6366f1", accent2: "#a78bfa", card: "#100e28", text: "#eef2ff", sub: "rgba(238,242,255,0.80)", border: "rgba(99,102,241,0.28)" },
+  "slate":       { bg: "#0c0e12", accent: "#94a3b8", accent2: "#cbd5e1", card: "#1a1e28", text: "#f8fafc", sub: "rgba(248,250,252,0.80)", border: "rgba(148,163,184,0.28)" },
+  "wine":        { bg: "#100408", accent: "#be185d", accent2: "#e11d48", card: "#200a14", text: "#fff0f6", sub: "rgba(255,240,246,0.80)", border: "rgba(190,24,93,0.28)" },
+  "custom":      { bg: "#080612", accent: "#a855f7", accent2: "#ec4899", card: "#13102a", text: "#f8f5ff", sub: "rgba(248,245,255,0.80)", border: "rgba(168,85,247,0.28)" },
+  "white":       { bg: "#f8f9fa", accent: "#6366f1", accent2: "#8b5cf6", card: "#ffffff", text: "#111827", sub: "rgba(17,24,39,0.65)", border: "rgba(0,0,0,0.08)" },
+  "cream":       { bg: "#faf7f2", accent: "#d97706", accent2: "#b45309", card: "#ffffff", text: "#1c1917", sub: "rgba(28,25,23,0.60)", border: "rgba(0,0,0,0.06)" },
+  "pure-black":  { bg: "#000000", accent: "#ffffff", accent2: "#a0a0a0", card: "#0a0a0a", text: "#ffffff", sub: "rgba(255,255,255,0.70)", border: "rgba(255,255,255,0.12)" },
+  "bold-red":    { bg: "#0a0000", accent: "#ff3333", accent2: "#ff6666", card: "#1a0505", text: "#fff5f5", sub: "rgba(255,245,245,0.80)", border: "rgba(255,51,51,0.25)" },
 };
 
 /* ══ COMPONENT ═════════════════════════════════════════════ */
@@ -71,24 +87,28 @@ const DashboardHome = () => {
   const profileUrl = username ? `${window.location.origin}/${username.replace(/^@/, "")}` : "";
   const displayUrl = username ? `maview.app/${username.replace(/^@/, "")}` : "";
 
-  /* ── Load ── */
+  /* ── Load (Supabase first, localStorage fallback) ── */
   useEffect(() => {
-    const stored = loadVitrine();
-    setCfg(stored);
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        const m = session.user.user_metadata;
-        setDisplayName(
-          (stored.displayName as string) || m?.full_name ||
-          session.user.email?.split("@")[0] || "Criador"
-        );
-        setUsername(
-          (stored.username as string) || m?.username ||
-          session.user.email?.split("@")[0] || ""
-        );
-      }
-    });
-    setTimeout(() => setVisible(true), 60);
+    (async () => {
+      // Use initialLoad which fetches from Supabase (source of truth) and caches in localStorage
+      const stored = await initialLoad();
+      setCfg(stored);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const m = session.user.user_metadata;
+          setDisplayName(
+            (stored.displayName as string) || m?.full_name ||
+            session.user.email?.split("@")[0] || "Criador"
+          );
+          setUsername(
+            (stored.username as string) || m?.username ||
+            session.user.email?.split("@")[0] || ""
+          );
+        }
+      } catch { /* keep stored data */ }
+      setTimeout(() => setVisible(true), 60);
+    })();
   }, []);
 
   /* ── QR code ── */
@@ -142,12 +162,62 @@ const DashboardHome = () => {
     return () => clearTimeout(t);
   }, [milestone]);
 
-  const products = ((cfg.products as { active: boolean; emoji?: string; title?: string; price?: string }[]) || []).filter(p => p.active);
-  const links = ((cfg.links as { title?: string; url?: string; icon?: string; active?: boolean; type?: string }[]) || []);
-  const testimonials = ((cfg.testimonials as { name?: string; text?: string; stars?: number }[]) || []);
-  const blocks = ((cfg.blocks as { id: string; type: string; refId?: string; title?: string }[]) || []);
+  const products = ((cfg.products as { active: boolean; emoji?: string; title?: string; price?: string; originalPrice?: string; images?: string[]; imageUrl?: string; linkType?: string; bookingDuration?: number; bookingDays?: string[]; badge?: string; description?: string; id?: string }[]) || []).filter(p => p.active);
+  const links = ((cfg.links as { title?: string; url?: string; icon?: string; active?: boolean; type?: string; isSocial?: boolean; id?: string }[]) || []);
+  const testimonials = ((cfg.testimonials as { name?: string; text?: string; stars?: number; avatar?: string; role?: string; id?: string }[]) || []);
+  const blocks = ((cfg.blocks as { id: string; type: string; refId?: string; title?: string; separatorStyle?: string }[]) || []);
 
   const theme = THEMES[(cfg.theme as string)] || THEMES["dark-purple"];
+  const design = (cfg.design as Record<string, unknown>) || {};
+
+  // Resolve design (matches DashboardPagina + Profile.tsx logic)
+  const pAccent = (design.accentColor as string) || theme.accent;
+  const pAccent2 = (design.accentColor2 as string) || theme.accent2;
+  const pBg = (design.bgColor as string) || theme.bg;
+  const pText = (design.textColor as string) || theme.text;
+  const pSub = (design.subtextColor as string) || theme.sub;
+  const pCard = (design.cardBg as string) || theme.card;
+  const pBorder = (design.cardBorder as string) || theme.border;
+  const pFontH = (design.fontHeading as string) || "Inter";
+  const pFontB = (design.fontBody as string) || "Inter";
+  const bgType = (design.bgType as string) || "solid";
+  const bgGradient = (design.bgGradient as [string, string]) || [pBg, "#1a0a2e"];
+  const bgGradientDir = (design.bgGradientDir as string) || "to-b";
+  const bgImageUrl = (design.bgImageUrl as string) || "";
+  const btnShape = (design.buttonShape as string) || "rounded";
+  const btnFill = (design.buttonFill as string) || "solid";
+  const btnRadius = (design.buttonRadius as number) ?? 12;
+  const btnShadow = (design.buttonShadow as string) || "none";
+  const profileShape = (design.profileShape as string) || "circle";
+  const profileSize = Math.round(((design.profileSize as number) ?? 88) * 0.7);
+  const profileBorder = (design.profileBorder as boolean) ?? true;
+  const profileBorderColor = (design.profileBorderColor as string) || pAccent;
+
+  // Derived styles
+  const pBtnRadius = btnShape === "pill" ? "999px" : btnShape === "square" ? "4px" : btnShape === "soft" ? "12px" : `${btnRadius}px`;
+  const pBtnShadowCss = btnShadow === "glow" ? `0 0 12px ${pAccent}40` : btnShadow === "md" ? "0 3px 8px rgba(0,0,0,0.3)" : btnShadow === "sm" ? "0 1px 4px rgba(0,0,0,0.2)" : "none";
+  const pBtnStyle: React.CSSProperties = btnFill === "outline"
+    ? { background: "transparent", border: `1.5px solid ${pBorder}`, borderRadius: pBtnRadius, boxShadow: pBtnShadowCss }
+    : btnFill === "glass"
+    ? { background: `${pCard}aa`, backdropFilter: "blur(8px)", border: `1px solid ${pBorder}`, borderRadius: pBtnRadius, boxShadow: pBtnShadowCss }
+    : btnFill === "ghost"
+    ? { background: "transparent", borderRadius: pBtnRadius, boxShadow: pBtnShadowCss }
+    : { background: pCard, border: `1px solid ${pBorder}`, borderRadius: pBtnRadius, boxShadow: pBtnShadowCss };
+  const pProfileRadius = profileShape === "circle" ? "9999px" : profileShape === "rounded" ? "20%" : profileShape === "square" ? "6px" : "0";
+  const pProfileClip = profileShape === "hexagon" ? "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" : undefined;
+
+  // Background CSS
+  const previewBgStyle: React.CSSProperties = (() => {
+    const GRAD_DIRS: Record<string, string> = { "to-b": "to bottom", "to-t": "to top", "to-r": "to right", "to-l": "to left", "to-br": "to bottom right", "to-bl": "to bottom left", "to-tr": "to top right", "to-tl": "to top left" };
+    switch (bgType) {
+      case "gradient": {
+        if (bgGradientDir === "radial") return { background: `radial-gradient(circle, ${bgGradient[0]}, ${bgGradient[1]})` };
+        return { background: `linear-gradient(${GRAD_DIRS[bgGradientDir] || "to bottom"}, ${bgGradient[0]}, ${bgGradient[1]})` };
+      }
+      case "image": return bgImageUrl ? { backgroundImage: `url(${bgImageUrl})`, backgroundSize: "cover", backgroundPosition: "center" } : { background: pBg };
+      default: return { background: pBg };
+    }
+  })();
 
   const healthColor = health >= 80 ? "#10b981" : health >= 50 ? "#a855f7" : health >= 20 ? "#f59e0b" : "#94a3b8";
 
@@ -179,6 +249,77 @@ const DashboardHome = () => {
     return "Vamos montar sua vitrine?";
   };
 
+  /* ── 4.1: AI Proactive Insights ── */
+  const [aiInsights, setAiInsights] = useState<string[]>([]);
+  const [insightsLoading, setInsightsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!cfg || Object.keys(cfg).length === 0) return;
+    // Check cache first (24h TTL)
+    const cacheKey = "maview_ai_insights";
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        const { insights, ts } = JSON.parse(cached);
+        if (Date.now() - ts < 24 * 3600000) { setAiInsights(insights); return; }
+      } catch {}
+    }
+
+    const generateInsights = async () => {
+      setInsightsLoading(true);
+      try {
+        const context = `Modo insights. Dados: health_score=${health}, produtos=${products.length}, links=${links.length}, depoimentos=${testimonials.length}, tema=${cfg.theme || "default"}, bio=${cfg.bio ? "sim" : "nao"}, avatar=${cfg.avatarUrl ? "sim" : "nao"}, whatsapp=${cfg.whatsapp ? "sim" : "nao"}. Gere 2-3 insights curtos e acionáveis em PT-BR. Cada insight em uma linha separada, começando com emoji.`;
+
+        const { data, error } = await supabase.functions.invoke("maview-ai", {
+          body: { message: context },
+        });
+
+        if (!error && data?.text) {
+          const parsed = data.text.split("\n").filter((l: string) => l.trim().length > 5).slice(0, 3);
+          setAiInsights(parsed);
+          localStorage.setItem(cacheKey, JSON.stringify({ insights: parsed, ts: Date.now() }));
+        }
+      } catch {}
+      setInsightsLoading(false);
+    };
+
+    // Delay to not overwhelm initial load
+    const t = setTimeout(generateInsights, 2000);
+    return () => clearTimeout(t);
+  }, [cfg, health, products.length, links.length, testimonials.length]);
+
+  /* ── 4.4: Achievements System ── */
+  const ACHIEVEMENTS = useMemo(() => [
+    { id: "first_step", label: "Primeiro passo", desc: "Completou o onboarding", icon: Zap, color: "text-yellow-500", bg: "bg-yellow-500/10", check: () => !!((cfg.design as any)?.onboardingDone) },
+    { id: "perfect_vitrine", label: "Vitrine perfeita", desc: "Health score 100", icon: Trophy, color: "text-emerald-500", bg: "bg-emerald-500/10", check: () => health >= 100 },
+    { id: "designer", label: "Designer", desc: "Escolheu um tema", icon: Palette, color: "text-pink-500", bg: "bg-pink-500/10", check: () => !!cfg.theme && cfg.theme !== "dark-purple" },
+    { id: "social", label: "Conectado", desc: "3+ links ativos", icon: Link2, color: "text-blue-500", bg: "bg-blue-500/10", check: () => links.length >= 3 },
+    { id: "proof", label: "Prova social", desc: "3+ depoimentos", icon: Star, color: "text-amber-500", bg: "bg-amber-500/10", check: () => testimonials.length >= 3 },
+    { id: "creator", label: "Criador premium", desc: "5+ produtos ativos", icon: ShoppingBag, color: "text-violet-500", bg: "bg-violet-500/10", check: () => products.length >= 5 },
+    { id: "marketer", label: "Marketeiro", desc: "Adicionou WhatsApp", icon: MessageCircle, color: "text-green-500", bg: "bg-green-500/10", check: () => !!cfg.whatsapp },
+    { id: "storyteller", label: "Storyteller", desc: "Escreveu uma bio", icon: FileText, color: "text-cyan-500", bg: "bg-cyan-500/10", check: () => !!cfg.bio && (cfg.bio as string).length > 20 },
+  ], [cfg, health, links.length, testimonials.length, products.length]);
+
+  const unlockedAchievements = ACHIEVEMENTS.filter(a => a.check());
+  const lockedAchievements = ACHIEVEMENTS.filter(a => !a.check());
+
+  // Check for new achievements and persist
+  useEffect(() => {
+    if (!cfg || Object.keys(cfg).length === 0) return;
+    const designObj = (cfg.design as Record<string, any>) || {};
+    const saved: string[] = designObj.achievements || [];
+    const current = unlockedAchievements.map(a => a.id);
+    const newOnes = current.filter(id => !saved.includes(id));
+    if (newOnes.length > 0) {
+      // Save new achievements
+      const updated = { ...designObj, achievements: [...saved, ...newOnes] };
+      const full = { ...loadLocal(), design: updated };
+      saveWithSync(full).catch(() => {});
+    }
+  }, [unlockedAchievements, cfg]);
+
+  const [showAllAchievements, setShowAllAchievements] = useState(false);
+
   return (
     <div className={`max-w-[1100px] mx-auto px-4 md:px-8 py-8 md:py-10 page-enter transition-opacity duration-500 ${visible ? "opacity-100" : "opacity-0"}`}>
 
@@ -209,12 +350,18 @@ const DashboardHome = () => {
                   <p className="text-[hsl(var(--dash-text-muted))] text-[12px] mt-0.5">Agora é hora de compartilhar e crescer</p>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <button onClick={copyLink}
                   className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 btn-interactive text-[hsl(var(--dash-text-secondary))]">
                   <Share2 size={16} className="text-primary" />
-                  <span className="text-[11px] font-medium">Compartilhar</span>
+                  <span className="text-[11px] font-medium">{copied ? "Copiado!" : "Copiar link"}</span>
                 </button>
+                <a href={`https://wa.me/?text=${encodeURIComponent(`Confira minha vitrine: ${profileUrl}`)}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 hover:border-emerald-500/40 btn-interactive text-emerald-600">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.75.75 0 00.917.918l4.458-1.495A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.3 0-4.438-.744-6.166-2.006l-.43-.322-2.657.89.89-2.657-.322-.43A9.935 9.935 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+                  <span className="text-[11px] font-medium">WhatsApp</span>
+                </a>
                 <Link to="/dashboard/analytics"
                   className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 btn-interactive text-[hsl(var(--dash-text-secondary))]">
                   <BarChart3 size={16} className="text-primary" />
@@ -353,6 +500,76 @@ const DashboardHome = () => {
             ))}
           </div>
 
+          {/* ── AI Insights (4.1) ── */}
+          {(aiInsights.length > 0 || insightsLoading) && (
+            <div className="glass-card rounded-2xl p-5">
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-fuchsia-500/15 to-violet-500/15 flex items-center justify-center">
+                  <Lightbulb size={15} className="text-fuchsia-500" />
+                </div>
+                <div>
+                  <p className="text-[hsl(var(--dash-text))] text-[13px] font-semibold">Insights da IA</p>
+                  <p className="text-[hsl(var(--dash-text-subtle))] text-[10px]">Atualizado diariamente</p>
+                </div>
+              </div>
+              {insightsLoading ? (
+                <div className="space-y-2">
+                  {[1, 2].map(i => <div key={i} className="skeleton h-4 rounded-lg" style={{ width: `${70 + i * 10}%` }} />)}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {aiInsights.map((insight, i) => (
+                    <p key={i} className="text-[hsl(var(--dash-text-secondary))] text-[12px] leading-relaxed pl-1">
+                      {insight}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── Achievements (4.4) ── */}
+          <div className="glass-card rounded-2xl p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                  <Award size={15} className="text-amber-500" />
+                </div>
+                <div>
+                  <p className="text-[hsl(var(--dash-text))] text-[13px] font-semibold">Conquistas</p>
+                  <p className="text-[hsl(var(--dash-text-subtle))] text-[10px]">{unlockedAchievements.length}/{ACHIEVEMENTS.length} desbloqueadas</p>
+                </div>
+              </div>
+              {ACHIEVEMENTS.length > 4 && (
+                <button onClick={() => setShowAllAchievements(!showAllAchievements)}
+                  className="text-[11px] text-primary font-medium hover:underline">
+                  {showAllAchievements ? "Menos" : "Ver todas"}
+                </button>
+              )}
+            </div>
+            <div className="h-1.5 rounded-full bg-[hsl(var(--dash-surface-2))] overflow-hidden mb-4">
+              <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-700"
+                style={{ width: `${(unlockedAchievements.length / ACHIEVEMENTS.length) * 100}%` }} />
+            </div>
+            <div className="grid grid-cols-4 gap-2">
+              {(showAllAchievements ? ACHIEVEMENTS : ACHIEVEMENTS.slice(0, 8)).map(a => {
+                const unlocked = a.check();
+                const Icon = a.icon;
+                return (
+                  <div key={a.id} title={`${a.label}: ${a.desc}`}
+                    className={`flex flex-col items-center gap-1 py-2.5 rounded-xl transition-all ${
+                      unlocked ? "bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))]" : "opacity-30"
+                    }`}>
+                    <div className={`w-7 h-7 rounded-lg ${unlocked ? a.bg : "bg-[hsl(var(--dash-surface-2))]"} flex items-center justify-center`}>
+                      <Icon size={13} className={unlocked ? a.color : "text-[hsl(var(--dash-text-subtle))]"} />
+                    </div>
+                    <span className="text-[9px] text-[hsl(var(--dash-text-muted))] font-medium text-center leading-tight px-0.5">{a.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {/* ── IA teaser (subtle, not overwhelming) ── */}
           <Link to="/dashboard/ia"
             className="glass-card card-hover rounded-2xl p-4 flex items-center gap-4 group hover:border-fuchsia-200">
@@ -377,57 +594,70 @@ const DashboardHome = () => {
               </Link>
             </div>
 
-            {/* Phone mockup */}
+            {/* Phone mockup — mirrors Profile.tsx rendering */}
             <div className="relative mx-auto" style={{ width: 310 }}>
               <div className="rounded-[2.8rem] border-[3px] border-[hsl(var(--dash-text))] overflow-hidden shadow-2xl flex flex-col"
-                style={{ aspectRatio: "9/16" }}>
+                style={{ aspectRatio: "9/16", ...previewBgStyle }}>
                 {/* Status bar */}
-                <div className="flex items-center justify-between px-6 pt-3 pb-1 flex-shrink-0" style={{ background: theme.bg }}>
-                  <span className="text-[11px] font-semibold" style={{ color: "rgba(255,255,255,0.7)" }}>9:41</span>
+                <div className="flex items-center justify-between px-6 pt-3 pb-1 flex-shrink-0">
+                  <span className="text-[10px] font-semibold" style={{ color: `${pText}B3` }}>9:41</span>
                   <div className="flex items-center gap-1">
                     <div className="flex gap-[2px] items-end">
                       {[3, 4, 5, 6].map(h => (
-                        <div key={h} className="w-[3px] rounded-sm" style={{ height: h, background: "rgba(255,255,255,0.7)" }} />
+                        <div key={h} className="w-[3px] rounded-sm" style={{ height: h, background: `${pText}B3` }} />
                       ))}
                     </div>
-                    <div className="w-5 h-2.5 rounded-sm border ml-1 relative" style={{ borderColor: "rgba(255,255,255,0.5)" }}>
-                      <div className="absolute inset-[2px] rounded-[1px]" style={{ background: "rgba(255,255,255,0.75)" }} />
+                    <div className="w-5 h-2.5 rounded-sm border ml-1 relative" style={{ borderColor: `${pText}80` }}>
+                      <div className="absolute inset-[2px] rounded-[1px]" style={{ background: `${pText}BF` }} />
                     </div>
                   </div>
                 </div>
 
                 {/* Dynamic Island */}
-                <div className="flex justify-center pb-3 flex-shrink-0" style={{ background: theme.bg }}>
+                <div className="flex justify-center pb-3 flex-shrink-0">
                   <div className="w-[88px] h-[26px] rounded-full bg-black" />
                 </div>
 
-                {/* Screen content */}
-                <div className="flex-1 overflow-y-auto" style={{ background: `linear-gradient(160deg,${theme.bg} 60%,${theme.accent}18)` }}>
-                  <div className="p-5">
+                {/* Scrollable screen content */}
+                <div className="flex-1 overflow-y-auto relative" style={{ fontFamily: `'${pFontB}', sans-serif` }}>
+                  {/* Ambient glow */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[200px] pointer-events-none" style={{ background: `radial-gradient(ellipse, ${pAccent}20, transparent 70%)` }} />
+                  <div className="p-5 relative z-10">
                     {/* Profile */}
                     <div className="flex flex-col items-center mb-5">
-                      <div className="w-14 h-14 rounded-full mb-2 overflow-hidden"
-                        style={{ boxShadow: `0 0 0 2px ${theme.accent}40` }}>
+                      <div className="mb-2.5 overflow-hidden"
+                        style={{
+                          width: profileSize, height: profileSize,
+                          borderRadius: pProfileRadius,
+                          clipPath: pProfileClip,
+                          boxShadow: profileBorder ? `0 0 0 2px ${profileBorderColor}50` : "none",
+                        }}>
                         {cfg.avatarUrl ? (
                           <img src={cfg.avatarUrl as string} alt="" className="w-full h-full object-cover"
                             onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center"
-                            style={{ background: `linear-gradient(135deg,${theme.accent},${theme.accent2})` }}>
-                            <span className="text-white text-lg font-bold">
+                            style={{ background: pAccent }}>
+                            <span className="text-white text-xl font-bold">
                               {(displayName || "M")[0].toUpperCase()}
                             </span>
                           </div>
                         )}
                       </div>
-                      <p className="font-bold text-[12px] text-white">{(cfg.displayName as string) || displayName || "Seu Nome"}</p>
+                      <p className="font-bold text-sm" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif` }}>{(cfg.displayName as string) || displayName || "Seu Nome"}</p>
                       {(cfg.username || username) && (
-                        <p className="text-[11px] mt-0.5" style={{ color: theme.accent }}>@{(cfg.username as string) || username}</p>
+                        <p className="text-xs mt-0.5" style={{ color: pAccent }}>@{((cfg.username as string) || username).replace(/^@/, "")}</p>
                       )}
                       {cfg.bio && (
-                        <p className="text-[10px] text-center mt-1 px-3 line-clamp-2" style={{ color: "rgba(220,220,220,0.8)" }}>
+                        <p className="text-xs text-center mt-1.5 px-2 line-clamp-2" style={{ color: pSub }}>
                           {cfg.bio as string}
                         </p>
+                      )}
+                      {cfg.whatsapp && (
+                        <div className="flex items-center gap-1 mt-2 px-2.5 py-1 rounded-full" style={{ background: "#25d36618" }}>
+                          <MessageCircle size={10} style={{ color: "#25d366" }} />
+                          <span className="text-[10px]" style={{ color: "#25d366" }}>WhatsApp</span>
+                        </div>
                       )}
                     </div>
 
@@ -435,44 +665,93 @@ const DashboardHome = () => {
                     {blocks.length > 0 ? (
                       blocks.map(block => {
                         if (block.type === "product") {
-                          const p = products.find(pr => pr.title && (pr as Record<string, unknown>).id === block.refId);
+                          const p = products.find(pr => (pr as any).id === block.refId);
                           if (!p) return null;
+                          const coverImg = p.images?.[0] || p.imageUrl;
+                          const isBooking = p.linkType === "booking";
                           return (
-                            <div key={block.id} className="flex items-center gap-2 rounded-xl border p-2 mb-1.5"
-                              style={{ borderColor: theme.accent + "30", background: theme.accent + "0a" }}>
-                              <span className="text-[11px] flex-shrink-0">{p.emoji || "📦"}</span>
-                              <span className="text-[10px] font-semibold text-white flex-1 truncate">{p.title}</span>
-                              {p.price && <span className="text-[10px] font-bold" style={{ color: theme.accent }}>{p.price}</span>}
+                            <div key={block.id} className="flex items-center gap-2.5 p-2.5 mb-2"
+                              style={{ ...pBtnStyle }}>
+                              {coverImg ? (
+                                <div className="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0">
+                                  <img src={coverImg} alt={p.title} className="w-full h-full object-cover" />
+                                </div>
+                              ) : (
+                                <span className="text-base flex-shrink-0">{p.emoji || "📦"}</span>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-semibold truncate" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif` }}>{p.title}</p>
+                                <div className="flex items-center gap-2">
+                                  {p.originalPrice && <span className="text-[9px] line-through" style={{ color: pSub }}>{p.originalPrice}</span>}
+                                  {p.price && <p className="text-[10px] font-bold" style={{ color: pAccent }}>{p.price}</p>}
+                                </div>
+                                {isBooking && (
+                                  <p className="text-[9px] mt-0.5 flex items-center gap-1" style={{ color: pSub }}>
+                                    <Clock size={8} /> {(p.bookingDuration || 60)}min · {(p.bookingDays || []).length} dias/sem
+                                  </p>
+                                )}
+                              </div>
+                              {p.badge && (
+                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: pAccent + "25", color: pAccent }}>
+                                  {p.badge}
+                                </span>
+                              )}
                             </div>
                           );
                         }
                         if (block.type === "link") {
-                          const l = links.find(lk => (lk as Record<string, unknown>).id === block.refId);
+                          const l = links.find(lk => (lk as any).id === block.refId);
                           if (!l) return null;
+                          if (l.type === "header") return (
+                            <div key={block.id} className="flex items-center gap-2 mb-2">
+                              <div className="flex-1 h-px" style={{ background: pAccent + "30" }} />
+                              <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: pAccent + "80" }}>{l.title}</span>
+                              <div className="flex-1 h-px" style={{ background: pAccent + "30" }} />
+                            </div>
+                          );
+                          if (l.type === "spotlight") return (
+                            <div key={block.id} className="p-2.5 mb-2 flex items-center justify-center gap-2"
+                              style={{ background: `${pAccent}20`, border: `1px solid ${pAccent}35`, borderRadius: pBtnRadius }}>
+                              <span className="text-xs font-bold" style={{ color: pAccent }}>{l.title || l.url}</span>
+                            </div>
+                          );
                           return (
-                            <div key={block.id} className="flex items-center gap-2 rounded-xl border p-2 mb-1.5"
-                              style={{ borderColor: theme.accent + "25", background: theme.accent + "08" }}>
-                              <span className="text-[10px] truncate" style={{ color: "rgba(200,200,200,0.8)" }}>{l.title || l.url}</span>
+                            <div key={block.id} className="flex items-center gap-2 p-2.5 mb-2"
+                              style={{ ...pBtnStyle }}>
+                              <span className="text-xs truncate" style={{ color: pSub }}>{l.title || l.url}</span>
                             </div>
                           );
                         }
                         if (block.type === "testimonial") {
-                          const t = testimonials.find(te => (te as Record<string, unknown>).id === block.refId);
-                          if (!t) return null;
+                          const te = testimonials.find(t => (t as any).id === block.refId);
+                          if (!te) return null;
                           return (
-                            <div key={block.id} className="rounded-xl border p-2 mb-1.5"
-                              style={{ borderColor: theme.accent + "20", background: theme.accent + "08" }}>
-                              <p className="text-[10px] italic line-clamp-1" style={{ color: "rgba(200,200,200,0.85)" }}>"{t.text}"</p>
-                              <p className="text-[10px] mt-0.5 font-semibold" style={{ color: theme.accent }}>— {t.name}</p>
+                            <div key={block.id} className="p-2.5 mb-2"
+                              style={{ ...pBtnStyle }}>
+                              <div className="flex items-center gap-2 mb-1.5">
+                                {te.avatar ? (
+                                  <img src={te.avatar} alt={te.name} className="w-5 h-5 rounded-full object-cover" />
+                                ) : (
+                                  <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white"
+                                    style={{ background: pAccent }}>
+                                    {(te.name || "?")[0]?.toUpperCase()}
+                                  </div>
+                                )}
+                                <p className="text-[9px] font-semibold" style={{ color: pAccent }}>
+                                  {te.name} {te.role && <span style={{ color: pSub }}>· {te.role}</span>}
+                                </p>
+                              </div>
+                              <div className="text-[10px] mb-1">{"⭐".repeat(te.stars || 5)}</div>
+                              <p className="text-[9px] line-clamp-2 italic" style={{ color: pSub }}>"{te.text}"</p>
                             </div>
                           );
                         }
                         if (block.type === "header") {
                           return (
-                            <div key={block.id} className="flex items-center gap-2 mb-1.5">
-                              <div className="flex-1 h-px" style={{ background: theme.accent + "30" }} />
-                              <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: theme.accent + "90" }}>{block.title}</span>
-                              <div className="flex-1 h-px" style={{ background: theme.accent + "30" }} />
+                            <div key={block.id} className="flex items-center gap-2 mb-2">
+                              <div className="flex-1 h-px" style={{ background: pAccent + "25" }} />
+                              {block.title && <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: pAccent + "85" }}>{block.title}</span>}
+                              {block.title && <div className="flex-1 h-px" style={{ background: pAccent + "25" }} />}
                             </div>
                           );
                         }
@@ -480,25 +759,36 @@ const DashboardHome = () => {
                       })
                     ) : (
                       <>
-                        {products.length > 0 ? products.slice(0, 3).map((p, i) => (
-                          <div key={i} className="flex items-center gap-2 rounded-xl border p-2 mb-1.5"
-                            style={{ borderColor: theme.accent + "30", background: theme.accent + "0a" }}>
-                            <span className="text-[11px]">{p.emoji || "📦"}</span>
-                            <span className="text-[10px] font-semibold text-white flex-1 truncate">{p.title}</span>
-                            {p.price && <span className="text-[10px] font-bold" style={{ color: theme.accent }}>{p.price}</span>}
-                          </div>
-                        )) : (
+                        {products.length > 0 ? products.slice(0, 3).map((p, i) => {
+                          const coverImg = p.images?.[0] || p.imageUrl;
+                          return (
+                            <div key={i} className="flex items-center gap-2.5 p-2.5 mb-2"
+                              style={{ ...pBtnStyle }}>
+                              {coverImg ? (
+                                <div className="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0">
+                                  <img src={coverImg} alt={p.title} className="w-full h-full object-cover" />
+                                </div>
+                              ) : (
+                                <span className="text-base flex-shrink-0">{p.emoji || "📦"}</span>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-semibold truncate" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif` }}>{p.title}</p>
+                                {p.price && <p className="text-[10px] font-bold" style={{ color: pAccent }}>{p.price}</p>}
+                              </div>
+                            </div>
+                          );
+                        }) : (
                           <div className="rounded-xl border border-dashed p-3 mb-2 flex flex-col items-center gap-1"
-                            style={{ borderColor: "rgba(255,255,255,0.1)" }}>
-                            <Package size={12} style={{ color: "rgba(255,255,255,0.35)" }} />
-                            <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.35)" }}>Adicione produtos</p>
+                            style={{ borderColor: `${pText}1A` }}>
+                            <Package size={12} style={{ color: `${pText}59` }} />
+                            <p className="text-[10px]" style={{ color: `${pText}59` }}>Adicione produtos</p>
                           </div>
                         )}
 
-                        {links.slice(0, 2).map((l, i) => (
-                          <div key={i} className="rounded-xl border p-2 mb-1.5 text-center"
-                            style={{ borderColor: theme.accent + "25", background: theme.accent + "08" }}>
-                            <span className="text-[10px]" style={{ color: "rgba(200,200,200,0.8)" }}>{l.title || l.url}</span>
+                        {links.filter(l => !l.isSocial).slice(0, 2).map((l, i) => (
+                          <div key={i} className="p-2.5 mb-2 text-center"
+                            style={{ ...pBtnStyle }}>
+                            <span className="text-xs" style={{ color: pSub }}>{l.title || l.url}</span>
                           </div>
                         ))}
                       </>
@@ -507,13 +797,13 @@ const DashboardHome = () => {
                     {/* Empty state */}
                     {products.length === 0 && links.length === 0 && blocks.length === 0 && (
                       <div className="text-center py-4 opacity-50">
-                        <p className="text-[10px]" style={{ color: "#aaa" }}>Adicione itens à sua vitrine</p>
+                        <p className="text-[10px]" style={{ color: pSub }}>Adicione itens à sua vitrine</p>
                       </div>
                     )}
 
                     {/* Footer */}
                     <div className="pt-4 pb-2 text-center">
-                      <p className="text-[10px]" style={{ color: "#555" }}>Criado com maview.app</p>
+                      <p className="text-[10px]" style={{ color: `${pText}33` }}>Criado com maview.app</p>
                     </div>
                   </div>
                 </div>

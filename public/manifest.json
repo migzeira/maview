@@ -14,20 +14,34 @@
       "type": "image/x-icon"
     },
     {
-      "src": "/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     },
     {
-      "src": "/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
   ],
   "categories": ["business", "productivity"],
   "lang": "pt-BR",
   "scope": "/",
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Minha Vitrine",
+      "short_name": "Vitrine",
+      "url": "/dashboard/pagina",
+      "description": "Editar minha vitrine"
+    },
+    {
+      "name": "Analytics",
+      "short_name": "Analytics",
+      "url": "/dashboard/analytics",
+      "description": "Ver metricas"
+    }
+  ]
 }

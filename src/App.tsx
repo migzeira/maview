@@ -25,6 +25,7 @@ const DashboardConfiguracoes = lazy(() => import("./pages/DashboardConfiguracoes
 const DashboardBlocos = lazy(() => import("./pages/DashboardBlocos.tsx"));
 const DashboardIA = lazy(() => import("./pages/DashboardIA.tsx"));
 const DashboardAnalytics = lazy(() => import("./pages/DashboardAnalytics.tsx"));
+const DashboardClientes = lazy(() => import("./pages/DashboardClientes.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -81,6 +82,8 @@ const App = () => (
             <Route path="/dashboard/configuracoes" element={<DashboardPage><DashboardConfiguracoes /></DashboardPage>} />
             <Route path="/dashboard/blocos" element={<DashboardPage><DashboardBlocos /></DashboardPage>} />
             <Route path="/dashboard/ia" element={<DashboardPage><DashboardIA /></DashboardPage>} />
+            <Route path="/dashboard/analytics" element={<DashboardPage><DashboardAnalytics /></DashboardPage>} />
+            <Route path="/dashboard/clientes" element={<DashboardPage><DashboardClientes /></DashboardPage>} />
             <Route path="/:username" element={<ProfilePage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL \"*\" ROUTE */}
             <Route path="*" element={<NotFound />} />
