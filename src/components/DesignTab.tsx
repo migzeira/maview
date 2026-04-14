@@ -114,15 +114,15 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   }, [config.design, updateConfig]);
 
   const applyFontPair = useCallback((headingFont: string) => {
-    setDesign("fontHeading", headingFont); loadFont(headingFont);
+    loadFont(headingFont);
     const paired = FONT_PAIRS[headingFont];
-    if (paired) { setDesign("fontBody", paired); loadFont(paired); }
+    if (paired) loadFont(paired);
+    updateConfig("design", { ...(config.design || {}), fontHeading: headingFont, ...(paired ? { fontBody: paired } : {}) });
     setInteracted(prev => new Set(prev).add(3));
-  }, [setDesign]);
+  }, [config.design, updateConfig]);
 
   const applyAutoHarmony = useCallback((accentHex: string) => {
     const harmony = generateHarmony(accentHex);
-    updateConfig("theme", "custom");
     updateConfig("design", { ...(config.design || {}), accentColor: accentHex, accentColor2: harmony.accent2,
       bgColor: harmony.bgColor, cardBg: harmony.cardBg, cardBorder: harmony.cardBorder,
       textColor: harmony.textColor, subtextColor: harmony.subtextColor });
@@ -138,9 +138,8 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
       const b = Math.max(0, parseInt(hex.slice(5, 7), 16) * 0.15) | 0;
       return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
     };
-    updateConfig("theme", "custom"); setDesign("bgColor", darken(colors.dominant));
-    setDesign("accentColor", colors.dominant); setDesign("accentColor2", colors.accent);
-  }, [config.avatarUrl, updateConfig, setDesign]);
+    updateConfig("design", { ...(config.design || {}), bgColor: darken(colors.dominant), accentColor: colors.dominant, accentColor2: colors.accent });
+  }, [config.avatarUrl, config.design, updateConfig]);
 
   const scrollCarousel = (dir: "left" | "right") => {
     carouselRef.current?.scrollBy({ left: dir === "left" ? -340 : 340, behavior: "smooth" });
@@ -151,8 +150,6 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   const isPackActive = (pack: DesignPack) => config.theme === pack.config.theme
     && d.fontHeading === (pack.config.design.fontHeading || "Inter")
     && d.bgEffect === (pack.config.design.bgEffect || "");
-
-  const setThemeCustom = useCallback(() => updateConfig("theme", "custom"), [updateConfig]);
 
   const handleCopyLink = useCallback(() => {
     const username = config.username || config.displayName?.toLowerCase().replace(/\s+/g, "");
@@ -272,7 +269,6 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         currentTheme={currentTheme}
         accent={accent}
         setDesign={setDesign}
-        setThemeCustom={setThemeCustom}
       />
 
       {/* ═══════ SAVE BUTTON — fixed at bottom ═══════ */}

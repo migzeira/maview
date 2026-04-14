@@ -20,10 +20,9 @@ interface AdvancedDrawerProps {
   currentTheme: ThemeDef;
   accent: string;
   setDesign: (key: keyof DesignConfig, value: any) => void;
-  setThemeCustom: () => void;
 }
 
-function AdvancedContent({ design: d, currentTheme, accent, setDesign, setThemeCustom }: Omit<AdvancedDrawerProps, "open" | "onOpenChange">) {
+function AdvancedContent({ design: d, currentTheme, accent, setDesign }: Omit<AdvancedDrawerProps, "open" | "onOpenChange">) {
   const bgImageInputRef = useRef<HTMLInputElement>(null);
   const bgVideoInputRef = useRef<HTMLInputElement>(null);
   const inputCls = "w-full rounded-xl border border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text))] text-sm px-3.5 py-2.5 placeholder:text-[hsl(var(--dash-text-subtle))] focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary/40 transition-all";
@@ -45,10 +44,10 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, setThemeC
 
         {d.bgType === "solid" && (
           <div className="space-y-3">
-            <ColorPicker value={d.bgColor || currentTheme.bg} onChange={v => { setDesign("bgColor", v); setThemeCustom(); }} label="Cor de fundo" />
+            <ColorPicker value={d.bgColor || currentTheme.bg} onChange={v => { setDesign("bgColor", v); }} label="Cor de fundo" />
             <div className="grid grid-cols-6 gap-2">
               {SOLID_COLORS.map(c => (
-                <button key={c} onClick={() => { setDesign("bgColor", c); setThemeCustom(); }}
+                <button key={c} onClick={() => { setDesign("bgColor", c); }}
                   className={`w-8 h-8 rounded-lg ring-1 transition-all hover:scale-110 ${(d.bgColor || currentTheme.bg) === c ? "ring-2 ring-primary" : "ring-white/10"}`} style={{ background: c }} />
               ))}
             </div>
@@ -58,12 +57,12 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, setThemeC
         {d.bgType === "gradient" && (
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
-              <ColorPicker value={d.bgGradient[0]} onChange={v => { setDesign("bgGradient", [v, d.bgGradient[1]]); setThemeCustom(); }} label="Cor 1" />
-              <ColorPicker value={d.bgGradient[1]} onChange={v => { setDesign("bgGradient", [d.bgGradient[0], v]); setThemeCustom(); }} label="Cor 2" />
+              <ColorPicker value={d.bgGradient[0]} onChange={v => { setDesign("bgGradient", [v, d.bgGradient[1]]); }} label="Cor 1" />
+              <ColorPicker value={d.bgGradient[1]} onChange={v => { setDesign("bgGradient", [d.bgGradient[0], v]); }} label="Cor 2" />
             </div>
             <div className="grid grid-cols-4 gap-1.5">
               {GRADIENT_PRESETS.map(([c1, c2], i) => (
-                <button key={i} onClick={() => { setDesign("bgGradient", [c1, c2]); setThemeCustom(); }}
+                <button key={i} onClick={() => { setDesign("bgGradient", [c1, c2]); }}
                   className="h-7 rounded-lg ring-1 ring-white/10 hover:scale-105 transition-all" style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }} />
               ))}
             </div>
@@ -105,7 +104,7 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, setThemeC
 
         {d.bgType === "pattern" && (
           <div className="space-y-3">
-            <ColorPicker value={d.bgColor || currentTheme.bg} onChange={v => { setDesign("bgColor", v); setThemeCustom(); }} label="Cor base" />
+            <ColorPicker value={d.bgColor || currentTheme.bg} onChange={v => { setDesign("bgColor", v); }} label="Cor base" />
             <div className="grid grid-cols-4 gap-1.5">
               {BG_PATTERNS.map(p => (
                 <button key={p.id} onClick={() => setDesign("bgPattern", p.id)}
@@ -122,7 +121,7 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, setThemeC
             currentEffect={d.bgEffect}
             accentColor={accent}
             bgColor={d.bgColor || currentTheme.bg}
-            onSelectEffect={id => { setDesign("bgEffect", id); setThemeCustom(); }}
+            onSelectEffect={id => { setDesign("bgEffect", id); }}
           />
         )}
       </Section>
