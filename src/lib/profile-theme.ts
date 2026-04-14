@@ -22,8 +22,8 @@ export const THEMES: Record<string, ThemeDef> = {
   "slate":       { bg: "#0c0e12", accent: "#94a3b8", accent2: "#cbd5e1", card: "#1a1e28", text: "#f8fafc", sub: "rgba(248,250,252,0.80)", border: "rgba(148,163,184,0.28)" },
   "wine":        { bg: "#100408", accent: "#be185d", accent2: "#e11d48", card: "#200a14", text: "#fff0f6", sub: "rgba(255,240,246,0.80)", border: "rgba(190,24,93,0.28)"    },
   "custom":      { bg: "#080612", accent: "#a855f7", accent2: "#ec4899", card: "#13102a", text: "#f8f5ff", sub: "rgba(248,245,255,0.80)", border: "rgba(168,85,247,0.28)" },
-  "white":       { bg: "#f8f9fa", accent: "#6366f1", accent2: "#8b5cf6", card: "#ffffff", text: "#111827", sub: "#4b5563", border: "rgba(0,0,0,0.08)" },
-  "cream":       { bg: "#faf7f2", accent: "#d97706", accent2: "#b45309", card: "#ffffff", text: "#1c1917", sub: "#57534e", border: "rgba(0,0,0,0.06)" },
+  "white":       { bg: "#f8f9fa", accent: "#6366f1", accent2: "#8b5cf6", card: "#ffffff", text: "#111827", sub: "#374151", border: "rgba(0,0,0,0.08)" },
+  "cream":       { bg: "#faf7f2", accent: "#d97706", accent2: "#b45309", card: "#ffffff", text: "#1c1917", sub: "#44403c", border: "rgba(0,0,0,0.06)" },
   "pure-black":  { bg: "#000000", accent: "#ffffff", accent2: "#a0a0a0", card: "#0a0a0a", text: "#ffffff", sub: "rgba(255,255,255,0.70)", border: "rgba(255,255,255,0.12)" },
   "bold-red":    { bg: "#0a0000", accent: "#ff3333", accent2: "#ff6666", card: "#1a0505", text: "#fff5f5", sub: "rgba(255,245,245,0.80)", border: "rgba(255,51,51,0.25)" },
 };

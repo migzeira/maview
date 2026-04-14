@@ -41,24 +41,24 @@ export interface ReferenceProfile {
   products: { title: string; price: string; image?: string }[];
 }
 
-const U = (id: string, w = 100, h = 100, crop = "face") =>
-  `https://images.unsplash.com/${id}?w=${w}&h=${h}&fit=crop&crop=${crop}`;
+const U = (id: string, w = 200, h = 200, crop = "face") =>
+  `https://images.unsplash.com/${id}?w=${w}&h=${h}&fit=crop&crop=${crop}${crop === "face" ? "&facepad=2.5" : ""}`;
 
 export const REFERENCE_PROFILES: ReferenceProfile[] = [
   /* 0 */ { name: "Ana Beatriz", username: "@anabeatriz", bio: "Designer & criadora de conteudo",
-    avatar: U("photo-1494790108377-be9c29b29330"),
+    avatar: U("photo-1573496359142-b8d87734a5a2"),
     socials: ["ig", "tt", "yt"], links: ["Meu portfolio", "Agende uma call"],
     products: [{ title: "Ebook Design", price: "R$ 47" }, { title: "Mentoria 1:1", price: "R$ 197" }] },
   /* 1 */ { name: "Lucas Santos", username: "@lucassantos", bio: "Fitness coach & nutricionista",
-    avatar: U("photo-1507003211169-0a1dd7228f2d"),
+    avatar: U("photo-1618077360395-f3068be8e001"),
     socials: ["ig", "yt"], links: ["Treinos online", "WhatsApp"],
     products: [{ title: "Plano 12 semanas", price: "R$ 97" }, { title: "Dieta personalizada", price: "R$ 67" }] },
   /* 2 */ { name: "Camila Rocha", username: "@camilarocha", bio: "Fotografa & videomaker",
-    avatar: U("photo-1438761681033-6461ffad8d80"),
+    avatar: U("photo-1544005313-94ddf0286df2"),
     socials: ["ig", "tt", "pin"], links: ["Booking", "Presets Lightroom"],
     products: [{ title: "Pack 50 Presets", price: "R$ 29" }, { title: "Curso de foto", price: "R$ 149" }] },
   /* 3 */ { name: "Pedro Mendes", username: "@pedromendes", bio: "Dev & criador de SaaS",
-    avatar: U("photo-1472099645785-5658abf4ff4e"),
+    avatar: U("photo-1560250097-0b93528c311a"),
     socials: ["gh", "tw", "li"], links: ["Newsletter", "Meu SaaS"],
     products: [{ title: "Template Next.js", price: "R$ 79" }, { title: "Consultoria", price: "R$ 297" }] },
   /* 4 */ { name: "Julia Lima", username: "@julialima", bio: "Artista digital & ilustradora",
@@ -69,7 +69,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
   /* ── Showcase Profiles (Vitrines Prontas) ── */
 
   /* 5 — Wellness */ { name: "Marina Costa", username: "@marinacosta", bio: "Wellness coach. Yoga, meditacao e vida equilibrada",
-    avatar: U("photo-1544005313-94ddf0286df2"),
+    avatar: U("photo-1438761681033-6461ffad8d80"),
     coverImage: U("photo-1506126613408-eca07ce68773", 400, 200, "center"),
     socials: ["ig", "tt", "yt"], links: ["Agende uma aula", "Comunidade VIP"],
     products: [
@@ -77,7 +77,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
       { title: "Meditacao guiada", price: "R$ 29", image: U("photo-1508672019048-805c876b67e2", 200, 150, "center") },
     ] },
   /* 6 — Coach */ { name: "Rafael Torres", username: "@rafaeltorres", bio: "Ajudo voce a crescer nas redes sociais e monetizar",
-    avatar: U("photo-1500648767791-00dcc994a43e"),
+    avatar: U("photo-1472099645785-5658abf4ff4e"),
     coverImage: U("photo-1498050108023-c5249f4df085", 400, 200, "center"),
     socials: ["ig", "tt", "li", "yt"], links: ["Agendar coaching", "Newsletter gratis"],
     products: [
@@ -85,7 +85,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
       { title: "Guia Monetizacao", price: "Gratis", image: U("photo-1460925895917-afdab827c52f", 200, 150, "center") },
     ] },
   /* 7 — Fashion */ { name: "Bianca Oliveira", username: "@biancaoliveira", bio: "Moda, estilo e consultoria de imagem pessoal",
-    avatar: U("photo-1531746020798-e6953c6e8e04"),
+    avatar: U("photo-1494790108377-be9c29b29330"),
     coverImage: U("photo-1558618666-fcd25c85f82e", 400, 200, "center"),
     socials: ["ig", "tt", "pin"], links: ["Meu closet", "Parcerias"],
     products: [
@@ -93,7 +93,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
       { title: "Closet Digital", price: "R$ 39", image: U("photo-1445205170230-053b83016050", 200, 150, "center") },
     ] },
   /* 8 — Fitness */ { name: "Thiago Almeida", username: "@thiagoalmeida", bio: "Personal trainer & coach de transformacao corporal",
-    avatar: U("photo-1506794778202-cad84cf45f1d"),
+    avatar: U("photo-1507003211169-0a1dd7228f2d"),
     coverImage: U("photo-1534438327276-14e5300c3a48", 400, 200, "center"),
     socials: ["ig", "yt"], links: ["Treino gratis", "WhatsApp"],
     products: [
@@ -109,7 +109,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
       { title: "Curso Fotografia", price: "R$ 197", image: U("photo-1542038784456-1ea8e935640e", 200, 150, "center") },
     ] },
   /* 10 — Dev */ { name: "Daniel Rocha", username: "@danielrocha", bio: "Desenvolvedor full-stack. Templates, SaaS e mentorias",
-    avatar: U("photo-1539571696357-5a69c17a67c6"),
+    avatar: U("photo-1500648767791-00dcc994a43e"),
     coverImage: U("photo-1550751827-4bd374c3f58b", 400, 200, "center"),
     socials: ["gh", "tw", "li"], links: ["Newsletter", "GitHub"],
     products: [
@@ -117,7 +117,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
       { title: "Mentoria Dev", price: "R$ 297", image: U("photo-1517694712202-14dd9538aa97", 200, 150, "center") },
     ] },
   /* 11 — Nutri */ { name: "Luana Ferreira", username: "@luanaferreira", bio: "Nutricionista esportiva. Dietas, receitas e saude",
-    avatar: U("photo-1487412720507-e7ab37603c6f"),
+    avatar: U("photo-1531746020798-e6953c6e8e04"),
     coverImage: U("photo-1490645935967-10de6ba17061", 400, 200, "center"),
     socials: ["ig", "tt", "yt"], links: ["Agendar consulta", "WhatsApp"],
     products: [
@@ -125,7 +125,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
       { title: "Ebook Receitas Fit", price: "R$ 29", image: U("photo-1495521821757-a1efb6729352", 200, 150, "center") },
     ] },
   /* 12 — Músico */ { name: "Gabriel Santos", username: "@gabrielsantos", bio: "Produtor musical. Beats, mixing e aulas de producao",
-    avatar: U("photo-1506277886164-e25aa3f4ef7f"),
+    avatar: U("photo-1539571696357-5a69c17a67c6"),
     coverImage: U("photo-1598488035139-bdbb2231ce04", 400, 200, "center"),
     socials: ["ig", "tt", "yt", "sc"], links: ["Spotify", "SoundCloud"],
     products: [
@@ -183,10 +183,10 @@ export const DESIGN_PACKS: DesignPack[] = [
     config: { theme: "crimson", design: { bgType: "effect", bgEffect: "radial-glow", bgColor: "#120508", buttonShape: "square", buttonFill: "solid", buttonShadow: "glow", buttonRadius: 6, fontHeading: "Bebas Neue", fontBody: "Poppins", profileShape: "circle", profileBorder: false, profileSize: 96, accentColor: "#dc2626", accentColor2: "#f87171" } } },
   { id: "clean-white", label: "Branco", desc: "Clean e luminoso", category: "light", refIdx: 0,
     preview: { bg: "#f8f9fa", accent: "#6366f1", accent2: "#8b5cf6" },
-    config: { theme: "white", design: { bgType: "solid", bgColor: "#f8f9fa", bgEffect: "", buttonShape: "pill", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 12, fontHeading: "Inter", fontBody: "DM Sans", profileShape: "circle", profileBorder: false, profileSize: 88, accentColor: "#6366f1", accentColor2: "#8b5cf6", textColor: "#111827", subtextColor: "#4b5563", cardBg: "#ffffff", cardBorder: "rgba(0,0,0,0.08)" } } },
+    config: { theme: "white", design: { bgType: "solid", bgColor: "#f8f9fa", bgEffect: "", buttonShape: "pill", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 12, fontHeading: "Inter", fontBody: "DM Sans", profileShape: "circle", profileBorder: false, profileSize: 88, accentColor: "#6366f1", accentColor2: "#8b5cf6", textColor: "#111827", subtextColor: "#374151", cardBg: "#ffffff", cardBorder: "rgba(0,0,0,0.08)" } } },
   { id: "warm-cream", label: "Creme", desc: "Quente e acolhedor", category: "light", refIdx: 4,
     preview: { bg: "#faf7f2", accent: "#d97706", accent2: "#b45309" },
-    config: { theme: "cream", design: { bgType: "solid", bgColor: "#faf7f2", bgEffect: "", buttonShape: "soft", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 14, fontHeading: "Playfair Display", fontBody: "Lora", profileShape: "circle", profileBorder: true, profileBorderColor: "#d97706", profileSize: 92, accentColor: "#d97706", accentColor2: "#b45309", textColor: "#1c1917", subtextColor: "#57534e", cardBg: "#ffffff", cardBorder: "rgba(0,0,0,0.06)" } } },
+    config: { theme: "cream", design: { bgType: "solid", bgColor: "#faf7f2", bgEffect: "", buttonShape: "soft", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 14, fontHeading: "Playfair Display", fontBody: "Lora", profileShape: "circle", profileBorder: true, profileBorderColor: "#d97706", profileSize: 92, accentColor: "#d97706", accentColor2: "#b45309", textColor: "#1c1917", subtextColor: "#44403c", cardBg: "#ffffff", cardBorder: "rgba(0,0,0,0.06)" } } },
   { id: "emerald-pro", label: "Emerald", desc: "Profissional e clean", category: "minimal", refIdx: 3,
     preview: { bg: "#021a0f", accent: "#10b981", accent2: "#6ee7b7" },
     config: { theme: "emerald", design: { bgType: "solid", bgColor: "#021a0f", bgEffect: "", buttonShape: "rounded", buttonFill: "outline", buttonShadow: "none", buttonRadius: 12, fontHeading: "Manrope", fontBody: "Rubik", profileShape: "circle", profileBorder: false, profileSize: 88, accentColor: "#10b981", accentColor2: "#6ee7b7" } } },
@@ -195,19 +195,19 @@ export const DESIGN_PACKS: DesignPack[] = [
 
   { id: "showcase-wellness", label: "Wellness", desc: "Yoga, meditacao e bem-estar", category: "showcase", refIdx: 5,
     preview: { bg: "#faf5f0", accent: "#d97706", accent2: "#b45309" },
-    config: { theme: "cream", design: { bgType: "image", bgImageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=800&fit=crop&crop=center", bgOverlay: 40, bgColor: "#faf5f0", buttonShape: "pill", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 12, fontHeading: "Outfit", fontBody: "Nunito", profileShape: "circle", profileBorder: true, profileBorderColor: "#d97706", profileSize: 96, accentColor: "#d97706", accentColor2: "#b45309", textColor: "#1c1917", subtextColor: "#57534e", cardBg: "rgba(255,255,255,0.85)", cardBorder: "rgba(0,0,0,0.08)" } } },
+    config: { theme: "cream", design: { bgType: "image", bgImageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=800&fit=crop&crop=center", bgOverlay: 40, bgColor: "#faf5f0", buttonShape: "pill", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 12, fontHeading: "Outfit", fontBody: "Nunito", profileShape: "circle", profileBorder: true, profileBorderColor: "#d97706", profileSize: 96, accentColor: "#d97706", accentColor2: "#b45309", textColor: "#1c1917", subtextColor: "#44403c", cardBg: "rgba(255,255,255,0.85)", cardBorder: "rgba(0,0,0,0.08)" } } },
   { id: "showcase-coach", label: "Coach", desc: "Social media e marketing", category: "showcase", refIdx: 6,
     preview: { bg: "#0a0618", accent: "#a855f7", accent2: "#ec4899" },
     config: { theme: "dark-purple", design: { bgType: "effect", bgEffect: "ambient-glow", bgColor: "#0a0618", buttonShape: "soft", buttonFill: "glass", buttonShadow: "glow", buttonRadius: 14, fontHeading: "Space Grotesk", fontBody: "DM Sans", profileShape: "circle", profileBorder: true, profileBorderColor: "#a855f7", profileSize: 96, accentColor: "#a855f7", accentColor2: "#ec4899" } } },
   { id: "showcase-fashion", label: "Fashion", desc: "Moda e consultoria de estilo", category: "showcase", refIdx: 7,
     preview: { bg: "#faf7f2", accent: "#be185d", accent2: "#e11d48" },
-    config: { theme: "cream", design: { bgType: "image", bgImageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=800&fit=crop&crop=center", bgOverlay: 35, bgColor: "#faf7f2", buttonShape: "pill", buttonFill: "solid", buttonShadow: "md", buttonRadius: 12, fontHeading: "Playfair Display", fontBody: "Lora", profileShape: "circle", profileBorder: true, profileBorderColor: "#be185d", profileSize: 96, accentColor: "#be185d", accentColor2: "#e11d48", textColor: "#1c1917", subtextColor: "#57534e", cardBg: "rgba(255,255,255,0.88)", cardBorder: "rgba(0,0,0,0.06)" } } },
+    config: { theme: "cream", design: { bgType: "image", bgImageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=800&fit=crop&crop=center", bgOverlay: 35, bgColor: "#faf7f2", buttonShape: "pill", buttonFill: "solid", buttonShadow: "md", buttonRadius: 12, fontHeading: "Playfair Display", fontBody: "Lora", profileShape: "circle", profileBorder: true, profileBorderColor: "#be185d", profileSize: 96, accentColor: "#be185d", accentColor2: "#e11d48", textColor: "#1c1917", subtextColor: "#44403c", cardBg: "rgba(255,255,255,0.88)", cardBorder: "rgba(0,0,0,0.06)" } } },
   { id: "showcase-fitness", label: "Fitness", desc: "Treino e transformacao", category: "showcase", refIdx: 8,
     preview: { bg: "#080808", accent: "#ef4444", accent2: "#f97316" },
     config: { theme: "crimson", design: { bgType: "image", bgImageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=800&fit=crop&crop=center", bgOverlay: 60, bgColor: "#080808", buttonShape: "square", buttonFill: "solid", buttonShadow: "glow", buttonRadius: 6, fontHeading: "Bebas Neue", fontBody: "Poppins", profileShape: "circle", profileBorder: true, profileBorderColor: "#ef4444", profileSize: 96, accentColor: "#ef4444", accentColor2: "#f97316" } } },
   { id: "showcase-photo", label: "Fotografa", desc: "Fotografia e presets", category: "showcase", refIdx: 9,
     preview: { bg: "#f8f9fa", accent: "#6366f1", accent2: "#8b5cf6" },
-    config: { theme: "white", design: { bgType: "solid", bgColor: "#f8f9fa", bgEffect: "", buttonShape: "pill", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 12, fontHeading: "Cormorant Garamond", fontBody: "Montserrat", profileShape: "circle", profileBorder: false, profileSize: 92, accentColor: "#6366f1", accentColor2: "#8b5cf6", textColor: "#111827", subtextColor: "#4b5563", cardBg: "#ffffff", cardBorder: "rgba(0,0,0,0.08)" } } },
+    config: { theme: "white", design: { bgType: "solid", bgColor: "#f8f9fa", bgEffect: "", buttonShape: "pill", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 12, fontHeading: "Cormorant Garamond", fontBody: "Montserrat", profileShape: "circle", profileBorder: false, profileSize: 92, accentColor: "#6366f1", accentColor2: "#8b5cf6", textColor: "#111827", subtextColor: "#374151", cardBg: "#ffffff", cardBorder: "rgba(0,0,0,0.08)" } } },
   { id: "showcase-dev", label: "Developer", desc: "Tech, SaaS e mentorias", category: "showcase", refIdx: 10,
     preview: { bg: "#05080f", accent: "#60a5fa", accent2: "#818cf8" },
     config: { theme: "midnight", design: { bgType: "effect", bgEffect: "matrix-grid", bgColor: "#05080f", buttonShape: "square", buttonFill: "glass", buttonShadow: "glow", buttonRadius: 6, fontHeading: "JetBrains Mono", fontBody: "Space Grotesk", profileShape: "circle", profileBorder: false, profileSize: 92, accentColor: "#60a5fa", accentColor2: "#818cf8" } } },
