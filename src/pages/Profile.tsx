@@ -563,7 +563,7 @@ const ProfilePage = () => {
             {profile.whatsapp && profile.products.length > 0 && (
               <a href={`https://wa.me/${profile.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2.5 w-full py-4 rounded-2xl font-bold text-[15px] text-white transition-all hover:scale-[1.02] active:scale-[0.98] mt-4"
-                style={{ background: "#25d366", boxShadow: "0 4px 16px rgba(37,211,102,0.3)" }}
+                style={{ background: "#25d366", boxShadow: "0 2px 8px rgba(37,211,102,0.15)" }}
                 aria-label="Enviar mensagem no WhatsApp">
                 <MessageCircle size={18} className="fill-white" /> Falar agora
               </a>
@@ -834,7 +834,7 @@ const ProfilePage = () => {
           className="fixed bottom-[72px] right-4 z-50 flex items-center gap-2.5 px-5 py-3.5 rounded-full shadow-2xl transition-all duration-200 hover:scale-105 active:scale-95 group"
           style={{
             background: "#25d366",
-            boxShadow: "0 6px 24px rgba(37,211,102,0.40), 0 0 0 3px rgba(37,211,102,0.15)",
+            boxShadow: "0 3px 10px rgba(37,211,102,0.20)",
             color: "#fff",
           }}
         >

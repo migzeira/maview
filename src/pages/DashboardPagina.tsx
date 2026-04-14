@@ -1571,7 +1571,7 @@ const DashboardPagina = () => {
       {/* WhatsApp floating button — inside phone frame */}
       {config.whatsapp && (
         <div className="absolute bottom-12 right-5 w-9 h-9 rounded-full flex items-center justify-center shadow-lg z-20"
-          style={{ background: "#25d366", boxShadow: "0 4px 12px rgba(37,211,102,0.4)" }}>
+          style={{ background: "#25d366", boxShadow: "0 2px 6px rgba(37,211,102,0.15)" }}>
           <MessageCircle size={14} className="text-white fill-white" />
         </div>
       )}
