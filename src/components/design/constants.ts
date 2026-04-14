@@ -44,36 +44,32 @@ export interface ReferenceProfile {
 const U = (id: string, w = 200, h = 200, crop = "center") =>
   `https://images.unsplash.com/${id}?w=${w}&h=${h}&fit=crop&crop=${crop}&q=80`;
 
-/** High-res avatar helper — 300×300 face-aware crop */
-const AV = (id: string) =>
-  `https://images.unsplash.com/${id}?w=300&h=300&fit=facearea&facepad=1.8&q=80`;
-
 export const REFERENCE_PROFILES: ReferenceProfile[] = [
   /* 0 */ { name: "Ana Beatriz", username: "@anabeatriz", bio: "Designer & criadora de conteudo",
-    avatar: AV("photo-1494790108377-be9c29b29330"),
+    avatar: "/avatars/ana.jpg",
     socials: ["ig", "tt", "yt"], links: ["Meu portfolio", "Agende uma call"],
     products: [{ title: "Ebook Design", price: "R$ 47" }, { title: "Mentoria 1:1", price: "R$ 197" }] },
   /* 1 */ { name: "Lucas Santos", username: "@lucassantos", bio: "Fitness coach & nutricionista",
-    avatar: AV("photo-1506794778202-cad84cf45f1d"),
+    avatar: "/avatars/lucas.jpg",
     socials: ["ig", "yt"], links: ["Treinos online", "WhatsApp"],
     products: [{ title: "Plano 12 semanas", price: "R$ 97" }, { title: "Dieta personalizada", price: "R$ 67" }] },
   /* 2 */ { name: "Camila Rocha", username: "@camilarocha", bio: "Fotografa & videomaker",
-    avatar: AV("photo-1534528741775-53994a69daeb"),
+    avatar: "/avatars/camila.jpg",
     socials: ["ig", "tt", "pin"], links: ["Booking", "Presets Lightroom"],
     products: [{ title: "Pack 50 Presets", price: "R$ 29" }, { title: "Curso de foto", price: "R$ 149" }] },
   /* 3 */ { name: "Pedro Mendes", username: "@pedromendes", bio: "Dev & criador de SaaS",
-    avatar: AV("photo-1500648767791-00dcc994a43e"),
+    avatar: "/avatars/pedro.jpg",
     socials: ["gh", "tw", "li"], links: ["Newsletter", "Meu SaaS"],
     products: [{ title: "Template Next.js", price: "R$ 79" }, { title: "Consultoria", price: "R$ 297" }] },
   /* 4 */ { name: "Julia Lima", username: "@julialima", bio: "Artista digital & ilustradora",
-    avatar: AV("photo-1580489944761-15a19d654956"),
+    avatar: "/avatars/julia.jpg",
     socials: ["ig", "be", "tt"], links: ["Loja de prints", "Commissions"],
     products: [{ title: "Pack wallpapers", price: "R$ 19" }, { title: "Ilustracao custom", price: "R$ 350" }] },
 
   /* ── Showcase Profiles (Vitrines Prontas) ── */
 
   /* 5 — Wellness */ { name: "Marina Costa", username: "@marinacosta", bio: "Wellness coach. Yoga, meditacao e vida equilibrada",
-    avatar: AV("photo-1544005313-94ddf0286df2"),
+    avatar: "/avatars/marina.jpg",
     coverImage: U("photo-1506126613408-eca07ce68773", 400, 200, "center"),
     socials: ["ig", "tt", "yt"], links: ["Agende uma aula", "Comunidade VIP"],
     products: [
@@ -81,7 +77,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
       { title: "Meditacao guiada", price: "R$ 29", image: U("photo-1508672019048-805c876b67e2", 200, 150, "center") },
     ] },
   /* 6 — Coach */ { name: "Rafael Torres", username: "@rafaeltorres", bio: "Ajudo voce a crescer nas redes sociais e monetizar",
-    avatar: AV("photo-1472099645785-5658abf4ff4e"),
+    avatar: "/avatars/rafael.jpg",
     coverImage: U("photo-1498050108023-c5249f4df085", 400, 200, "center"),
     socials: ["ig", "tt", "li", "yt"], links: ["Agendar coaching", "Newsletter gratis"],
     products: [
@@ -89,7 +85,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
       { title: "Guia Monetizacao", price: "Gratis", image: U("photo-1460925895917-afdab827c52f", 200, 150, "center") },
     ] },
   /* 7 — Fashion */ { name: "Bianca Oliveira", username: "@biancaoliveira", bio: "Moda, estilo e consultoria de imagem pessoal",
-    avatar: AV("photo-1438761681033-6461ffad8d80"),
+    avatar: "/avatars/bianca.jpg",
     coverImage: U("photo-1558618666-fcd25c85f82e", 400, 200, "center"),
     socials: ["ig", "tt", "pin"], links: ["Meu closet", "Parcerias"],
     products: [
@@ -97,7 +93,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
       { title: "Closet Digital", price: "R$ 39", image: U("photo-1445205170230-053b83016050", 200, 150, "center") },
     ] },
   /* 8 — Fitness */ { name: "Thiago Almeida", username: "@thiagoalmeida", bio: "Personal trainer & coach de transformacao corporal",
-    avatar: AV("photo-1507003211169-0a1dd7228f2d"),
+    avatar: "/avatars/thiago.jpg",
     coverImage: U("photo-1534438327276-14e5300c3a48", 400, 200, "center"),
     socials: ["ig", "yt"], links: ["Treino gratis", "WhatsApp"],
     products: [
@@ -105,7 +101,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
       { title: "Dieta + Treino", price: "R$ 147", image: U("photo-1490645935967-10de6ba17061", 200, 150, "center") },
     ] },
   /* 9 — Fotógrafa */ { name: "Isabela Mendes", username: "@isabelamendes", bio: "Fotografa profissional. Retratos, paisagens e presets",
-    avatar: AV("photo-1531746020798-e6953c6e8e04"),
+    avatar: "/avatars/isabela.jpg",
     coverImage: U("photo-1516035069371-29a1b244cc32", 400, 200, "center"),
     socials: ["ig", "tt", "pin"], links: ["Booking", "Portfolio"],
     products: [
@@ -113,7 +109,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
       { title: "Curso Fotografia", price: "R$ 197", image: U("photo-1542038784456-1ea8e935640e", 200, 150, "center") },
     ] },
   /* 10 — Dev */ { name: "Daniel Rocha", username: "@danielrocha", bio: "Desenvolvedor full-stack. Templates, SaaS e mentorias",
-    avatar: AV("photo-1539571696357-5a69c17a67c6"),
+    avatar: "/avatars/daniel.jpg",
     coverImage: U("photo-1550751827-4bd374c3f58b", 400, 200, "center"),
     socials: ["gh", "tw", "li"], links: ["Newsletter", "GitHub"],
     products: [
@@ -121,7 +117,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
       { title: "Mentoria Dev", price: "R$ 297", image: U("photo-1517694712202-14dd9538aa97", 200, 150, "center") },
     ] },
   /* 11 — Nutri */ { name: "Luana Ferreira", username: "@luanaferreira", bio: "Nutricionista esportiva. Dietas, receitas e saude",
-    avatar: AV("photo-1487412720507-e7ab37603c6f"),
+    avatar: "/avatars/luana.jpg",
     coverImage: U("photo-1490645935967-10de6ba17061", 400, 200, "center"),
     socials: ["ig", "tt", "yt"], links: ["Agendar consulta", "WhatsApp"],
     products: [
@@ -129,7 +125,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
       { title: "Ebook Receitas Fit", price: "R$ 29", image: U("photo-1495521821757-a1efb6729352", 200, 150, "center") },
     ] },
   /* 12 — Músico */ { name: "Gabriel Santos", username: "@gabrielsantos", bio: "Produtor musical. Beats, mixing e aulas de producao",
-    avatar: AV("photo-1506277886164-e25aa3f4ef7f"),
+    avatar: "/avatars/gabriel.jpg",
     coverImage: U("photo-1598488035139-bdbb2231ce04", 400, 200, "center"),
     socials: ["ig", "tt", "yt", "sc"], links: ["Spotify", "SoundCloud"],
     products: [
