@@ -54,12 +54,12 @@ function PhoneMockup({ pack, isActive, onClick }: { pack: DesignPack; isActive: 
                 <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 30%, ${bg}DD)` }} />
               </div>
               <div className="-mt-6 w-14 h-14 mb-1 flex-shrink-0 overflow-hidden z-10 ring-2" style={{ borderRadius: pR, border: dd.profileBorder ? `2px solid ${dd.profileBorderColor || accent}` : "none", ringColor: bg }}>
-                <img src={ref.avatar} alt="" className="w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" />
+                <img src={ref.avatar} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" loading="lazy" />
               </div>
             </>
           ) : (
             <div className="pt-8 w-14 h-14 mb-1.5 flex-shrink-0 overflow-hidden" style={{ borderRadius: pR, border: dd.profileBorder ? `2px solid ${dd.profileBorderColor || accent}` : "1px solid rgba(255,255,255,0.1)" }}>
-              <img src={ref.avatar} alt="" className="w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" />
+              <img src={ref.avatar} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" loading="lazy" />
             </div>
           )}
 
