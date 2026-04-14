@@ -13,6 +13,34 @@ function isRateLimited(key: string, maxRequests: number, windowMs: number): bool
 
 const LS_KEY = "maview_vitrine_config";
 
+/* ── Cached access token for synchronous flush ─────── */
+let _cachedAccessToken: string | null = null;
+
+// Keep token fresh via auth state changes
+supabase.auth.onAuthStateChange((_event, session) => {
+  _cachedAccessToken = session?.access_token ?? null;
+});
+
+// Also try to get initial token
+supabase.auth.getSession().then(({ data: { session } }) => {
+  _cachedAccessToken = session?.access_token ?? null;
+});
+
+/* ── SSRF protection for webhook URLs ──────────────── */
+function isValidWebhookUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    if (u.protocol !== "https:") return false;
+    const host = u.hostname;
+    if (
+      host === "localhost" || host === "127.0.0.1" || host === "0.0.0.0" ||
+      host.startsWith("10.") || host.startsWith("192.168.") || host.startsWith("169.254.") ||
+      (host.startsWith("172.") && (() => { const b = parseInt(host.split(".")[1]); return b >= 16 && b <= 31; })())
+    ) return false;
+    return true;
+  } catch { return false; }
+}
+
 export interface VitrineConfig {
   displayName?: string;
   username?: string;
@@ -69,7 +97,7 @@ export async function fetchRemote(): Promise<VitrineConfig | null> {
 
   const { data, error } = await supabase
     .from("vitrines")
-    .select("*")
+    .select("id, user_id, username, display_name, bio, avatar_url, whatsapp, theme, design, products, links, testimonials, blocks, published, created_at, updated_at")
     .eq("user_id", session.user.id)
     .maybeSingle();
 
@@ -95,7 +123,7 @@ export async function fetchRemote(): Promise<VitrineConfig | null> {
 export async function fetchByUsername(username: string): Promise<VitrineConfig | null> {
   const { data, error } = await supabase
     .from("vitrines")
-    .select("*")
+    .select("id, user_id, username, display_name, bio, avatar_url, whatsapp, theme, design, products, links, testimonials, blocks, published, created_at, updated_at")
     .eq("username", username)
     .eq("published", true)
     .maybeSingle();
@@ -223,7 +251,7 @@ export function flushSync() {
     // Save to localStorage as safety net
     saveLocal(cfg);
 
-    // Try sendBeacon for reliability during page unload
+    // Use fetch with keepalive to include Authorization header during page unload
     const url = `${supabase.supabaseUrl}/rest/v1/vitrines?username=eq.${encodeURIComponent(username)}`;
     const anonKey = supabase.supabaseKey;
     const payload = JSON.stringify({
@@ -239,16 +267,24 @@ export function flushSync() {
       blocks: cfg.blocks || [],
     });
 
-    // sendBeacon works during page unload when fetch doesn't
-    const sent = navigator.sendBeacon?.(
-      url,
-      new Blob([payload], { type: "application/json" })
-    );
+    // Get cached session token for authenticated request
+    const token = _cachedAccessToken;
 
-    // Fallback: also try regular push (may or may not complete)
-    if (!sent) {
+    // fetch with keepalive: true works during page unload and supports headers
+    fetch(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": anonKey,
+        ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+        "Prefer": "return=minimal",
+      },
+      body: payload,
+      keepalive: true,
+    }).catch(() => {
+      // Fallback: also try regular push (may or may not complete)
       pushToRemote(cfg).catch(() => {});
-    }
+    });
     _pendingConfig = null;
   }
 }
@@ -394,11 +430,11 @@ export async function submitLead(
   });
   if (error && error.code !== "23505") return false;
 
-  // Fire webhook if configured
+  // Fire webhook if configured (with SSRF protection)
   const { data: vitrineData } = await supabase
     .from("vitrines").select("design").eq("id", vitrine.id).maybeSingle();
   const webhookUrl = (vitrineData?.design as any)?.webhookUrl;
-  if (webhookUrl) {
+  if (webhookUrl && isValidWebhookUrl(webhookUrl)) {
     fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

@@ -56,6 +56,13 @@ export interface DesignConfig {
 
   // Effects
   hideWatermark: boolean;
+
+  // Payment / integrations (stored in design JSONB)
+  mercadoPagoToken?: string;
+  pixKey?: string;
+  webhookUrl?: string;
+  gaId?: string;
+  metaPixelId?: string;
 }
 
 export interface ProductItem {
@@ -216,6 +223,36 @@ export interface EmailQueueItem {
   sent: boolean;
   sent_at: string | null;
   created_at: string;
+}
+
+/* ── Theme definition ── */
+export interface ThemeDef {
+  bg: string; accent: string; accent2: string;
+  card: string; text: string; sub: string; border: string;
+}
+
+/* ── Embed item (used in Profile public page) ── */
+export interface EmbedItem {
+  id: string;
+  url: string;
+  platform: "youtube" | "spotify" | "tiktok" | "soundcloud" | "custom";
+  title?: string;
+}
+
+/* ── Profile data (public page) ── */
+export interface ProfileData {
+  username: string;
+  displayName: string;
+  bio: string;
+  avatar?: string;
+  theme: ThemeId;
+  design?: Partial<DesignConfig>;
+  whatsapp?: string;
+  links: LinkItem[];
+  products: ProductItem[];
+  testimonials?: TestimonialItem[];
+  stats?: { label: string; value: string }[];
+  embeds?: EmbedItem[];
 }
 
 /* ── Extended DesignConfig with new fields ── */

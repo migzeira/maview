@@ -1,8 +1,9 @@
-import { useState, useEffect, useMemo } from "react";
-import { DollarSign, ShoppingBag, TrendingUp, Calendar, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { useState, useEffect, useMemo, lazy, Suspense } from "react";
+import { DollarSign, ShoppingBag, TrendingUp, Calendar, ArrowUpRight, ArrowDownRight, Loader2 } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, BarChart, Bar } from "recharts";
-import DashboardProdutos from "./DashboardProdutos";
-import DashboardVendas from "./DashboardVendas";
+
+const DashboardProdutos = lazy(() => import("./DashboardProdutos"));
+const DashboardVendas = lazy(() => import("./DashboardVendas"));
 import { fetchOrders, type Order } from "@/lib/vitrine-sync";
 
 const TABS = [
@@ -50,8 +51,10 @@ const DashboardMonetizacao = () => {
 
       {/* Tab content */}
       <div className="-mx-4 md:-mx-8 -mb-8 md:-mb-10">
-        {activeTab === "produtos" && <DashboardProdutos />}
-        {activeTab === "vendas" && <DashboardVendas />}
+        <Suspense fallback={<div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-violet-400" /></div>}>
+          {activeTab === "produtos" && <DashboardProdutos />}
+          {activeTab === "vendas" && <DashboardVendas />}
+        </Suspense>
         {activeTab === "receita" && <ReceitaContent />}
       </div>
     </div>
