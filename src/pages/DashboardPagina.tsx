@@ -13,6 +13,7 @@ import { initialLoad, saveWithSync, forceSaveNow, onSyncStatus, uploadImage, ret
 import { useHistory } from "@/hooks/useHistory";
 import DesignTab from "@/components/DesignTab";
 import OnboardingWizard from "@/components/OnboardingWizard";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Undo2, Redo2 } from "lucide-react";
 
 import type {
@@ -28,6 +29,33 @@ import {
   isValidUrl, isScheduledActive, getDynamicSubtitle, autoCompleteUrl,
   generateBlocks, emptyProduct, emptyLink, emptyTestimonial,
 } from "@/lib/vitrine-constants";
+
+const VITRINE_BLOCK_TYPES = [
+  { type: "product" as const, emoji: "📦", title: "Produto Digital",
+    description: "Venda e-books, cursos, mentorias, templates e qualquer produto ou serviço digital",
+    iconBg: "bg-gradient-to-br from-violet-500 to-purple-600",
+    colorBg: "bg-violet-500/10", colorBorder: "border-violet-500/25", colorRing: "ring-violet-500/30" },
+  { type: "booking" as const, emoji: "📅", title: "Agendamento",
+    description: "Receba marcações para consultas, aulas particulares, reuniões e sessões online",
+    iconBg: "bg-gradient-to-br from-emerald-500 to-green-600",
+    colorBg: "bg-emerald-500/10", colorBorder: "border-emerald-500/25", colorRing: "ring-emerald-500/30" },
+  { type: "link" as const, emoji: "🔗", title: "Link Externo",
+    description: "Direcione para qualquer página, rede social, grupo de WhatsApp ou loja externa",
+    iconBg: "bg-gradient-to-br from-blue-500 to-cyan-600",
+    colorBg: "bg-blue-500/10", colorBorder: "border-blue-500/25", colorRing: "ring-blue-500/30" },
+  { type: "testimonial" as const, emoji: "⭐", title: "Depoimento",
+    description: "Mostre provas sociais com avaliações reais dos seus clientes e seguidores",
+    iconBg: "bg-gradient-to-br from-amber-500 to-yellow-600",
+    colorBg: "bg-amber-500/10", colorBorder: "border-amber-500/25", colorRing: "ring-amber-500/30" },
+  { type: "header" as const, emoji: "📐", title: "Separador",
+    description: "Organize sua vitrine em seções com títulos, linhas e ícones personalizados",
+    iconBg: "bg-gradient-to-br from-slate-500 to-gray-600",
+    colorBg: "bg-slate-500/10", colorBorder: "border-slate-500/25", colorRing: "ring-slate-500/30" },
+  { type: "embed" as const, emoji: "▶️", title: "Embed de Mídia",
+    description: "Incorpore vídeos do YouTube, músicas do Spotify, TikToks e mais na sua página",
+    iconBg: "bg-gradient-to-br from-rose-500 to-red-600",
+    colorBg: "bg-rose-500/10", colorBorder: "border-rose-500/25", colorRing: "ring-rose-500/30" },
+];
 
 const LINK_ICON_MAP: Record<LinkItem["icon"], React.ReactNode> = {
   instagram: <Instagram size={14} />,
@@ -428,8 +456,10 @@ const DashboardPagina = () => {
   const toastTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const copyToastTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
-  // Add menu
-  const [showAddMenu, setShowAddMenu] = useState(false);
+  // Add modal
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [aiIdeas, setAiIdeas] = useState<string[] | null>(null);
+  const [aiIdeasLoading, setAiIdeasLoading] = useState(false);
   // Active form type
   const [activeForm, setActiveForm] = useState<"product" | "link" | "testimonial" | "header" | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -947,6 +977,20 @@ const DashboardPagina = () => {
     setActiveForm("embed");
     setEmbedUrl("");
     setEditingEmbedBlockId(null);
+  };
+
+  const fetchAiIdeas = async () => {
+    if (aiIdeasLoading) return;
+    setAiIdeasLoading(true);
+    try {
+      const prompt = `Baseado neste perfil: "${config.displayName || "criador digital"}"${config.bio ? ` (bio: ${config.bio})` : ""}, sugira 4 ideias criativas de produtos digitais para vender na vitrine. Cada ideia em uma linha, começando com emoji. Formato: "emoji Nome do Produto — descrição curta". Só as 4 ideias, sem introdução nem numeração.`;
+      const { data, error } = await supabase.functions.invoke("maview-ai", { body: { message: prompt } });
+      if (!error && data?.text) {
+        const ideas = data.text.split("\n").filter((l: string) => l.trim().length > 5).slice(0, 4);
+        setAiIdeas(ideas);
+      }
+    } catch { /* silent — supplementary feature */ }
+    setAiIdeasLoading(false);
   };
 
   const openEditEmbed = (block: VitrineBlock) => {
@@ -1710,51 +1754,79 @@ const DashboardPagina = () => {
             {activeTab === "vitrine" && (
               <div className="space-y-4">
 
-                {/* CTA dominante + dropdown */}
-                <div className="relative">
+                {/* CTA — abre modal profissional */}
+                <div>
                   <button
-                    onClick={() => setShowAddMenu(!showAddMenu)}
+                    onClick={() => setShowAddModal(true)}
                     className="w-full btn-primary-gradient text-sm font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
                   >
                     <Plus size={18} /> Adicionar à Vitrine
                   </button>
 
-                  {showAddMenu && (
-                    <>
-                      <div className="fixed inset-0 z-30" onClick={() => setShowAddMenu(false)} />
-                      <div className="absolute top-full left-0 right-0 mt-2 z-40 glass-card rounded-xl shadow-xl border border-[hsl(var(--dash-border-subtle))] p-1.5 animate-in slide-in-from-top-2 duration-200">
-                        {[
-                          { type: "product" as const, icon: <Package size={15} className="text-primary" />, label: "Produto", desc: "Venda produtos ou serviços" },
-                          { type: "booking" as const, icon: <Calendar size={15} className="text-primary" />, label: "Agendamento", desc: "Receba marcações online" },
-                          { type: "link" as const, icon: <Link2 size={15} className="text-primary" />, label: "Link", desc: "Direcione para qualquer URL" },
-                          { type: "testimonial" as const, icon: <Star size={15} className="text-primary" />, label: "Depoimento", desc: "Prova social" },
-                          { type: "header" as const, icon: <Type size={15} className="text-[hsl(var(--dash-text-subtle))]" />, label: "Separador", desc: "Organize seções" },
-                          { type: "embed" as const, icon: <Play size={15} className="text-primary" />, label: "Embed", desc: "YouTube, Spotify, TikTok" },
-                        ].map(opt => (
-                          <button key={opt.type}
-                            onClick={() => {
-                              setShowAddMenu(false);
-                              if (opt.type === "product") openAddProduct();
-                              else if (opt.type === "booking") openAddBooking();
-                              else if (opt.type === "link") openAddLink();
-                              else if (opt.type === "testimonial") openAddTestimonial();
-                              else if (opt.type === "embed") openAddEmbed();
-                              else openAddHeader();
-                            }}
-                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left hover:bg-[hsl(var(--dash-surface-2))] transition-all"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-[hsl(var(--dash-accent))] flex items-center justify-center flex-shrink-0">
-                              {opt.icon}
+                  <Dialog open={showAddModal} onOpenChange={v => { setShowAddModal(v); if (!v) setAiIdeas(null); }}>
+                    <DialogContent className="sm:max-w-[640px] max-h-[85vh] overflow-y-auto bg-[hsl(var(--dash-surface))] border-[hsl(var(--dash-border-subtle))] p-0">
+                      <DialogHeader className="px-6 pt-6 pb-0">
+                        <DialogTitle className="text-[hsl(var(--dash-text))] text-lg font-bold">Adicionar à Vitrine</DialogTitle>
+                        <DialogDescription className="text-[hsl(var(--dash-text-subtle))] text-sm">
+                          Escolha o tipo de bloco para adicionar à sua página
+                        </DialogDescription>
+                      </DialogHeader>
+
+                      {/* ── AI Ideas Banner ── */}
+                      <div className="mx-6 mt-4">
+                        <button onClick={fetchAiIdeas} disabled={aiIdeasLoading}
+                          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-[hsl(var(--dash-purple))]/10 to-[hsl(var(--dash-purple-light,var(--dash-purple)))]/10 border border-[hsl(var(--dash-purple))]/20 hover:border-[hsl(var(--dash-purple))]/40 transition-all duration-200 group">
+                          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[hsl(var(--dash-purple))] to-[hsl(var(--dash-purple))]/80 flex items-center justify-center flex-shrink-0 shadow-lg">
+                            <Sparkles size={18} className={`text-white ${aiIdeasLoading ? "animate-spin" : ""}`} />
+                          </div>
+                          <div className="text-left flex-1">
+                            <p className="text-[hsl(var(--dash-text))] text-[13px] font-semibold">
+                              {aiIdeasLoading ? "Gerando ideias..." : "Obtenha ideias de produtos"}
+                            </p>
+                            <p className="text-[hsl(var(--dash-text-subtle))] text-[11px]">IA sugere produtos baseados no seu perfil</p>
+                          </div>
+                          <ArrowRight size={16} className="text-[hsl(var(--dash-text-subtle))] group-hover:text-[hsl(var(--dash-purple))] transition-colors" />
+                        </button>
+
+                        {aiIdeas && (
+                          <div className="mt-3 space-y-2 animate-in slide-in-from-top-2 duration-300">
+                            {aiIdeas.map((idea, i) => (
+                              <button key={i} onClick={() => {
+                                setShowAddModal(false); setAiIdeas(null); openAddProduct();
+                                const match = idea.match(/^.+?\s(.+?)(?:\s[—–\-]\s|$)/);
+                                if (match?.[1]) setTimeout(() => setProductForm(f => f ? { ...f, title: match[1].trim() } : f), 100);
+                              }}
+                                className="w-full text-left px-3 py-2.5 rounded-lg bg-[hsl(var(--dash-surface-2))] hover:bg-[hsl(var(--dash-accent))] border border-[hsl(var(--dash-border-subtle))] text-[hsl(var(--dash-text))] text-[12px] transition-all duration-150">
+                                {idea}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* ── Block Type Grid ── */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 px-6 py-5">
+                        {VITRINE_BLOCK_TYPES.map(opt => (
+                          <button key={opt.type} onClick={() => {
+                            setShowAddModal(false); setAiIdeas(null);
+                            if (opt.type === "product") openAddProduct();
+                            else if (opt.type === "booking") openAddBooking();
+                            else if (opt.type === "link") openAddLink();
+                            else if (opt.type === "testimonial") openAddTestimonial();
+                            else if (opt.type === "embed") openAddEmbed();
+                            else openAddHeader();
+                          }}
+                            className={`group relative flex flex-col items-start gap-3 p-4 rounded-xl border ${opt.colorBorder} ${opt.colorBg} hover:ring-2 ${opt.colorRing} hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-left`}>
+                            <div className={`w-12 h-12 rounded-xl ${opt.iconBg} flex items-center justify-center shadow-lg`}>
+                              <span className="text-2xl leading-none">{opt.emoji}</span>
                             </div>
-                            <div>
-                              <p className="text-[hsl(var(--dash-text))] text-[13px] font-medium">{opt.label}</p>
-                              <p className="text-[hsl(var(--dash-text-subtle))] text-[11px]">{opt.desc}</p>
-                            </div>
+                            <p className="text-[hsl(var(--dash-text))] text-[14px] font-bold leading-tight">{opt.title}</p>
+                            <p className="text-[hsl(var(--dash-text-subtle))] text-[12px] leading-relaxed">{opt.description}</p>
                           </button>
                         ))}
                       </div>
-                    </>
-                  )}
+                    </DialogContent>
+                  </Dialog>
                 </div>
 
                 {/* ── Active form (inline at top) ── */}
