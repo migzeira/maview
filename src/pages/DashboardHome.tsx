@@ -809,11 +809,11 @@ const DashboardHome = () => {
                 </div>
               </div>
 
-              {/* WhatsApp button */}
+              {/* WhatsApp button — inside phone frame */}
               {cfg.whatsapp && (
-                <div className="absolute bottom-10 right-[-4px] w-7 h-7 rounded-full flex items-center justify-center shadow-lg"
-                  style={{ background: "#25d366" }}>
-                  <MessageCircle size={12} className="text-white" />
+                <div className="absolute bottom-14 right-4 w-9 h-9 rounded-full flex items-center justify-center shadow-lg z-20"
+                  style={{ background: "#25d366", boxShadow: "0 4px 12px rgba(37,211,102,0.4)" }}>
+                  <MessageCircle size={14} className="text-white fill-white" />
                 </div>
               )}
             </div>
