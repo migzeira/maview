@@ -277,7 +277,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
 
       {/* ═══════ SAVE BUTTON — fixed at bottom ═══════ */}
       {onForceSave && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 lg:left-auto lg:translate-x-0 lg:right-[440px]">
+        <div className="fixed bottom-6 right-4 z-50 sm:right-6 lg:right-[380px]">
           <button
             onClick={async () => {
               setSaving(true);
