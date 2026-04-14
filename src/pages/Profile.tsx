@@ -1093,27 +1093,7 @@ const CountdownBadge = ({ accent }: { accent: string }) => {
   );
 };
 
-/* ──────────────────────────────────────────────────────────────── */
-/*  👀 VIEWERS — "X pessoas vendo agora"                           */
-/* ──────────────────────────────────────────────────────────────── */
-const ViewersBadge = ({ accent }: { accent: string }) => {
-  const [count, setCount] = useState(() => 12 + Math.floor(Math.random() * 25));
-  useEffect(() => {
-    const t = setInterval(() => {
-      setCount(c => Math.max(5, c + Math.floor(Math.random() * 5) - 2));
-    }, 8000);
-    return () => clearInterval(t);
-  }, []);
-  return (
-    <div className="flex items-center gap-1.5 text-[11px] font-semibold" style={{ color: `${accent}cc` }}>
-      <span className="relative flex h-2 w-2">
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: "#22c55e" }} />
-        <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: "#22c55e" }} />
-      </span>
-      {count} pessoas vendo agora
-    </div>
-  );
-};
+/* ViewersBadge removed — fake counters look unprofessional */
 
 /* ──────────────────────────────────────────────────────────────── */
 /*  Stagger entrance hook                                           */
@@ -1739,15 +1719,10 @@ const ProfilePage = () => {
             </div>
 
             <h1 className="text-[22px] font-extrabold mb-1 text-center tracking-tight" style={{ color: t.text, fontFamily: `'${rd.fontHeading}', sans-serif` }}>{profile.displayName}</h1>
-            <p className="text-[13px] font-semibold mb-2" style={{ color: t.accent }}>@{profile.username}</p>
+            <p className="text-[13px] font-semibold mb-2" style={{ color: t.sub }}>@{profile.username}</p>
             {profile.bio && <p className="text-[14px] text-center leading-relaxed max-w-[300px] mb-3 line-clamp-3" style={{ color: t.sub, fontFamily: `'${rd.fontBody}', sans-serif` }}>{profile.bio}</p>}
 
-            {/* Viewers badge — only show when vitrine has real content */}
-            {(profile.products.length > 0 || regularLinks.length > 0) && (
-              <div className="mb-4">
-                <ViewersBadge accent={t.accent} />
-              </div>
-            )}
+            {/* Viewer badge removed — unprofessional */}
 
             {/* Stats */}
             {profile.stats && (
@@ -1769,7 +1744,7 @@ const ProfilePage = () => {
                     return (
                       <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
                         className="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
-                        style={{ background: `${t.accent}18`, border: `1.5px solid ${t.accent}30` }} title={link.title}>
+                        style={{ background: `${t.accent}15`, border: `1.5px solid ${t.accent}22` }} title={link.title}>
                         <Icon size={18} style={{ color: t.text }} />
                       </a>
                     );
@@ -1782,14 +1757,14 @@ const ProfilePage = () => {
                   ].map(s => (
                     <div key={s.key}
                       className="w-11 h-11 rounded-full flex items-center justify-center"
-                      style={{ background: `${t.accent}12`, border: `1.5px solid ${t.accent}20`, color: `${t.accent}40` }}>
+                      style={{ background: `${t.accent}10`, border: `1.5px solid ${t.accent}18`, color: `${t.accent}50` }}>
                       {s.icon}
                     </div>
                   ))
               }
               <button onClick={handleShare}
                 className="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
-                style={{ background: `${t.accent}18`, border: `1.5px solid ${t.accent}30` }}>
+                style={{ background: `${t.accent}15`, border: `1.5px solid ${t.accent}22` }}>
                 {copied ? <Check size={17} style={{ color: "#22c55e" }} /> : <Share2 size={17} style={{ color: t.text }} />}
               </button>
             </div>
@@ -1869,7 +1844,7 @@ const ProfilePage = () => {
                       <Wrapper {...(wrapperProps as any)}
                         className={`group flex items-center gap-4 w-full px-4 py-3.5 transition-all duration-200 active:scale-[0.97] ${isBooking ? "cursor-pointer text-left" : ""}`}
                       >
-                        <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center text-2xl flex-shrink-0" style={{ background: `${t.accent}12` }}>
+                        <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center text-2xl flex-shrink-0" style={{ background: `${t.accent}0a` }}>
                           {coverImg
                             ? <img src={coverImg} alt={product.title} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                             : product.emoji
@@ -1881,12 +1856,12 @@ const ProfilePage = () => {
                             {/* Auto "Mais vendido" badge on first product */}
                             {i === 0 && profile.products.length > 1 && !product.badge && (
                               <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 flex items-center gap-0.5"
-                                style={{ background: `${t.accent}20`, color: t.accent, border: `1px solid ${t.accent}30` }}>
+                                style={{ background: `${t.accent}15`, color: t.text, opacity: 0.85, border: `1px solid ${t.accent}20` }}>
                                 <Flame size={8} /> Mais vendido
                               </span>
                             )}
                             {product.badge && (
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: `${t.accent}22`, color: t.accent, border: `1px solid ${t.accent}30` }}>
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: `${t.accent}15`, color: t.text, opacity: 0.85, border: `1px solid ${t.accent}20` }}>
                                 {product.badge}
                               </span>
                             )}
@@ -1901,7 +1876,7 @@ const ProfilePage = () => {
                           {product.description && <p className="text-[12px] truncate" style={{ color: t.sub }}>{product.description}</p>}
                           {product.price && (
                             <div className="flex items-center gap-2 mt-1">
-                              <span className="text-[13px] font-bold" style={{ color: t.accent }}>{product.price}</span>
+                              <span className="text-[13px] font-bold" style={{ color: t.text }}>{product.price}</span>
                               {product.originalPrice && <span className="text-[11px] line-through" style={{ color: t.sub }}>{product.originalPrice}</span>}
                             </div>
                           )}
@@ -2036,8 +2011,8 @@ const ProfilePage = () => {
                       onMouseEnter={e => onHoverIn(e.currentTarget as HTMLElement)}
                       onMouseLeave={e => onHoverOut(e.currentTarget as HTMLElement)}
                     >
-                      <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${t.accent}18` }}>
-                        <Icon size={15} style={{ color: t.accent }} />
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${t.accent}12` }}>
+                        <Icon size={15} style={{ color: t.text, opacity: 0.8 }} />
                       </div>
                       <span className="flex-1 truncate">{link.title}</span>
                       <ArrowRight size={14} style={{ color: t.sub, opacity: 0.75 }} className="group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200" />
@@ -2105,19 +2080,22 @@ const ProfilePage = () => {
       {/* ── Email Capture Form ── */}
       {!emailCaptured && (
         <div className="relative z-10 max-w-md mx-auto px-4 pb-6">
+          <p className="text-center text-[12px] font-medium mb-2" style={{ color: t.sub }}>
+            Receba novidades e ofertas exclusivas
+          </p>
           <form onSubmit={handleEmailSubmit}
             className="flex gap-2 p-1.5 rounded-2xl"
             style={{ background: t.card, border: `1px solid ${t.border}` }}
           >
             <div className="flex items-center gap-2 flex-1 pl-3">
-              <Mail size={16} style={{ color: t.sub, opacity: 0.6 }} />
+              <Mail size={16} style={{ color: t.sub, opacity: 0.5 }} />
               <input
                 type="email"
                 required
                 placeholder="Seu melhor email"
                 value={captureEmail}
                 onChange={e => setCaptureEmail(e.target.value)}
-                className="flex-1 bg-transparent text-sm outline-none placeholder:opacity-50"
+                className="flex-1 bg-transparent text-sm outline-none placeholder:opacity-40"
                 style={{ color: t.text }}
               />
             </div>
