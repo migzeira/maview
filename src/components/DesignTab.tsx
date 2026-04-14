@@ -146,7 +146,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     carouselRef.current?.scrollBy({ left: dir === "left" ? -340 : 340, behavior: "smooth" });
   };
 
-  const filteredPacks = DESIGN_PACKS.filter(p => packFilter === "all" || p.category === packFilter);
+  const filteredPacks = DESIGN_PACKS.filter(p => packFilter === "all" ? p.category !== "animated" : p.category === packFilter);
 
   const isPackActive = (pack: DesignPack) => config.theme === pack.config.theme
     && d.fontHeading === (pack.config.design.fontHeading || "Inter")
@@ -230,10 +230,10 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
       {/* ═══════ 2. COLORS — simplified ═══════ */}
       <div className="space-y-3">
         <h3 className="text-[hsl(var(--dash-text))] font-bold text-[14px]">Cor</h3>
-        <div className="flex gap-2 flex-wrap">
+        <div className="grid grid-cols-8 gap-2">
           {ACCENT_COLORS.map(c => (
             <button key={c} onClick={() => applyAutoHarmony(c)} title={c}
-              className={`w-9 h-9 rounded-xl transition-all hover:scale-110 ${(d.accentColor || currentTheme.accent) === c ? "ring-2 ring-white scale-110 shadow-lg" : "ring-1 ring-white/10"}`}
+              className={`w-full aspect-square rounded-xl transition-all hover:scale-110 ${(d.accentColor || currentTheme.accent) === c ? "ring-2 ring-white scale-110 shadow-lg" : "ring-1 ring-white/10"}`}
               style={{ background: c }} />
           ))}
         </div>
