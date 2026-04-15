@@ -69,8 +69,16 @@ function MiniPreview({ design: d, currentTheme, accent, avatarUrl, displayName }
           </>
         )}
 
+        {/* Cover image */}
+        {d.coverImageUrl && (
+          <div className="absolute top-0 left-0 right-0 h-[45%] overflow-hidden">
+            <img src={d.coverImageUrl} alt="" className="w-full h-full object-cover" />
+            <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 30%, ${bg}DD)` }} />
+          </div>
+        )}
+
         {/* Content */}
-        <div className="relative z-10 flex flex-col items-center px-4">
+        <div className="relative z-10 flex flex-col items-center px-4" style={{ paddingTop: d.coverImageUrl ? 40 : 0 }}>
           {/* Avatar with glow + border */}
           <div className="relative mb-2">
             {d.profileGlow !== false && (
@@ -147,7 +155,9 @@ function Toggle({ on, onToggle, label, desc }: { on: boolean; onToggle: () => vo
 function AdvancedContent({ design: d, currentTheme, accent, avatarUrl, displayName, setDesign, onBgColorChange }: Omit<AdvancedDrawerProps, "open" | "onOpenChange">) {
   const bgImageInputRef = useRef<HTMLInputElement>(null);
   const bgVideoInputRef = useRef<HTMLInputElement>(null);
+  const coverImageInputRef = useRef<HTMLInputElement>(null);
   const [bgUploading, setBgUploading] = useState(false);
+  const [coverUploading, setCoverUploading] = useState(false);
 
   return (
     <div className="space-y-4 px-1">
@@ -203,6 +213,49 @@ function AdvancedContent({ design: d, currentTheme, accent, avatarUrl, displayNa
               Ao enviar uma <strong className="text-[hsl(var(--dash-text-muted))]">imagem de fundo</strong>, a cor da borda e do brilho se ajustam automaticamente.
             </p>
           </div>
+        </div>
+      </Section>
+
+      {/* ══════════════════════════════════════════════════════════
+          CAPA / BANNER
+          ══════════════════════════════════════════════════════════ */}
+      <Section title="Imagem de capa" icon={<Layers size={14} />}>
+        <div className="space-y-3 pt-2">
+          <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] leading-relaxed">
+            Banner no topo do perfil, acima da foto. A cor de fundo aparece abaixo.
+          </p>
+          {d.coverImageUrl ? (
+            <div className="relative rounded-xl overflow-hidden h-24">
+              <img src={d.coverImageUrl} alt="" className="w-full h-full object-cover" />
+              <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 40%, ${d.bgColor || currentTheme.bg}DD)` }} />
+              <button onClick={() => setDesign("coverImageUrl", "")}
+                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-red-500 transition-colors">
+                <X size={12} />
+              </button>
+              <button onClick={() => coverImageInputRef.current?.click()}
+                className="absolute bottom-2 right-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-[10px] font-semibold text-gray-800 hover:bg-white transition-all shadow-md">
+                <Upload size={10} /> Trocar
+              </button>
+            </div>
+          ) : (
+            <button onClick={() => coverImageInputRef.current?.click()}
+              className="w-full h-20 rounded-xl border-2 border-dashed border-[hsl(var(--dash-border))] flex flex-col items-center justify-center gap-1 text-[hsl(var(--dash-text-subtle))] hover:border-primary/40 hover:text-primary transition-all">
+              <Upload size={16} /><span className="text-[10px]">Enviar imagem de capa</span>
+            </button>
+          )}
+          <input type="file" ref={coverImageInputRef} accept="image/*" className="hidden" onChange={async e => {
+            const f = e.target.files?.[0]; if (!f) return; e.target.value = "";
+            const r = new FileReader(); r.onload = () => setDesign("coverImageUrl", r.result as string); r.readAsDataURL(f);
+            setCoverUploading(true);
+            const publicUrl = await uploadImage(f, "backgrounds");
+            setCoverUploading(false);
+            if (publicUrl) setDesign("coverImageUrl", publicUrl);
+          }} />
+          {coverUploading && (
+            <div className="flex items-center gap-1.5 text-[10px] text-primary font-medium">
+              <Loader2 size={10} className="animate-spin" /> Enviando...
+            </div>
+          )}
         </div>
       </Section>
 

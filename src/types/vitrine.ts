@@ -57,6 +57,9 @@ export interface DesignConfig {
   buttonShadow: ButtonShadow;
   buttonRadius: number;
 
+  // Cover image (banner at top of profile)
+  coverImageUrl: string;         // cover/banner image URL
+
   // Profile photo
   profileShape: ProfileShape;
   profileBorder: boolean;

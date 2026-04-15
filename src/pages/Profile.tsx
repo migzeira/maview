@@ -502,7 +502,14 @@ const ProfilePage = () => {
       </div>
 
       {/* ── Main content ── */}
-      <main className="flex-1 flex flex-col items-center px-4 pt-12 pb-28 relative z-10">
+      <main className="flex-1 flex flex-col items-center px-4 pb-28 relative z-10" style={{ paddingTop: rd.coverImageUrl ? 0 : 48 }}>
+        {/* Cover image banner */}
+        {rd.coverImageUrl && (
+          <div className="w-full max-w-[440px] relative mb-[-36px] rounded-b-2xl overflow-hidden" style={{ height: 140 }}>
+            <img src={rd.coverImageUrl} alt="" className="w-full h-full object-cover" loading="eager" />
+            <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 30%, ${t.bg}DD)` }} />
+          </div>
+        )}
         <div className="w-full max-w-[400px]">
 
           {/* ── HERO ── */}

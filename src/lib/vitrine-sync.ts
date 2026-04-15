@@ -95,6 +95,9 @@ export function saveLocal(cfg: VitrineConfig) {
       if (typeof d.bgImageUrl === "string" && (d.bgImageUrl as string).startsWith("data:")) {
         d.bgImageUrl = ""; // Will be re-fetched from Supabase on next load
       }
+      if (typeof d.coverImageUrl === "string" && (d.coverImageUrl as string).startsWith("data:")) {
+        d.coverImageUrl = "";
+      }
       safe.design = d;
     }
     localStorage.setItem(LS_KEY, JSON.stringify(safe));

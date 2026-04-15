@@ -155,11 +155,27 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
 
   const applyPack = useCallback((pack: DesignPack) => {
     updateConfig("theme", pack.config.theme);
-    updateConfig("design", { ...pack.config.design });
+    // Preserve user's custom images and profile colors when switching packs
+    const prev = designRef.current || {};
+    const preserved: Record<string, unknown> = {};
+    if (prev.bgImageUrl) {
+      preserved.bgImageUrl = prev.bgImageUrl;
+      preserved.bgType = "image";
+      if (prev.bgOverlay) preserved.bgOverlay = prev.bgOverlay;
+      if (prev.bgImageZoom) preserved.bgImageZoom = prev.bgImageZoom;
+      if (prev.bgImagePosX !== undefined) preserved.bgImagePosX = prev.bgImagePosX;
+      if (prev.bgImagePosY !== undefined) preserved.bgImagePosY = prev.bgImagePosY;
+    }
+    if (prev.coverImageUrl) preserved.coverImageUrl = prev.coverImageUrl;
+    if (prev.profileBorderColor) preserved.profileBorderColor = prev.profileBorderColor;
+    if (prev.profileGlowColor) preserved.profileGlowColor = prev.profileGlowColor;
+    const latest = { ...pack.config.design, ...preserved };
+    designRef.current = latest;
+    updateConfig("design", latest);
     if (pack.config.design.fontHeading) loadFont(pack.config.design.fontHeading);
     if (pack.config.design.fontBody) loadFont(pack.config.design.fontBody);
     setInteracted(prev => new Set(prev).add(1));
-  }, [config.design, updateConfig]);
+  }, [updateConfig]);
 
   const applyFontPair = useCallback((headingFont: string) => {
     loadFont(headingFont);

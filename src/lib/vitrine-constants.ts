@@ -51,6 +51,7 @@ export const DEFAULT_DESIGN: DesignConfig = {
   accentColor: "", accentColor2: "",
   fontHeading: "Inter", fontBody: "Inter",
   buttonShape: "rounded", buttonFill: "solid", buttonShadow: "none", buttonRadius: 12,
+  coverImageUrl: "",
   profileShape: "circle", profileBorder: true, profileBorderColor: "", profileGlow: true, profileGlowColor: "", profileSize: 88,
   textShadow: 0, hideWatermark: false,
 };

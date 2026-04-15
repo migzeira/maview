@@ -1391,7 +1391,14 @@ const DashboardPagina = () => {
           {previewEffectOverlay && <div key={d.bgEffect} className="animate-in fade-in duration-400">{previewEffectOverlay}</div>}
           {/* Ambient glow */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[200px] pointer-events-none" style={{ background: `radial-gradient(ellipse, ${pAccent}20, transparent 70%)` }} />
-          <div className="p-5 relative z-10">
+          {/* Cover image */}
+          {d.coverImageUrl && (
+            <div className="relative w-full overflow-hidden" style={{ height: 80 }}>
+              <img src={d.coverImageUrl} alt="" className="w-full h-full object-cover" />
+              <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 30%, ${pBg}DD)` }} />
+            </div>
+          )}
+          <div className={`p-5 relative z-10 ${d.coverImageUrl ? "-mt-6" : ""}`}>
             {/* Profile */}
             <div className="flex flex-col items-center mb-5">
               <div className="mb-2.5 overflow-hidden"
