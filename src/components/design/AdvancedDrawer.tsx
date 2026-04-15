@@ -127,51 +127,8 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, onBgColor
         )}
       </Section>
 
-      {/* ── Botoes ── */}
-      <Section title="Botoes" icon={<Square size={14} />}>
-        <div className="space-y-3 pt-2">
-          <div className="grid grid-cols-4 gap-1.5">
-            {(["rounded", "pill", "square", "soft"] as ButtonShape[]).map(shape => (
-              <button key={shape} onClick={() => setDesign("buttonShape", shape)}
-                className={`py-2.5 rounded-xl text-[10px] font-medium transition-all ${d.buttonShape === shape ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent"}`}>
-                {shape === "rounded" ? "Arredondado" : shape === "pill" ? "Pilula" : shape === "square" ? "Quadrado" : "Suave"}
-              </button>
-            ))}
-          </div>
-          <div className="grid grid-cols-4 gap-1.5">
-            {(["solid", "outline", "glass", "ghost"] as ButtonFill[]).map(fill => (
-              <button key={fill} onClick={() => setDesign("buttonFill", fill)}
-                className={`py-2.5 rounded-xl text-[10px] font-medium transition-all ${d.buttonFill === fill ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent"}`}>
-                {fill === "solid" ? "Solido" : fill === "outline" ? "Contorno" : fill === "glass" ? "Vidro" : "Fantasma"}
-              </button>
-            ))}
-          </div>
-        </div>
-      </Section>
-
-      {/* ── Foto de perfil ── */}
-      <Section title="Foto de perfil" icon={<Circle size={14} />}>
-        <div className="space-y-3 pt-2">
-          <div className="grid grid-cols-4 gap-1.5">
-            {(["circle", "rounded", "square", "hexagon"] as ProfileShape[]).map(shape => (
-              <button key={shape} onClick={() => setDesign("profileShape", shape)}
-                className={`py-2.5 rounded-xl text-[9px] font-medium transition-all ${d.profileShape === shape ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent"}`}>
-                {shape === "circle" ? "Circulo" : shape === "rounded" ? "Arredondado" : shape === "square" ? "Quadrado" : "Hexagono"}
-              </button>
-            ))}
-          </div>
-          <div className="flex items-center justify-between">
-            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Borda colorida</p>
-            <button onClick={() => setDesign("profileBorder", !d.profileBorder)}
-              className={`relative w-9 h-5 rounded-full transition-colors ${d.profileBorder ? "bg-primary" : "bg-[hsl(var(--dash-border))]"}`}>
-              <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${d.profileBorder ? "left-[18px]" : "left-0.5"}`} />
-            </button>
-          </div>
-        </div>
-      </Section>
-
-      {/* ── Textos ── */}
-      <Section title="Cores dos textos" icon={<Type size={14} />}>
+      {/* ── Textos (PRIMEIRO — mais importante para legibilidade) ── */}
+      <Section title="Cores dos textos" icon={<Type size={14} />} defaultOpen>
         <div className="space-y-3 pt-2">
           <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] leading-relaxed">
             Controle a cor de cada texto da sua vitrine. Se o fundo for escuro, use textos claros. Se for claro, use escuros.
@@ -242,6 +199,52 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, onBgColor
             }`}>
             Cards transparentes
           </button>
+        </div>
+      </Section>
+
+      {/* ── Botoes ── */}
+      <Section title="Formato dos botoes" icon={<Square size={14} />}>
+        <div className="space-y-3 pt-2">
+          <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] leading-relaxed">
+            Formato e estilo dos botoes de links e produtos.
+          </p>
+          <div className="grid grid-cols-4 gap-1.5">
+            {(["rounded", "pill", "square", "soft"] as ButtonShape[]).map(shape => (
+              <button key={shape} onClick={() => setDesign("buttonShape", shape)}
+                className={`py-2.5 rounded-xl text-[10px] font-medium transition-all ${d.buttonShape === shape ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent"}`}>
+                {shape === "rounded" ? "Arredondado" : shape === "pill" ? "Pilula" : shape === "square" ? "Quadrado" : "Suave"}
+              </button>
+            ))}
+          </div>
+          <div className="grid grid-cols-4 gap-1.5">
+            {(["solid", "outline", "glass", "ghost"] as ButtonFill[]).map(fill => (
+              <button key={fill} onClick={() => setDesign("buttonFill", fill)}
+                className={`py-2.5 rounded-xl text-[10px] font-medium transition-all ${d.buttonFill === fill ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent"}`}>
+                {fill === "solid" ? "Solido" : fill === "outline" ? "Contorno" : fill === "glass" ? "Vidro" : "Fantasma"}
+              </button>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      {/* ── Foto de perfil ── */}
+      <Section title="Foto de perfil" icon={<Circle size={14} />}>
+        <div className="space-y-3 pt-2">
+          <div className="grid grid-cols-4 gap-1.5">
+            {(["circle", "rounded", "square", "hexagon"] as ProfileShape[]).map(shape => (
+              <button key={shape} onClick={() => setDesign("profileShape", shape)}
+                className={`py-2.5 rounded-xl text-[9px] font-medium transition-all ${d.profileShape === shape ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent"}`}>
+                {shape === "circle" ? "Circulo" : shape === "rounded" ? "Arredondado" : shape === "square" ? "Quadrado" : "Hexagono"}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Borda colorida</p>
+            <button onClick={() => setDesign("profileBorder", !d.profileBorder)}
+              className={`relative w-9 h-5 rounded-full transition-colors ${d.profileBorder ? "bg-primary" : "bg-[hsl(var(--dash-border))]"}`}>
+              <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${d.profileBorder ? "left-[18px]" : "left-0.5"}`} />
+            </button>
+          </div>
         </div>
       </Section>
     </div>
