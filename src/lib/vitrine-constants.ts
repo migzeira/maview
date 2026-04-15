@@ -41,12 +41,18 @@ export const DEFAULT_DESIGN: DesignConfig = {
   bgType: "solid", bgColor: "", bgGradient: ["#080612", "#1a0a2e"],
   bgGradientDir: "to-b", bgImageUrl: "", bgVideoUrl: "",
   bgPattern: "", bgOverlay: 40, bgBlur: 0, bgEffect: "",
-  textColor: "", subtextColor: "", cardBg: "", cardBorder: "",
+  bgImageZoom: 100, bgImagePosX: 50, bgImagePosY: 50,
+  textColor: "", subtextColor: "",
+  nameColor: "", productTitleColor: "", priceColor: "",
+  originalPriceColor: "", descriptionColor: "",
+  urgencyBadgeBg: "", urgencyBadgeText: "",
+  socialIconStyle: "brand", socialIconCustomColor: "",
+  cardBg: "", cardBorder: "",
   accentColor: "", accentColor2: "",
   fontHeading: "Inter", fontBody: "Inter",
   buttonShape: "rounded", buttonFill: "solid", buttonShadow: "none", buttonRadius: 12,
   profileShape: "circle", profileBorder: true, profileBorderColor: "", profileSize: 88,
-  hideWatermark: false,
+  textShadow: 0, hideWatermark: false,
 };
 
 export const BG_PATTERNS: { id: string; label: string; svg: string }[] = [

@@ -13,11 +13,17 @@ export type ProfileShape = "circle" | "rounded" | "square" | "hexagon";
 export interface DesignConfig {
   bgType: BgType; bgColor: string; bgGradient: [string, string]; bgGradientDir: GradientDir;
   bgImageUrl: string; bgVideoUrl: string; bgPattern: string; bgOverlay: number; bgBlur: number; bgEffect: string;
-  textColor: string; subtextColor: string; cardBg: string; cardBorder: string;
+  bgImageZoom: number; bgImagePosX: number; bgImagePosY: number;
+  textColor: string; subtextColor: string;
+  nameColor: string; productTitleColor: string; priceColor: string;
+  originalPriceColor: string; descriptionColor: string;
+  urgencyBadgeBg: string; urgencyBadgeText: string;
+  socialIconStyle: "brand" | "theme" | "custom"; socialIconCustomColor: string;
+  cardBg: string; cardBorder: string;
   accentColor: string; accentColor2: string; fontHeading: string; fontBody: string;
   buttonShape: ButtonShape; buttonFill: ButtonFill; buttonShadow: ButtonShadow; buttonRadius: number;
   profileShape: ProfileShape; profileBorder: boolean; profileBorderColor: string; profileSize: number;
-  hideWatermark: boolean; layout?: string;
+  textShadow: number; hideWatermark: boolean; layout?: string;
 }
 
 export interface ThemeDef { id: ThemeId; label: string; bg: string; accent: string; accent2: string; }
