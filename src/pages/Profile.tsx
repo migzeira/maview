@@ -124,12 +124,14 @@ const useCountdown = (initialSeconds: number) => {
 
 const countdownSeed = 5400 + Math.floor((Date.now() / 86400000) % 1 * 3600); // fixed per day session
 
-const CountdownBadge = ({ accent }: { accent: string }) => {
+const CountdownBadge = ({ accent, badgeBg, badgeText }: { accent: string; badgeBg?: string; badgeText?: string }) => {
   const time = useCountdown(countdownSeed);
+  const bg = badgeBg || "rgba(239,68,68,0.25)";
+  const fg = badgeText || "#f87171";
   return (
     <span
-      className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
-      style={{ background: "rgba(239,68,68,0.25)", color: "#f87171", border: "1px solid rgba(239,68,68,0.40)" }}
+      className="flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
+      style={{ background: bg, color: fg, border: `1px solid ${fg}40` }}
     >
       <Clock size={9} /> {time}
     </span>
@@ -255,6 +257,9 @@ const ProfilePage = () => {
   /* Resolve design early (before returns) so hooks are stable */
   const baseTheme = useMemo(() => profile ? (THEMES[profile.theme] || THEMES["dark-purple"]) : THEMES["dark-purple"], [profile?.theme]);
   const rd = useMemo(() => resolveDesign(baseTheme, profile?.design), [baseTheme, profile?.design]);
+
+  /* Text shadow for readability on image backgrounds */
+  const tShadow = rd.textShadow ? "0 1px 4px rgba(0,0,0,0.7), 0 0 12px rgba(0,0,0,0.35)" : undefined;
 
   /* Load Google Fonts — must be before early returns */
   useEffect(() => {
@@ -518,11 +523,11 @@ const ProfilePage = () => {
               }
             </div>
 
-            <h1 className="text-[22px] font-extrabold mb-1 text-center tracking-tight" style={{ color: t.text, fontFamily: `'${rd.fontHeading}', sans-serif` }}>{profile.displayName}</h1>
-            <p className="text-[13px] font-semibold mb-2" style={{ color: t.sub }}>@{profile.username}</p>
+            <h1 className="text-[22px] font-extrabold mb-1 text-center tracking-tight" style={{ color: rd.nameColor || t.text, fontFamily: `'${rd.fontHeading}', sans-serif`, textShadow: tShadow }}>{profile.displayName}</h1>
+            <p className="text-[13px] font-semibold mb-2" style={{ color: t.sub, textShadow: tShadow }}>@{profile.username}</p>
             {profile.bio && (
               <div className="max-w-[300px] mb-3 text-center">
-                <p className={`text-[14px] leading-relaxed ${bioExpanded ? "" : "line-clamp-3"}`} style={{ color: t.sub, fontFamily: `'${rd.fontBody}', sans-serif` }}>{profile.bio}</p>
+                <p className={`text-[14px] leading-relaxed ${bioExpanded ? "" : "line-clamp-3"}`} style={{ color: t.sub, fontFamily: `'${rd.fontBody}', sans-serif`, textShadow: tShadow }}>{profile.bio}</p>
                 {profile.bio.length > 120 && !bioExpanded && (
                   <button onClick={() => setBioExpanded(true)} className="text-[12px] font-medium mt-1 transition-colors hover:opacity-80" style={{ color: t.accent }}>
                     ver mais
@@ -657,7 +662,7 @@ const ProfilePage = () => {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                            <p className="text-[15px] font-bold leading-snug line-clamp-2" style={{ color: t.text, fontFamily: `'${rd.fontHeading}', sans-serif` }}>{product.title}</p>
+                            <p className="text-[15px] font-bold leading-snug line-clamp-2" style={{ color: rd.productTitleColor || t.text, fontFamily: `'${rd.fontHeading}', sans-serif` }}>{product.title}</p>
                             {/* Auto "Mais vendido" badge on first product */}
                             {i === 0 && profile.products.length > 1 && !product.badge && (
                               <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 flex items-center gap-0.5"
@@ -676,7 +681,7 @@ const ProfilePage = () => {
                                 Agenda online
                               </span>
                             )}
-                            {product.urgency && <CountdownBadge accent={t.accent} />}
+                            {product.urgency && <CountdownBadge accent={t.accent} badgeBg={rd.urgencyBadgeBg} badgeText={rd.urgencyBadgeText} />}
                           </div>
                           {product.description && <p className="text-[12px] truncate" style={{ color: t.sub }}>{product.description}</p>}
                           {product.price && (

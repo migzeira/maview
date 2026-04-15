@@ -135,22 +135,74 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, onBgColor
           </p>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <ColorPicker value={d.textColor || currentTheme.text} onChange={v => setDesign("textColor", v)} label="Nome e titulos" />
-              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Seu nome, titulos dos produtos</p>
+              <ColorPicker value={d.nameColor || d.textColor || currentTheme.text} onChange={v => setDesign("nameColor", v)} label="Seu nome" />
+              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Nome no topo do perfil</p>
             </div>
             <div>
               <ColorPicker value={d.subtextColor || currentTheme.sub} onChange={v => setDesign("subtextColor", v)} label="Bio e descricoes" />
               <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Bio, descricao dos produtos</p>
             </div>
           </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <ColorPicker value={d.productTitleColor || d.textColor || currentTheme.text} onChange={v => setDesign("productTitleColor", v)} label="Titulo produtos" />
+              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Nome dos produtos e precos</p>
+            </div>
+            <div>
+              <ColorPicker value={d.textColor || currentTheme.text} onChange={v => setDesign("textColor", v)} label="Outros textos" />
+              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Badges, links, stats</p>
+            </div>
+          </div>
           <div className="flex gap-2">
-            <button onClick={() => { setDesign("textColor", "#ffffff"); setDesign("subtextColor", "rgba(255,255,255,0.80)"); }}
+            <button onClick={() => { setDesign("textColor", "#ffffff"); setDesign("subtextColor", "rgba(255,255,255,0.80)"); setDesign("nameColor", "#ffffff"); setDesign("productTitleColor", "#ffffff"); }}
               className="flex-1 py-2 rounded-xl text-[10px] font-medium bg-gray-900 text-white border border-gray-700 hover:border-primary/40 transition-all">
               <Eye size={10} className="inline mr-1" /> Texto claro
             </button>
-            <button onClick={() => { setDesign("textColor", "#111827"); setDesign("subtextColor", "#374151"); }}
+            <button onClick={() => { setDesign("textColor", "#111827"); setDesign("subtextColor", "#374151"); setDesign("nameColor", "#111827"); setDesign("productTitleColor", "#111827"); }}
               className="flex-1 py-2 rounded-xl text-[10px] font-medium bg-white text-gray-900 border border-gray-300 hover:border-primary/40 transition-all">
               <Eye size={10} className="inline mr-1" /> Texto escuro
+            </button>
+          </div>
+          {/* Text shadow toggle */}
+          <div className="flex items-center justify-between pt-1">
+            <div>
+              <p className="text-[10px] font-medium text-[hsl(var(--dash-text))]">Sombra nos textos</p>
+              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))]">Melhora leitura em fotos de fundo</p>
+            </div>
+            <button onClick={() => setDesign("textShadow", !d.textShadow)}
+              className={`relative w-9 h-5 rounded-full transition-colors ${d.textShadow ? "bg-primary" : "bg-[hsl(var(--dash-border))]"}`}>
+              <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${d.textShadow ? "left-[18px]" : "left-0.5"}`} />
+            </button>
+          </div>
+        </div>
+      </Section>
+
+      {/* ── Badge de urgencia ── */}
+      <Section title="Badge de urgencia" icon={<Eye size={14} />}>
+        <div className="space-y-3 pt-2">
+          <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] leading-relaxed">
+            Cor do contador regressivo nos produtos com urgencia ativa.
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <ColorPicker value={d.urgencyBadgeBg || "rgba(239,68,68,0.25)"} onChange={v => setDesign("urgencyBadgeBg", v)} label="Fundo do badge" />
+            </div>
+            <div>
+              <ColorPicker value={d.urgencyBadgeText || "#f87171"} onChange={v => setDesign("urgencyBadgeText", v)} label="Texto do badge" />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => { setDesign("urgencyBadgeBg", "rgba(239,68,68,0.25)"); setDesign("urgencyBadgeText", "#f87171"); }}
+              className="flex-1 py-2 rounded-xl text-[10px] font-medium bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/40 transition-all">
+              Vermelho (padrao)
+            </button>
+            <button onClick={() => { setDesign("urgencyBadgeBg", "rgba(245,158,11,0.25)"); setDesign("urgencyBadgeText", "#fbbf24"); }}
+              className="flex-1 py-2 rounded-xl text-[10px] font-medium bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/40 transition-all">
+              Amarelo
+            </button>
+            <button onClick={() => { setDesign("urgencyBadgeBg", `${accent}20`); setDesign("urgencyBadgeText", accent); }}
+              className="flex-1 py-2 rounded-xl text-[10px] font-medium bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/40 transition-all">
+              Cor do tema
             </button>
           </div>
         </div>

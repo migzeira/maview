@@ -48,12 +48,14 @@ export const GRAD_DIR: Record<GradientDir, string> = {
 /* ─── Resolved design (theme + overrides) ───────────────────── */
 export interface ResolvedDesign {
   bg: string; accent: string; accent2: string; card: string; text: string; sub: string; border: string;
+  nameColor: string; productTitleColor: string; urgencyBadgeBg: string; urgencyBadgeText: string;
   fontHeading: string; fontBody: string;
   bgType: string; bgGradient: [string, string]; bgGradientDir: GradientDir;
   bgImageUrl: string; bgVideoUrl: string; bgPattern: string; bgOverlay: number; bgBlur: number; bgEffect: string;
   bgImageZoom: number; bgImagePosX: number; bgImagePosY: number;
   buttonShape: ButtonShape; buttonFill: ButtonFill; buttonShadow: string; buttonRadius: number;
   profileShape: ProfileShape; profileBorder: boolean; profileBorderColor: string; profileSize: number;
+  textShadow: boolean;
   hideWatermark: boolean;
 }
 
@@ -67,6 +69,10 @@ export function resolveDesign(theme: ThemeDef, design?: Partial<DesignConfig>): 
     text: d.textColor || theme.text,
     sub: d.subtextColor || theme.sub,
     border: d.cardBorder || theme.border,
+    nameColor: d.nameColor || "",           // empty = use text
+    productTitleColor: d.productTitleColor || "", // empty = use text
+    urgencyBadgeBg: d.urgencyBadgeBg || "rgba(239,68,68,0.25)",
+    urgencyBadgeText: d.urgencyBadgeText || "#f87171",
     fontHeading: d.fontHeading || "Inter",
     fontBody: d.fontBody || "Inter",
     bgType: d.bgType || "solid",
@@ -89,6 +95,7 @@ export function resolveDesign(theme: ThemeDef, design?: Partial<DesignConfig>): 
     profileBorder: d.profileBorder ?? true,
     profileBorderColor: d.profileBorderColor || theme.accent,
     profileSize: d.profileSize ?? 88,
+    textShadow: d.textShadow ?? false,
     hideWatermark: d.hideWatermark ?? false,
   };
 

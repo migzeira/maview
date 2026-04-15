@@ -33,6 +33,10 @@ export interface DesignConfig {
   // Colors
   textColor: string;
   subtextColor: string;
+  nameColor: string;           // display name color (independent from product titles)
+  productTitleColor: string;   // product title color
+  urgencyBadgeBg: string;      // urgency countdown badge background
+  urgencyBadgeText: string;    // urgency countdown badge text
   cardBg: string;
   cardBorder: string;
   accentColor: string;
@@ -56,6 +60,9 @@ export interface DesignConfig {
 
   // Layout
   layout?: "stack" | "cards" | "grid" | "bento" | "magazine" | "minimal";
+
+  // Text readability
+  textShadow: boolean;        // adds dark shadow behind text for readability on images
 
   // Effects
   hideWatermark: boolean;
