@@ -133,7 +133,7 @@ const CountdownBadge = ({ accent, badgeBg, badgeText }: { accent: string; badgeB
       className="flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
       style={{ background: bg, color: fg, border: `1px solid ${fg}40` }}
     >
-      <Clock size={9} /> {time}
+      <Clock size={11} /> {time}
     </span>
   );
 };
@@ -601,6 +601,56 @@ const ProfilePage = () => {
             </div>
           </div>
 
+          {/* ── DEPOIMENTOS (before products = social proof first) ── */}
+          {profile.testimonials && profile.testimonials.length > 0 && (
+            <section className="mb-7" aria-label="Depoimentos">
+              <div className="flex items-center gap-2 mb-3">
+                <Star size={14} className="fill-amber-400 text-amber-400" />
+                <span className="text-[13px] font-bold tracking-wide uppercase" style={{ color: t.text, opacity: 0.7 }}>Depoimentos</span>
+              </div>
+              <div className="space-y-2.5">
+                {profile.testimonials.map((item, i) => (
+                  <div key={i}
+                    className="px-4 py-4"
+                    style={{
+                      ...buttonStyles(rd),
+                      opacity: testimonialStagger[i] ? 1 : 0,
+                      transform: testimonialStagger[i] ? "translateY(0)" : "translateY(8px)",
+                      transition: "opacity 0.3s ease, transform 0.3s ease",
+                    }}
+                  >
+                    <div className="flex items-center gap-0.5 mb-2">
+                      {Array.from({ length: item.stars }).map((_, s) => (
+                        <Star key={s} size={11} className="fill-amber-400 text-amber-400" />
+                      ))}
+                    </div>
+                    <p className="text-[14px] leading-relaxed mb-3 italic" style={{ color: t.sub }}>
+                      "{item.text}"
+                    </p>
+                    {item.screenshotUrl && (
+                      <img src={item.screenshotUrl} alt={`Captura de depoimento de ${item.name}`}
+                        className="w-full rounded-lg mb-3 object-contain max-h-48 border border-white/10" loading="lazy" />
+                    )}
+                    <div className="flex items-center gap-2.5">
+                      {item.avatar ? (
+                        <img src={item.avatar} alt={item.name} className="w-7 h-7 rounded-full object-cover flex-shrink-0" loading="lazy" decoding="async" />
+                      ) : (
+                        <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-white"
+                          style={{ background: t.accent }}>
+                          {item.name[0]?.toUpperCase()}
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-[14px] font-bold leading-none" style={{ color: t.text }}>{item.name}</p>
+                        {item.role && <p className="text-[11px] mt-0.5" style={{ color: t.sub }}>{item.role}</p>}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* ── PRODUTOS ── */}
           {profile.products.length > 0 && (
             <section className="mb-7" aria-label="Produtos">
@@ -703,7 +753,7 @@ const ProfilePage = () => {
                             )}
                             {product.urgency && <CountdownBadge accent={t.accent} badgeBg={rd.urgencyBadgeBg} badgeText={rd.urgencyBadgeText} />}
                           </div>
-                          {product.description && <p className="text-[12px] truncate" style={{ color: t.sub }}>{product.description}</p>}
+                          {product.description && <p className="text-[12px] line-clamp-2" style={{ color: t.sub }}>{product.description}</p>}
                           {product.price && (
                             <div className="flex items-center gap-2 mt-1">
                               <span className="text-[13px] font-bold" style={{ color: rd.priceColor || t.text }}>{product.price}</span>
@@ -732,60 +782,6 @@ const ProfilePage = () => {
                     </div>
                   );
                 })}
-              </div>
-            </section>
-          )}
-
-          {/* Depoimentos */}
-          {profile.testimonials && profile.testimonials.length > 0 && (
-            <section className="mb-7" aria-label="Depoimentos">
-              <div className="flex items-center gap-2 mb-3">
-                <Star size={14} className="fill-amber-400 text-amber-400" />
-                <span className="text-[13px] font-bold tracking-wide uppercase" style={{ color: t.text, opacity: 0.7 }}>Depoimentos</span>
-              </div>
-              <div className="space-y-2.5">
-                {profile.testimonials.map((item, i) => (
-                  <div key={i}
-                    className="px-4 py-4"
-                    style={{
-                      ...buttonStyles(rd),
-                      opacity: testimonialStagger[i] ? 1 : 0,
-                      transform: testimonialStagger[i] ? "translateY(0)" : "translateY(8px)",
-                      transition: "opacity 0.3s ease, transform 0.3s ease",
-                    }}
-                  >
-                    {/* Stars */}
-                    <div className="flex items-center gap-0.5 mb-2">
-                      {Array.from({ length: item.stars }).map((_, s) => (
-                        <Star key={s} size={11} className="fill-amber-400 text-amber-400" />
-                      ))}
-                    </div>
-                    {/* Quote */}
-                    <p className="text-[14px] leading-relaxed mb-3 italic" style={{ color: t.sub }}>
-                      "{item.text}"
-                    </p>
-                    {/* Screenshot do depoimento real */}
-                    {item.screenshotUrl && (
-                      <img src={item.screenshotUrl} alt={`Captura de depoimento de ${item.name}`}
-                        className="w-full rounded-lg mb-3 object-contain max-h-48 border border-white/10" loading="lazy" />
-                    )}
-                    {/* Author */}
-                    <div className="flex items-center gap-2.5">
-                      {item.avatar ? (
-                        <img src={item.avatar} alt={item.name} className="w-7 h-7 rounded-full object-cover flex-shrink-0" loading="lazy" decoding="async" />
-                      ) : (
-                        <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-white"
-                          style={{ background: t.accent }}>
-                          {item.name[0]?.toUpperCase()}
-                        </div>
-                      )}
-                      <div>
-                        <p className="text-[14px] font-bold leading-none" style={{ color: t.text }}>{item.name}</p>
-                        {item.role && <p className="text-[11px] mt-0.5" style={{ color: t.sub }}>{item.role}</p>}
-                      </div>
-                    </div>
-                  </div>
-                ))}
               </div>
             </section>
           )}
@@ -900,7 +896,34 @@ const ProfilePage = () => {
         />
       )}
 
-      {/* Email capture removed */}
+      {/* ── Email capture — lead generation ── */}
+      {profile && !emailCaptured && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-[380px]">
+          <form onSubmit={handleEmailSubmit}
+            className="flex items-center gap-2 px-3 py-2.5 rounded-2xl backdrop-blur-xl shadow-lg"
+            style={{ background: `${t.card}ee`, border: `1px solid ${t.border}` }}>
+            <Mail size={16} style={{ color: t.sub, flexShrink: 0 }} />
+            <input type="email" required placeholder="Seu email para novidades"
+              value={captureEmail} onChange={e => setCaptureEmail(e.target.value)}
+              className="flex-1 bg-transparent text-[13px] outline-none placeholder:opacity-50 min-w-0"
+              style={{ color: t.text }} />
+            <button type="submit" disabled={emailSubmitting}
+              className="px-3.5 py-1.5 rounded-xl text-[11px] font-bold text-white flex-shrink-0 transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+              style={{ background: t.accent }}>
+              {emailSubmitting ? "..." : "Enviar"}
+            </button>
+          </form>
+        </div>
+      )}
+      {emailCaptured && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40">
+          <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl backdrop-blur-xl shadow-lg"
+            style={{ background: `${t.card}ee`, border: `1px solid ${t.border}` }}>
+            <Check size={14} style={{ color: "#22c55e" }} />
+            <span className="text-[12px] font-medium" style={{ color: t.text }}>Obrigado! Voce recebera novidades.</span>
+          </div>
+        </div>
+      )}
 
       {/* ── Payment Checkout Modal ── */}
       {pixCheckoutProduct && profile.design?.mercadoPagoToken ? (
