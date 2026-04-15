@@ -154,8 +154,9 @@ const ProfilePage = () => {
   const [heroVis, setHeroVis]   = useState(false);
   const [bookingProduct, setBookingProduct] = useState<ProductItem | null>(null);
   const [pixCheckoutProduct, setPixCheckoutProduct] = useState<ProductItem | null>(null);
+  const [detailProduct, setDetailProduct] = useState<ProductItem | null>(null);
 
-  /* Email capture */
+  /* Email capture (legacy — kept for state cleanup) */
   const [captureEmail, setCaptureEmail] = useState("");
   const [emailCaptured, setEmailCaptured] = useState(false);
   const [emailSubmitting, setEmailSubmitting] = useState(false);
@@ -524,14 +525,14 @@ const ProfilePage = () => {
           {/* ── HERO ── */}
           <div className="flex flex-col items-center mb-7 transition-all duration-500" style={{ opacity: heroVis ? 1 : 0, transform: heroVis ? "translateY(0)" : "translateY(12px)" }}>
             {/* Avatar */}
-            <div className="relative mb-4">
-              {rd.profileGlow && (
-                <div className="absolute inset-[-8px] opacity-50 blur-[14px]"
-                  style={{
-                    background: rd.profileGlowColor || rd.profileBorderColor || t.accent,
-                    borderRadius: profileBorderRadius(rd.profileShape),
-                  }} />
-              )}
+            <div className="relative mb-4"
+              style={{
+                width: rd.profileSize, height: rd.profileSize,
+                borderRadius: profileBorderRadius(rd.profileShape),
+                boxShadow: rd.profileGlow
+                  ? `0 0 24px 8px ${rd.profileGlowColor || rd.profileBorderColor || t.accent}55, 0 0 48px 16px ${rd.profileGlowColor || rd.profileBorderColor || t.accent}25`
+                  : "none",
+              }}>
               {profile.avatar
                 ? <img src={profile.avatar} alt={profile.displayName}
                     className="relative object-cover z-10" loading="eager" decoding="async" fetchPriority="high"
@@ -713,26 +714,18 @@ const ProfilePage = () => {
                   const hasPixKey = !!(profile.design?.pixKey);
                   const isPixEligible = !isBooking && !isNone && (hasMpToken || hasPixKey) && product.price;
 
-                  const handleClick = isPixEligible
-                    ? (e: React.MouseEvent) => { e.preventDefault(); setPixCheckoutProduct(product); trackEvent(profile.username, "click_product", { productId: product.id, title: product.title }); }
-                    : bookingUsesModal
-                    ? (e: React.MouseEvent) => { e.preventDefault(); setBookingProduct(product); }
-                    : undefined;
+                  // Always open the product detail modal first (except booking with modal)
+                  const handleClick = (e: React.MouseEvent) => {
+                    e.preventDefault();
+                    trackEvent(profile.username, "click_product", { productId: product.id, title: product.title });
+                    if (isPixEligible) { setPixCheckoutProduct(product); return; }
+                    if (bookingUsesModal) { setBookingProduct(product); return; }
+                    // Open product detail modal
+                    setDetailProduct(product);
+                  };
 
-                  const Wrapper = isPixEligible ? "button"
-                    : (isNone && !isBooking) ? "div"
-                    : bookingUsesModal ? "button"
-                    : bookingDirectUrl ? "a"
-                    : isBooking ? "div" : "a";
-                  const wrapperProps = isPixEligible
-                    ? { onClick: handleClick }
-                    : bookingUsesModal
-                    ? { onClick: handleClick }
-                    : bookingDirectUrl
-                      ? { href: bookingDirectUrl, target: "_blank", rel: "noopener noreferrer" }
-                    : isNone
-                      ? {}
-                      : { href: productHref, target: "_blank", rel: "noopener noreferrer" };
+                  const Wrapper = "button" as const;
+                  const wrapperProps = { onClick: handleClick };
 
                   return (
                     <div key={product.id}
@@ -962,6 +955,135 @@ const ProfilePage = () => {
         />
       ) : null}
 
+      {/* ── Product Detail Modal ── */}
+      {detailProduct && profile && (() => {
+        const dp = detailProduct;
+        const isWhatsApp = dp.linkType === "whatsapp";
+        const isBooking = dp.linkType === "booking";
+        const dpHref = isWhatsApp && dp.url
+          ? `https://wa.me/${(dp.url || "").replace(/\D/g, "")}${dp.whatsappMsg ? `?text=${encodeURIComponent(dp.whatsappMsg)}` : ""}`
+          : sanitizeUrl(dp.url);
+        const dpCta = dp.ctaText || (isBooking ? "Agendar agora" : isWhatsApp ? "Chamar no WhatsApp" : dp.price ? "Comprar agora" : "Ver mais");
+        const dpImg = dp.images?.[0] || dp.imageUrl;
+        const hasDiscount = dp.originalPrice && dp.price;
+
+        return (
+          <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center"
+            onClick={(e) => { if (e.target === e.currentTarget) setDetailProduct(null); }}>
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+
+            {/* Modal */}
+            <div className="relative w-full max-w-[420px] max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl animate-in slide-in-from-bottom-4 duration-300"
+              style={{ background: t.bg, border: `1px solid ${t.border}` }}>
+
+              {/* Close button */}
+              <button onClick={() => setDetailProduct(null)}
+                className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                style={{ background: `${t.card}dd`, border: `1px solid ${t.border}`, backdropFilter: "blur(8px)" }}>
+                <X size={16} style={{ color: t.text }} />
+              </button>
+
+              {/* Product image — large hero */}
+              {dpImg ? (
+                <div className="relative w-full overflow-hidden rounded-t-3xl sm:rounded-t-3xl" style={{ aspectRatio: "4/3" }}>
+                  <img src={dpImg} alt={dp.title} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 50%, ${t.bg})` }} />
+                  {/* Badge overlay */}
+                  {hasDiscount && (
+                    <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-[12px] font-bold"
+                      style={{ background: t.accent, color: "#fff" }}>
+                      {(() => {
+                        const orig = parseFloat((dp.originalPrice || "").replace(/[^\d.,]/g, "").replace(",", "."));
+                        const curr = parseFloat((dp.price || "").replace(/[^\d.,]/g, "").replace(",", "."));
+                        if (orig && curr && orig > curr) return `-${Math.round(((orig - curr) / orig) * 100)}%`;
+                        return "Oferta";
+                      })()}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="w-full flex items-center justify-center text-6xl pt-10 pb-6">
+                  {dp.emoji || "📦"}
+                </div>
+              )}
+
+              {/* Content */}
+              <div className="px-6 pb-6" style={{ marginTop: dpImg ? "-20px" : "0" }}>
+                <div className="relative z-10">
+                  {/* Title */}
+                  <h2 className="text-[22px] font-extrabold leading-tight mb-2"
+                    style={{ color: c.productTitle, fontFamily: `'${rd.fontHeading}', sans-serif` }}>
+                    {dp.title}
+                  </h2>
+
+                  {/* Badges */}
+                  <div className="flex items-center gap-2 flex-wrap mb-4">
+                    {dp.badge && (
+                      <span className="text-[11px] font-bold px-2.5 py-1 rounded-full"
+                        style={{ background: `${t.accent}15`, color: t.accent, border: `1px solid ${t.accent}25` }}>
+                        {dp.badge}
+                      </span>
+                    )}
+                    {dp.urgency && <CountdownBadge accent={t.accent} badgeBg={rd.urgencyBadgeBg} badgeText={rd.urgencyBadgeText} />}
+                    {isBooking && (
+                      <span className="text-[11px] font-bold px-2 py-1 rounded-full"
+                        style={{ background: "rgba(34,197,94,0.15)", color: "#22c55e", border: "1px solid rgba(34,197,94,0.25)" }}>
+                        <Calendar size={10} className="inline mr-1" /> Agenda online
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Description */}
+                  {dp.description && (
+                    <p className="text-[14px] leading-relaxed mb-5"
+                      style={{ color: c.productDesc, fontFamily: `'${rd.fontBody}', sans-serif` }}>
+                      {dp.description}
+                    </p>
+                  )}
+
+                  {/* Booking info */}
+                  {isBooking && (
+                    <div className="flex items-center gap-3 mb-5 px-4 py-3 rounded-xl"
+                      style={{ background: `${t.accent}08`, border: `1px solid ${t.accent}15` }}>
+                      <Clock size={14} style={{ color: t.accent }} />
+                      <span className="text-[13px]" style={{ color: t.sub }}>
+                        {(dp.bookingDuration || 60) >= 60 ? `${Math.floor((dp.bookingDuration || 60) / 60)}h${(dp.bookingDuration || 60) % 60 || ""}` : `${dp.bookingDuration}min`}
+                        {" · "}{(dp.bookingDays || []).length} dias/semana
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Price */}
+                  {dp.price && (
+                    <div className="flex items-center gap-3 mb-6">
+                      <span className="text-[24px] font-extrabold" style={{ color: c.price }}>{dp.price}</span>
+                      {dp.originalPrice && (
+                        <span className="text-[15px] line-through" style={{ color: c.originalPrice }}>{dp.originalPrice}</span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* CTA Button */}
+                  {dp.linkType !== "none" && (
+                    <a href={dpHref || "#"} target="_blank" rel="noopener noreferrer"
+                      onClick={() => { trackEvent(profile.username, "click_cta", { productId: dp.id, title: dp.title }); }}
+                      className="flex items-center justify-center gap-2.5 w-full py-4 rounded-2xl font-bold text-[15px] text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
+                      style={{
+                        background: isWhatsApp ? "#25d366" : t.accent,
+                        borderRadius: buttonBorderRadius(rd.buttonShape, rd.buttonRadius),
+                      }}>
+                      {isBooking ? <Calendar size={16} /> : isWhatsApp ? <WhatsAppIcon size={16} style={{ color: "#fff" }} /> : <ShoppingCart size={16} />}
+                      {dpCta}
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* ── Footer ── */}
       {!rd.hideWatermark && (
         <footer className="relative z-10 flex justify-center pb-10 pt-6">
@@ -971,7 +1093,7 @@ const ProfilePage = () => {
           >
             <img src={logoSrc} alt="Maview" className="w-4 h-4 object-contain" />
             <span className="text-[11px] font-semibold" style={{ color: t.sub }}>
-              feito por maview.app
+              criado por maview.app
             </span>
           </Link>
         </footer>
