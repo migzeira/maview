@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import {
-  Layers, Square, Circle, Palette, Upload, X, Play,
+  Layers, Square, Circle, Palette, Upload, X, Play, Type, Eye,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
@@ -170,29 +170,77 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, onBgColor
         </div>
       </Section>
 
-      {/* ── Cores avancadas ── */}
-      <Section title="Cores avancadas" icon={<Palette size={14} />}>
+      {/* ── Textos ── */}
+      <Section title="Cores dos textos" icon={<Type size={14} />}>
         <div className="space-y-3 pt-2">
-          <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] -mb-1">
-            {d.bgType === "effect" ? "Cor de destaque e da animacao (username, precos, links, icones, efeitos)" : "Cor de destaque (username, precos, links, icones)"}
+          <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] leading-relaxed">
+            Controle a cor de cada texto da sua vitrine. Se o fundo for escuro, use textos claros. Se for claro, use escuros.
           </p>
           <div className="grid grid-cols-2 gap-3">
-            <ColorPicker value={d.accentColor || accent} onChange={v => setDesign("accentColor", v)} label={d.bgType === "effect" ? "Animacao / Destaque" : "Destaque 1"} />
-            <ColorPicker value={d.accentColor2 || accent} onChange={v => setDesign("accentColor2", v)} label="Destaque 2" />
+            <div>
+              <ColorPicker value={d.textColor || currentTheme.text} onChange={v => setDesign("textColor", v)} label="Nome e titulos" />
+              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Seu nome, titulos dos produtos</p>
+            </div>
+            <div>
+              <ColorPicker value={d.subtextColor || currentTheme.sub} onChange={v => setDesign("subtextColor", v)} label="Bio e descricoes" />
+              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Bio, descricao dos produtos</p>
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <ColorPicker value={d.textColor || "#f8f5ff"} onChange={v => setDesign("textColor", v)} label="Texto" />
-            <ColorPicker value={d.subtextColor || "rgba(248,245,255,0.5)"} onChange={v => setDesign("subtextColor", v)} label="Subtexto" />
+          <div className="flex gap-2">
+            <button onClick={() => { setDesign("textColor", "#ffffff"); setDesign("subtextColor", "rgba(255,255,255,0.80)"); }}
+              className="flex-1 py-2 rounded-xl text-[10px] font-medium bg-gray-900 text-white border border-gray-700 hover:border-primary/40 transition-all">
+              <Eye size={10} className="inline mr-1" /> Texto claro
+            </button>
+            <button onClick={() => { setDesign("textColor", "#111827"); setDesign("subtextColor", "#374151"); }}
+              className="flex-1 py-2 rounded-xl text-[10px] font-medium bg-white text-gray-900 border border-gray-300 hover:border-primary/40 transition-all">
+              <Eye size={10} className="inline mr-1" /> Texto escuro
+            </button>
           </div>
+        </div>
+      </Section>
+
+      {/* ── Cores de destaque ── */}
+      <Section title="Cores de destaque" icon={<Palette size={14} />}>
+        <div className="space-y-3 pt-2">
+          <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] leading-relaxed">
+            {d.bgType === "effect"
+              ? "Cor principal dos botoes, precos, @username, icones sociais e da animacao de fundo."
+              : "Cor principal dos botoes, precos, @username e icones sociais."}
+          </p>
           <div className="grid grid-cols-2 gap-3">
-            <ColorPicker value={d.cardBg || "#13102a"} onChange={v => setDesign("cardBg", v)} label="Fundo card" />
-            <ColorPicker value={d.cardBorder || "rgba(168,85,247,0.18)"} onChange={v => setDesign("cardBorder", v)} label="Borda card" />
+            <div>
+              <ColorPicker value={d.accentColor || accent} onChange={v => setDesign("accentColor", v)} label={d.bgType === "effect" ? "Cor principal / Animacao" : "Cor principal"} />
+              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Botoes, precos, username</p>
+            </div>
+            <div>
+              <ColorPicker value={d.accentColor2 || accent} onChange={v => setDesign("accentColor2", v)} label="Cor secundaria" />
+              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Gradientes, detalhes</p>
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      {/* ── Cards / Produto ── */}
+      <Section title="Cards dos produtos" icon={<Square size={14} />}>
+        <div className="space-y-3 pt-2">
+          <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] leading-relaxed">
+            Fundo e borda dos cards de produtos, links e depoimentos.
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <ColorPicker value={d.cardBg || currentTheme.card} onChange={v => setDesign("cardBg", v)} label="Fundo do card" />
+              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Fundo dos produtos e links</p>
+            </div>
+            <div>
+              <ColorPicker value={d.cardBorder || currentTheme.border} onChange={v => setDesign("cardBorder", v)} label="Borda do card" />
+              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Contorno dos cards</p>
+            </div>
           </div>
           <button onClick={() => { setDesign("cardBg", "transparent"); setDesign("cardBorder", "transparent"); }}
             className={`w-full py-2 rounded-xl text-[10px] font-medium transition-all ${
               d.cardBg === "transparent" ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent"
             }`}>
-            Fundo transparente
+            Cards transparentes
           </button>
         </div>
       </Section>
@@ -210,7 +258,7 @@ export default function AdvancedDrawer(props: AdvancedDrawerProps) {
         <SheetContent side="right" className="w-[420px] max-w-[90vw] overflow-y-auto bg-[hsl(var(--dash-bg))] border-[hsl(var(--dash-border-subtle))]">
           <SheetHeader className="pb-2">
             <SheetTitle className="text-[hsl(var(--dash-text))] text-[15px]">Personalizar mais</SheetTitle>
-            <SheetDescription className="text-[hsl(var(--dash-text-subtle))] text-[11px]">Fundo, botoes, foto e cores avancadas</SheetDescription>
+            <SheetDescription className="text-[hsl(var(--dash-text-subtle))] text-[11px]">Fundo, textos, cores, botoes, cards e foto de perfil</SheetDescription>
           </SheetHeader>
           <AdvancedContent {...contentProps} />
         </SheetContent>
@@ -223,7 +271,7 @@ export default function AdvancedDrawer(props: AdvancedDrawerProps) {
       <DrawerContent className="max-h-[85vh] bg-[hsl(var(--dash-bg))] border-[hsl(var(--dash-border-subtle))]">
         <DrawerHeader className="pb-2">
           <DrawerTitle className="text-[hsl(var(--dash-text))] text-[15px]">Personalizar mais</DrawerTitle>
-          <DrawerDescription className="text-[hsl(var(--dash-text-subtle))] text-[11px]">Fundo, botoes, foto e cores avancadas</DrawerDescription>
+          <DrawerDescription className="text-[hsl(var(--dash-text-subtle))] text-[11px]">Fundo, textos, cores, botoes, cards e foto de perfil</DrawerDescription>
         </DrawerHeader>
         <div className="overflow-y-auto px-4 pb-6">
           <AdvancedContent {...contentProps} />

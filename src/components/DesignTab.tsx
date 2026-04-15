@@ -20,9 +20,13 @@ import type { DesignPack } from "./design/constants";
 /* ═══════════════════════════════════════════════════════════════════
    Rich Phone Mockup — shows a reference profile with real content
    ═══════════════════════════════════════════════════════════════════ */
-function PhoneMockup({ pack, isActive, onClick }: { pack: DesignPack; isActive: boolean; onClick: () => void }) {
-  const { bg, accent, accent2 } = pack.preview;
-  const dd = pack.config.design;
+function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack; isActive: boolean; onClick: () => void; liveDesign?: DesignConfig }) {
+  const { bg: packBg, accent: packAccent, accent2: packAccent2 } = pack.preview;
+  // If this is the active pack, use the LIVE design state so edits reflect in real-time
+  const dd = (isActive && liveDesign) ? liveDesign : pack.config.design;
+  const bg = dd.bgColor || packBg;
+  const accent = dd.accentColor || packAccent;
+  const accent2 = dd.accentColor2 || packAccent2;
   const ref = REFERENCE_PROFILES[pack.refIdx % REFERENCE_PROFILES.length];
   const hasCover = !!ref.coverImage;
   const isLight = bg.startsWith("#f") || bg.startsWith("#e") || bg === "#ffffff";
@@ -38,10 +42,15 @@ function PhoneMockup({ pack, isActive, onClick }: { pack: DesignPack; isActive: 
         {/* Background layer */}
         <div className="absolute inset-0" style={{ background: dd.bgType === "gradient" ? `linear-gradient(to bottom, ${(dd.bgGradient as [string, string])?.[0] || bg}, ${(dd.bgGradient as [string, string])?.[1] || bg})` : bg }}>
           {dd.bgType === "image" && dd.bgImageUrl && (
-            <img src={dd.bgImageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" />
+            <div className="absolute inset-0" style={{
+              backgroundImage: `url(${dd.bgImageUrl})`,
+              backgroundSize: `${(dd as any).bgImageZoom ?? 100}%`,
+              backgroundPosition: `${(dd as any).bgImagePosX ?? 50}% ${(dd as any).bgImagePosY ?? 50}%`,
+              backgroundRepeat: "no-repeat",
+            }} />
           )}
-          {dd.bgType === "image" && dd.bgOverlay && (
-            <div className="absolute inset-0" style={{ background: `${bg}`, opacity: (dd.bgOverlay || 0) / 100 }} />
+          {dd.bgType === "image" && (dd.bgOverlay ?? 0) > 0 && (
+            <div className="absolute inset-0" style={{ background: `rgba(0,0,0,${(dd.bgOverlay || 0) / 100})` }} />
           )}
           {dd.bgEffect && <div className="absolute inset-0 opacity-70 overflow-hidden">{getEffectPreviewElements(dd.bgEffect, accent)}</div>}
         </div>
@@ -243,7 +252,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
           <div ref={carouselRef} className="flex gap-4 overflow-x-auto pb-3 pt-1 px-2 scroll-smooth snap-x" style={{ scrollbarWidth: "none" }}>
             {filteredPacks.map(pack => (
               <div key={pack.id} className="snap-center">
-                <PhoneMockup pack={pack} isActive={isPackActive(pack)} onClick={() => applyPack(pack)} />
+                <PhoneMockup pack={pack} isActive={isPackActive(pack)} onClick={() => applyPack(pack)} liveDesign={isPackActive(pack) ? d : undefined} />
               </div>
             ))}
           </div>
