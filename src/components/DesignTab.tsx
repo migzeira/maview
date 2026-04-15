@@ -58,8 +58,8 @@ function PhoneMockup({ pack, isActive, onClick }: { pack: DesignPack; isActive: 
               </div>
             </>
           ) : (
-            <div className="pt-8 w-14 h-14 mb-1.5 flex-shrink-0 overflow-hidden" style={{ borderRadius: pR, border: dd.profileBorder ? `2px solid ${dd.profileBorderColor || accent}` : "1px solid rgba(255,255,255,0.1)" }}>
-              <img src={ref.avatar} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" loading="lazy" />
+            <div className="mt-8 w-14 h-14 mb-1.5 flex-shrink-0 overflow-hidden" style={{ borderRadius: pR, border: dd.profileBorder ? `2px solid ${dd.profileBorderColor || accent}` : "1px solid rgba(255,255,255,0.1)" }}>
+              <img src={ref.avatar} alt="" className="w-full h-full object-cover" loading="lazy" />
             </div>
           )}
 
