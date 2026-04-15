@@ -131,8 +131,9 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, onBgColor
       <Section title="Cores dos textos" icon={<Type size={14} />} defaultOpen>
         <div className="space-y-3 pt-2">
           <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] leading-relaxed">
-            Controle a cor de cada texto da sua vitrine. Se o fundo for escuro, use textos claros. Se for claro, use escuros.
+            Cada texto da sua vitrine tem cor independente. Fundo escuro = textos claros. Fundo claro = textos escuros.
           </p>
+          {/* Row 1: Name + Bio */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <ColorPicker value={d.nameColor || d.textColor || currentTheme.text} onChange={v => setDesign("nameColor", v)} label="Seu nome" />
@@ -143,22 +144,31 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, onBgColor
               <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Bio, descricao dos produtos</p>
             </div>
           </div>
+          {/* Row 2: Product title + Price */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <ColorPicker value={d.productTitleColor || d.textColor || currentTheme.text} onChange={v => setDesign("productTitleColor", v)} label="Titulo produtos" />
-              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Nome dos produtos e precos</p>
+              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Nome dos produtos (ex: iPhone 15)</p>
             </div>
+            <div>
+              <ColorPicker value={d.priceColor || d.textColor || currentTheme.text} onChange={v => setDesign("priceColor", v)} label="Preco" />
+              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Valor dos produtos</p>
+            </div>
+          </div>
+          {/* Row 3: Others */}
+          <div className="grid grid-cols-2 gap-3">
             <div>
               <ColorPicker value={d.textColor || currentTheme.text} onChange={v => setDesign("textColor", v)} label="Outros textos" />
               <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Badges, links, stats</p>
             </div>
           </div>
+          {/* Quick buttons */}
           <div className="flex gap-2">
-            <button onClick={() => { setDesign("textColor", "#ffffff"); setDesign("subtextColor", "rgba(255,255,255,0.80)"); setDesign("nameColor", "#ffffff"); setDesign("productTitleColor", "#ffffff"); }}
+            <button onClick={() => { setDesign("textColor", "#ffffff"); setDesign("subtextColor", "rgba(255,255,255,0.80)"); setDesign("nameColor", "#ffffff"); setDesign("productTitleColor", "#ffffff"); setDesign("priceColor", "#ffffff"); }}
               className="flex-1 py-2 rounded-xl text-[10px] font-medium bg-gray-900 text-white border border-gray-700 hover:border-primary/40 transition-all">
               <Eye size={10} className="inline mr-1" /> Texto claro
             </button>
-            <button onClick={() => { setDesign("textColor", "#111827"); setDesign("subtextColor", "#374151"); setDesign("nameColor", "#111827"); setDesign("productTitleColor", "#111827"); }}
+            <button onClick={() => { setDesign("textColor", "#111827"); setDesign("subtextColor", "#374151"); setDesign("nameColor", "#111827"); setDesign("productTitleColor", "#111827"); setDesign("priceColor", "#111827"); }}
               className="flex-1 py-2 rounded-xl text-[10px] font-medium bg-white text-gray-900 border border-gray-300 hover:border-primary/40 transition-all">
               <Eye size={10} className="inline mr-1" /> Texto escuro
             </button>
@@ -167,7 +177,7 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, onBgColor
           <div className="flex items-center justify-between pt-1">
             <div>
               <p className="text-[10px] font-medium text-[hsl(var(--dash-text))]">Sombra nos textos</p>
-              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))]">Melhora leitura em fotos de fundo</p>
+              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))]">Destaca o texto sobre fotos de fundo (como Canva)</p>
             </div>
             <button onClick={() => setDesign("textShadow", !d.textShadow)}
               className={`relative w-9 h-5 rounded-full transition-colors ${d.textShadow ? "bg-primary" : "bg-[hsl(var(--dash-border))]"}`}>
@@ -194,7 +204,7 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, onBgColor
           <div className="flex gap-2">
             <button onClick={() => { setDesign("urgencyBadgeBg", "rgba(239,68,68,0.25)"); setDesign("urgencyBadgeText", "#f87171"); }}
               className="flex-1 py-2 rounded-xl text-[10px] font-medium bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/40 transition-all">
-              Vermelho (padrao)
+              Vermelho
             </button>
             <button onClick={() => { setDesign("urgencyBadgeBg", "rgba(245,158,11,0.25)"); setDesign("urgencyBadgeText", "#fbbf24"); }}
               className="flex-1 py-2 rounded-xl text-[10px] font-medium bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/40 transition-all">
@@ -204,6 +214,38 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, onBgColor
               className="flex-1 py-2 rounded-xl text-[10px] font-medium bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/40 transition-all">
               Cor do tema
             </button>
+          </div>
+        </div>
+      </Section>
+
+      {/* ── Icones sociais ── */}
+      <Section title="Icones das redes sociais" icon={<Circle size={14} />}>
+        <div className="space-y-3 pt-2">
+          <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] leading-relaxed">
+            Escolha como os icones das redes sociais aparecem na sua vitrine.
+          </p>
+          <div className="grid grid-cols-3 gap-1.5">
+            {(["brand", "theme", "custom"] as const).map(style => (
+              <button key={style} onClick={() => setDesign("socialIconStyle", style)}
+                className={`py-2.5 rounded-xl text-[10px] font-medium transition-all ${
+                  (d.socialIconStyle || "brand") === style ? "bg-primary/15 text-primary border border-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent"
+                }`}>
+                {style === "brand" ? "Cor oficial" : style === "theme" ? "Cor do tema" : "Cor personalizada"}
+              </button>
+            ))}
+          </div>
+          {(d.socialIconStyle || "brand") === "custom" && (
+            <ColorPicker value={d.socialIconCustomColor || accent} onChange={v => setDesign("socialIconCustomColor", v)} label="Cor dos icones" />
+          )}
+          <div className="flex items-center gap-2 bg-[hsl(var(--dash-accent))] rounded-xl p-2.5">
+            <div className="flex gap-1">
+              <div className="w-5 h-5 rounded-full bg-[#E4405F]/15 flex items-center justify-center"><span className="text-[8px]" style={{ color: "#E4405F" }}>IG</span></div>
+              <div className="w-5 h-5 rounded-full bg-[#25D366]/15 flex items-center justify-center"><span className="text-[8px]" style={{ color: "#25D366" }}>WA</span></div>
+              <div className="w-5 h-5 rounded-full bg-[#FF0000]/15 flex items-center justify-center"><span className="text-[8px]" style={{ color: "#FF0000" }}>YT</span></div>
+            </div>
+            <p className="text-[8px] text-[hsl(var(--dash-text-subtle))]">
+              {(d.socialIconStyle || "brand") === "brand" ? "Cada rede usa sua cor oficial" : (d.socialIconStyle || "brand") === "theme" ? "Todos usam a cor do tema" : "Todos usam a cor personalizada"}
+            </p>
           </div>
         </div>
       </Section>

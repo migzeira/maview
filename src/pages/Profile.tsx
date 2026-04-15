@@ -24,7 +24,7 @@ import EffectLayer from "@/components/profile/EffectLayer";
 import BookingModal from "@/components/profile/BookingModal";
 import MiniVideoPlayer from "@/components/profile/MiniVideoPlayer";
 import SocialProofToast from "@/components/profile/SocialProofToast";
-import { getIcon, WhatsAppIcon } from "@/components/profile/ProfileIcons";
+import { getIcon, WhatsAppIcon, BRAND_COLORS } from "@/components/profile/ProfileIcons";
 import { useStagger } from "@/hooks/useStagger";
 
 /* ──────────────────────────────────────────────────────────────── */
@@ -497,7 +497,7 @@ const ProfilePage = () => {
             {/* Avatar */}
             <div className="relative mb-4">
               {rd.profileBorder && (
-                <div className="absolute inset-[-3px] opacity-30 blur-[10px]"
+                <div className="absolute inset-[-3px] opacity-40 blur-[10px]"
                   style={{
                     background: rd.profileBorderColor || t.accent,
                     borderRadius: profileBorderRadius(rd.profileShape),
@@ -511,7 +511,7 @@ const ProfilePage = () => {
                       width: rd.profileSize, height: rd.profileSize,
                       borderRadius: profileBorderRadius(rd.profileShape),
                       clipPath: profileClip(rd.profileShape),
-                      border: rd.profileBorder ? `2px solid ${rd.profileBorderColor}50` : "none",
+                      border: rd.profileBorder ? `2.5px solid ${rd.profileBorderColor || t.accent}70` : "none",
                     }} />
                 : <div className="relative z-10 flex items-center justify-center text-2xl font-bold text-white"
                     style={{
@@ -554,31 +554,51 @@ const ProfilePage = () => {
             <div className="flex items-center gap-3">
               {socialLinks.map(link => {
                 const Icon = getIcon(link.icon);
+                const brandColor = BRAND_COLORS[link.icon];
+                const iconColor = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
+                  ? rd.socialIconCustomColor
+                  : rd.socialIconStyle === "theme" ? t.text
+                  : (brandColor || t.text);
+                const iconBg = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
+                  ? `${rd.socialIconCustomColor}15`
+                  : rd.socialIconStyle === "theme" ? `${t.accent}15`
+                  : (brandColor ? `${brandColor}18` : `${t.accent}15`);
+                const iconBorder = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
+                  ? `1.5px solid ${rd.socialIconCustomColor}25`
+                  : rd.socialIconStyle === "theme" ? `1.5px solid ${t.accent}22`
+                  : (brandColor ? `1.5px solid ${brandColor}25` : `1.5px solid ${t.accent}22`);
                 return (
                   <a key={link.id} href={sanitizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
                     className="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
-                    style={{ background: `${t.accent}15`, border: `1.5px solid ${t.accent}22` }} title={link.title}
+                    style={{ background: iconBg, border: iconBorder }} title={link.title}
                     aria-label={link.title || "Social link"}>
-                    <Icon size={18} style={{ color: t.text }} />
+                    <Icon size={18} style={{ color: iconColor }} />
                   </a>
                 );
               })}
+              {/* WhatsApp as social icon */}
+              {profile.whatsapp && (() => {
+                const waColor = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
+                  ? rd.socialIconCustomColor : rd.socialIconStyle === "theme" ? t.text : "#25d366";
+                const waBg = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
+                  ? `${rd.socialIconCustomColor}15` : rd.socialIconStyle === "theme" ? `${t.accent}15` : "rgba(37,211,102,0.15)";
+                const waBorder = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
+                  ? `1.5px solid ${rd.socialIconCustomColor}25` : rd.socialIconStyle === "theme" ? `1.5px solid ${t.accent}22` : "1.5px solid rgba(37,211,102,0.25)";
+                return (
+                  <a href={`https://wa.me/${profile.whatsapp!.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"
+                    className="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
+                    style={{ background: waBg, border: waBorder }}
+                    aria-label="WhatsApp">
+                    <WhatsAppIcon size={18} style={{ color: waColor }} />
+                  </a>
+                );
+              })()}
               <button onClick={handleShare} aria-label="Compartilhar perfil"
                 className="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
                 style={{ background: `${t.accent}15`, border: `1.5px solid ${t.accent}22` }}>
                 {copied ? <Check size={17} style={{ color: "#22c55e" }} /> : <Share2 size={17} style={{ color: t.text }} />}
               </button>
             </div>
-
-            {/* WhatsApp as social icon (same style as Instagram, etc.) */}
-            {profile.whatsapp && (
-              <a href={`https://wa.me/${profile.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"
-                className="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
-                style={{ background: "rgba(37,211,102,0.15)", border: "1.5px solid rgba(37,211,102,0.25)" }}
-                aria-label="WhatsApp">
-                <WhatsAppIcon size={18} style={{ color: "#25d366" }} />
-              </a>
-            )}
           </div>
 
           {/* ── PRODUTOS ── */}
@@ -686,7 +706,7 @@ const ProfilePage = () => {
                           {product.description && <p className="text-[12px] truncate" style={{ color: t.sub }}>{product.description}</p>}
                           {product.price && (
                             <div className="flex items-center gap-2 mt-1">
-                              <span className="text-[13px] font-bold" style={{ color: t.text }}>{product.price}</span>
+                              <span className="text-[13px] font-bold" style={{ color: rd.priceColor || t.text }}>{product.price}</span>
                               {product.originalPrice && <span className="text-[11px] line-through" style={{ color: t.sub }}>{product.originalPrice}</span>}
                             </div>
                           )}

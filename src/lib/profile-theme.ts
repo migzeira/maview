@@ -48,7 +48,9 @@ export const GRAD_DIR: Record<GradientDir, string> = {
 /* ─── Resolved design (theme + overrides) ───────────────────── */
 export interface ResolvedDesign {
   bg: string; accent: string; accent2: string; card: string; text: string; sub: string; border: string;
-  nameColor: string; productTitleColor: string; urgencyBadgeBg: string; urgencyBadgeText: string;
+  nameColor: string; productTitleColor: string; priceColor: string;
+  urgencyBadgeBg: string; urgencyBadgeText: string;
+  socialIconStyle: "brand" | "theme" | "custom"; socialIconCustomColor: string;
   fontHeading: string; fontBody: string;
   bgType: string; bgGradient: [string, string]; bgGradientDir: GradientDir;
   bgImageUrl: string; bgVideoUrl: string; bgPattern: string; bgOverlay: number; bgBlur: number; bgEffect: string;
@@ -71,8 +73,11 @@ export function resolveDesign(theme: ThemeDef, design?: Partial<DesignConfig>): 
     border: d.cardBorder || theme.border,
     nameColor: d.nameColor || "",           // empty = use text
     productTitleColor: d.productTitleColor || "", // empty = use text
+    priceColor: d.priceColor || "",         // empty = use text
     urgencyBadgeBg: d.urgencyBadgeBg || "rgba(239,68,68,0.25)",
     urgencyBadgeText: d.urgencyBadgeText || "#f87171",
+    socialIconStyle: d.socialIconStyle || "brand",
+    socialIconCustomColor: d.socialIconCustomColor || "",
     fontHeading: d.fontHeading || "Inter",
     fontBody: d.fontBody || "Inter",
     bgType: d.bgType || "solid",

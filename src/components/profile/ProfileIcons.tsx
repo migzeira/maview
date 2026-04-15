@@ -64,3 +64,33 @@ export const ICON_MAP: Record<string, any> = {
 };
 
 export const getIcon = (val: string) => ICON_MAP[val] || Link2;
+
+/** Official brand colors for social platforms */
+export const BRAND_COLORS: Record<string, string> = {
+  instagram: "#E4405F",
+  youtube: "#FF0000",
+  twitter: "#000000",  // X brand
+  tiktok: "#000000",
+  discord: "#5865F2",
+  github: "#181717",
+  twitch: "#9146FF",
+  telegram: "#26A5E4",
+  facebook: "#1877F2",
+  linkedin: "#0A66C2",
+  pinterest: "#BD081C",
+  threads: "#000000",
+  kwai: "#FF7E29",
+  whatsapp: "#25D366",
+};
+
+/** Get the background tint for a brand icon (15% opacity) */
+export const brandBg = (icon: string): string => {
+  const c = BRAND_COLORS[icon];
+  return c ? `${c}18` : undefined as any;
+};
+
+/** Get the border tint for a brand icon */
+export const brandBorder = (icon: string): string => {
+  const c = BRAND_COLORS[icon];
+  return c ? `1.5px solid ${c}25` : undefined as any;
+};

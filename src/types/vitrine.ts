@@ -37,6 +37,9 @@ export interface DesignConfig {
   productTitleColor: string;   // product title color
   urgencyBadgeBg: string;      // urgency countdown badge background
   urgencyBadgeText: string;    // urgency countdown badge text
+  priceColor: string;          // product price color
+  socialIconStyle: "brand" | "theme" | "custom"; // social icon coloring mode
+  socialIconCustomColor: string; // custom social icon color (when style=custom)
   cardBg: string;
   cardBorder: string;
   accentColor: string;
