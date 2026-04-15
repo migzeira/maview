@@ -1394,7 +1394,16 @@ const DashboardPagina = () => {
           {/* Cover image */}
           {d.coverImageUrl && (
             <div className="relative w-full overflow-hidden" style={{ height: 80 }}>
-              <img src={d.coverImageUrl} alt="" className="w-full h-full object-cover" />
+              <div className="absolute inset-0" style={{
+                backgroundImage: `url(${d.coverImageUrl})`,
+                backgroundSize: `${d.coverZoom ?? 100}%`,
+                backgroundPosition: `${d.coverPosX ?? 50}% ${d.coverPosY ?? 50}%`,
+                backgroundRepeat: "no-repeat",
+                backgroundColor: "#111",
+              }} />
+              {(d.coverOverlay ?? 0) > 0 && (
+                <div className="absolute inset-0" style={{ background: `rgba(0,0,0,${(d.coverOverlay || 0) / 100})` }} />
+              )}
               <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 30%, ${pBg}DD)` }} />
             </div>
           )}

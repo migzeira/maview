@@ -57,7 +57,7 @@ export interface ResolvedDesign {
   bgImageUrl: string; bgVideoUrl: string; bgPattern: string; bgOverlay: number; bgBlur: number; bgEffect: string;
   bgImageZoom: number; bgImagePosX: number; bgImagePosY: number;
   buttonShape: ButtonShape; buttonFill: ButtonFill; buttonShadow: string; buttonRadius: number;
-  coverImageUrl: string;
+  coverImageUrl: string; coverOverlay: number; coverZoom: number; coverPosX: number; coverPosY: number;
   profileShape: ProfileShape; profileBorder: boolean; profileBorderColor: string; profileGlow: boolean; profileGlowColor: string; profileSize: number;
   textShadow: number;  // 0=off, 1-10 intensity
   hideWatermark: boolean;
@@ -101,6 +101,10 @@ export function resolveDesign(theme: ThemeDef, design?: Partial<DesignConfig>): 
     buttonShadow: d.buttonShadow || "none",
     buttonRadius: d.buttonRadius ?? 12,
     coverImageUrl: d.coverImageUrl || "",
+    coverOverlay: d.coverOverlay ?? 0,
+    coverZoom: d.coverZoom ?? 100,
+    coverPosX: d.coverPosX ?? 50,
+    coverPosY: d.coverPosY ?? 50,
     profileShape: d.profileShape || "circle",
     profileBorder: d.profileBorder ?? true,
     profileBorderColor: d.profileBorderColor || theme.accent,

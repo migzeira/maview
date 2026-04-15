@@ -461,7 +461,14 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
 
           {d.coverImageUrl ? (
             <div className="relative rounded-xl overflow-hidden h-24">
-              <img src={d.coverImageUrl} alt="" className="w-full h-full object-cover" />
+              <div className="absolute inset-0" style={{
+                backgroundImage: `url(${d.coverImageUrl})`,
+                backgroundSize: `${d.coverZoom ?? 100}%`,
+                backgroundPosition: `${d.coverPosX ?? 50}% ${d.coverPosY ?? 50}%`,
+                backgroundRepeat: "no-repeat",
+                backgroundColor: "#111",
+              }} />
+              <div className="absolute inset-0" style={{ background: `rgba(0,0,0,${(d.coverOverlay ?? 0) / 100})` }} />
               <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 30%, ${d.bgColor || "#000"}DD)` }} />
               <button onClick={() => setDesign("coverImageUrl", "")}
                 className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-red-500 transition-colors">
@@ -498,6 +505,64 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
               if (publicUrl) setDesign("coverImageUrl", publicUrl);
             }}
           />
+
+          {/* Sliders de ajuste da capa */}
+          {d.coverImageUrl && (
+            <div className="space-y-2.5">
+              {/* Escurecimento */}
+              <div className="flex items-center gap-3">
+                <span className="text-[11px] text-[hsl(var(--dash-text-muted))] whitespace-nowrap w-24">Escurecimento</span>
+                <input type="range" min="0" max="90" step="5" value={d.coverOverlay ?? 0}
+                  onChange={(e) => setDesign("coverOverlay", Number(e.target.value))}
+                  className="flex-1 h-1.5 rounded-full accent-primary" />
+                <span className="text-[11px] font-semibold text-[hsl(var(--dash-text))] w-8 text-right">{d.coverOverlay ?? 0}%</span>
+              </div>
+
+              {/* Zoom */}
+              <div className="flex items-center gap-3">
+                <span className="text-[11px] text-[hsl(var(--dash-text-muted))] whitespace-nowrap w-24 flex items-center gap-1">
+                  <ZoomIn size={10} /> Zoom
+                </span>
+                <input type="range" min="100" max="300" step="5" value={d.coverZoom ?? 100}
+                  onChange={(e) => setDesign("coverZoom", Number(e.target.value))}
+                  className="flex-1 h-1.5 rounded-full accent-primary" />
+                <span className="text-[11px] font-semibold text-[hsl(var(--dash-text))] w-8 text-right">{d.coverZoom ?? 100}%</span>
+              </div>
+
+              {/* Horizontal */}
+              <div className="flex items-center gap-3">
+                <span className="text-[11px] text-[hsl(var(--dash-text-muted))] whitespace-nowrap w-24 flex items-center gap-1">
+                  <Move size={10} /> Horizontal
+                </span>
+                <input type="range" min="0" max="100" step="1" value={d.coverPosX ?? 50}
+                  onChange={(e) => setDesign("coverPosX", Number(e.target.value))}
+                  className="flex-1 h-1.5 rounded-full accent-primary" />
+                <span className="text-[11px] font-semibold text-[hsl(var(--dash-text))] w-8 text-right">{d.coverPosX ?? 50}%</span>
+              </div>
+
+              {/* Vertical */}
+              <div className="flex items-center gap-3">
+                <span className="text-[11px] text-[hsl(var(--dash-text-muted))] whitespace-nowrap w-24 flex items-center gap-1">
+                  <Move size={10} /> Vertical
+                </span>
+                <input type="range" min="0" max="100" step="1" value={d.coverPosY ?? 50}
+                  onChange={(e) => setDesign("coverPosY", Number(e.target.value))}
+                  className="flex-1 h-1.5 rounded-full accent-primary" />
+                <span className="text-[11px] font-semibold text-[hsl(var(--dash-text))] w-8 text-right">{d.coverPosY ?? 50}%</span>
+              </div>
+
+              {/* Reset */}
+              <button onClick={() => {
+                setDesign("coverZoom", 100);
+                setDesign("coverPosX", 50);
+                setDesign("coverPosY", 50);
+                setDesign("coverOverlay", 0);
+              }}
+                className="w-full py-1.5 rounded-lg text-[11px] font-medium text-[hsl(var(--dash-text-subtle))] hover:text-primary border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 transition-all">
+                Resetar ajustes
+              </button>
+            </div>
+          )}
         </div>
 
       {/* ═══════ 2. COLORS — simplified ═══════ */}

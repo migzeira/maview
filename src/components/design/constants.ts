@@ -22,7 +22,7 @@ export interface DesignConfig {
   cardBg: string; cardBorder: string;
   accentColor: string; accentColor2: string; fontHeading: string; fontBody: string;
   buttonShape: ButtonShape; buttonFill: ButtonFill; buttonShadow: ButtonShadow; buttonRadius: number;
-  coverImageUrl: string;
+  coverImageUrl: string; coverOverlay: number; coverZoom: number; coverPosX: number; coverPosY: number;
   profileShape: ProfileShape; profileBorder: boolean; profileBorderColor: string; profileGlow: boolean; profileGlowColor: string; profileSize: number;
   textShadow: number; hideWatermark: boolean; layout?: string;
 }

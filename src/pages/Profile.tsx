@@ -506,7 +506,16 @@ const ProfilePage = () => {
         {/* Cover image banner */}
         {rd.coverImageUrl && (
           <div className="w-full max-w-[440px] relative mb-[-36px] rounded-b-2xl overflow-hidden" style={{ height: 140 }}>
-            <img src={rd.coverImageUrl} alt="" className="w-full h-full object-cover" loading="eager" />
+            <div className="absolute inset-0" style={{
+              backgroundImage: `url(${rd.coverImageUrl})`,
+              backgroundSize: `${rd.coverZoom ?? 100}%`,
+              backgroundPosition: `${rd.coverPosX ?? 50}% ${rd.coverPosY ?? 50}%`,
+              backgroundRepeat: "no-repeat",
+              backgroundColor: "#111",
+            }} />
+            {(rd.coverOverlay ?? 0) > 0 && (
+              <div className="absolute inset-0" style={{ background: `rgba(0,0,0,${(rd.coverOverlay || 0) / 100})` }} />
+            )}
             <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 30%, ${t.bg}DD)` }} />
           </div>
         )}

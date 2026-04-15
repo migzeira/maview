@@ -59,6 +59,10 @@ export interface DesignConfig {
 
   // Cover image (banner at top of profile)
   coverImageUrl: string;         // cover/banner image URL
+  coverOverlay: number;          // darken overlay 0-90
+  coverZoom: number;             // zoom 100-300%
+  coverPosX: number;             // horizontal position 0-100%
+  coverPosY: number;             // vertical position 0-100%
 
   // Profile photo
   profileShape: ProfileShape;
