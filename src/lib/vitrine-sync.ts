@@ -87,7 +87,20 @@ export function loadLocal(): VitrineConfig {
 
 /* ── Write to localStorage ──────────────────────────── */
 export function saveLocal(cfg: VitrineConfig) {
-  localStorage.setItem(LS_KEY, JSON.stringify(cfg));
+  try {
+    // Strip base64 data URLs before saving to avoid exceeding localStorage quota (5MB)
+    const safe = { ...cfg };
+    if (safe.design && typeof safe.design === "object") {
+      const d = { ...safe.design } as Record<string, unknown>;
+      if (typeof d.bgImageUrl === "string" && (d.bgImageUrl as string).startsWith("data:")) {
+        d.bgImageUrl = ""; // Will be re-fetched from Supabase on next load
+      }
+      safe.design = d;
+    }
+    localStorage.setItem(LS_KEY, JSON.stringify(safe));
+  } catch (e) {
+    console.warn("[Maview] localStorage save failed (quota?):", e);
+  }
 }
 
 /* ── Fetch vitrine from Supabase (for current user) ── */
@@ -388,7 +401,7 @@ export async function checkUsername(username: string): Promise<"available" | "ta
 /* ── Upload image to Supabase Storage ──────────────── */
 export async function uploadImage(
   file: File,
-  bucket: "avatars" | "products",
+  bucket: "avatars" | "products" | "backgrounds",
 ): Promise<string | null> {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session?.user) return null;
@@ -400,10 +413,30 @@ export async function uploadImage(
     .from(bucket)
     .upload(path, file, { cacheControl: "3600", upsert: true });
 
-  if (error) return null;
+  if (error) {
+    console.error(`[Maview] Upload to ${bucket} failed:`, error.message);
+    return null;
+  }
 
   const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(path);
   return urlData.publicUrl;
+}
+
+/* ── Upload base64 data URL to Supabase Storage ───── */
+export async function uploadBase64Image(
+  dataUrl: string,
+  bucket: "avatars" | "products" | "backgrounds",
+): Promise<string | null> {
+  try {
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    const ext = blob.type.split("/")[1] || "jpg";
+    const file = new File([blob], `bg_${Date.now()}.${ext}`, { type: blob.type });
+    return uploadImage(file, bucket);
+  } catch (e) {
+    console.error("[Maview] base64 upload failed:", e);
+    return null;
+  }
 }
 
 /* ── Submit lead (email capture on public profile) ──── */

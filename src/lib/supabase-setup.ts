@@ -109,6 +109,7 @@ CREATE POLICY IF NOT EXISTS "Vitrine owner can read events"
 -- 5. Storage buckets
 INSERT INTO storage.buckets (id, name, public) VALUES ('avatars', 'avatars', true) ON CONFLICT DO NOTHING;
 INSERT INTO storage.buckets (id, name, public) VALUES ('products', 'products', true) ON CONFLICT DO NOTHING;
+INSERT INTO storage.buckets (id, name, public) VALUES ('backgrounds', 'backgrounds', true) ON CONFLICT DO NOTHING;
 
 -- Storage policies
 CREATE POLICY IF NOT EXISTS "Avatar upload" ON storage.objects FOR INSERT
@@ -119,4 +120,8 @@ CREATE POLICY IF NOT EXISTS "Product upload" ON storage.objects FOR INSERT
   WITH CHECK (bucket_id = 'products' AND auth.role() = 'authenticated');
 CREATE POLICY IF NOT EXISTS "Product public read" ON storage.objects FOR SELECT
   USING (bucket_id = 'products');
+CREATE POLICY IF NOT EXISTS "Background upload" ON storage.objects FOR INSERT
+  WITH CHECK (bucket_id = 'backgrounds' AND auth.role() = 'authenticated');
+CREATE POLICY IF NOT EXISTS "Background public read" ON storage.objects FOR SELECT
+  USING (bucket_id = 'backgrounds');
 `.trim();

@@ -14,6 +14,7 @@ import FontSelector from "./design/FontSelector";
 import AdvancedDrawer from "./design/AdvancedDrawer";
 import DesignWizardProgress from "./design/DesignWizardProgress";
 import { getEffectPreviewElements } from "./design/EffectThumbnailGrid";
+import { uploadImage } from "@/lib/vitrine-sync";
 
 import type { DesignPack } from "./design/constants";
 
@@ -133,6 +134,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   const [interacted, setInteracted] = useState<Set<number>>(new Set());
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [bgUploading, setBgUploading] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const bgImageInputRef = useRef<HTMLInputElement>(null);
 
@@ -306,6 +308,11 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
                 className="absolute bottom-2 right-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-[11px] font-semibold text-gray-800 hover:bg-white transition-all shadow-md">
                 <Upload size={11} /> Trocar foto
               </button>
+              {bgUploading && (
+                <div className="absolute bottom-2 left-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/70 text-[10px] font-medium text-white">
+                  <Loader2 size={10} className="animate-spin" /> Salvando...
+                </div>
+              )}
             </div>
           ) : (
             <button onClick={() => bgImageInputRef.current?.click()}
@@ -315,9 +322,11 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
             </button>
           )}
           <input type="file" ref={bgImageInputRef} accept="image/*" className="hidden"
-            onChange={(e) => {
+            onChange={async (e) => {
               const f = e.target.files?.[0];
               if (!f) return;
+              e.target.value = "";
+              // Show base64 preview immediately while uploading
               const reader = new FileReader();
               reader.onload = () => {
                 setDesign("bgImageUrl", reader.result as string);
@@ -325,7 +334,13 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
                 if (!d.bgOverlay || d.bgOverlay < 20) setDesign("bgOverlay", 40);
               };
               reader.readAsDataURL(f);
-              e.target.value = "";
+              // Upload to Supabase Storage in background
+              setBgUploading(true);
+              const publicUrl = await uploadImage(f, "backgrounds");
+              setBgUploading(false);
+              if (publicUrl) {
+                setDesign("bgImageUrl", publicUrl);
+              }
             }}
           />
 

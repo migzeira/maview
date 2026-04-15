@@ -1,12 +1,13 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
-  Layers, Square, Circle, Palette, Upload, X, Play, Type, Eye,
+  Layers, Square, Circle, Palette, Upload, X, Play, Type, Eye, Loader2,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { ColorPicker, Section, getContrastColors } from "./utils";
 import EffectThumbnailGrid from "./EffectThumbnailGrid";
+import { uploadImage } from "@/lib/vitrine-sync";
 import {
   type DesignConfig, type BgType, type ButtonShape, type ButtonFill,
   type ProfileShape, type ThemeDef,
@@ -26,6 +27,7 @@ interface AdvancedDrawerProps {
 function AdvancedContent({ design: d, currentTheme, accent, setDesign, onBgColorChange }: Omit<AdvancedDrawerProps, "open" | "onOpenChange">) {
   const bgImageInputRef = useRef<HTMLInputElement>(null);
   const bgVideoInputRef = useRef<HTMLInputElement>(null);
+  const [bgUploading, setBgUploading] = useState(false);
   const inputCls = "w-full rounded-xl border border-[hsl(var(--dash-border))] bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text))] text-sm px-3.5 py-2.5 placeholder:text-[hsl(var(--dash-text-subtle))] focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary/40 transition-all";
 
   return (
@@ -82,7 +84,21 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, onBgColor
                 <Upload size={18} /><span className="text-[10px]">Enviar imagem</span>
               </button>
             )}
-            <input type="file" ref={bgImageInputRef} accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (!f) return; const r = new FileReader(); r.onload = () => setDesign("bgImageUrl", r.result as string); r.readAsDataURL(f); e.target.value = ""; }} />
+            <input type="file" ref={bgImageInputRef} accept="image/*" className="hidden" onChange={async e => {
+              const f = e.target.files?.[0]; if (!f) return; e.target.value = "";
+              // Preview immediately with base64
+              const r = new FileReader(); r.onload = () => setDesign("bgImageUrl", r.result as string); r.readAsDataURL(f);
+              // Upload to storage in background
+              setBgUploading(true);
+              const publicUrl = await uploadImage(f, "backgrounds");
+              setBgUploading(false);
+              if (publicUrl) setDesign("bgImageUrl", publicUrl);
+            }} />
+            {bgUploading && (
+              <div className="flex items-center gap-1.5 text-[10px] text-primary font-medium">
+                <Loader2 size={10} className="animate-spin" /> Enviando imagem...
+              </div>
+            )}
             <input type="url" className={inputCls} placeholder="Ou cole URL..." value={d.bgImageUrl.startsWith("data:") ? "" : d.bgImageUrl} onChange={e => setDesign("bgImageUrl", e.target.value)} />
           </div>
         )}
