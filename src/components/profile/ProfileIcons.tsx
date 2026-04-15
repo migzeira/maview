@@ -67,7 +67,7 @@ export const getIcon = (val: string) => ICON_MAP[val] || Link2;
 
 /** Official brand colors for social platforms */
 export const BRAND_COLORS: Record<string, string> = {
-  instagram: "#E4405F",
+  instagram: "#D6249F",  // Instagram magenta-pink (gradient midpoint)
   youtube: "#FF0000",
   twitter: "#000000",  // X brand
   tiktok: "#000000",
@@ -83,14 +83,10 @@ export const BRAND_COLORS: Record<string, string> = {
   whatsapp: "#25D366",
 };
 
-/** Get the background tint for a brand icon (15% opacity) */
-export const brandBg = (icon: string): string => {
-  const c = BRAND_COLORS[icon];
-  return c ? `${c}18` : undefined as any;
+/** Instagram uses a gradient — return CSS gradient for background */
+export const BRAND_GRADIENTS: Record<string, string> = {
+  instagram: "linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)",
 };
 
-/** Get the border tint for a brand icon */
-export const brandBorder = (icon: string): string => {
-  const c = BRAND_COLORS[icon];
-  return c ? `1.5px solid ${c}25` : undefined as any;
-};
+/** Check if a brand has a gradient */
+export const hasBrandGradient = (icon: string): boolean => !!BRAND_GRADIENTS[icon];

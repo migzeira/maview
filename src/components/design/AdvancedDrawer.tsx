@@ -131,7 +131,7 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, onBgColor
       <Section title="Cores dos textos" icon={<Type size={14} />} defaultOpen>
         <div className="space-y-3 pt-2">
           <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] leading-relaxed">
-            Cada texto da sua vitrine tem cor independente. Fundo escuro = textos claros. Fundo claro = textos escuros.
+            Cada texto tem cor 100% independente. Nenhum afeta o outro.
           </p>
           {/* Row 1: Name + Bio */}
           <div className="grid grid-cols-2 gap-3">
@@ -140,22 +140,33 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, onBgColor
               <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Nome no topo do perfil</p>
             </div>
             <div>
-              <ColorPicker value={d.subtextColor || currentTheme.sub} onChange={v => setDesign("subtextColor", v)} label="Bio e descricoes" />
-              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Bio, descricao dos produtos</p>
+              <ColorPicker value={d.subtextColor || currentTheme.sub} onChange={v => setDesign("subtextColor", v)} label="Bio" />
+              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Texto da sua bio</p>
             </div>
           </div>
           {/* Row 2: Product title + Price */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <ColorPicker value={d.productTitleColor || d.textColor || currentTheme.text} onChange={v => setDesign("productTitleColor", v)} label="Titulo produtos" />
-              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Nome dos produtos (ex: iPhone 15)</p>
+              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Nome do produto (ex: iPhone 15)</p>
             </div>
             <div>
-              <ColorPicker value={d.priceColor || d.textColor || currentTheme.text} onChange={v => setDesign("priceColor", v)} label="Preco" />
-              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Valor dos produtos</p>
+              <ColorPicker value={d.descriptionColor || d.subtextColor || currentTheme.sub} onChange={v => setDesign("descriptionColor", v)} label="Descricao produto" />
+              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Texto abaixo do titulo</p>
             </div>
           </div>
-          {/* Row 3: Others */}
+          {/* Row 3: Price + Strikethrough price */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <ColorPicker value={d.priceColor || d.textColor || currentTheme.text} onChange={v => setDesign("priceColor", v)} label="Preco atual" />
+              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Valor do produto</p>
+            </div>
+            <div>
+              <ColorPicker value={d.originalPriceColor || "rgba(156,163,175,0.7)"} onChange={v => setDesign("originalPriceColor", v)} label="Preco riscado" />
+              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Valor anterior (riscado)</p>
+            </div>
+          </div>
+          {/* Row 4: Others */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <ColorPicker value={d.textColor || currentTheme.text} onChange={v => setDesign("textColor", v)} label="Outros textos" />
@@ -164,25 +175,37 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, onBgColor
           </div>
           {/* Quick buttons */}
           <div className="flex gap-2">
-            <button onClick={() => { setDesign("textColor", "#ffffff"); setDesign("subtextColor", "rgba(255,255,255,0.80)"); setDesign("nameColor", "#ffffff"); setDesign("productTitleColor", "#ffffff"); setDesign("priceColor", "#ffffff"); }}
+            <button onClick={() => { setDesign("textColor", "#ffffff"); setDesign("subtextColor", "rgba(255,255,255,0.80)"); setDesign("nameColor", "#ffffff"); setDesign("productTitleColor", "#ffffff"); setDesign("priceColor", "#ffffff"); setDesign("descriptionColor", "rgba(255,255,255,0.70)"); setDesign("originalPriceColor", "rgba(255,255,255,0.50)"); }}
               className="flex-1 py-2 rounded-xl text-[10px] font-medium bg-gray-900 text-white border border-gray-700 hover:border-primary/40 transition-all">
               <Eye size={10} className="inline mr-1" /> Texto claro
             </button>
-            <button onClick={() => { setDesign("textColor", "#111827"); setDesign("subtextColor", "#374151"); setDesign("nameColor", "#111827"); setDesign("productTitleColor", "#111827"); setDesign("priceColor", "#111827"); }}
+            <button onClick={() => { setDesign("textColor", "#111827"); setDesign("subtextColor", "#374151"); setDesign("nameColor", "#111827"); setDesign("productTitleColor", "#111827"); setDesign("priceColor", "#111827"); setDesign("descriptionColor", "#6b7280"); setDesign("originalPriceColor", "#9ca3af"); }}
               className="flex-1 py-2 rounded-xl text-[10px] font-medium bg-white text-gray-900 border border-gray-300 hover:border-primary/40 transition-all">
               <Eye size={10} className="inline mr-1" /> Texto escuro
             </button>
           </div>
-          {/* Text shadow toggle */}
-          <div className="flex items-center justify-between pt-1">
-            <div>
-              <p className="text-[10px] font-medium text-[hsl(var(--dash-text))]">Sombra nos textos</p>
-              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))]">Destaca o texto sobre fotos de fundo (como Canva)</p>
+          {/* Text shadow — slider */}
+          <div className="space-y-2 pt-1">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-medium text-[hsl(var(--dash-text))]">Sombra nos textos</p>
+                <p className="text-[8px] text-[hsl(var(--dash-text-subtle))]">Destaca o texto sobre fotos (como Canva)</p>
+              </div>
+              <span className="text-[10px] font-mono text-[hsl(var(--dash-text-muted))]">
+                {(typeof d.textShadow === "number" ? d.textShadow : (d.textShadow ? 5 : 0)) > 0
+                  ? `${typeof d.textShadow === "number" ? d.textShadow : 5}`
+                  : "Off"}
+              </span>
             </div>
-            <button onClick={() => setDesign("textShadow", !d.textShadow)}
-              className={`relative w-9 h-5 rounded-full transition-colors ${d.textShadow ? "bg-primary" : "bg-[hsl(var(--dash-border))]"}`}>
-              <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${d.textShadow ? "left-[18px]" : "left-0.5"}`} />
-            </button>
+            <input type="range" min={0} max={10} step={1}
+              value={typeof d.textShadow === "number" ? d.textShadow : (d.textShadow ? 5 : 0)}
+              onChange={e => setDesign("textShadow", Number(e.target.value))}
+              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-primary bg-[hsl(var(--dash-border))]" />
+            <div className="flex justify-between text-[8px] text-[hsl(var(--dash-text-subtle))]">
+              <span>Sem sombra</span>
+              <span>Sutil</span>
+              <span>Forte</span>
+            </div>
           </div>
         </div>
       </Section>

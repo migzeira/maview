@@ -49,6 +49,7 @@ export const GRAD_DIR: Record<GradientDir, string> = {
 export interface ResolvedDesign {
   bg: string; accent: string; accent2: string; card: string; text: string; sub: string; border: string;
   nameColor: string; productTitleColor: string; priceColor: string;
+  originalPriceColor: string; descriptionColor: string;
   urgencyBadgeBg: string; urgencyBadgeText: string;
   socialIconStyle: "brand" | "theme" | "custom"; socialIconCustomColor: string;
   fontHeading: string; fontBody: string;
@@ -57,7 +58,7 @@ export interface ResolvedDesign {
   bgImageZoom: number; bgImagePosX: number; bgImagePosY: number;
   buttonShape: ButtonShape; buttonFill: ButtonFill; buttonShadow: string; buttonRadius: number;
   profileShape: ProfileShape; profileBorder: boolean; profileBorderColor: string; profileSize: number;
-  textShadow: boolean;
+  textShadow: number;  // 0=off, 1-10 intensity
   hideWatermark: boolean;
 }
 
@@ -74,6 +75,8 @@ export function resolveDesign(theme: ThemeDef, design?: Partial<DesignConfig>): 
     nameColor: d.nameColor || "",           // empty = use text
     productTitleColor: d.productTitleColor || "", // empty = use text
     priceColor: d.priceColor || "",         // empty = use text
+    originalPriceColor: d.originalPriceColor || "", // empty = use sub
+    descriptionColor: d.descriptionColor || "",     // empty = use sub
     urgencyBadgeBg: d.urgencyBadgeBg || "rgba(239,68,68,0.25)",
     urgencyBadgeText: d.urgencyBadgeText || "#f87171",
     socialIconStyle: d.socialIconStyle || "brand",
@@ -100,7 +103,7 @@ export function resolveDesign(theme: ThemeDef, design?: Partial<DesignConfig>): 
     profileBorder: d.profileBorder ?? true,
     profileBorderColor: d.profileBorderColor || theme.accent,
     profileSize: d.profileSize ?? 88,
-    textShadow: d.textShadow ?? false,
+    textShadow: typeof d.textShadow === "number" ? d.textShadow : (d.textShadow ? 5 : 0),
     hideWatermark: d.hideWatermark ?? false,
   };
 

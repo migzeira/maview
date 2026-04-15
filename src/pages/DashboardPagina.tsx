@@ -1223,6 +1223,8 @@ const DashboardPagina = () => {
   const pBg = d.bgColor || currentTheme.bg;
   const pText = d.textColor || currentTheme.text;
   const pSub = d.subtextColor || currentTheme.sub;
+  const pShadowN = typeof d.textShadow === "number" ? d.textShadow : (d.textShadow ? 5 : 0);
+  const pTxtShadow = pShadowN > 0 ? `0 1px ${pShadowN * 1.5}px rgba(0,0,0,${Math.min(0.3 + pShadowN * 0.08, 0.95)}), 0 0 ${pShadowN * 3}px rgba(0,0,0,${Math.min(0.15 + pShadowN * 0.06, 0.7)})` : undefined;
   const pCard = d.cardBg || currentTheme.accent + "0a";
   const pBorder = d.cardBorder || currentTheme.accent + "30";
   const pFontH = d.fontHeading || "Inter";
@@ -1411,9 +1413,9 @@ const DashboardPagina = () => {
                   </div>
                 )}
               </div>
-              <p className="font-bold text-sm" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif` }}>{config.displayName || "Seu Nome"}</p>
-              {config.username && <p className="text-xs mt-0.5" style={{ color: pAccent }}>{config.username.startsWith("@") ? config.username : `@${config.username}`}</p>}
-              {config.bio && <p className="text-xs text-center mt-1.5 px-2 line-clamp-2" style={{ color: pSub }}>{config.bio}</p>}
+              <p className="font-bold text-sm" style={{ color: d.nameColor || pText, fontFamily: `'${pFontH}', sans-serif`, textShadow: pTxtShadow }}>{config.displayName || "Seu Nome"}</p>
+              {config.username && <p className="text-xs mt-0.5" style={{ color: pAccent, textShadow: pTxtShadow }}>{config.username.startsWith("@") ? config.username : `@${config.username}`}</p>}
+              {config.bio && <p className="text-xs text-center mt-1.5 px-2 line-clamp-2" style={{ color: pSub, textShadow: pTxtShadow }}>{config.bio}</p>}
               {/* Social icons row — shows real social links + WhatsApp */}
               {(() => {
                 const BRAND_CLR: Record<string, string> = { instagram: "#E4405F", youtube: "#FF0000", twitter: "#000000", tiktok: "#000000", facebook: "#1877F2", linkedin: "#0A66C2", globe: "", link: "" };
@@ -3054,16 +3056,20 @@ const DashboardPagina = () => {
                         onChange={e => updateConfig("design", { ...(config.design || {}), subtextColor: e.target.value })}
                         className="w-6 h-6 rounded-md border border-[hsl(var(--dash-border))] cursor-pointer" />
                     </div>
-                    {/* Sombra do texto — toggle */}
+                    {/* Sombra do texto — toggle (cycles 0 → 3 → 5 → 8 → 0) */}
                     <button
-                      onClick={() => updateConfig("design", { ...(config.design || {}), textShadow: !(config.design?.textShadow) })}
+                      onClick={() => {
+                        const cur = typeof config.design?.textShadow === "number" ? config.design.textShadow : (config.design?.textShadow ? 5 : 0);
+                        const next = cur === 0 ? 3 : cur <= 3 ? 5 : cur <= 5 ? 8 : 0;
+                        updateConfig("design", { ...(config.design || {}), textShadow: next });
+                      }}
                       className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-medium transition-all ${
-                        config.design?.textShadow
+                        (typeof config.design?.textShadow === "number" ? config.design.textShadow > 0 : !!config.design?.textShadow)
                           ? "bg-primary/15 text-primary border border-primary/30"
                           : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] border border-transparent hover:border-primary/20"
                       }`}>
                       <Type size={10} />
-                      Sombra
+                      Sombra {(typeof config.design?.textShadow === "number" && config.design.textShadow > 0) ? config.design.textShadow : ""}
                     </button>
                     <p className="text-[hsl(var(--dash-text-subtle))] text-[10px] flex items-center gap-1">
                       <TrendingUp size={9} /> Bios com emojis recebem mais cliques

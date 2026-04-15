@@ -24,7 +24,7 @@ import EffectLayer from "@/components/profile/EffectLayer";
 import BookingModal from "@/components/profile/BookingModal";
 import MiniVideoPlayer from "@/components/profile/MiniVideoPlayer";
 import SocialProofToast from "@/components/profile/SocialProofToast";
-import { getIcon, WhatsAppIcon, BRAND_COLORS } from "@/components/profile/ProfileIcons";
+import { getIcon, WhatsAppIcon, BRAND_COLORS, BRAND_GRADIENTS, hasBrandGradient } from "@/components/profile/ProfileIcons";
 import { useStagger } from "@/hooks/useStagger";
 
 /* ──────────────────────────────────────────────────────────────── */
@@ -258,8 +258,10 @@ const ProfilePage = () => {
   const baseTheme = useMemo(() => profile ? (THEMES[profile.theme] || THEMES["dark-purple"]) : THEMES["dark-purple"], [profile?.theme]);
   const rd = useMemo(() => resolveDesign(baseTheme, profile?.design), [baseTheme, profile?.design]);
 
-  /* Text shadow for readability on image backgrounds */
-  const tShadow = rd.textShadow ? "0 1px 4px rgba(0,0,0,0.7), 0 0 12px rgba(0,0,0,0.35)" : undefined;
+  /* Text shadow for readability on image backgrounds — intensity 0-10 */
+  const tShadow = rd.textShadow > 0
+    ? `0 1px ${rd.textShadow * 1.5}px rgba(0,0,0,${Math.min(0.3 + rd.textShadow * 0.08, 0.95)}), 0 0 ${rd.textShadow * 3}px rgba(0,0,0,${Math.min(0.15 + rd.textShadow * 0.06, 0.7)})`
+    : undefined;
 
   /* Load Google Fonts — must be before early returns */
   useEffect(() => {
@@ -555,6 +557,8 @@ const ProfilePage = () => {
               {socialLinks.map(link => {
                 const Icon = getIcon(link.icon);
                 const brandColor = BRAND_COLORS[link.icon];
+                const hasGrad = hasBrandGradient(link.icon);
+                const useBrand = rd.socialIconStyle !== "custom" && rd.socialIconStyle !== "theme";
                 const iconColor = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
                   ? rd.socialIconCustomColor
                   : rd.socialIconStyle === "theme" ? t.text
@@ -562,17 +566,20 @@ const ProfilePage = () => {
                 const iconBg = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
                   ? `${rd.socialIconCustomColor}15`
                   : rd.socialIconStyle === "theme" ? `${t.accent}15`
+                  : (hasGrad && useBrand) ? BRAND_GRADIENTS[link.icon]
                   : (brandColor ? `${brandColor}18` : `${t.accent}15`);
                 const iconBorder = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
                   ? `1.5px solid ${rd.socialIconCustomColor}25`
                   : rd.socialIconStyle === "theme" ? `1.5px solid ${t.accent}22`
                   : (brandColor ? `1.5px solid ${brandColor}25` : `1.5px solid ${t.accent}22`);
+                // For Instagram gradient bg, icon should be white
+                const finalIconColor = (hasGrad && useBrand) ? "#ffffff" : iconColor;
                 return (
                   <a key={link.id} href={sanitizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
                     className="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
                     style={{ background: iconBg, border: iconBorder }} title={link.title}
                     aria-label={link.title || "Social link"}>
-                    <Icon size={18} style={{ color: iconColor }} />
+                    <Icon size={18} style={{ color: finalIconColor }} />
                   </a>
                 );
               })}
@@ -753,11 +760,11 @@ const ProfilePage = () => {
                             )}
                             {product.urgency && <CountdownBadge accent={t.accent} badgeBg={rd.urgencyBadgeBg} badgeText={rd.urgencyBadgeText} />}
                           </div>
-                          {product.description && <p className="text-[12px] line-clamp-2" style={{ color: t.sub }}>{product.description}</p>}
+                          {product.description && <p className="text-[12px] line-clamp-2" style={{ color: rd.descriptionColor || t.sub }}>{product.description}</p>}
                           {product.price && (
                             <div className="flex items-center gap-2 mt-1">
                               <span className="text-[13px] font-bold" style={{ color: rd.priceColor || t.text }}>{product.price}</span>
-                              {product.originalPrice && <span className="text-[11px] line-through" style={{ color: t.sub }}>{product.originalPrice}</span>}
+                              {product.originalPrice && <span className="text-[11px] line-through" style={{ color: rd.originalPriceColor || "rgba(156,163,175,0.7)" }}>{product.originalPrice}</span>}
                             </div>
                           )}
                           {isBooking && (

@@ -38,6 +38,8 @@ export interface DesignConfig {
   urgencyBadgeBg: string;      // urgency countdown badge background
   urgencyBadgeText: string;    // urgency countdown badge text
   priceColor: string;          // product price color
+  originalPriceColor: string;  // strikethrough price color
+  descriptionColor: string;    // product description color
   socialIconStyle: "brand" | "theme" | "custom"; // social icon coloring mode
   socialIconCustomColor: string; // custom social icon color (when style=custom)
   cardBg: string;
@@ -65,7 +67,7 @@ export interface DesignConfig {
   layout?: "stack" | "cards" | "grid" | "bento" | "magazine" | "minimal";
 
   // Text readability
-  textShadow: boolean;        // adds dark shadow behind text for readability on images
+  textShadow: number;         // 0=off, 1-10 intensity of text shadow for readability
 
   // Effects
   hideWatermark: boolean;
