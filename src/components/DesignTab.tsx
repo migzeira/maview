@@ -137,10 +137,14 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   const [bgUploading, setBgUploading] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const bgImageInputRef = useRef<HTMLInputElement>(null);
+  const designRef = useRef(config.design);
+  designRef.current = config.design;
 
   const setDesign = useCallback((key: keyof DesignConfig, value: any) => {
-    updateConfig("design", { ...(config.design || {}), [key]: value });
-  }, [config.design, updateConfig]);
+    const latest = { ...(designRef.current || {}), [key]: value };
+    designRef.current = latest;
+    updateConfig("design", latest);
+  }, [updateConfig]);
 
   useEffect(() => {
     if (d.fontHeading && d.fontHeading !== "Inter") loadFont(d.fontHeading);
@@ -161,22 +165,28 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     loadFont(headingFont);
     const paired = FONT_PAIRS[headingFont];
     if (paired) loadFont(paired);
-    updateConfig("design", { ...(config.design || {}), fontHeading: headingFont, ...(paired ? { fontBody: paired } : {}) });
+    const latest = { ...(designRef.current || {}), fontHeading: headingFont, ...(paired ? { fontBody: paired } : {}) };
+    designRef.current = latest;
+    updateConfig("design", latest);
     setInteracted(prev => new Set(prev).add(3));
-  }, [config.design, updateConfig]);
+  }, [updateConfig]);
 
   const applyAutoHarmony = useCallback((accentHex: string) => {
     const harmony = generateHarmony(accentHex);
-    updateConfig("design", { ...(config.design || {}), accentColor: accentHex, accentColor2: harmony.accent2,
+    const latest = { ...(designRef.current || {}), accentColor: accentHex, accentColor2: harmony.accent2,
       bgColor: harmony.bgColor, cardBg: harmony.cardBg, cardBorder: harmony.cardBorder,
-      textColor: harmony.textColor, subtextColor: harmony.subtextColor });
+      textColor: harmony.textColor, subtextColor: harmony.subtextColor };
+    designRef.current = latest;
+    updateConfig("design", latest);
     setInteracted(prev => new Set(prev).add(2));
-  }, [config.design, updateConfig]);
+  }, [updateConfig]);
 
   const handleBgColorChange = useCallback((color: string) => {
     const contrast = getContrastColors(color);
-    updateConfig("design", { ...(config.design || {}), bgColor: color, textColor: contrast.textColor, subtextColor: contrast.subtextColor });
-  }, [config.design, updateConfig]);
+    const latest = { ...(designRef.current || {}), bgColor: color, textColor: contrast.textColor, subtextColor: contrast.subtextColor };
+    designRef.current = latest;
+    updateConfig("design", latest);
+  }, [updateConfig]);
 
   const autoThemeFromAvatar = useCallback(async () => {
     if (!config.avatarUrl) return;
@@ -187,8 +197,10 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
       const b = Math.max(0, parseInt(hex.slice(5, 7), 16) * 0.15) | 0;
       return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
     };
-    updateConfig("design", { ...(config.design || {}), bgColor: darken(colors.dominant), accentColor: colors.dominant, accentColor2: colors.accent });
-  }, [config.avatarUrl, config.design, updateConfig]);
+    const latest = { ...(designRef.current || {}), bgColor: darken(colors.dominant), accentColor: colors.dominant, accentColor2: colors.accent };
+    designRef.current = latest;
+    updateConfig("design", latest);
+  }, [config.avatarUrl, updateConfig]);
 
   const scrollCarousel = (dir: "left" | "right") => {
     carouselRef.current?.scrollBy({ left: dir === "left" ? -420 : 420, behavior: "smooth" });
@@ -345,7 +357,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
                   const colors = await extractColorsFromImage(publicUrl);
                   if (colors?.dominant) {
                     setDesign("profileBorderColor", colors.dominant);
-                    setDesign("profileGlowColor" as any, colors.dominant);
+                    setDesign("profileGlowColor", colors.dominant);
                   }
                 } catch { /* color extraction is best-effort */ }
               }

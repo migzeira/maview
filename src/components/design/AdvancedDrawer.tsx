@@ -35,7 +35,7 @@ function MiniPreview({ design: d, currentTheme, accent, avatarUrl, displayName }
   const textC = d.textColor || currentTheme.text || "#fff";
   const subC = d.subtextColor || currentTheme.sub || "rgba(255,255,255,0.6)";
   const borderColor = d.profileBorderColor || accent;
-  const glowColor = (d as any).profileGlowColor || borderColor;
+  const glowColor = d.profileGlowColor || borderColor;
   const isLight = bg.startsWith("#f") || bg.startsWith("#e") || bg === "#ffffff";
   const cardBg = d.cardBg || currentTheme.card || (isLight ? "#ffffff" : "#13102a");
   const cardBorder = d.cardBorder || currentTheme.border || "rgba(255,255,255,0.1)";
@@ -73,7 +73,7 @@ function MiniPreview({ design: d, currentTheme, accent, avatarUrl, displayName }
         <div className="relative z-10 flex flex-col items-center px-4">
           {/* Avatar with glow + border */}
           <div className="relative mb-2">
-            {(d as any).profileGlow !== false && (
+            {d.profileGlow !== false && (
               <div className="absolute inset-[-3px] opacity-40 blur-[8px]"
                 style={{ background: glowColor, borderRadius: profileRadius, clipPath: profileClip }} />
             )}
@@ -188,11 +188,11 @@ function AdvancedContent({ design: d, currentTheme, accent, avatarUrl, displayNa
 
           {/* Brilho / Glow */}
           <div className="space-y-2 pt-1 border-t border-[hsl(var(--dash-border-subtle))]/40">
-            <Toggle on={(d as any).profileGlow !== false}
-              onToggle={() => setDesign("profileGlow" as any, (d as any).profileGlow === false ? true : false)}
+            <Toggle on={d.profileGlow !== false}
+              onToggle={() => setDesign("profileGlow", d.profileGlow === false ? true : false)}
               label="Brilho (glow) atras da foto" desc="Sombra luminosa colorida por tras do perfil" />
-            {(d as any).profileGlow !== false && (
-              <ColorPicker value={(d as any).profileGlowColor || d.profileBorderColor || accent} onChange={v => setDesign("profileGlowColor" as any, v)} label="Cor do brilho" />
+            {d.profileGlow !== false && (
+              <ColorPicker value={d.profileGlowColor || d.profileBorderColor || accent} onChange={v => setDesign("profileGlowColor", v)} label="Cor do brilho" />
             )}
           </div>
 
@@ -277,7 +277,7 @@ function AdvancedContent({ design: d, currentTheme, accent, avatarUrl, displayNa
                     const colors = await extractColorsFromImage(publicUrl);
                     if (colors?.dominant) {
                       setDesign("profileBorderColor", colors.dominant);
-                      setDesign("profileGlowColor" as any, colors.dominant);
+                      setDesign("profileGlowColor", colors.dominant);
                     }
                   } catch { /* best-effort */ }
                 }

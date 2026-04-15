@@ -1401,7 +1401,7 @@ const DashboardPagina = () => {
                   clipPath: pProfileClip,
                   boxShadow: [
                     d.profileBorder ? `0 0 0 2px ${d.profileBorderColor || pAccent}50` : "",
-                    (d as any).profileGlow !== false ? `0 0 12px 4px ${(d as any).profileGlowColor || d.profileBorderColor || pAccent}40` : "",
+                    d.profileGlow !== false ? `0 0 12px 4px ${d.profileGlowColor || d.profileBorderColor || pAccent}40` : "",
                   ].filter(Boolean).join(", ") || "none",
                 }}>
                 {config.avatarUrl ? (

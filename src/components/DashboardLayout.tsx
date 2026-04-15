@@ -35,10 +35,6 @@ const NAV_MAIN: NavItem[] = [
   { path: "/dashboard/ia", label: "IA Maview", icon: Sparkles, badge: "Novo" },
 ];
 
-const NAV_BOTTOM: NavItem[] = [
-  { path: "/dashboard/configuracoes", label: "Configurações", icon: Settings },
-];
-
 // ── Health calculator (lightweight, from localStorage) ──────────────────────
 
 const LS_KEY = "maview_vitrine_config";
@@ -261,13 +257,6 @@ const DashboardLayout = ({ children }: Props) => {
 
         {/* Main nav */}
         {NAV_MAIN.map((item, i) => renderNavItem(item, i === 0))}
-
-        {/* Spacer */}
-        <div className="pt-2" />
-
-        {/* Bottom nav */}
-        {NAV_BOTTOM.map(item => renderNavItem(item))}
-
       </nav>
 
       {/* ── Bottom section: Profile + CTA ── */}
@@ -317,8 +306,8 @@ const DashboardLayout = ({ children }: Props) => {
             </button>
           </div>
 
-          {/* Profile mini-card */}
-          <div className="flex items-center gap-2.5 px-2 py-1">
+          {/* Profile mini-card with settings */}
+          <div className="flex items-center gap-2.5 px-2 py-2 rounded-xl hover:bg-[hsl(var(--dash-surface-2))] transition-all">
             <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-label font-bold flex-shrink-0">
               {initials}
             </div>
@@ -326,9 +315,18 @@ const DashboardLayout = ({ children }: Props) => {
               <p className="text-detail font-semibold text-[hsl(var(--dash-text))] truncate">{displayName}</p>
               <p className="text-caption text-[hsl(var(--dash-text-subtle))] font-mono truncate">@{username}</p>
             </div>
+            <Link
+              to="/dashboard/configuracoes"
+              onClick={() => setMobileOpen(false)}
+              className="p-1.5 rounded-lg text-[hsl(var(--dash-text-subtle))] hover:text-primary hover:bg-primary/10 transition-all flex-shrink-0"
+              title="Configurações"
+              aria-label="Configurações"
+            >
+              <Settings size={14} />
+            </Link>
             <button
               onClick={handleLogout}
-              className="p-1.5 rounded-lg text-[hsl(var(--dash-text-subtle))] hover:text-red-400 hover:bg-red-50 transition-all flex-shrink-0"
+              className="p-1.5 rounded-lg text-[hsl(var(--dash-text-subtle))] hover:text-red-400 hover:bg-red-500/10 transition-all flex-shrink-0"
               title="Sair"
               aria-label="Sair da conta"
             >
