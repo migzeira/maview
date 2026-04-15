@@ -492,6 +492,8 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         design={d}
         currentTheme={currentTheme}
         accent={accent}
+        avatarUrl={config.avatarUrl}
+        displayName={config.displayName}
         setDesign={setDesign}
         onBgColorChange={handleBgColorChange}
       />
