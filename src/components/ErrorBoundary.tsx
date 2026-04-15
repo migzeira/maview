@@ -45,6 +45,12 @@ class ErrorBoundary extends Component<Props, State> {
             <p className="text-sm text-[hsl(var(--dash-text-muted))] mb-6">
               Ocorreu um erro inesperado. Tente recarregar a página.
             </p>
+            {this.state.error && (
+              <div className="mb-4 p-3 rounded-lg bg-red-950/30 border border-red-500/20 text-left max-w-lg mx-auto overflow-auto max-h-40">
+                <p className="text-xs font-mono text-red-400 break-all">{this.state.error.message}</p>
+                <p className="text-[10px] font-mono text-red-400/60 mt-1 break-all whitespace-pre-wrap">{this.state.error.stack?.split('\n').slice(1, 5).join('\n')}</p>
+              </div>
+            )}
             <button
               onClick={() => window.location.reload()}
               className="px-6 py-2.5 rounded-xl bg-[hsl(var(--dash-purple))] text-white text-sm font-medium hover:opacity-90 transition-opacity"

@@ -1221,8 +1221,8 @@ const DashboardPagina = () => {
   const pAccent = d.accentColor || currentTheme.accent;
   const pAccent2 = d.accentColor2 || currentTheme.accent2;
   const pBg = d.bgColor || currentTheme.bg;
-  const pText = d.textColor || currentTheme.text;
-  const pSub = d.subtextColor || currentTheme.sub;
+  const pText = d.textColor || currentTheme.text || "#ffffff";
+  const pSub = d.subtextColor || currentTheme.sub || "rgba(255,255,255,0.55)";
   const pShadowN = typeof d.textShadow === "number" ? d.textShadow : (d.textShadow ? 5 : 0);
   const pTxtShadow = pShadowN > 0 ? `0 1px ${pShadowN * 1.5}px rgba(0,0,0,${Math.min(0.3 + pShadowN * 0.08, 0.95)}), 0 0 ${pShadowN * 3}px rgba(0,0,0,${Math.min(0.15 + pShadowN * 0.06, 0.7)})` : undefined;
   const pCard = d.cardBg || currentTheme.accent + "0a";

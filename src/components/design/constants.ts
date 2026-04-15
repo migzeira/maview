@@ -26,7 +26,7 @@ export interface DesignConfig {
   textShadow: number; hideWatermark: boolean; layout?: string;
 }
 
-export interface ThemeDef { id: ThemeId; label: string; bg: string; accent: string; accent2: string; }
+export interface ThemeDef { id: ThemeId; label: string; bg: string; accent: string; accent2: string; text?: string; sub?: string; card?: string; border?: string; }
 
 export interface DesignTabProps {
   config: { theme: ThemeId; design?: Partial<DesignConfig>; avatarUrl: string; displayName: string; username?: string; };

@@ -419,19 +419,19 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
           <div>
             <label className="text-[10px] font-semibold text-[hsl(var(--dash-text-muted))] mb-1 block">Seu nome</label>
             <div className="flex items-center gap-2">
-              <input type="color" value={d.nameColor || d.textColor || currentTheme.text}
+              <input type="color" value={d.nameColor || d.textColor || currentTheme.text || "#ffffff"}
                 onChange={(e) => setDesign("nameColor", e.target.value)}
                 className="w-8 h-8 rounded-lg border border-[hsl(var(--dash-border))] cursor-pointer" />
-              <span className="text-[11px] font-mono text-[hsl(var(--dash-text-muted))]">{d.nameColor || d.textColor || currentTheme.text}</span>
+              <span className="text-[11px] font-mono text-[hsl(var(--dash-text-muted))]">{d.nameColor || d.textColor || currentTheme.text || "#ffffff"}</span>
             </div>
           </div>
           <div>
             <label className="text-[10px] font-semibold text-[hsl(var(--dash-text-muted))] mb-1 block">Bio e descricoes</label>
             <div className="flex items-center gap-2">
-              <input type="color" value={(() => { const v = d.subtextColor || currentTheme.sub; return v.startsWith("rgba") ? "#999999" : v; })()}
+              <input type="color" value={(() => { const v = d.subtextColor || currentTheme.sub || "#999999"; return v.startsWith("rgba") ? "#999999" : v; })()}
                 onChange={(e) => setDesign("subtextColor", e.target.value)}
                 className="w-8 h-8 rounded-lg border border-[hsl(var(--dash-border))] cursor-pointer" />
-              <span className="text-[11px] font-mono text-[hsl(var(--dash-text-muted))] truncate">{d.subtextColor || currentTheme.sub}</span>
+              <span className="text-[11px] font-mono text-[hsl(var(--dash-text-muted))] truncate">{d.subtextColor || currentTheme.sub || "#999999"}</span>
             </div>
           </div>
         </div>
