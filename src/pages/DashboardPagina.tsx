@@ -3044,6 +3044,14 @@ const DashboardPagina = () => {
                       <Sparkles size={12} className={aiLoading ? "animate-spin" : ""} />
                       {aiLoading ? "Gerando..." : "Sugerir bio"}
                     </button>
+                    {/* Cor da bio — inline picker */}
+                    <div className="flex items-center gap-1.5">
+                      <label className="text-[10px] text-[hsl(var(--dash-text-subtle))] font-medium">Cor da bio:</label>
+                      <input type="color"
+                        value={(() => { const v = config.design?.subtextColor || ""; return v.startsWith("rgba") ? "#999999" : (v || "#999999"); })()}
+                        onChange={e => updateConfig("design", { ...(config.design || {}), subtextColor: e.target.value })}
+                        className="w-6 h-6 rounded-md border border-[hsl(var(--dash-border))] cursor-pointer" />
+                    </div>
                     <p className="text-[hsl(var(--dash-text-subtle))] text-[10px] flex items-center gap-1">
                       <TrendingUp size={9} /> Bios com emojis recebem mais cliques
                     </p>

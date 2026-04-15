@@ -454,7 +454,7 @@ const ProfilePage = () => {
         <div className="fixed inset-0 pointer-events-none z-0"
           style={{
             backgroundImage: `url(${rd.bgImageUrl})`,
-            backgroundSize: `${rd.bgImageZoom || 100}%`,
+            backgroundSize: rd.bgImageZoom > 100 ? `${rd.bgImageZoom}%` : "cover",
             backgroundPosition: `${rd.bgImagePosX ?? 50}% ${rd.bgImagePosY ?? 50}%`,
             backgroundRepeat: "no-repeat",
             filter: rd.bgBlur ? `blur(${rd.bgBlur}px)` : undefined,
@@ -565,13 +565,13 @@ const ProfilePage = () => {
               </button>
             </div>
 
-            {/* Primary WhatsApp CTA */}
-            {profile.whatsapp && profile.products.length > 0 && (
+            {/* WhatsApp as social icon (same style as Instagram, etc.) */}
+            {profile.whatsapp && (
               <a href={`https://wa.me/${profile.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2.5 w-full py-4 rounded-2xl font-bold text-[15px] text-white transition-all hover:scale-[1.02] active:scale-[0.98] mt-4"
-                style={{ background: "#25d366", boxShadow: "0 2px 8px rgba(37,211,102,0.15)" }}
-                aria-label="Enviar mensagem no WhatsApp">
-                <WhatsAppIcon size={20} style={{ color: "#fff" }} /> Falar agora
+                className="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
+                style={{ background: "rgba(37,211,102,0.15)", border: "1.5px solid rgba(37,211,102,0.25)" }}
+                aria-label="WhatsApp">
+                <WhatsAppIcon size={18} style={{ color: "#25d366" }} />
               </a>
             )}
           </div>
@@ -830,25 +830,17 @@ const ProfilePage = () => {
         </div>
       </main>
 
-      {/* 💬 WhatsApp sticky button — enorme no Brasil */}
+      {/* 💬 WhatsApp sticky — ícone redondo limpo */}
       {profile.whatsapp && (
         <a
           href={`https://wa.me/${profile.whatsapp}`}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Enviar mensagem no WhatsApp"
-          className="fixed bottom-[72px] right-4 z-50 flex items-center gap-2.5 px-5 py-3.5 rounded-full shadow-2xl transition-all duration-200 hover:scale-105 active:scale-95 group"
-          style={{
-            background: "#25d366",
-            boxShadow: "0 3px 10px rgba(37,211,102,0.20)",
-            color: "#fff",
-          }}
+          aria-label="WhatsApp"
+          className="fixed bottom-6 right-4 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-110 active:scale-95"
+          style={{ background: "#25d366" }}
         >
-          <span className="relative">
-            <WhatsAppIcon size={20} style={{ color: "#fff" }} />
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-white animate-ping" />
-          </span>
-          <span className="text-[13px] font-bold">Falar agora</span>
+          <WhatsAppIcon size={24} style={{ color: "#fff" }} />
         </a>
       )}
 
