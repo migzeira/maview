@@ -26,6 +26,9 @@ export interface DesignConfig {
   bgOverlay: number;
   bgBlur: number;
   bgEffect: string;
+  bgImageZoom: number;    // 100 = normal, 150 = 1.5x zoom, etc.
+  bgImagePosX: number;    // 0-100 (percentual, 50 = centro)
+  bgImagePosY: number;    // 0-100 (percentual, 50 = centro)
 
   // Colors
   textColor: string;

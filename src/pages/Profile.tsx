@@ -452,7 +452,13 @@ const ProfilePage = () => {
       )}
       {rd.bgType === "image" && rd.bgImageUrl && (
         <div className="fixed inset-0 pointer-events-none z-0"
-          style={{ backgroundImage: `url(${rd.bgImageUrl})`, backgroundSize: "cover", backgroundPosition: "center", filter: rd.bgBlur ? `blur(${rd.bgBlur}px)` : undefined }} />
+          style={{
+            backgroundImage: `url(${rd.bgImageUrl})`,
+            backgroundSize: `${rd.bgImageZoom || 100}%`,
+            backgroundPosition: `${rd.bgImagePosX ?? 50}% ${rd.bgImagePosY ?? 50}%`,
+            backgroundRepeat: "no-repeat",
+            filter: rd.bgBlur ? `blur(${rd.bgBlur}px)` : undefined,
+          }} />
       )}
       {rd.bgType === "pattern" && rd.bgPattern && BG_PATTERNS[rd.bgPattern] && (
         <div className="fixed inset-0 pointer-events-none z-0" style={{ backgroundImage: BG_PATTERNS[rd.bgPattern], backgroundRepeat: "repeat" }} />

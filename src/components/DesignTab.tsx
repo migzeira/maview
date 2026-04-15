@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import {
   Check, ChevronLeft, ChevronRight, Sparkles, Wand2, Save, Loader2, Upload, ImageIcon, X as XIcon,
+  ZoomIn, Move,
 } from "lucide-react";
 
 import {
@@ -262,15 +263,22 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
 
         {/* ── Background customization (for image-based templates) ── */}
         {(d.bgType === "image" || d.bgImageUrl) && (
-          <div className="space-y-2 p-3 rounded-2xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))]">
+          <div className="space-y-3 p-4 rounded-2xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))]">
             <div className="flex items-center gap-2">
               <ImageIcon size={14} className="text-primary" />
               <span className="text-[13px] font-bold text-[hsl(var(--dash-text))]">Imagem de fundo</span>
             </div>
+
+            {/* Preview da imagem com controles */}
             {d.bgImageUrl ? (
-              <div className="relative rounded-xl overflow-hidden h-24">
-                <img src={d.bgImageUrl} alt="" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+              <div className="relative rounded-xl overflow-hidden h-28">
+                <div className="absolute inset-0" style={{
+                  backgroundImage: `url(${d.bgImageUrl})`,
+                  backgroundSize: `${d.bgImageZoom ?? 100}%`,
+                  backgroundPosition: `${d.bgImagePosX ?? 50}% ${d.bgImagePosY ?? 50}%`,
+                  backgroundRepeat: "no-repeat",
+                }} />
+                <div className="absolute inset-0" style={{ background: `rgba(0,0,0,${(d.bgOverlay ?? 40) / 100})` }} />
                 <button onClick={() => { setDesign("bgImageUrl", ""); setDesign("bgType", "solid"); }}
                   className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-red-500 transition-colors">
                   <XIcon size={12} />
@@ -301,13 +309,62 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
                 e.target.value = "";
               }}
             />
+
+            {/* Sliders de ajuste */}
             {d.bgImageUrl && (
-              <div className="flex items-center gap-3">
-                <span className="text-[11px] text-[hsl(var(--dash-text-muted))] whitespace-nowrap">Escurecimento</span>
-                <input type="range" min="0" max="80" value={d.bgOverlay ?? 40}
-                  onChange={(e) => setDesign("bgOverlay", Number(e.target.value))}
-                  className="flex-1 h-1.5 rounded-full accent-primary" />
-                <span className="text-[11px] font-semibold text-[hsl(var(--dash-text))] w-8 text-right">{d.bgOverlay ?? 40}%</span>
+              <div className="space-y-2.5">
+                {/* Escurecimento / Opacidade */}
+                <div className="flex items-center gap-3">
+                  <span className="text-[11px] text-[hsl(var(--dash-text-muted))] whitespace-nowrap w-24">Escurecimento</span>
+                  <input type="range" min="0" max="90" step="5" value={d.bgOverlay ?? 40}
+                    onChange={(e) => setDesign("bgOverlay", Number(e.target.value))}
+                    className="flex-1 h-1.5 rounded-full accent-primary" />
+                  <span className="text-[11px] font-semibold text-[hsl(var(--dash-text))] w-8 text-right">{d.bgOverlay ?? 40}%</span>
+                </div>
+
+                {/* Zoom */}
+                <div className="flex items-center gap-3">
+                  <span className="text-[11px] text-[hsl(var(--dash-text-muted))] whitespace-nowrap w-24 flex items-center gap-1">
+                    <ZoomIn size={10} /> Zoom
+                  </span>
+                  <input type="range" min="100" max="300" step="5" value={d.bgImageZoom ?? 100}
+                    onChange={(e) => setDesign("bgImageZoom", Number(e.target.value))}
+                    className="flex-1 h-1.5 rounded-full accent-primary" />
+                  <span className="text-[11px] font-semibold text-[hsl(var(--dash-text))] w-8 text-right">{d.bgImageZoom ?? 100}%</span>
+                </div>
+
+                {/* Posicao Horizontal */}
+                <div className="flex items-center gap-3">
+                  <span className="text-[11px] text-[hsl(var(--dash-text-muted))] whitespace-nowrap w-24 flex items-center gap-1">
+                    <Move size={10} /> Horizontal
+                  </span>
+                  <input type="range" min="0" max="100" step="1" value={d.bgImagePosX ?? 50}
+                    onChange={(e) => setDesign("bgImagePosX", Number(e.target.value))}
+                    className="flex-1 h-1.5 rounded-full accent-primary" />
+                  <span className="text-[11px] font-semibold text-[hsl(var(--dash-text))] w-8 text-right">{d.bgImagePosX ?? 50}%</span>
+                </div>
+
+                {/* Posicao Vertical */}
+                <div className="flex items-center gap-3">
+                  <span className="text-[11px] text-[hsl(var(--dash-text-muted))] whitespace-nowrap w-24 flex items-center gap-1">
+                    <Move size={10} /> Vertical
+                  </span>
+                  <input type="range" min="0" max="100" step="1" value={d.bgImagePosY ?? 50}
+                    onChange={(e) => setDesign("bgImagePosY", Number(e.target.value))}
+                    className="flex-1 h-1.5 rounded-full accent-primary" />
+                  <span className="text-[11px] font-semibold text-[hsl(var(--dash-text))] w-8 text-right">{d.bgImagePosY ?? 50}%</span>
+                </div>
+
+                {/* Reset button */}
+                <button onClick={() => {
+                  setDesign("bgImageZoom", 100);
+                  setDesign("bgImagePosX", 50);
+                  setDesign("bgImagePosY", 50);
+                  setDesign("bgOverlay", 40);
+                }}
+                  className="w-full py-1.5 rounded-lg text-[11px] font-medium text-[hsl(var(--dash-text-subtle))] hover:text-primary border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 transition-all">
+                  Resetar ajustes
+                </button>
               </div>
             )}
           </div>
