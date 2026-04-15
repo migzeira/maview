@@ -526,11 +526,10 @@ const ProfilePage = () => {
             {/* Avatar */}
             <div className="relative mb-4">
               {rd.profileGlow && (
-                <div className="absolute inset-[-3px] opacity-40 blur-[10px]"
+                <div className="absolute inset-[-8px] opacity-50 blur-[14px]"
                   style={{
                     background: rd.profileGlowColor || rd.profileBorderColor || t.accent,
                     borderRadius: profileBorderRadius(rd.profileShape),
-                    clipPath: profileClip(rd.profileShape),
                   }} />
               )}
               {profile.avatar
@@ -930,34 +929,7 @@ const ProfilePage = () => {
         />
       )}
 
-      {/* ── Email capture — lead generation ── */}
-      {profile && !emailCaptured && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-[380px]">
-          <form onSubmit={handleEmailSubmit}
-            className="flex items-center gap-2 px-3 py-2.5 rounded-2xl backdrop-blur-xl shadow-lg"
-            style={{ background: `${t.card}ee`, border: `1px solid ${t.border}` }}>
-            <Mail size={16} style={{ color: t.sub, flexShrink: 0 }} />
-            <input type="email" required placeholder="Seu email para novidades"
-              value={captureEmail} onChange={e => setCaptureEmail(e.target.value)}
-              className="flex-1 bg-transparent text-[13px] outline-none placeholder:opacity-50 min-w-0"
-              style={{ color: t.text }} />
-            <button type="submit" disabled={emailSubmitting}
-              className="px-3.5 py-1.5 rounded-xl text-[11px] font-bold text-white flex-shrink-0 transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
-              style={{ background: t.accent }}>
-              {emailSubmitting ? "..." : "Enviar"}
-            </button>
-          </form>
-        </div>
-      )}
-      {emailCaptured && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40">
-          <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl backdrop-blur-xl shadow-lg"
-            style={{ background: `${t.card}ee`, border: `1px solid ${t.border}` }}>
-            <Check size={14} style={{ color: "#22c55e" }} />
-            <span className="text-[12px] font-medium" style={{ color: t.text }}>Obrigado! Voce recebera novidades.</span>
-          </div>
-        </div>
-      )}
+      {/* Email capture removed — only watermark footer */}
 
       {/* ── Payment Checkout Modal ── */}
       {pixCheckoutProduct && profile.design?.mercadoPagoToken ? (
@@ -992,13 +964,13 @@ const ProfilePage = () => {
 
       {/* ── Footer ── */}
       {!rd.hideWatermark && (
-        <footer className="relative z-10 flex justify-center pb-10 pt-4">
+        <footer className="relative z-10 flex justify-center pb-10 pt-6">
           <Link to="/"
-            className="flex items-center gap-1.5 px-4 py-2 rounded-full transition-opacity duration-150 hover:opacity-80"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full transition-all duration-150 hover:opacity-80 hover:scale-[1.02]"
             style={{ background: t.card, border: `1px solid ${t.border}` }}
           >
-            <img src={logoSrc} alt="Maview" className="w-3.5 h-3.5 object-contain opacity-85" />
-            <span className="text-[10px] font-medium" style={{ color: t.sub }}>
+            <img src={logoSrc} alt="Maview" className="w-4 h-4 object-contain" />
+            <span className="text-[11px] font-semibold" style={{ color: t.sub }}>
               feito por maview.app
             </span>
           </Link>

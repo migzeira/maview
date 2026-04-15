@@ -171,9 +171,9 @@ export function buttonBorderRadius(shape: ButtonShape, radius: number): string {
 
 export function buttonStyles(rd: ResolvedDesign, isAccent = false): React.CSSProperties {
   const br = buttonBorderRadius(rd.buttonShape, rd.buttonRadius);
-  const shadow = rd.buttonShadow === "glow" ? `0 4px 20px ${rd.accent}40`
-    : rd.buttonShadow === "md" ? `0 4px 12px rgba(0,0,0,0.3)`
-    : rd.buttonShadow === "sm" ? `0 2px 6px rgba(0,0,0,0.2)`
+  const shadow = rd.buttonShadow === "glow" ? `0 2px 10px ${rd.accent}20`
+    : rd.buttonShadow === "md" ? `0 4px 12px rgba(0,0,0,0.25)`
+    : rd.buttonShadow === "sm" ? `0 2px 6px rgba(0,0,0,0.15)`
     : "none";
 
   if (isAccent) {
