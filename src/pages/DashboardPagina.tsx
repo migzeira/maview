@@ -1356,7 +1356,7 @@ const DashboardPagina = () => {
 
   const phonePreview = (
     <div className="relative mx-auto" style={{ width: 310 }}>
-      <div className="rounded-[2.8rem] border-[3px] border-[hsl(var(--dash-text))] overflow-hidden shadow-2xl flex flex-col"
+      <div className="rounded-[2.8rem] border-[3px] border-[hsl(var(--dash-text))] overflow-hidden shadow-2xl flex flex-col relative"
         style={{ aspectRatio: "9/16", ...previewBgStyle }}>
         {/* Status bar */}
         <div className="flex items-center justify-between px-6 pt-3 pb-1 flex-shrink-0">
@@ -1378,9 +1378,9 @@ const DashboardPagina = () => {
           <div className="w-[88px] h-[26px] rounded-full bg-black" />
         </div>
 
-        {/* Image/effect overlay (darkening) */}
+        {/* Image/effect overlay (darkening) — must stay inside the phone frame */}
         {(d.bgType === "image" || d.bgType === "video" || d.bgType === "pattern" || d.bgType === "effect") && (d.bgOverlay ?? 0) > 0 && (
-          <div className="absolute inset-0 pointer-events-none z-[1]" style={{ background: `rgba(0,0,0,${(d.bgOverlay || 0) / 100})` }} />
+          <div className="absolute inset-0 pointer-events-none z-[1] rounded-[2.5rem]" style={{ background: `rgba(0,0,0,${(d.bgOverlay || 0) / 100})` }} />
         )}
 
         {/* Scrollable screen content */}
