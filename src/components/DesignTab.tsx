@@ -135,8 +135,10 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [bgUploading, setBgUploading] = useState(false);
+  const [coverUploading, setCoverUploading] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const bgImageInputRef = useRef<HTMLInputElement>(null);
+  const coverImageInputRef = useRef<HTMLInputElement>(null);
   const designRef = useRef(config.design);
   designRef.current = config.design;
 
@@ -158,9 +160,11 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     // Preserve ONLY user-uploaded images (not template Unsplash images) and profile colors
     const prev = designRef.current || {};
     const preserved: Record<string, unknown> = {};
-    // Only preserve bg image if it's user-uploaded (Supabase Storage), not from a template pack (Unsplash)
+    // Only preserve user-uploaded images (Supabase Storage, not Unsplash)
+    // AND only preserve bg image if the new pack ALSO uses image bg (avoids bg leaking into cover-based layouts)
     const isUserUpload = (url: string | undefined) => url && !url.includes("images.unsplash.com");
-    if (prev.bgImageUrl && isUserUpload(prev.bgImageUrl as string)) {
+    const newPackUsesBgImage = pack.config.design.bgType === "image";
+    if (prev.bgImageUrl && isUserUpload(prev.bgImageUrl as string) && newPackUsesBgImage) {
       preserved.bgImageUrl = prev.bgImageUrl;
       preserved.bgType = "image";
       if (prev.bgOverlay) preserved.bgOverlay = prev.bgOverlay;
@@ -441,6 +445,60 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
           )}
         </div>
       </div>
+
+      {/* ── Cover image (banner no topo do perfil) ── */}
+        <div className="space-y-3 p-4 rounded-2xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ImageIcon size={14} className="text-primary" />
+              <span className="text-[13px] font-bold text-[hsl(var(--dash-text))]">Imagem de capa</span>
+            </div>
+            {d.coverImageUrl && (
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">Ativa</span>
+            )}
+          </div>
+          <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] -mt-1">Foto no topo do perfil (banner). A cor do tema fica abaixo.</p>
+
+          {d.coverImageUrl ? (
+            <div className="relative rounded-xl overflow-hidden h-24">
+              <img src={d.coverImageUrl} alt="" className="w-full h-full object-cover" />
+              <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 30%, ${d.bgColor || "#000"}DD)` }} />
+              <button onClick={() => setDesign("coverImageUrl", "")}
+                className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-red-500 transition-colors">
+                <XIcon size={12} />
+              </button>
+              <button onClick={() => coverImageInputRef.current?.click()}
+                className="absolute bottom-2 right-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-[11px] font-semibold text-gray-800 hover:bg-white transition-all shadow-md">
+                <Upload size={11} /> Trocar foto
+              </button>
+              {coverUploading && (
+                <div className="absolute bottom-2 left-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/70 text-[10px] font-medium text-white">
+                  <Loader2 size={10} className="animate-spin" /> Salvando...
+                </div>
+              )}
+            </div>
+          ) : (
+            <button onClick={() => coverImageInputRef.current?.click()}
+              className="w-full h-16 rounded-xl border-2 border-dashed border-[hsl(var(--dash-border))] flex flex-col items-center justify-center gap-1.5 text-[hsl(var(--dash-text-subtle))] hover:border-primary/40 hover:text-primary transition-all">
+              <Upload size={16} />
+              <span className="text-[11px] font-medium">Adicionar imagem de capa</span>
+            </button>
+          )}
+          <input type="file" ref={coverImageInputRef} accept="image/*" className="hidden"
+            onChange={async (e) => {
+              const f = e.target.files?.[0];
+              if (!f) return;
+              e.target.value = "";
+              const reader = new FileReader();
+              reader.onload = () => setDesign("coverImageUrl", reader.result as string);
+              reader.readAsDataURL(f);
+              setCoverUploading(true);
+              const publicUrl = await uploadImage(f, "backgrounds");
+              setCoverUploading(false);
+              if (publicUrl) setDesign("coverImageUrl", publicUrl);
+            }}
+          />
+        </div>
 
       {/* ═══════ 2. COLORS — simplified ═══════ */}
       <div className="space-y-3">
