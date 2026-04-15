@@ -28,8 +28,8 @@ export default function FontSelector({ currentFont, bodyFont, displayName, onSel
     <div className="space-y-3">
       <h3 className="text-[hsl(var(--dash-text))] font-bold text-[14px]">Fonte</h3>
 
-      {/* Primary 9 fonts */}
-      <div className="grid grid-cols-3 gap-1.5">
+      {/* Top 12 fontes mais populares */}
+      <div className="grid grid-cols-4 gap-1.5">
         {primaryFonts.map(f => {
           const isActive = currentFont === f.name;
           return (

@@ -24,7 +24,7 @@ import EffectLayer from "@/components/profile/EffectLayer";
 import BookingModal from "@/components/profile/BookingModal";
 import MiniVideoPlayer from "@/components/profile/MiniVideoPlayer";
 import SocialProofToast from "@/components/profile/SocialProofToast";
-import { getIcon } from "@/components/profile/ProfileIcons";
+import { getIcon, WhatsAppIcon } from "@/components/profile/ProfileIcons";
 import { useStagger } from "@/hooks/useStagger";
 
 /* ──────────────────────────────────────────────────────────────── */
@@ -565,7 +565,7 @@ const ProfilePage = () => {
                 className="flex items-center justify-center gap-2.5 w-full py-4 rounded-2xl font-bold text-[15px] text-white transition-all hover:scale-[1.02] active:scale-[0.98] mt-4"
                 style={{ background: "#25d366", boxShadow: "0 2px 8px rgba(37,211,102,0.15)" }}
                 aria-label="Enviar mensagem no WhatsApp">
-                <MessageCircle size={18} className="fill-white" /> Falar agora
+                <WhatsAppIcon size={20} style={{ color: "#fff" }} /> Falar agora
               </a>
             )}
           </div>
@@ -694,7 +694,7 @@ const ProfilePage = () => {
                               background: isWhatsApp ? "#25d366" : t.accent,
                               color: "#fff",
                             }}>
-                            {isBooking ? <Calendar size={11} /> : isWhatsApp ? <MessageCircle size={11} /> : <ShoppingCart size={11} />} {ctaLabel}
+                            {isBooking ? <Calendar size={11} /> : isWhatsApp ? <WhatsAppIcon size={13} style={{ color: "#fff" }} /> : <ShoppingCart size={11} />} {ctaLabel}
                           </div>
                         )}
                       </Wrapper>
@@ -839,7 +839,7 @@ const ProfilePage = () => {
           }}
         >
           <span className="relative">
-            <MessageCircle size={18} className="fill-white" />
+            <WhatsAppIcon size={20} style={{ color: "#fff" }} />
             <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-white animate-ping" />
           </span>
           <span className="text-[13px] font-bold">Falar agora</span>

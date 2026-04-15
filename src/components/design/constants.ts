@@ -195,13 +195,13 @@ export const DESIGN_PACKS: DesignPack[] = [
 
   { id: "showcase-wellness", label: "Wellness", desc: "Yoga, meditacao e bem-estar", category: "showcase", refIdx: 5,
     preview: { bg: "#faf5f0", accent: "#d97706", accent2: "#b45309" },
-    config: { theme: "cream", design: { bgType: "image", bgImageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=800&fit=crop&crop=center", bgOverlay: 40, bgColor: "#faf5f0", buttonShape: "pill", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 12, fontHeading: "Outfit", fontBody: "Nunito", profileShape: "circle", profileBorder: true, profileBorderColor: "#d97706", profileSize: 96, accentColor: "#d97706", accentColor2: "#b45309", textColor: "#1c1917", subtextColor: "#292524", cardBg: "rgba(255,255,255,0.85)", cardBorder: "rgba(0,0,0,0.08)" } } },
+    config: { theme: "cream", design: { bgType: "image", bgImageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=800&fit=crop&crop=center", bgOverlay: 45, bgColor: "#faf5f0", buttonShape: "pill", buttonFill: "glass", buttonShadow: "sm", buttonRadius: 12, fontHeading: "Outfit", fontBody: "Nunito", profileShape: "circle", profileBorder: true, profileBorderColor: "#d97706", profileSize: 96, accentColor: "#d97706", accentColor2: "#b45309", cardBg: "rgba(0,0,0,0.35)", cardBorder: "rgba(255,255,255,0.12)" } } },
   { id: "showcase-coach", label: "Coach", desc: "Social media e marketing", category: "showcase", refIdx: 6,
     preview: { bg: "#0a0618", accent: "#a855f7", accent2: "#ec4899" },
     config: { theme: "dark-purple", design: { bgType: "effect", bgEffect: "ambient-glow", bgColor: "#0a0618", buttonShape: "soft", buttonFill: "glass", buttonShadow: "glow", buttonRadius: 14, fontHeading: "Space Grotesk", fontBody: "DM Sans", profileShape: "circle", profileBorder: true, profileBorderColor: "#a855f7", profileSize: 96, accentColor: "#a855f7", accentColor2: "#ec4899" } } },
   { id: "showcase-fashion", label: "Fashion", desc: "Moda e consultoria de estilo", category: "showcase", refIdx: 7,
     preview: { bg: "#faf7f2", accent: "#be185d", accent2: "#e11d48" },
-    config: { theme: "cream", design: { bgType: "image", bgImageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=800&fit=crop&crop=center", bgOverlay: 35, bgColor: "#faf7f2", buttonShape: "pill", buttonFill: "solid", buttonShadow: "md", buttonRadius: 12, fontHeading: "Playfair Display", fontBody: "Lora", profileShape: "circle", profileBorder: true, profileBorderColor: "#be185d", profileSize: 96, accentColor: "#be185d", accentColor2: "#e11d48", textColor: "#1c1917", subtextColor: "#292524", cardBg: "rgba(255,255,255,0.88)", cardBorder: "rgba(0,0,0,0.06)" } } },
+    config: { theme: "cream", design: { bgType: "image", bgImageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=800&fit=crop&crop=center", bgOverlay: 45, bgColor: "#faf7f2", buttonShape: "pill", buttonFill: "glass", buttonShadow: "md", buttonRadius: 12, fontHeading: "Playfair Display", fontBody: "Lora", profileShape: "circle", profileBorder: true, profileBorderColor: "#be185d", profileSize: 96, accentColor: "#be185d", accentColor2: "#e11d48", cardBg: "rgba(0,0,0,0.35)", cardBorder: "rgba(255,255,255,0.12)" } } },
   { id: "showcase-fitness", label: "Fitness", desc: "Treino e transformacao", category: "showcase", refIdx: 8,
     preview: { bg: "#080808", accent: "#ef4444", accent2: "#f97316" },
     config: { theme: "crimson", design: { bgType: "image", bgImageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=800&fit=crop&crop=center", bgOverlay: 60, bgColor: "#080808", buttonShape: "square", buttonFill: "solid", buttonShadow: "glow", buttonRadius: 6, fontHeading: "Bebas Neue", fontBody: "Poppins", profileShape: "circle", profileBorder: true, profileBorderColor: "#ef4444", profileSize: 96, accentColor: "#ef4444", accentColor2: "#f97316" } } },
@@ -275,25 +275,41 @@ export const EFFECT_CATEGORIES = [
 export interface FontDef { name: string; category: "sans" | "serif" | "display" | "handwriting" | "mono"; }
 
 export const GOOGLE_FONTS: FontDef[] = [
+  /* ── Sans-serif (top do mercado) ── */
   { name: "Inter", category: "sans" }, { name: "Poppins", category: "sans" }, { name: "Montserrat", category: "sans" },
+  { name: "Roboto", category: "sans" }, { name: "Open Sans", category: "sans" }, { name: "Lato", category: "sans" },
+  { name: "Raleway", category: "sans" }, { name: "Nunito", category: "sans" }, { name: "Quicksand", category: "sans" },
   { name: "Outfit", category: "sans" }, { name: "DM Sans", category: "sans" }, { name: "Space Grotesk", category: "sans" },
-  { name: "Nunito", category: "sans" }, { name: "Rubik", category: "sans" }, { name: "Manrope", category: "sans" },
-  { name: "Plus Jakarta Sans", category: "sans" }, { name: "Urbanist", category: "sans" }, { name: "Sora", category: "sans" },
+  { name: "Rubik", category: "sans" }, { name: "Manrope", category: "sans" }, { name: "Plus Jakarta Sans", category: "sans" },
+  { name: "Urbanist", category: "sans" }, { name: "Sora", category: "sans" }, { name: "Lexend", category: "sans" },
+  { name: "Work Sans", category: "sans" }, { name: "Figtree", category: "sans" }, { name: "Geologica", category: "sans" },
+  /* ── Serif ── */
   { name: "Playfair Display", category: "serif" }, { name: "Lora", category: "serif" }, { name: "Merriweather", category: "serif" },
   { name: "DM Serif Display", category: "serif" }, { name: "Cormorant Garamond", category: "serif" },
+  { name: "Libre Baskerville", category: "serif" }, { name: "Crimson Text", category: "serif" },
+  /* ── Display ── */
   { name: "Bebas Neue", category: "display" }, { name: "Righteous", category: "display" },
+  { name: "Oswald", category: "display" }, { name: "Anton", category: "display" }, { name: "Josefin Sans", category: "display" },
+  /* ── Handwriting ── */
   { name: "Pacifico", category: "handwriting" }, { name: "Satisfy", category: "handwriting" }, { name: "Dancing Script", category: "handwriting" },
+  { name: "Great Vibes", category: "handwriting" }, { name: "Caveat", category: "handwriting" },
+  /* ── Mono ── */
   { name: "JetBrains Mono", category: "mono" }, { name: "Fira Code", category: "mono" },
 ];
 
-/** 9 primary fonts — one from each category, most versatile */
+/** Top 12 fontes mais populares do mercado — destaque no seletor */
 export const PRIMARY_FONTS = [
-  "Inter", "Poppins", "Montserrat", "Outfit", "DM Sans",
-  "Playfair Display", "Bebas Neue", "Dancing Script", "JetBrains Mono",
+  "Poppins", "Montserrat", "Inter", "Roboto", "Raleway", "Lato",
+  "Playfair Display", "Nunito", "Quicksand", "Outfit", "Oswald", "Open Sans",
 ];
 
 export const FONT_PAIRS: Record<string, string> = {
   "Inter": "DM Sans", "Poppins": "DM Sans", "Montserrat": "Urbanist", "Outfit": "Nunito",
+  "Roboto": "Open Sans", "Open Sans": "Roboto", "Lato": "Merriweather", "Raleway": "Lora",
+  "Quicksand": "Nunito", "Lexend": "Inter", "Work Sans": "DM Sans", "Figtree": "Inter",
+  "Geologica": "DM Sans", "Libre Baskerville": "Raleway", "Crimson Text": "Lato",
+  "Oswald": "Roboto", "Anton": "Poppins", "Josefin Sans": "Quicksand",
+  "Great Vibes": "Montserrat", "Caveat": "Nunito",
   "DM Sans": "Inter", "Space Grotesk": "JetBrains Mono", "Nunito": "Outfit", "Rubik": "Manrope",
   "Manrope": "Rubik", "Plus Jakarta Sans": "DM Sans", "Urbanist": "Montserrat", "Sora": "Inter",
   "Playfair Display": "Lora", "Lora": "Playfair Display", "Merriweather": "DM Sans",

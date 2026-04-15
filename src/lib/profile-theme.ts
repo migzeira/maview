@@ -58,7 +58,7 @@ export interface ResolvedDesign {
 
 export function resolveDesign(theme: ThemeDef, design?: Partial<DesignConfig>): ResolvedDesign {
   const d = design || {};
-  return {
+  const base: ResolvedDesign = {
     bg: d.bgColor || theme.bg,
     accent: d.accentColor || theme.accent,
     accent2: d.accentColor2 || theme.accent2,
@@ -87,6 +87,18 @@ export function resolveDesign(theme: ThemeDef, design?: Partial<DesignConfig>): 
     profileSize: d.profileSize ?? 88,
     hideWatermark: d.hideWatermark ?? false,
   };
+
+  // Auto-contrast: if bg has overlay or is image/effect, auto-adjust text
+  // Only override if the user hasn't explicitly set custom text colors
+  const userSetTextColor = !!d.textColor;
+  const userSetSubColor = !!d.subtextColor;
+  if (!userSetTextColor || !userSetSubColor) {
+    const auto = autoContrastColors(base);
+    if (!userSetTextColor) base.text = auto.text;
+    if (!userSetSubColor) base.sub = auto.sub;
+  }
+
+  return base;
 }
 
 export function bgCss(rd: ResolvedDesign): React.CSSProperties {
@@ -152,6 +164,57 @@ export function buttonStyles(rd: ResolvedDesign, isAccent = false): React.CSSPro
     default:
       return { background: rd.card, border: `1px solid ${rd.border}`, borderRadius: br, boxShadow: shadow };
   }
+}
+
+/* ─── Luminance & auto-contrast ─────────────────────────────── */
+/** Parse hex (#rrggbb or #rgb) to [r,g,b] */
+function hexToRgb(hex: string): [number, number, number] {
+  let h = hex.replace("#", "");
+  if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+  return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)];
+}
+
+/** Relative luminance (WCAG 2.1) — 0 = black, 1 = white */
+export function relativeLuminance(hex: string): number {
+  const [r, g, b] = hexToRgb(hex).map(c => {
+    const s = c / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/** Is background considered "light"? (luminance > 0.45) */
+export function isLightBackground(bgColor: string): boolean {
+  try { return relativeLuminance(bgColor) > 0.45; } catch { return false; }
+}
+
+/**
+ * Auto-resolve text colors based on effective background brightness.
+ * For dark bg → light text; for light bg → dark text.
+ * Accounts for overlay darkening on image backgrounds.
+ */
+export function autoContrastColors(rd: ResolvedDesign): { text: string; sub: string } {
+  let effectiveBg = rd.bg;
+
+  // If image/video/pattern/effect with overlay, blend towards black
+  if ((rd.bgType === "image" || rd.bgType === "video" || rd.bgType === "pattern" || rd.bgType === "effect") && rd.bgOverlay > 0) {
+    // Overlay is rgba(0,0,0,X) — darkens the background
+    // If overlay >= 30%, treat as dark regardless of base bg
+    if (rd.bgOverlay >= 30) {
+      return { text: "#ffffff", sub: "rgba(255,255,255,0.80)" };
+    }
+  }
+
+  // For gradient, check first color (dominant)
+  if (rd.bgType === "gradient" && rd.bgGradient?.[0]) {
+    effectiveBg = rd.bgGradient[0];
+  }
+
+  const light = isLightBackground(effectiveBg);
+  if (light) {
+    return { text: "#111827", sub: "#374151" }; // gray-900 / gray-700
+  }
+  return { text: "#ffffff", sub: "rgba(255,255,255,0.80)" };
 }
 
 /* ─── URL sanitizer (blocks javascript: / data: / vbscript:) ── */
