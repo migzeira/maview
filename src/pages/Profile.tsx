@@ -414,6 +414,17 @@ const ProfilePage = () => {
 
   // `rd` and `baseTheme` already computed above early returns
   const t = { bg: rd.bg, accent: rd.accent, accent2: rd.accent2, card: rd.card, text: rd.text, sub: rd.sub, border: rd.border };
+
+  /* ── Independent color layer — each text gets its own final color ── */
+  const c = {
+    name: rd.nameColor || rd.text,                    // display name
+    bio: rd.sub,                                       // bio only
+    productTitle: rd.productTitleColor || rd.text,     // product name
+    productDesc: rd.descriptionColor || rd.sub,        // product description
+    price: rd.priceColor || rd.text,                   // current price
+    originalPrice: rd.originalPriceColor || "rgba(156,163,175,0.7)", // strikethrough price
+    secondary: rd.sub,                                 // @username, stats labels, testimonial roles
+  };
   const socialLinks  = profile.links.filter(l => l.active && l.isSocial);
   const regularLinks = profile.links.filter(l => l.active && !l.isSocial);
 
@@ -426,7 +437,7 @@ const ProfilePage = () => {
         <div className="w-20 h-20 rounded-full bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 border border-violet-500/20 flex items-center justify-center mx-auto mb-6">
           <span className="text-3xl font-bold text-violet-400/60">{(profile.displayName || profile.username || "?")[0]?.toUpperCase()}</span>
         </div>
-        <h1 className="text-white text-xl font-bold mb-2">@{profile.username}</h1>
+        <h1 className="text-white text-xl font-bold mb-2">@{profile.username.replace(/^@+/, "")}</h1>
         <p className="text-white/40 text-sm mb-2">Esta vitrine está sendo preparada.</p>
         <p className="text-white/25 text-xs mb-8">Em breve terá conteúdo incrível por aqui.</p>
         <Link to="/" className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-white text-sm font-bold transition-all hover:brightness-110 hover:shadow-xl hover:shadow-violet-500/20" style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7)" }}>
@@ -525,11 +536,11 @@ const ProfilePage = () => {
               }
             </div>
 
-            <h1 className="text-[22px] font-extrabold mb-1 text-center tracking-tight" style={{ color: rd.nameColor || t.text, fontFamily: `'${rd.fontHeading}', sans-serif`, textShadow: tShadow }}>{profile.displayName}</h1>
-            <p className="text-[13px] font-semibold mb-2" style={{ color: t.sub, textShadow: tShadow }}>@{profile.username}</p>
+            <h1 className="text-[22px] font-extrabold mb-1 text-center tracking-tight" style={{ color: c.name, fontFamily: `'${rd.fontHeading}', sans-serif`, textShadow: tShadow }}>{profile.displayName}</h1>
+            <p className="text-[13px] font-semibold mb-2" style={{ color: t.accent, textShadow: tShadow }}>@{profile.username.replace(/^@+/, "")}</p>
             {profile.bio && (
               <div className="max-w-[300px] mb-3 text-center">
-                <p className={`text-[14px] leading-relaxed ${bioExpanded ? "" : "line-clamp-3"}`} style={{ color: t.sub, fontFamily: `'${rd.fontBody}', sans-serif`, textShadow: tShadow }}>{profile.bio}</p>
+                <p className={`text-[14px] leading-relaxed ${bioExpanded ? "" : "line-clamp-3"}`} style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif`, textShadow: tShadow }}>{profile.bio}</p>
                 {profile.bio.length > 120 && !bioExpanded && (
                   <button onClick={() => setBioExpanded(true)} className="text-[12px] font-medium mt-1 transition-colors hover:opacity-80" style={{ color: t.accent }}>
                     ver mais
@@ -739,7 +750,7 @@ const ProfilePage = () => {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                            <p className="text-[15px] font-bold leading-snug line-clamp-2" style={{ color: rd.productTitleColor || t.text, fontFamily: `'${rd.fontHeading}', sans-serif` }}>{product.title}</p>
+                            <p className="text-[15px] font-bold leading-snug line-clamp-2" style={{ color: c.productTitle, fontFamily: `'${rd.fontHeading}', sans-serif` }}>{product.title}</p>
                             {/* Auto "Mais vendido" badge on first product */}
                             {i === 0 && profile.products.length > 1 && !product.badge && (
                               <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 flex items-center gap-0.5"
@@ -760,11 +771,11 @@ const ProfilePage = () => {
                             )}
                             {product.urgency && <CountdownBadge accent={t.accent} badgeBg={rd.urgencyBadgeBg} badgeText={rd.urgencyBadgeText} />}
                           </div>
-                          {product.description && <p className="text-[12px] line-clamp-2" style={{ color: rd.descriptionColor || t.sub }}>{product.description}</p>}
+                          {product.description && <p className="text-[12px] line-clamp-2" style={{ color: c.productDesc }}>{product.description}</p>}
                           {product.price && (
                             <div className="flex items-center gap-2 mt-1">
-                              <span className="text-[13px] font-bold" style={{ color: rd.priceColor || t.text }}>{product.price}</span>
-                              {product.originalPrice && <span className="text-[11px] line-through" style={{ color: rd.originalPriceColor || "rgba(156,163,175,0.7)" }}>{product.originalPrice}</span>}
+                              <span className="text-[13px] font-bold" style={{ color: c.price }}>{product.price}</span>
+                              {product.originalPrice && <span className="text-[11px] line-through" style={{ color: c.originalPrice }}>{product.originalPrice}</span>}
                             </div>
                           )}
                           {isBooking && (

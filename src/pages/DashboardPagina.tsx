@@ -296,7 +296,7 @@ const ProfileHeroCard = ({ config, onUpdate, onEditProfile, onHealthAction, onCo
               </button>
             )}
           </div>
-          {config.username && <p className="text-[hsl(var(--dash-text-muted))] text-[12px] mb-1">{config.username.startsWith("@") ? config.username : `@${config.username}`}</p>}
+          {config.username && <p className="text-[hsl(var(--dash-text-muted))] text-[12px] mb-1">@{config.username.replace(/^@+/, "")}</p>}
           {config.bio && <p className="text-[hsl(var(--dash-text-subtle))] text-[11.5px] line-clamp-1 mb-2">{config.bio}</p>}
           {socialLinks.length > 0 && (
             <div className="flex items-center gap-1.5 mb-2.5">
@@ -1414,7 +1414,7 @@ const DashboardPagina = () => {
                 )}
               </div>
               <p className="font-bold text-sm" style={{ color: d.nameColor || pText, fontFamily: `'${pFontH}', sans-serif`, textShadow: pTxtShadow }}>{config.displayName || "Seu Nome"}</p>
-              {config.username && <p className="text-xs mt-0.5" style={{ color: pAccent, textShadow: pTxtShadow }}>{config.username.startsWith("@") ? config.username : `@${config.username}`}</p>}
+              {config.username && <p className="text-xs mt-0.5" style={{ color: pAccent, textShadow: pTxtShadow }}>@{config.username.replace(/^@+/, "")}</p>}
               {config.bio && <p className="text-xs text-center mt-1.5 px-2 line-clamp-2" style={{ color: pSub, textShadow: pTxtShadow }}>{config.bio}</p>}
               {/* Social icons row — shows real social links + WhatsApp */}
               {(() => {
@@ -2963,7 +2963,7 @@ const DashboardPagina = () => {
                         {config.displayName || "Seu nome"}
                       </p>
                       <p className="text-[12px] font-semibold mt-0.5" style={{ color: currentTheme.accent }}>
-                        @{config.username || "username"}
+                        @{(config.username || "username").replace(/^@+/, "")}
                       </p>
                       {config.bio && <p className="text-[10px] mt-1 truncate leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>{config.bio}</p>}
                     </div>
