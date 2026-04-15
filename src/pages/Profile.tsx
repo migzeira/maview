@@ -525,32 +525,46 @@ const ProfilePage = () => {
           {/* ── HERO ── */}
           <div className="flex flex-col items-center mb-7 transition-all duration-500" style={{ opacity: heroVis ? 1 : 0, transform: heroVis ? "translateY(0)" : "translateY(12px)" }}>
             {/* Avatar */}
-            <div className="relative mb-4"
-              style={{
-                width: rd.profileSize, height: rd.profileSize,
-                borderRadius: profileBorderRadius(rd.profileShape),
-                boxShadow: rd.profileGlow
-                  ? `0 0 24px 8px ${rd.profileGlowColor || rd.profileBorderColor || t.accent}55, 0 0 48px 16px ${rd.profileGlowColor || rd.profileBorderColor || t.accent}25`
-                  : "none",
-              }}>
-              {profile.avatar
-                ? <img src={profile.avatar} alt={profile.displayName}
-                    className="relative object-cover z-10" loading="eager" decoding="async" fetchPriority="high"
-                    style={{
-                      width: rd.profileSize, height: rd.profileSize,
-                      borderRadius: profileBorderRadius(rd.profileShape),
-                      clipPath: profileClip(rd.profileShape),
-                      border: rd.profileBorder ? `2.5px solid ${rd.profileBorderColor || t.accent}70` : "none",
-                    }} />
-                : <div className="relative z-10 flex items-center justify-center text-2xl font-bold text-white"
-                    style={{
-                      width: rd.profileSize, height: rd.profileSize,
-                      borderRadius: profileBorderRadius(rd.profileShape),
-                      clipPath: profileClip(rd.profileShape),
-                      background: t.accent,
-                    }}>{(profile.displayName || "?")[0]}</div>
-              }
-            </div>
+            {(() => {
+              const glowC = rd.profileGlowColor || rd.profileBorderColor || t.accent;
+              // Parse hex to rgba for reliable cross-browser glow
+              const hexToRgba = (hex: string, a: number) => {
+                const h = hex.replace("#", "");
+                const r = parseInt(h.slice(0, 2), 16) || 0;
+                const g = parseInt(h.slice(2, 4), 16) || 0;
+                const b = parseInt(h.slice(4, 6), 16) || 0;
+                return `rgba(${r},${g},${b},${a})`;
+              };
+              const showGlow = rd.profileGlow !== false;
+              return (
+                <div className="relative mb-4"
+                  style={{
+                    width: rd.profileSize, height: rd.profileSize,
+                    borderRadius: profileBorderRadius(rd.profileShape),
+                    boxShadow: showGlow
+                      ? `0 0 28px 10px ${hexToRgba(glowC, 0.35)}, 0 0 56px 20px ${hexToRgba(glowC, 0.15)}`
+                      : "none",
+                  }}>
+                  {profile.avatar
+                    ? <img src={profile.avatar} alt={profile.displayName}
+                        className="relative object-cover z-10" loading="eager" decoding="async" fetchPriority="high"
+                        style={{
+                          width: rd.profileSize, height: rd.profileSize,
+                          borderRadius: profileBorderRadius(rd.profileShape),
+                          clipPath: profileClip(rd.profileShape),
+                          border: rd.profileBorder ? `2.5px solid ${hexToRgba(glowC, 0.5)}` : "none",
+                        }} />
+                    : <div className="relative z-10 flex items-center justify-center text-2xl font-bold text-white"
+                        style={{
+                          width: rd.profileSize, height: rd.profileSize,
+                          borderRadius: profileBorderRadius(rd.profileShape),
+                          clipPath: profileClip(rd.profileShape),
+                          background: t.accent,
+                        }}>{(profile.displayName || "?")[0]}</div>
+                  }
+                </div>
+              );
+            })()}
 
             <h1 className="text-[22px] font-extrabold mb-1 text-center tracking-tight" style={{ color: c.name, fontFamily: `'${rd.fontHeading}', sans-serif`, textShadow: tShadow }}>{profile.displayName}</h1>
             <p className="text-[13px] font-semibold mb-2" style={{ color: t.accent, textShadow: tShadow }}>@{profile.username.replace(/^@+/, "")}</p>
@@ -748,9 +762,9 @@ const ProfilePage = () => {
 
                       {/* Card body */}
                       <Wrapper {...(wrapperProps as any)}
-                        className={`group flex items-center gap-4 w-full px-4 py-3.5 transition-all duration-200 active:scale-[0.97] ${isBooking ? "cursor-pointer text-left" : ""}`}
+                        className={`group flex items-center gap-4 w-full px-4 py-4 transition-all duration-200 active:scale-[0.97] ${isBooking ? "cursor-pointer text-left" : ""}`}
                       >
-                        <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center text-2xl flex-shrink-0" style={{ background: `${t.accent}0a` }}>
+                        <div className="w-14 h-14 rounded-xl overflow-hidden flex items-center justify-center text-2xl flex-shrink-0" style={{ background: `${t.accent}08`, border: `1px solid ${t.accent}10` }}>
                           {coverImg
                             ? <img src={coverImg} alt={product.title} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                             : product.emoji
@@ -798,10 +812,11 @@ const ProfilePage = () => {
                           <div className="flex-shrink-0 flex items-center gap-1.5 px-4 py-3 min-h-[44px] text-[13px] font-semibold rounded-lg transition-colors duration-150"
                             style={{
                               borderRadius: buttonBorderRadius(rd.buttonShape, rd.buttonRadius),
-                              background: isWhatsApp ? "#25d366" : t.accent,
-                              color: "#fff",
+                              background: isWhatsApp ? "rgba(37,211,102,0.18)" : `${t.accent}18`,
+                              border: isWhatsApp ? "1px solid rgba(37,211,102,0.30)" : `1px solid ${t.accent}30`,
+                              color: isWhatsApp ? "#25d366" : t.accent,
                             }}>
-                            {isBooking ? <Calendar size={11} /> : isWhatsApp ? <WhatsAppIcon size={13} style={{ color: "#fff" }} /> : <ShoppingCart size={11} />} {ctaLabel}
+                            {isBooking ? <Calendar size={11} /> : isWhatsApp ? <WhatsAppIcon size={13} style={{ color: "#25d366" }} /> : <ShoppingCart size={11} />} {ctaLabel}
                           </div>
                         )}
                       </Wrapper>
@@ -974,7 +989,7 @@ const ProfilePage = () => {
             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
 
             {/* Modal */}
-            <div className="relative w-full max-w-[420px] max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl animate-in slide-in-from-bottom-4 duration-300"
+            <div className="relative w-full max-w-[460px] max-h-[94vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl animate-in slide-in-from-bottom-4 duration-300"
               style={{ background: t.bg, border: `1px solid ${t.border}` }}>
 
               {/* Close button */}
@@ -1068,12 +1083,14 @@ const ProfilePage = () => {
                   {dp.linkType !== "none" && (
                     <a href={dpHref || "#"} target="_blank" rel="noopener noreferrer"
                       onClick={() => { trackEvent(profile.username, "click_cta", { productId: dp.id, title: dp.title }); }}
-                      className="flex items-center justify-center gap-2.5 w-full py-4 rounded-2xl font-bold text-[15px] text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
+                      className="flex items-center justify-center gap-2.5 w-full py-4 rounded-2xl font-bold text-[15px] transition-all hover:scale-[1.02] active:scale-[0.98]"
                       style={{
-                        background: isWhatsApp ? "#25d366" : t.accent,
+                        background: isWhatsApp ? "rgba(37,211,102,0.15)" : `${t.accent}15`,
+                        border: isWhatsApp ? "1.5px solid rgba(37,211,102,0.40)" : `1.5px solid ${t.accent}40`,
+                        color: isWhatsApp ? "#25d366" : t.accent,
                         borderRadius: buttonBorderRadius(rd.buttonShape, rd.buttonRadius),
                       }}>
-                      {isBooking ? <Calendar size={16} /> : isWhatsApp ? <WhatsAppIcon size={16} style={{ color: "#fff" }} /> : <ShoppingCart size={16} />}
+                      {isBooking ? <Calendar size={16} /> : isWhatsApp ? <WhatsAppIcon size={16} style={{ color: "#25d366" }} /> : <ShoppingCart size={16} />}
                       {dpCta}
                     </a>
                   )}
