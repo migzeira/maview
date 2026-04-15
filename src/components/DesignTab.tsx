@@ -155,10 +155,12 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
 
   const applyPack = useCallback((pack: DesignPack) => {
     updateConfig("theme", pack.config.theme);
-    // Preserve user's custom images and profile colors when switching packs
+    // Preserve ONLY user-uploaded images (not template Unsplash images) and profile colors
     const prev = designRef.current || {};
     const preserved: Record<string, unknown> = {};
-    if (prev.bgImageUrl) {
+    // Only preserve bg image if it's user-uploaded (Supabase Storage), not from a template pack (Unsplash)
+    const isUserUpload = (url: string | undefined) => url && !url.includes("images.unsplash.com");
+    if (prev.bgImageUrl && isUserUpload(prev.bgImageUrl as string)) {
       preserved.bgImageUrl = prev.bgImageUrl;
       preserved.bgType = "image";
       if (prev.bgOverlay) preserved.bgOverlay = prev.bgOverlay;
@@ -166,7 +168,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
       if (prev.bgImagePosX !== undefined) preserved.bgImagePosX = prev.bgImagePosX;
       if (prev.bgImagePosY !== undefined) preserved.bgImagePosY = prev.bgImagePosY;
     }
-    if (prev.coverImageUrl) preserved.coverImageUrl = prev.coverImageUrl;
+    if (prev.coverImageUrl && isUserUpload(prev.coverImageUrl as string)) preserved.coverImageUrl = prev.coverImageUrl;
     if (prev.profileBorderColor) preserved.profileBorderColor = prev.profileBorderColor;
     if (prev.profileGlowColor) preserved.profileGlowColor = prev.profileGlowColor;
     const latest = { ...pack.config.design, ...preserved };
