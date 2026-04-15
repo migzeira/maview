@@ -1221,8 +1221,8 @@ const DashboardPagina = () => {
   const pAccent = d.accentColor || currentTheme.accent;
   const pAccent2 = d.accentColor2 || currentTheme.accent2;
   const pBg = d.bgColor || currentTheme.bg;
-  const pText = d.textColor || "#f8f5ff";
-  const pSub = d.subtextColor || "rgba(220,220,220,0.8)";
+  const pText = d.textColor || currentTheme.text;
+  const pSub = d.subtextColor || currentTheme.sub;
   const pCard = d.cardBg || currentTheme.accent + "0a";
   const pBorder = d.cardBorder || currentTheme.accent + "30";
   const pFontH = d.fontHeading || "Inter";
@@ -1251,7 +1251,13 @@ const DashboardPagina = () => {
           ? { background: `radial-gradient(circle, ${d.bgGradient[0]}, ${d.bgGradient[1]})` }
           : { background: `linear-gradient(${dir}, ${d.bgGradient[0]}, ${d.bgGradient[1]})` };
       }
-      case "image": return d.bgImageUrl ? { backgroundImage: `url(${d.bgImageUrl})`, backgroundSize: "cover", backgroundPosition: "center" } : { background: pBg };
+      case "image": return d.bgImageUrl ? {
+        backgroundImage: `url(${d.bgImageUrl})`,
+        backgroundSize: `${d.bgImageZoom ?? 100}%`,
+        backgroundPosition: `${d.bgImagePosX ?? 50}% ${d.bgImagePosY ?? 50}%`,
+        backgroundRepeat: "no-repeat" as const,
+        backgroundColor: pBg,
+      } : { background: pBg };
       case "effect": return { background: pBg };
       default: return { background: pBg };
     }
@@ -1372,8 +1378,13 @@ const DashboardPagina = () => {
           <div className="w-[88px] h-[26px] rounded-full bg-black" />
         </div>
 
+        {/* Image/effect overlay (darkening) */}
+        {(d.bgType === "image" || d.bgType === "video" || d.bgType === "pattern" || d.bgType === "effect") && (d.bgOverlay ?? 0) > 0 && (
+          <div className="absolute inset-0 pointer-events-none z-[1]" style={{ background: `rgba(0,0,0,${(d.bgOverlay || 0) / 100})` }} />
+        )}
+
         {/* Scrollable screen content */}
-        <div className="flex-1 overflow-y-auto relative" style={{ fontFamily: `'${pFontB}', sans-serif` }}>
+        <div className="flex-1 overflow-y-auto relative z-[2]" style={{ fontFamily: `'${pFontB}', sans-serif` }}>
           {/* Effect overlay — crossfade on effect change */}
           {previewEffectOverlay && <div key={d.bgEffect} className="animate-in fade-in duration-400">{previewEffectOverlay}</div>}
           {/* Ambient glow */}
@@ -3238,7 +3249,10 @@ const DashboardPagina = () => {
                     {/* Mini phone mockup */}
                     <div className="flex-shrink-0 w-[140px] rounded-2xl overflow-hidden border-2 border-[hsl(var(--dash-text))]/30 shadow-lg">
                       <div className="overflow-hidden relative" style={{ ...previewBgStyle, height: 180, fontFamily: `'${pFontB}', sans-serif` }}>
-                        {previewEffectOverlay && <div key={d.bgEffect} className="absolute inset-0 pointer-events-none z-[1] animate-in fade-in duration-400">{previewEffectOverlay}</div>}
+                        {(d.bgType === "image" || d.bgType === "video" || d.bgType === "pattern" || d.bgType === "effect") && (d.bgOverlay ?? 0) > 0 && (
+                          <div className="absolute inset-0 pointer-events-none z-[1]" style={{ background: `rgba(0,0,0,${(d.bgOverlay || 0) / 100})` }} />
+                        )}
+                        {previewEffectOverlay && <div key={d.bgEffect} className="absolute inset-0 pointer-events-none z-[2] animate-in fade-in duration-400">{previewEffectOverlay}</div>}
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[80px] pointer-events-none" style={{ background: `radial-gradient(ellipse, ${pAccent}20, transparent 70%)` }} />
                         <div className="p-2.5 relative z-10">
                           <div className="flex flex-col items-center mb-2">

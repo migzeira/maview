@@ -411,6 +411,42 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         </button>
       </div>
 
+      {/* ═══════ 2.5. TEXT COLORS — quick access ═══════ */}
+      <div className="space-y-3">
+        <h3 className="text-[hsl(var(--dash-text))] font-bold text-[14px]">Cor dos textos</h3>
+        <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] -mt-1">Mude a cor do seu nome, bio e descricoes</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-[10px] font-semibold text-[hsl(var(--dash-text-muted))] mb-1 block">Nome e titulos</label>
+            <div className="flex items-center gap-2">
+              <input type="color" value={d.textColor || currentTheme.text}
+                onChange={(e) => setDesign("textColor", e.target.value)}
+                className="w-8 h-8 rounded-lg border border-[hsl(var(--dash-border))] cursor-pointer" />
+              <span className="text-[11px] font-mono text-[hsl(var(--dash-text-muted))]">{d.textColor || currentTheme.text}</span>
+            </div>
+          </div>
+          <div>
+            <label className="text-[10px] font-semibold text-[hsl(var(--dash-text-muted))] mb-1 block">Bio e descricoes</label>
+            <div className="flex items-center gap-2">
+              <input type="color" value={(() => { const v = d.subtextColor || currentTheme.sub; return v.startsWith("rgba") ? "#999999" : v; })()}
+                onChange={(e) => setDesign("subtextColor", e.target.value)}
+                className="w-8 h-8 rounded-lg border border-[hsl(var(--dash-border))] cursor-pointer" />
+              <span className="text-[11px] font-mono text-[hsl(var(--dash-text-muted))] truncate">{d.subtextColor || currentTheme.sub}</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={() => { setDesign("textColor", "#ffffff"); setDesign("subtextColor", "rgba(255,255,255,0.80)"); }}
+            className="flex-1 py-2 rounded-xl text-[11px] font-semibold bg-gray-900 text-white border border-gray-700 hover:border-primary/40 transition-all">
+            Texto claro
+          </button>
+          <button onClick={() => { setDesign("textColor", "#111827"); setDesign("subtextColor", "#374151"); }}
+            className="flex-1 py-2 rounded-xl text-[11px] font-semibold bg-white text-gray-900 border border-gray-300 hover:border-primary/40 transition-all">
+            Texto escuro
+          </button>
+        </div>
+      </div>
+
       {/* ═══════ 3. FONT — simplified ═══════ */}
       <FontSelector
         currentFont={d.fontHeading}
