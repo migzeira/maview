@@ -92,7 +92,18 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, onBgColor
               setBgUploading(true);
               const publicUrl = await uploadImage(f, "backgrounds");
               setBgUploading(false);
-              if (publicUrl) setDesign("bgImageUrl", publicUrl);
+              if (publicUrl) {
+                setDesign("bgImageUrl", publicUrl);
+                // Auto-extract dominant color and apply to profile border + glow
+                try {
+                  const { extractColorsFromImage } = await import("./utils");
+                  const colors = await extractColorsFromImage(publicUrl);
+                  if (colors?.dominant) {
+                    setDesign("profileBorderColor", colors.dominant);
+                    setDesign("profileGlowColor" as any, colors.dominant);
+                  }
+                } catch { /* best-effort */ }
+              }
             }} />
             {bgUploading && (
               <div className="flex items-center gap-1.5 text-[10px] text-primary font-medium">
@@ -371,6 +382,7 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, onBgColor
               </button>
             ))}
           </div>
+          {/* Borda colorida */}
           <div className="flex items-center justify-between">
             <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Borda colorida</p>
             <button onClick={() => setDesign("profileBorder", !d.profileBorder)}
@@ -378,6 +390,27 @@ function AdvancedContent({ design: d, currentTheme, accent, setDesign, onBgColor
               <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${d.profileBorder ? "left-[18px]" : "left-0.5"}`} />
             </button>
           </div>
+          {d.profileBorder && (
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Cor da borda</p>
+              <ColorPicker color={d.profileBorderColor || accent} onChange={c => setDesign("profileBorderColor", c)} />
+            </div>
+          )}
+
+          {/* Brilho / Glow */}
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Brilho (glow)</p>
+            <button onClick={() => setDesign("profileGlow", !(d as any).profileGlow)}
+              className={`relative w-9 h-5 rounded-full transition-colors ${(d as any).profileGlow ? "bg-primary" : "bg-[hsl(var(--dash-border))]"}`}>
+              <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${(d as any).profileGlow ? "left-[18px]" : "left-0.5"}`} />
+            </button>
+          </div>
+          {(d as any).profileGlow && (
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">Cor do brilho</p>
+              <ColorPicker color={(d as any).profileGlowColor || d.profileBorderColor || accent} onChange={c => setDesign("profileGlowColor" as any, c)} />
+            </div>
+          )}
         </div>
       </Section>
     </div>

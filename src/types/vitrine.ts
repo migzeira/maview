@@ -61,6 +61,8 @@ export interface DesignConfig {
   profileShape: ProfileShape;
   profileBorder: boolean;
   profileBorderColor: string;
+  profileGlow: boolean;          // glow/shadow behind profile photo
+  profileGlowColor: string;     // color of the glow (empty = same as borderColor)
   profileSize: number;
 
   // Layout

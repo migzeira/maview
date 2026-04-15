@@ -1399,7 +1399,10 @@ const DashboardPagina = () => {
                   width: pSize, height: pSize,
                   borderRadius: pProfileRadius,
                   clipPath: pProfileClip,
-                  boxShadow: d.profileBorder ? `0 0 0 2px ${d.profileBorderColor || pAccent}50` : "none",
+                  boxShadow: [
+                    d.profileBorder ? `0 0 0 2px ${d.profileBorderColor || pAccent}50` : "",
+                    (d as any).profileGlow !== false ? `0 0 12px 4px ${(d as any).profileGlowColor || d.profileBorderColor || pAccent}40` : "",
+                  ].filter(Boolean).join(", ") || "none",
                 }}>
                 {config.avatarUrl ? (
                   <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover"

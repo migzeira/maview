@@ -509,10 +509,10 @@ const ProfilePage = () => {
           <div className="flex flex-col items-center mb-7 transition-all duration-500" style={{ opacity: heroVis ? 1 : 0, transform: heroVis ? "translateY(0)" : "translateY(12px)" }}>
             {/* Avatar */}
             <div className="relative mb-4">
-              {rd.profileBorder && (
+              {rd.profileGlow && (
                 <div className="absolute inset-[-3px] opacity-40 blur-[10px]"
                   style={{
-                    background: rd.profileBorderColor || t.accent,
+                    background: rd.profileGlowColor || rd.profileBorderColor || t.accent,
                     borderRadius: profileBorderRadius(rd.profileShape),
                     clipPath: profileClip(rd.profileShape),
                   }} />

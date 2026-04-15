@@ -57,7 +57,7 @@ export interface ResolvedDesign {
   bgImageUrl: string; bgVideoUrl: string; bgPattern: string; bgOverlay: number; bgBlur: number; bgEffect: string;
   bgImageZoom: number; bgImagePosX: number; bgImagePosY: number;
   buttonShape: ButtonShape; buttonFill: ButtonFill; buttonShadow: string; buttonRadius: number;
-  profileShape: ProfileShape; profileBorder: boolean; profileBorderColor: string; profileSize: number;
+  profileShape: ProfileShape; profileBorder: boolean; profileBorderColor: string; profileGlow: boolean; profileGlowColor: string; profileSize: number;
   textShadow: number;  // 0=off, 1-10 intensity
   hideWatermark: boolean;
 }
@@ -102,6 +102,8 @@ export function resolveDesign(theme: ThemeDef, design?: Partial<DesignConfig>): 
     profileShape: d.profileShape || "circle",
     profileBorder: d.profileBorder ?? true,
     profileBorderColor: d.profileBorderColor || theme.accent,
+    profileGlow: d.profileGlow ?? true,
+    profileGlowColor: d.profileGlowColor || "",
     profileSize: d.profileSize ?? 88,
     textShadow: typeof d.textShadow === "number" ? d.textShadow : (d.textShadow ? 5 : 0),
     hideWatermark: d.hideWatermark ?? false,

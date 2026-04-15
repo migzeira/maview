@@ -340,6 +340,14 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
               setBgUploading(false);
               if (publicUrl) {
                 setDesign("bgImageUrl", publicUrl);
+                // Auto-extract dominant color and apply to profile border + glow
+                try {
+                  const colors = await extractColorsFromImage(publicUrl);
+                  if (colors?.dominant) {
+                    setDesign("profileBorderColor", colors.dominant);
+                    setDesign("profileGlowColor" as any, colors.dominant);
+                  }
+                } catch { /* color extraction is best-effort */ }
               }
             }}
           />
