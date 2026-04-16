@@ -77,7 +77,7 @@ const FAQ_ITEMS = [
   { q: "O Maview é realmente grátis?", a: "Sim, 100% grátis. Sem período de teste, sem cartão de crédito. Você cria sua vitrine e começa a usar agora mesmo." },
   { q: "Preciso de cartão de crédito?", a: "Não. Você cria sua conta apenas com email e senha. Sem cobrança nenhuma." },
   { q: "Posso vender produtos pela vitrine?", a: "Sim! Você pode vender produtos digitais, físicos, serviços e sessões de coaching — e o Maview cobra 0% de taxa por venda." },
-  { q: "Como personalizo minha página?", a: "No painel, escolha entre 20+ temas, 40+ efeitos animados e 24+ fontes. Tudo com 1 clique — sem código, sem complicação." },
+  { q: "Como personalizo minha página?", a: "No painel, escolha entre 23+ temas, 40+ efeitos animados e 24+ fontes. Tudo com 1 clique — sem código, sem complicação." },
   { q: "O Maview cobra taxa por venda?", a: "Não. O Maview cobra 0% de taxa. O valor da venda é 100% seu. Cobramos apenas pela futura versão Pro (opcional)." },
 ];
 
@@ -1049,7 +1049,7 @@ const Login = () => {
                 {[
                   ["Preço",               "Grátis",   "$5-24/mês",  "$29-99/mês"],
                   ["Taxa por venda",      "0%",       "2.9%",       "0%"],
-                  ["Temas personalizáveis","19+",      "Limitados",  "1 layout"],
+                  ["Temas personalizáveis","23+",      "Limitados",  "1 layout"],
                   ["Efeitos animados",    "40+",      "0",          "0"],
                   ["Booking nativo",      "true",     "false",      "true"],
                   ["IA integrada",        "true",     "false",      "false"],
