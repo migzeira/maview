@@ -1053,7 +1053,7 @@ const Login = () => {
                   ["Efeitos animados",    "40+",      "0",          "0"],
                   ["Booking nativo",      "true",     "false",      "true"],
                   ["IA integrada",        "true",     "false",      "false"],
-                  ["Design Packs 1 clique","16",      "0",          "0"],
+                  ["Design Packs 1 clique","23+",     "0",          "0"],
                   ["Google Fonts",        "24+",      "Limitado",   "0"],
                   ["Suporte em PT-BR",    "true",     "false",      "false"],
                 ].map(([feature, maview, linktree, stan], i) => (
