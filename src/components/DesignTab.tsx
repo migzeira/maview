@@ -24,7 +24,14 @@ import type { DesignPack } from "./design/constants";
 function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack; isActive: boolean; onClick: () => void; liveDesign?: DesignConfig }) {
   const { bg: packBg, accent: packAccent, accent2: packAccent2 } = pack.preview;
   // If this is the active pack, use the LIVE design state so edits reflect in real-time
-  const dd = (isActive && liveDesign) ? liveDesign : pack.config.design;
+  // BUT never leak the user's uploaded bg image into the pack preview — always show the pack's own bg
+  const dd = (isActive && liveDesign) ? {
+    ...liveDesign,
+    bgImageUrl: pack.config.design.bgImageUrl,
+    bgType: pack.config.design.bgType,
+    bgOverlay: pack.config.design.bgOverlay ?? liveDesign.bgOverlay,
+    coverImageUrl: pack.config.design.coverImageUrl,
+  } : pack.config.design;
   const bg = dd.bgColor || packBg;
   const accent = dd.accentColor || packAccent;
   const accent2 = dd.accentColor2 || packAccent2;
