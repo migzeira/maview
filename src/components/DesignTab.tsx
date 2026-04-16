@@ -364,16 +364,30 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     const centerX = rect.left + rect.width / 2;
     const items = el.children;
     const newMap = new Map<number, { scale: number; opacity: number }>();
+    // Find closest card to center first
+    let minDist = Infinity;
     for (let i = 0; i < items.length; i++) {
       const child = items[i] as HTMLElement;
       const childRect = child.getBoundingClientRect();
       const childCenterX = childRect.left + childRect.width / 2;
       const dist = Math.abs(childCenterX - centerX);
-      const maxDist = rect.width * 0.55;
-      const t = Math.min(dist / maxDist, 1); // 0 = center, 1 = far edge
-      const scale = 1 - t * 0.16; // 1.0 → 0.84
-      const opacity = 1 - t * 0.3; // 1.0 → 0.7
-      newMap.set(i, { scale: Math.max(scale, 0.84), opacity: Math.max(opacity, 0.7) });
+      if (dist < minDist) minDist = dist;
+    }
+    // Now set scale/opacity relative to card width (240px)
+    const cardW = 260; // card width + gap
+    for (let i = 0; i < items.length; i++) {
+      const child = items[i] as HTMLElement;
+      const childRect = child.getBoundingClientRect();
+      const childCenterX = childRect.left + childRect.width / 2;
+      const dist = Math.abs(childCenterX - centerX);
+      // Cards within ~half a card width of center = full size
+      const deadzone = cardW * 0.4;
+      const effectiveDist = Math.max(0, dist - deadzone);
+      const maxDist = cardW * 1.5;
+      const t = Math.min(effectiveDist / maxDist, 1); // 0 = center zone, 1 = far
+      const scale = 1 - t * 0.12; // 1.0 → 0.88
+      const opacity = 1 - t * 0.25; // 1.0 → 0.75
+      newMap.set(i, { scale: Math.max(scale, 0.88), opacity: Math.max(opacity, 0.75) });
     }
     setCoverflowStyles(newMap);
   }, []);
@@ -383,13 +397,15 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     if (!el) return;
     const handler = () => requestAnimationFrame(updateCoverflow);
     el.addEventListener("scroll", handler, { passive: true });
-    // Initial calculation
-    const timer = setTimeout(handler, 100);
+    // Initial calculation — multiple attempts for layout settle
+    const t1 = setTimeout(handler, 50);
+    const t2 = setTimeout(handler, 300);
     window.addEventListener("resize", handler);
     return () => {
       el.removeEventListener("scroll", handler);
       window.removeEventListener("resize", handler);
-      clearTimeout(timer);
+      clearTimeout(t1);
+      clearTimeout(t2);
     };
   }, [updateCoverflow, packFilter]);
 

@@ -57,7 +57,7 @@ const U = (id: string, w = 200, h = 200, crop = "center") =>
 
 export const REFERENCE_PROFILES: ReferenceProfile[] = [
   /* 0 — Designer */ { name: "Ana Beatriz", username: "@anabeatriz", bio: "Transformo marcas em experiencias inesqueciveis 🎨",
-    avatar: U("photo-1494790108377-be9c29b29330", 300, 300, "face"),
+    avatar: U("photo-1580489944761-15a19d654956", 300, 300, "face"),
     socials: ["ig", "tt", "yt"], links: ["Ver portfolio completo →", "Agendar mentoria gratuita →", "Baixar ebook gratis →"],
     products: [
       { title: "Ebook Design Systems", price: "R$ 47", image: U("photo-1558655146-9f40138edfeb", 200, 150, "center") },
@@ -66,7 +66,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     ],
     stats: [{ value: "12.4k", label: "alunos" }, { value: "4.9", label: "⭐" }, { value: "320+", label: "projetos" }] },
   /* 1 — Fitness */ { name: "Lucas Santos", username: "@lucassantos", bio: "Transformo corpos e mentes em 12 semanas 💪",
-    avatar: U("photo-1507003211169-0a1dd7228f2d", 300, 300, "face"),
+    avatar: U("photo-1583468982228-19f19b4e3b4f", 300, 300, "face"),
     socials: ["ig", "yt", "wa"], links: ["Falar no WhatsApp →", "Baixar treino gratis →", "Agendar avaliacao →"],
     products: [
       { title: "Plano de Treino 12 Semanas", price: "R$ 97", image: U("photo-1534438327276-14e5300c3a48", 200, 150, "center") },
@@ -75,7 +75,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     ],
     stats: [{ value: "+3.2k", label: "alunos" }, { value: "4.9", label: "⭐" }, { value: "8 anos", label: "exp." }] },
   /* 2 — Fotografa */ { name: "Camila Rocha", username: "@camilarocha", bio: "Transformando momentos em arte desde 2016 📸",
-    avatar: U("photo-1438761681033-6461ffad8d80", 300, 300, "face"),
+    avatar: U("photo-1573496359142-b8d87734a5a2", 300, 300, "face"),
     socials: ["ig", "tt", "pin"], links: ["Agendar ensaio →", "Ver portfolio completo →", "Baixar presets gratis →"],
     products: [
       { title: "Pack 80 Presets Pro", price: "R$ 49", image: U("photo-1452587925148-ce544e77e70d", 200, 150, "center") },
@@ -84,7 +84,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     ],
     stats: [{ value: "+500", label: "ensaios" }, { value: "5.0", label: "⭐" }, { value: "10", label: "premios" }] },
   /* 3 — Dev */ { name: "Pedro Mendes", username: "@pedromendes", bio: "Criando SaaS que faturam enquanto durmo 🚀",
-    avatar: U("photo-1472099645785-5658abf4ff4e", 300, 300, "face"),
+    avatar: U("photo-1519085360753-af0119f7cbe7", 300, 300, "face"),
     socials: ["gh", "tw", "li"], links: ["Baixar template gratis →", "Agendar mentoria →", "Newsletter semanal →"],
     products: [
       { title: "Template SaaS Next.js", price: "R$ 129", image: U("photo-1555066931-4365d14bab8c", 200, 150, "center") },
@@ -93,7 +93,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     ],
     stats: [{ value: "10.8k", label: "devs" }, { value: "4.9", label: "⭐" }, { value: "5", label: "SaaS" }] },
   /* 4 — Artista */ { name: "Julia Lima", username: "@julialima", bio: "Cada traco conta uma historia ✨",
-    avatar: U("photo-1534528741775-53994a69daeb", 300, 300, "face"),
+    avatar: U("photo-1487412720507-e7ab37603c6f", 300, 300, "face"),
     socials: ["ig", "be", "tt"], links: ["Encomendar arte →", "Ver galeria completa →", "Baixar wallpapers →"],
     products: [
       { title: "Print Pack Exclusivo", price: "R$ 39", image: U("photo-1513364776144-60967b0f800f", 200, 150, "center") },
@@ -105,7 +105,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
   /* ── Showcase Profiles (Vitrines Prontas) — fotos reais de rosto ── */
 
   /* 5 — Wellness */ { name: "Marina Costa", username: "@marinacosta", bio: "Te ajudo a encontrar equilibrio e paz interior 🧘", verified: true,
-    avatar: U("photo-1544005313-94ddf0286df2", 400, 500, "face"),
+    avatar: U("photo-1548690312-e3b507d8c110", 400, 500, "face"),
     coverImage: U("photo-1506126613408-eca07ce68773", 400, 200, "center"),
     socials: ["ig", "tt", "yt"], links: ["Agendar aula experimental →", "Falar no WhatsApp →", "Baixar meditacao gratis →"],
     products: [
@@ -115,7 +115,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     ],
     stats: [{ value: "8.7k", label: "alunas" }, { value: "4.9", label: "⭐" }, { value: "R$680k", label: "faturado" }] },
   /* 6 — Coach */ { name: "Rafael Torres", username: "@rafaeltorres", bio: "Ensino creators a monetizar sem burnout 📱", verified: true,
-    avatar: U("photo-1500648767791-00dcc994a43e", 400, 500, "face"),
+    avatar: U("photo-1507003211169-0a1dd7228f2d", 400, 500, "face"),
     coverImage: U("photo-1498050108023-c5249f4df085", 400, 200, "center"),
     socials: ["ig", "tt", "li", "yt"], links: ["Agendar mentoria gratuita →", "Baixar guia gratis →", "Falar no WhatsApp →"],
     products: [
@@ -125,7 +125,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     ],
     stats: [{ value: "+850", label: "creators" }, { value: "4.8", label: "⭐" }, { value: "R$1.2M", label: "faturado" }] },
   /* 7 — Fashion */ { name: "Bianca Oliveira", username: "@biancaoliveira", bio: "Seu estilo e sua melhor estrategia 👗", verified: true,
-    avatar: U("photo-1524504388940-b1c1722653e1", 400, 500, "face"),
+    avatar: U("photo-1529626455594-4ff0802cfb7e", 400, 500, "face"),
     coverImage: U("photo-1469334031218-e382a71b716b", 400, 200, "center"),
     socials: ["ig", "tt", "pin"], links: ["Agendar consultoria →", "Falar no WhatsApp →", "Ver looks do mes →"],
     products: [
@@ -135,7 +135,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     ],
     stats: [{ value: "+1.4k", label: "clientes" }, { value: "5.0", label: "⭐" }, { value: "12 anos", label: "exp." }] },
   /* 8 — Fitness */ { name: "Thiago Almeida", username: "@thiagoalmeida", bio: "Resultado real, ciencia aplicada, zero achismo 💪", verified: true,
-    avatar: U("photo-1568602471122-7832951cc4c5", 400, 500, "face"),
+    avatar: U("photo-1594381898411-846e7d193883", 400, 500, "face"),
     coverImage: U("photo-1534438327276-14e5300c3a48", 400, 200, "center"),
     socials: ["ig", "yt", "wa"], links: ["Baixar treino gratis →", "Falar no WhatsApp →", "Agendar avaliacao →"],
     products: [
@@ -145,7 +145,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     ],
     stats: [{ value: "+4.6k", label: "alunos" }, { value: "4.9", label: "⭐" }, { value: "CREF", label: "ativo" }] },
   /* 9 — Fotografa */ { name: "Isabela Mendes", username: "@isabelamendes", bio: "Transformo luz em emocao 📷", verified: true,
-    avatar: U("photo-1531746020798-e6953c6e8e04", 400, 500, "face"),
+    avatar: U("photo-1534528741775-53994a69daeb", 400, 500, "face"),
     coverImage: U("photo-1516035069371-29a1b244cc32", 400, 200, "center"),
     socials: ["ig", "tt", "pin"], links: ["Agendar ensaio →", "Ver portfolio completo →", "Baixar presets gratis →"],
     products: [
@@ -155,7 +155,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     ],
     stats: [{ value: "+1.2k", label: "ensaios" }, { value: "5.0", label: "⭐" }, { value: "18", label: "premios" }] },
   /* 10 — Dev */ { name: "Daniel Rocha", username: "@danielrocha", bio: "Templates que geram receita recorrente ⚡", verified: true,
-    avatar: U("photo-1506794778202-cad84cf45f1d", 400, 500, "face"),
+    avatar: U("photo-1472099645785-5658abf4ff4e", 400, 500, "face"),
     coverImage: U("photo-1550751827-4bd374c3f58b", 400, 200, "center"),
     socials: ["gh", "tw", "li"], links: ["Baixar template gratis →", "Agendar mentoria →", "Newsletter dev →"],
     products: [
@@ -165,7 +165,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     ],
     stats: [{ value: "6.3k", label: "devs" }, { value: "4.9", label: "⭐" }, { value: "120+", label: "templates" }] },
   /* 11 — Nutri */ { name: "Luana Ferreira", username: "@luanaferreira", bio: "Alimentacao inteligente para quem quer resultado 🥗", verified: true,
-    avatar: U("photo-1487412720507-e7ab37603c6f", 400, 500, "face"),
+    avatar: U("photo-1494790108377-be9c29b29330", 400, 500, "face"),
     coverImage: U("photo-1490645935967-10de6ba17061", 400, 200, "center"),
     socials: ["ig", "tt", "yt"], links: ["Agendar consulta →", "Falar no WhatsApp →", "Baixar ebook gratis →"],
     products: [
@@ -175,7 +175,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     ],
     stats: [{ value: "+3.8k", label: "pacientes" }, { value: "4.9", label: "⭐" }, { value: "CRN", label: "ativa" }] },
   /* 12 — Musico */ { name: "Gabriel Santos", username: "@gabrielsantos", bio: "Beats que fazem hits 🎵", verified: true,
-    avatar: U("photo-1539571696357-5a69c17a67c6", 400, 500, "face"),
+    avatar: U("photo-1500648767791-00dcc994a43e", 400, 500, "face"),
     coverImage: U("photo-1598488035139-bdbb2231ce04", 400, 200, "center"),
     socials: ["ig", "tt", "yt", "sc"], links: ["Ouvir no Spotify →", "Encomendar beat exclusivo →", "Falar no WhatsApp →"],
     products: [
