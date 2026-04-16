@@ -164,7 +164,9 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     const preserved: Record<string, unknown> = {};
     const isUserUpload = (url: string | undefined) => url && !url.includes("images.unsplash.com");
     const newPackUsesBgImage = pack.config.design.bgType === "image";
-    if (prev.bgImageUrl && isUserUpload(prev.bgImageUrl as string) && newPackUsesBgImage) {
+    const isShowcase = pack.category === "showcase";
+    // Don't preserve user bg image for showcase packs — they have their own curated images
+    if (prev.bgImageUrl && isUserUpload(prev.bgImageUrl as string) && newPackUsesBgImage && !isShowcase) {
       preserved.bgImageUrl = prev.bgImageUrl;
       preserved.bgType = "image";
       if (prev.bgOverlay) preserved.bgOverlay = prev.bgOverlay;
@@ -172,7 +174,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
       if (prev.bgImagePosX !== undefined) preserved.bgImagePosX = prev.bgImagePosX;
       if (prev.bgImagePosY !== undefined) preserved.bgImagePosY = prev.bgImagePosY;
     }
-    if (prev.coverImageUrl && isUserUpload(prev.coverImageUrl as string)) preserved.coverImageUrl = prev.coverImageUrl;
+    if (prev.coverImageUrl && isUserUpload(prev.coverImageUrl as string) && !isShowcase) preserved.coverImageUrl = prev.coverImageUrl;
     if (prev.profileBorderColor) preserved.profileBorderColor = prev.profileBorderColor;
     if (prev.profileGlowColor) preserved.profileGlowColor = prev.profileGlowColor;
     const latest = { profileGlow: true, ...pack.config.design, ...preserved };

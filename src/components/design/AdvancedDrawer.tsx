@@ -423,6 +423,12 @@ function AdvancedContent({ design: d, currentTheme, accent, avatarUrl, displayNa
               <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Nome no topo do perfil</p>
             </div>
             <div>
+              <ColorPicker value={d.accentColor || currentTheme.accent} onChange={v => setDesign("accentColor", v)} label="@usuario" />
+              <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Cor do @arroba</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
               <ColorPicker value={d.subtextColor || currentTheme.sub || "#999999"} onChange={v => setDesign("subtextColor", v)} label="Bio" />
               <p className="text-[8px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Texto da sua bio</p>
             </div>
