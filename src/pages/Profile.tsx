@@ -462,18 +462,15 @@ const ProfilePage = () => {
         username={profile.username}
         type="profile"
       />
-    {/* Desktop outer wrapper — shows theme bg color around the phone-like content area */}
-    <div className="min-h-screen md:flex md:justify-center" style={{ background: t.bg, fontFamily: `'${rd.fontBody}', sans-serif` }}>
-    <div className="min-h-screen flex flex-col relative w-full md:max-w-[480px] md:shadow-2xl" style={{ ...bgCss(rd) }}>
+    <div className="min-h-screen flex flex-col relative" style={{ ...bgCss(rd), fontFamily: `'${rd.fontBody}', sans-serif` }}>
 
       {/* ── BG layers: video / image / pattern / overlay ── */}
-      {/* On desktop these are scoped to the phone container via absolute instead of fixed */}
       {rd.bgType === "video" && rd.bgVideoUrl && (
-        <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0"
+        <video autoPlay loop muted playsInline className="fixed inset-0 w-full h-full object-cover pointer-events-none z-0"
           style={{ filter: rd.bgBlur ? `blur(${rd.bgBlur}px)` : undefined }} src={rd.bgVideoUrl} />
       )}
       {rd.bgType === "image" && rd.bgImageUrl && (
-        <div className="absolute inset-0 pointer-events-none z-0"
+        <div className="fixed inset-0 pointer-events-none z-0"
           style={{
             backgroundImage: `url(${rd.bgImageUrl})`,
             backgroundSize: rd.bgImageZoom > 100 ? `${rd.bgImageZoom}%` : "cover",
@@ -483,7 +480,7 @@ const ProfilePage = () => {
           }} />
       )}
       {rd.bgType === "pattern" && rd.bgPattern && BG_PATTERNS[rd.bgPattern] && (
-        <div className="absolute inset-0 pointer-events-none z-0" style={{ backgroundImage: BG_PATTERNS[rd.bgPattern], backgroundRepeat: "repeat" }} />
+        <div className="fixed inset-0 pointer-events-none z-0" style={{ backgroundImage: BG_PATTERNS[rd.bgPattern], backgroundRepeat: "repeat" }} />
       )}
       {/* Effect layer (21st.dev animated backgrounds) */}
       {rd.bgType === "effect" && rd.bgEffect && (
@@ -491,7 +488,7 @@ const ProfilePage = () => {
       )}
       {/* Overlay (for image/video/pattern/effect) */}
       {(rd.bgType === "image" || rd.bgType === "video" || rd.bgType === "pattern" || rd.bgType === "effect") && rd.bgOverlay > 0 && (
-        <div className="absolute inset-0 pointer-events-none z-[1]" style={{ background: `rgba(0,0,0,${rd.bgOverlay / 100})` }} />
+        <div className="fixed inset-0 pointer-events-none z-[1]" style={{ background: `rgba(0,0,0,${rd.bgOverlay / 100})` }} />
       )}
 
       {/* Ambient glow removed — too distracting */}
@@ -1174,8 +1171,7 @@ const ProfilePage = () => {
           </Link>
         </footer>
       )}
-    </div>{/* end phone container */}
-    </div>{/* end desktop outer wrapper */}
+    </div>
     </>
   );
 };
