@@ -536,7 +536,7 @@ const ProfilePage = () => {
                 const b = parseInt(h.slice(4, 6), 16) || 0;
                 return `rgba(${r},${g},${b},${a})`;
               };
-              const showGlow = rd.profileGlow !== false;
+              const showGlow = true; // always show glow on public vitrine
               return (
                 <div className="relative mb-4"
                   style={{
