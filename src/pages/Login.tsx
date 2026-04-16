@@ -95,33 +95,37 @@ const TEMPLATE_GALLERY = [
   {
     name: "Criadora de Conteúdo",
     theme: { bg: "#080612", accent: "#a855f7", accent2: "#ec4899" },
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face",
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face",
     displayName: "Mariana Silva",
-    bio: "Criadora digital & mentora",
+    bio: "Criadora digital & mentora 🎨",
+    stats: "5.2k alunos · 4.9 ⭐",
     items: ["Mentoria 1:1 — R$197", "Ebook Redes Sociais — R$47", "Instagram", "YouTube"],
   },
   {
     name: "Coach & Consultor",
     theme: { bg: "#021a0f", accent: "#10b981", accent2: "#6ee7b7" },
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face",
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face",
     displayName: "Rafael Costa",
-    bio: "Coach de carreira & negócios",
+    bio: "Coach de carreira & negócios 🚀",
+    stats: "50+ marcas · R$2M faturado",
     items: ["Sessão Estratégica — R$297", "Curso Online — R$197", "LinkedIn", "WhatsApp"],
   },
   {
     name: "Artista & Designer",
     theme: { bg: "#0a0010", accent: "#ff2d95", accent2: "#ff6ec7" },
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&fit=crop&crop=face",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face",
     displayName: "Julia Melo",
-    bio: "Design gráfico & ilustração",
+    bio: "Design gráfico & ilustração ✨",
+    stats: "800+ comissões · 5.0 ⭐",
     items: ["Portfolio", "Pacote de Logos — R$350", "Behance", "Dribbble"],
   },
   {
     name: "Fitness & Saúde",
     theme: { bg: "#0f0a00", accent: "#f59e0b", accent2: "#fcd34d" },
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
     displayName: "Lucas Ferreira",
-    bio: "Personal trainer certificado",
+    bio: "Personal trainer certificado 💪",
+    stats: "200+ alunos · 4.8 ⭐",
     items: ["Plano Treino 12 sem — R$97", "Consultoria Nutri — R$147", "Instagram", "TikTok"],
   },
 ];
@@ -1087,11 +1091,17 @@ const Login = () => {
         </div>
       </div>
 
-      {/* ══════════ TEMPLATE GALLERY ══════════ */}
-      <div className="relative z-10 py-16 px-6 border-t border-maview-border">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-maview-text mb-3 tracking-tight">
+      {/* ══════════ TEMPLATE GALLERY — Premium Showcase ══════════ */}
+      <div className="relative z-10 py-20 px-6 overflow-hidden">
+        {/* Premium section background */}
+        <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full opacity-[0.03]"
+            style={{ background: "radial-gradient(ellipse, #a855f7 0%, transparent 70%)", filter: "blur(100px)" }} />
+        </div>
+        <div className="max-w-5xl mx-auto relative">
+          <div className="text-center mb-14">
+            <p className="text-maview-purple text-xs font-bold tracking-widest uppercase mb-3">Templates profissionais</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-maview-text mb-4 tracking-tight">
               Comece com um{" "}
               <span className="bg-gradient-to-r from-maview-purple to-violet-500 bg-clip-text text-transparent">template pronto</span>
             </h2>
@@ -1100,33 +1110,76 @@ const Login = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
             {TEMPLATE_GALLERY.map((tpl, i) => (
               <button
                 key={i}
                 onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); switchMode("signup"); }}
-                className="group relative bg-white dark:bg-[hsl(260,30%,9%)] border border-maview-border rounded-2xl overflow-hidden hover:border-maview-purple/40 hover:shadow-xl hover:shadow-maview-purple/10 transition-all duration-300"
+                className="group relative flex flex-col transition-all duration-500 hover:scale-[1.03] active:scale-[0.98]"
               >
-                {/* Mini phone preview */}
-                <div className="aspect-[9/14] rounded-t-xl overflow-hidden" style={{ background: tpl.theme.bg }}>
-                  <div className="flex flex-col items-center pt-6 px-3">
-                    <img src={tpl.avatar} alt="" className="w-10 h-10 rounded-full object-cover mb-2" style={{ boxShadow: `0 0 0 2px ${tpl.theme.accent}40` }} />
-                    <p className="text-white text-[11px] font-bold">{tpl.displayName}</p>
-                    <p className="text-[10px] mb-3" style={{ color: tpl.theme.accent }}>@{tpl.displayName.toLowerCase().replace(/\s/g, "")}</p>
+                {/* Realistic phone frame */}
+                <div className="relative mx-auto" style={{
+                  filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.25)) drop-shadow(0 2px 8px rgba(0,0,0,0.15))",
+                }}>
+                  <div className="relative rounded-[20px] sm:rounded-[24px] overflow-hidden transition-all duration-500 group-hover:shadow-[0_0_30px_rgba(168,85,247,0.15)]"
+                    style={{ aspectRatio: "9/16.5", border: "2px solid #1a1a1e", boxShadow: "inset 0 0 0 0.5px rgba(255,255,255,0.06)" }}>
 
-                    {tpl.items.slice(0, 3).map((item, j) => (
-                      <div key={j} className="w-full rounded-lg border px-2.5 py-1.5 mb-1.5 text-center"
-                        style={{ borderColor: tpl.theme.accent + "30", background: tpl.theme.accent + "08" }}>
-                        <span className="text-[9px] text-white/80 truncate block">{item}</span>
+                    {/* Background */}
+                    <div className="absolute inset-0" style={{ background: tpl.theme.bg }} />
+
+                    {/* Status bar */}
+                    <div className="absolute top-0 inset-x-0 h-[14px] z-10 flex items-center justify-between px-2.5 pt-0.5">
+                      <span className="text-[5px] font-bold text-white/40">9:41</span>
+                      <div className="flex items-center gap-[2px]">
+                        <div className="w-[6px] h-[4px] rounded-[1px]" style={{ background: "rgba(255,255,255,0.3)" }} />
+                        <div className="w-[6px] h-[4px] rounded-[1px]" style={{ background: "rgba(255,255,255,0.3)" }} />
                       </div>
-                    ))}
+                    </div>
+
+                    {/* Content */}
+                    <div className="relative flex flex-col items-center h-full pt-[18px] px-2.5 sm:px-3">
+                      <img src={tpl.avatar} alt="" className="w-11 h-11 sm:w-12 sm:h-12 rounded-full object-cover mb-1.5 flex-shrink-0"
+                        style={{ border: `2px solid ${tpl.theme.accent}50`, boxShadow: `0 0 12px ${tpl.theme.accent}30` }}
+                        crossOrigin="anonymous" loading="lazy" />
+                      <p className="text-white text-[11px] sm:text-[12px] font-extrabold tracking-tight">{tpl.displayName}</p>
+                      <p className="text-[8px] sm:text-[9px] mb-1" style={{ color: `${tpl.theme.accent}CC` }}>{tpl.bio}</p>
+
+                      {/* Social proof stats */}
+                      {tpl.stats && (
+                        <p className="text-[7px] sm:text-[7.5px] font-semibold mb-2 px-2 py-0.5 rounded-full"
+                          style={{ color: tpl.theme.accent, background: `${tpl.theme.accent}12`, border: `0.5px solid ${tpl.theme.accent}20` }}>
+                          {tpl.stats}
+                        </p>
+                      )}
+
+                      {/* Social icons */}
+                      <div className="flex gap-1 mb-2">
+                        {[0, 1, 2].map(j => (
+                          <div key={j} className="w-[12px] h-[12px] sm:w-[14px] sm:h-[14px] rounded-full flex items-center justify-center"
+                            style={{ background: `${tpl.theme.accent}18`, border: `0.5px solid ${tpl.theme.accent}25` }}>
+                            <div className="w-[5px] h-[5px] sm:w-[6px] sm:h-[6px] rounded-full" style={{ background: tpl.theme.accent }} />
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Link buttons */}
+                      {tpl.items.slice(0, 3).map((item, j) => (
+                        <div key={j} className="w-full rounded-lg px-2 py-[6px] mb-[5px] text-center"
+                          style={{ background: `${tpl.theme.accent}12`, border: `0.5px solid ${tpl.theme.accent}22` }}>
+                          <span className="text-[8px] sm:text-[9px] font-semibold text-white/85 truncate block">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Home indicator */}
+                    <div className="absolute bottom-[4px] left-1/2 -translate-x-1/2 w-[35%] h-[2.5px] rounded-full z-10" style={{ background: "rgba(255,255,255,0.2)" }} />
                   </div>
                 </div>
 
-                {/* Label */}
-                <div className="px-3 py-3 text-center">
-                  <p className="text-maview-text text-xs font-bold">{tpl.name}</p>
-                  <p className="text-maview-muted text-[10px] mt-0.5 group-hover:text-maview-purple transition-colors">Usar este template →</p>
+                {/* Label below phone */}
+                <div className="text-center mt-3">
+                  <p className="text-maview-text text-xs sm:text-[13px] font-bold group-hover:text-maview-purple transition-colors">{tpl.name}</p>
+                  <p className="text-maview-muted text-[10px] mt-0.5 group-hover:text-maview-purple/70 transition-colors">Usar template →</p>
                 </div>
               </button>
             ))}
