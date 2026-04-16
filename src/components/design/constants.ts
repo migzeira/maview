@@ -30,7 +30,7 @@ export interface DesignConfig {
 export interface ThemeDef { id: ThemeId; label: string; bg: string; accent: string; accent2: string; text?: string; sub?: string; card?: string; border?: string; }
 
 export interface DesignTabProps {
-  config: { theme: ThemeId; design?: Partial<DesignConfig>; avatarUrl: string; displayName: string; username?: string; };
+  config: { theme: ThemeId; design?: Partial<DesignConfig>; avatarUrl: string; displayName: string; username?: string; products?: any[]; links?: any[]; blocks?: any[] };
   themes: ThemeDef[];
   defaultDesign: DesignConfig;
   updateConfig: (key: string, value: any) => void;
@@ -143,12 +143,18 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
 
 /* ── Design Packs ─────────────────────────────────── */
 
+export interface SampleProduct { title: string; price?: string; emoji?: string; }
+export interface SampleLink { title: string; type?: "link" | "spotlight"; icon?: string; }
+
 export interface DesignPack {
   id: string; label: string; desc: string;
   category: "dark" | "light" | "animated" | "minimal" | "bold" | "showcase";
   preview: { bg: string; accent: string; accent2: string };
   config: { theme: string; design: Partial<DesignConfig> };
   refIdx: number;
+  /** Sample content for showcase packs — populated when user has no products */
+  sampleProducts?: SampleProduct[];
+  sampleLinks?: SampleLink[];
 }
 
 export const DESIGN_PACKS: DesignPack[] = [
@@ -201,27 +207,43 @@ export const DESIGN_PACKS: DesignPack[] = [
   /* ── Vitrines Prontas (Showcase) ── */
 
   { id: "showcase-wellness", label: "Wellness", desc: "Yoga, meditacao e bem-estar", category: "showcase", refIdx: 5,
+    sampleProducts: [{ title: "Plano Wellness 30 dias", price: "R$ 90/mes", emoji: "🧘" }, { title: "Meditacao guiada", price: "R$ 29", emoji: "🕯️" }],
+    sampleLinks: [{ title: "Agende uma aula", type: "spotlight" }, { title: "Comunidade VIP", type: "link" }],
     preview: { bg: "#faf5f0", accent: "#d97706", accent2: "#b45309" },
     config: { theme: "cream", design: { bgType: "image", bgImageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=800&fit=crop&crop=center", bgOverlay: 50, bgColor: "#faf5f0", buttonShape: "pill", buttonFill: "glass", buttonShadow: "sm", buttonRadius: 12, fontHeading: "Outfit", fontBody: "Nunito", profileShape: "circle", profileBorder: true, profileBorderColor: "#d97706", profileGlow: true, profileGlowColor: "#d97706", profileSize: 96, accentColor: "#d97706", accentColor2: "#b45309", textColor: "#ffffff", subtextColor: "rgba(255,255,255,0.80)", nameColor: "#ffffff", productTitleColor: "#ffffff", priceColor: "#fbbf24", originalPriceColor: "rgba(255,255,255,0.40)", descriptionColor: "rgba(255,255,255,0.70)", cardBg: "rgba(0,0,0,0.40)", cardBorder: "rgba(255,255,255,0.12)", textShadow: 1 } } },
   { id: "showcase-coach", label: "Coach", desc: "Social media e marketing", category: "showcase", refIdx: 6,
+    sampleProducts: [{ title: "Coaching 1:1", price: "R$ 197", emoji: "🚀" }, { title: "Guia de Monetizacao", price: "Gratis", emoji: "📖" }],
+    sampleLinks: [{ title: "Agendar coaching", type: "spotlight" }, { title: "Newsletter gratis", type: "link" }],
     preview: { bg: "#0a0618", accent: "#a855f7", accent2: "#ec4899" },
     config: { theme: "dark-purple", design: { bgType: "effect", bgEffect: "ambient-glow", bgColor: "#0a0618", coverImageUrl: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&h=300&fit=crop&crop=center&q=80", buttonShape: "soft", buttonFill: "glass", buttonShadow: "glow", buttonRadius: 14, fontHeading: "Space Grotesk", fontBody: "DM Sans", profileShape: "circle", profileBorder: true, profileBorderColor: "#a855f7", profileGlow: true, profileGlowColor: "#a855f7", profileSize: 96, accentColor: "#a855f7", accentColor2: "#ec4899", textColor: "#ffffff", subtextColor: "rgba(255,255,255,0.65)", nameColor: "#ffffff", productTitleColor: "#ffffff", priceColor: "#c084fc", originalPriceColor: "rgba(255,255,255,0.35)", descriptionColor: "rgba(255,255,255,0.60)", cardBg: "rgba(168,85,247,0.08)", cardBorder: "rgba(168,85,247,0.20)", textShadow: 1 } } },
   { id: "showcase-fashion", label: "Fashion", desc: "Moda e consultoria de estilo", category: "showcase", refIdx: 7,
+    sampleProducts: [{ title: "Consultoria de Imagem", price: "R$ 147", emoji: "👗" }, { title: "Closet Digital", price: "R$ 39", emoji: "✨" }],
+    sampleLinks: [{ title: "Meu closet", type: "spotlight" }, { title: "Parcerias", type: "link" }],
     preview: { bg: "#1a0a14", accent: "#be185d", accent2: "#e11d48" },
     config: { theme: "wine", design: { bgType: "image", bgImageUrl: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=800&fit=crop&crop=center", bgOverlay: 55, bgColor: "#1a0a14", buttonShape: "pill", buttonFill: "glass", buttonShadow: "md", buttonRadius: 12, fontHeading: "Playfair Display", fontBody: "Lora", profileShape: "circle", profileBorder: true, profileBorderColor: "#be185d", profileGlow: true, profileGlowColor: "#be185d", profileSize: 96, accentColor: "#be185d", accentColor2: "#e11d48", textColor: "#ffffff", subtextColor: "rgba(255,255,255,0.75)", nameColor: "#ffffff", productTitleColor: "#ffffff", priceColor: "#f472b6", descriptionColor: "rgba(255,255,255,0.65)", originalPriceColor: "rgba(255,255,255,0.45)", cardBg: "rgba(0,0,0,0.45)", cardBorder: "rgba(190,24,93,0.20)", textShadow: 1 } } },
   { id: "showcase-fitness", label: "Fitness", desc: "Treino e transformacao", category: "showcase", refIdx: 8,
+    sampleProducts: [{ title: "Plano 12 semanas", price: "R$ 97", emoji: "💪" }, { title: "Dieta + Treino", price: "R$ 147", emoji: "🥗" }],
+    sampleLinks: [{ title: "Treino gratis", type: "spotlight" }, { title: "WhatsApp", type: "link", icon: "whatsapp" }],
     preview: { bg: "#080808", accent: "#ef4444", accent2: "#f97316" },
     config: { theme: "crimson", design: { bgType: "image", bgImageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=800&fit=crop&crop=center", bgOverlay: 65, bgColor: "#080808", buttonShape: "square", buttonFill: "solid", buttonShadow: "glow", buttonRadius: 6, fontHeading: "Bebas Neue", fontBody: "Poppins", profileShape: "circle", profileBorder: true, profileBorderColor: "#ef4444", profileGlow: true, profileGlowColor: "#ef4444", profileSize: 96, accentColor: "#ef4444", accentColor2: "#f97316", textColor: "#ffffff", subtextColor: "rgba(255,255,255,0.75)", nameColor: "#ffffff", productTitleColor: "#ffffff", priceColor: "#f87171", originalPriceColor: "rgba(255,255,255,0.40)", descriptionColor: "rgba(255,255,255,0.65)", cardBg: "rgba(0,0,0,0.50)", cardBorder: "rgba(239,68,68,0.20)", textShadow: 1 } } },
   { id: "showcase-photo", label: "Fotografa", desc: "Fotografia e presets", category: "showcase", refIdx: 9,
+    sampleProducts: [{ title: "Pack 50 Presets", price: "R$ 49", emoji: "📸" }, { title: "Curso de Fotografia", price: "R$ 197", emoji: "🎞️" }],
+    sampleLinks: [{ title: "Booking", type: "spotlight" }, { title: "Portfolio", type: "link" }],
     preview: { bg: "#f8f9fa", accent: "#6366f1", accent2: "#8b5cf6" },
     config: { theme: "white", design: { bgType: "solid", bgColor: "#f8f9fa", bgEffect: "", coverImageUrl: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&h=300&fit=crop&crop=center&q=80", buttonShape: "pill", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 12, fontHeading: "Cormorant Garamond", fontBody: "Montserrat", profileShape: "circle", profileBorder: true, profileBorderColor: "#6366f1", profileGlow: true, profileGlowColor: "#6366f1", profileSize: 92, accentColor: "#6366f1", accentColor2: "#8b5cf6", textColor: "#111827", subtextColor: "#4b5563", nameColor: "#111827", productTitleColor: "#111827", priceColor: "#6366f1", originalPriceColor: "rgba(0,0,0,0.35)", descriptionColor: "#6b7280", cardBg: "#ffffff", cardBorder: "rgba(0,0,0,0.08)" } } },
   { id: "showcase-dev", label: "Developer", desc: "Tech, SaaS e mentorias", category: "showcase", refIdx: 10,
+    sampleProducts: [{ title: "Template SaaS", price: "R$ 79", emoji: "💻" }, { title: "Mentoria Dev", price: "R$ 297", emoji: "🧑‍💻" }],
+    sampleLinks: [{ title: "Newsletter", type: "spotlight" }, { title: "GitHub", type: "link", icon: "github" }],
     preview: { bg: "#05080f", accent: "#60a5fa", accent2: "#818cf8" },
     config: { theme: "midnight", design: { bgType: "effect", bgEffect: "matrix-grid", bgColor: "#05080f", coverImageUrl: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=600&h=300&fit=crop&crop=center&q=80", buttonShape: "square", buttonFill: "glass", buttonShadow: "glow", buttonRadius: 6, fontHeading: "JetBrains Mono", fontBody: "Space Grotesk", profileShape: "circle", profileBorder: false, profileGlow: true, profileGlowColor: "#60a5fa", profileSize: 92, accentColor: "#60a5fa", accentColor2: "#818cf8", textColor: "#e2e8f0", subtextColor: "rgba(255,255,255,0.55)", nameColor: "#ffffff", productTitleColor: "#e2e8f0", priceColor: "#60a5fa", originalPriceColor: "rgba(255,255,255,0.30)", descriptionColor: "rgba(255,255,255,0.50)", cardBg: "rgba(96,165,250,0.06)", cardBorder: "rgba(96,165,250,0.15)", textShadow: 1 } } },
   { id: "showcase-nutri", label: "Nutricao", desc: "Dietas e vida saudavel", category: "showcase", refIdx: 11,
+    sampleProducts: [{ title: "Plano Alimentar", price: "R$ 67", emoji: "🥑" }, { title: "Ebook Receitas Fit", price: "R$ 29", emoji: "📗" }],
+    sampleLinks: [{ title: "Agendar consulta", type: "spotlight" }, { title: "WhatsApp", type: "link", icon: "whatsapp" }],
     preview: { bg: "#f0fdf4", accent: "#16a34a", accent2: "#4ade80" },
     config: { theme: "emerald", design: { bgType: "image", bgImageUrl: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=800&fit=crop&crop=center", bgOverlay: 50, bgColor: "#f0fdf4", buttonShape: "soft", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 14, fontHeading: "DM Sans", fontBody: "Inter", profileShape: "circle", profileBorder: true, profileBorderColor: "#16a34a", profileGlow: true, profileGlowColor: "#16a34a", profileSize: 92, accentColor: "#16a34a", accentColor2: "#4ade80", textColor: "#ffffff", subtextColor: "rgba(255,255,255,0.75)", nameColor: "#ffffff", productTitleColor: "#ffffff", priceColor: "#4ade80", originalPriceColor: "rgba(255,255,255,0.40)", descriptionColor: "rgba(255,255,255,0.65)", cardBg: "rgba(0,0,0,0.40)", cardBorder: "rgba(22,163,74,0.20)", textShadow: 1 } } },
   { id: "showcase-music", label: "Produtor", desc: "Musica e beats", category: "showcase", refIdx: 12,
+    sampleProducts: [{ title: "Beat Pack Premium", price: "R$ 49", emoji: "🎵" }, { title: "Aula de Producao", price: "R$ 97", emoji: "🎧" }],
+    sampleLinks: [{ title: "Spotify", type: "spotlight", icon: "globe" }, { title: "SoundCloud", type: "link", icon: "globe" }],
     preview: { bg: "#0a0010", accent: "#ff2d95", accent2: "#ff6ec7" },
     config: { theme: "neon-pink", design: { bgType: "effect", bgEffect: "aurora", bgColor: "#0a0010", coverImageUrl: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=600&h=300&fit=crop&crop=center&q=80", buttonShape: "pill", buttonFill: "glass", buttonShadow: "glow", buttonRadius: 12, fontHeading: "Sora", fontBody: "Inter", profileShape: "circle", profileBorder: true, profileBorderColor: "#ff2d95", profileGlow: true, profileGlowColor: "#ff2d95", profileSize: 96, accentColor: "#ff2d95", accentColor2: "#ff6ec7", textColor: "#ffffff", subtextColor: "rgba(255,255,255,0.60)", nameColor: "#ffffff", productTitleColor: "#ffffff", priceColor: "#ff6ec7", originalPriceColor: "rgba(255,255,255,0.35)", descriptionColor: "rgba(255,255,255,0.55)", cardBg: "rgba(255,45,149,0.08)", cardBorder: "rgba(255,45,149,0.20)", textShadow: 1 } } },
 ];

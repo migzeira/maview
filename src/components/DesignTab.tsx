@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 
 import {
-  type DesignConfig, type DesignTabProps, type ThemeDef,
+  type DesignConfig, type DesignTabProps, type ThemeDef, type SampleProduct, type SampleLink,
   DESIGN_PACKS, PACK_CATEGORIES, REFERENCE_PROFILES,
   ACCENT_COLORS, GOOGLE_FONTS, FONT_PAIRS,
 } from "./design/constants";
@@ -136,6 +136,8 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [bgUploading, setBgUploading] = useState(false);
   const [coverUploading, setCoverUploading] = useState(false);
+  const [showContentModal, setShowContentModal] = useState(false);
+  const [pendingContent, setPendingContent] = useState<{ products: SampleProduct[]; links: SampleLink[] } | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
   const bgImageInputRef = useRef<HTMLInputElement>(null);
   const coverImageInputRef = useRef<HTMLInputElement>(null);
@@ -160,8 +162,6 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     // Preserve ONLY user-uploaded images (not template Unsplash images) and profile colors
     const prev = designRef.current || {};
     const preserved: Record<string, unknown> = {};
-    // Only preserve user-uploaded images (Supabase Storage, not Unsplash)
-    // AND only preserve bg image if the new pack ALSO uses image bg (avoids bg leaking into cover-based layouts)
     const isUserUpload = (url: string | undefined) => url && !url.includes("images.unsplash.com");
     const newPackUsesBgImage = pack.config.design.bgType === "image";
     if (prev.bgImageUrl && isUserUpload(prev.bgImageUrl as string) && newPackUsesBgImage) {
@@ -175,14 +175,21 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     if (prev.coverImageUrl && isUserUpload(prev.coverImageUrl as string)) preserved.coverImageUrl = prev.coverImageUrl;
     if (prev.profileBorderColor) preserved.profileBorderColor = prev.profileBorderColor;
     if (prev.profileGlowColor) preserved.profileGlowColor = prev.profileGlowColor;
-    // Ensure profileGlow is always on unless pack explicitly disables it
     const latest = { profileGlow: true, ...pack.config.design, ...preserved };
     designRef.current = latest;
     updateConfig("design", latest);
     if (pack.config.design.fontHeading) loadFont(pack.config.design.fontHeading);
     if (pack.config.design.fontBody) loadFont(pack.config.design.fontBody);
     setInteracted(prev => new Set(prev).add(1));
-  }, [updateConfig]);
+
+    // Populate sample content for showcase packs when user has no products
+    const userProducts = config.products || [];
+    const hasUserProducts = userProducts.some((p: any) => p.title && p.title !== "");
+    if (pack.sampleProducts && pack.sampleProducts.length > 0 && !hasUserProducts) {
+      setPendingContent({ products: [...pack.sampleProducts], links: pack.sampleLinks || [] });
+      setShowContentModal(true);
+    }
+  }, [updateConfig, config.products]);
 
   const applyFontPair = useCallback((headingFont: string) => {
     loadFont(headingFont);
@@ -193,6 +200,32 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     updateConfig("design", latest);
     setInteracted(prev => new Set(prev).add(3));
   }, [updateConfig]);
+
+  const confirmSampleContent = useCallback(() => {
+    if (!pendingContent) return;
+    const genId = () => Math.random().toString(36).slice(2, 9);
+    // Create products from sample data
+    const newProducts = pendingContent.products.map(sp => ({
+      id: genId(), title: sp.title, description: "", price: sp.price || "", originalPrice: "",
+      emoji: sp.emoji || "📦", images: [] as string[], url: "", linkType: "whatsapp" as const,
+      whatsappMsg: "", ctaText: "", badge: "", urgency: false, active: true,
+    }));
+    // Create links from sample data
+    const newLinks = pendingContent.links.map(sl => ({
+      id: genId(), title: sl.title, url: "", icon: sl.icon || "link",
+      type: sl.type || "link", isSocial: false, active: true,
+    }));
+    // Create blocks for ordering
+    const newBlocks = [
+      ...newProducts.map(p => ({ id: genId(), type: "product" as const, refId: p.id })),
+      ...newLinks.map(l => ({ id: genId(), type: "link" as const, refId: l.id })),
+    ];
+    updateConfig("products", newProducts);
+    updateConfig("links", newLinks);
+    updateConfig("blocks", newBlocks);
+    setShowContentModal(false);
+    setPendingContent(null);
+  }, [pendingContent, updateConfig]);
 
   const applyAutoHarmony = useCallback((accentHex: string) => {
     const harmony = generateHarmony(accentHex);
@@ -680,6 +713,50 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
               <><Save size={15} /> Salvar vitrine</>
             )}
           </button>
+        </div>
+      )}
+
+      {/* ═══════ CONTENT MODAL — Showcase template content ═══════ */}
+      {showContentModal && pendingContent && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => { setShowContentModal(false); setPendingContent(null); }}>
+          <div className="relative w-full max-w-[400px] mx-4 rounded-2xl overflow-hidden shadow-2xl" style={{ background: "hsl(var(--dash-card))", border: "1px solid hsl(var(--dash-border))" }} onClick={e => e.stopPropagation()}>
+            <div className="px-6 pt-6 pb-4">
+              <div className="flex items-center gap-2 mb-1">
+                <Sparkles size={18} className="text-primary" />
+                <h3 className="text-[16px] font-bold text-[hsl(var(--dash-text))]">Vitrine pronta!</h3>
+              </div>
+              <p className="text-[13px] text-[hsl(var(--dash-text-subtle))]">Edite os nomes e precos dos seus produtos. Voce pode alterar depois.</p>
+            </div>
+            <div className="px-6 space-y-3">
+              {pendingContent.products.map((sp, i) => (
+                <div key={i} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "hsl(var(--dash-bg))", border: "1px solid hsl(var(--dash-border-subtle))" }}>
+                  <span className="text-xl flex-shrink-0">{sp.emoji || "📦"}</span>
+                  <div className="flex-1 min-w-0 space-y-1.5">
+                    <input type="text" value={sp.title} onChange={e => {
+                      const updated = [...pendingContent.products];
+                      updated[i] = { ...updated[i], title: e.target.value };
+                      setPendingContent({ ...pendingContent, products: updated });
+                    }} className="w-full bg-transparent text-[14px] font-semibold text-[hsl(var(--dash-text))] outline-none border-b border-[hsl(var(--dash-border-subtle))] focus:border-primary pb-0.5 transition-colors" placeholder="Nome do produto" />
+                    <input type="text" value={sp.price || ""} onChange={e => {
+                      const updated = [...pendingContent.products];
+                      updated[i] = { ...updated[i], price: e.target.value };
+                      setPendingContent({ ...pendingContent, products: updated });
+                    }} className="w-full bg-transparent text-[12px] text-primary outline-none border-b border-[hsl(var(--dash-border-subtle))] focus:border-primary pb-0.5 transition-colors" placeholder="R$ 0,00" />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="px-6 py-5 flex gap-3">
+              <button onClick={() => { setShowContentModal(false); setPendingContent(null); }}
+                className="flex-1 py-2.5 rounded-xl text-[13px] font-medium text-[hsl(var(--dash-text-subtle))] border border-[hsl(var(--dash-border))] hover:bg-[hsl(var(--dash-bg))] transition-all">
+                Pular
+              </button>
+              <button onClick={confirmSampleContent}
+                className="flex-1 py-2.5 rounded-xl text-[13px] font-bold text-white bg-primary hover:opacity-90 transition-all shadow-sm">
+                Adicionar produtos
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
