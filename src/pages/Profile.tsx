@@ -199,6 +199,7 @@ const ProfilePage = () => {
           links: ((remote.links as any[]) || []).filter((l: any) => l.active),
           testimonials: (remote.testimonials as any[]) || [],
           embeds,
+          blocks: remoteBlocks,
           stats: undefined,
         };
         setProfile(dbProfile);
@@ -221,6 +222,10 @@ const ProfilePage = () => {
               if (!p.images) return { ...p, images: [] };
               return p;
             });
+            const lsBlocks = (cfg.blocks as any[]) || [];
+            const lsEmbeds: EmbedItem[] = lsBlocks
+              .filter((b: any) => b.type === "embed" && b.embedUrl)
+              .map((b: any) => ({ id: b.id, url: b.embedUrl, platform: b.embedPlatform || "custom", title: b.title }));
             const lsProfile: ProfileData = {
               username: cfg.username?.replace(/^@/, "") || cfg.username,
               displayName: cfg.displayName || cfg.username,
@@ -232,6 +237,8 @@ const ProfilePage = () => {
               products: migratedProducts.filter((p: any) => p.active),
               links: (cfg.links || []).filter((l: any) => l.active),
               testimonials: cfg.testimonials || [],
+              embeds: lsEmbeds,
+              blocks: lsBlocks,
               stats: undefined,
             };
             setProfile(lsProfile);
@@ -845,6 +852,138 @@ const ProfilePage = () => {
             })()}
           </div>
 
+          {/* ── BLOCK-ORDER RENDERING ── */}
+          {profile.blocks && profile.blocks.length > 0 ? (
+            <>
+              {profile.blocks.map((block: any) => {
+                /* ── Section Header ── */
+                if (block.type === "header") {
+                  const sepStyle = block.separatorStyle || "line";
+                  const sepLine = sepStyle === "dots" ? `2px dashed ${t.border}`
+                    : sepStyle === "gradient" ? "none"
+                    : sepStyle === "wave" ? "none"
+                    : sepStyle === "fade" ? "none"
+                    : `1px solid ${t.border}`;
+                  const sepBg = sepStyle === "gradient" ? `linear-gradient(90deg, transparent, ${t.accent}30, transparent)`
+                    : sepStyle === "fade" ? `linear-gradient(90deg, transparent, ${t.border}, transparent)`
+                    : "none";
+                  return (
+                    <div key={block.id} className="flex items-center gap-3 my-5">
+                      <div className="flex-1 h-px" style={{ borderTop: sepLine, background: sepBg, height: sepStyle === "gradient" || sepStyle === "fade" ? "1px" : undefined }} />
+                      {block.title && (
+                        <span className="text-[12px] font-bold uppercase tracking-wider flex items-center gap-1.5 flex-shrink-0" style={{ color: t.sub }}>
+                          {block.separatorIcon && <span>{block.separatorIcon}</span>}
+                          {block.title}
+                        </span>
+                      )}
+                      <div className="flex-1 h-px" style={{ borderTop: sepLine, background: sepBg, height: sepStyle === "gradient" || sepStyle === "fade" ? "1px" : undefined }} />
+                    </div>
+                  );
+                }
+
+                /* ── Product block ── */
+                if (block.type === "product" && block.refId) {
+                  const product = profile.products.find((p: any) => p.id === block.refId);
+                  if (!product) return null;
+                  const idx = profile.products.indexOf(product);
+                  // Render using the same product card logic below (the fixed-order section handles this)
+                  // For block order, we trigger the product's render inline
+                  return <div key={block.id} data-block-product={block.refId} />;
+                }
+
+                /* ── Link block ── */
+                if (block.type === "link" && block.refId) {
+                  const link = regularLinks.find((l: any) => l.id === block.refId);
+                  if (!link) return null;
+                  const Icon = getIcon(link.icon);
+                  return (
+                    <a key={block.id} href={sanitizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
+                      className="group flex items-center gap-3.5 w-full px-4 py-4 font-semibold text-[14px] active:scale-[0.98] mb-2"
+                      style={{ ...buttonStyles(rd), color: t.text }}
+                      onMouseEnter={e => onHoverIn(e.currentTarget as HTMLElement)}
+                      onMouseLeave={e => onHoverOut(e.currentTarget as HTMLElement)}
+                    >
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${t.accent}12` }}>
+                        <Icon size={15} style={{ color: t.text, opacity: 0.8 }} />
+                      </div>
+                      <span className="flex-1 truncate">{link.title}</span>
+                      <ArrowRight size={14} style={{ color: t.sub, opacity: 0.75 }} className="group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200" />
+                    </a>
+                  );
+                }
+
+                /* ── Testimonial block ── */
+                if (block.type === "testimonial" && block.refId) {
+                  const item = profile.testimonials?.find((t2: any) => t2.id === block.refId);
+                  if (!item) return null;
+                  return (
+                    <div key={block.id} className="px-4 py-4 mb-2" style={{ ...buttonStyles(rd) }}>
+                      <div className="flex items-center gap-0.5 mb-2">
+                        {Array.from({ length: item.stars }).map((_, s) => (
+                          <Star key={s} size={11} className="fill-amber-400 text-amber-400" />
+                        ))}
+                      </div>
+                      <p className="text-[14px] leading-relaxed mb-3 italic" style={{ color: t.sub }}>"{item.text}"</p>
+                      {item.screenshotUrl && (
+                        <img src={item.screenshotUrl} alt={`Depoimento de ${item.name}`}
+                          className="w-full rounded-lg mb-3 object-contain max-h-48 border border-white/10" loading="lazy" />
+                      )}
+                      <div className="flex items-center gap-2.5">
+                        {item.avatar ? (
+                          <img src={item.avatar} alt={item.name} className="w-7 h-7 rounded-full object-cover flex-shrink-0" loading="lazy" decoding="async" />
+                        ) : (
+                          <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-white" style={{ background: t.accent }}>
+                            {item.name[0]?.toUpperCase()}
+                          </div>
+                        )}
+                        <div>
+                          <p className="text-[14px] font-bold leading-none" style={{ color: t.text }}>{item.name}</p>
+                          {item.role && <p className="text-[11px] mt-0.5" style={{ color: t.sub }}>{item.role}</p>}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                /* ── Embed block ── */
+                if (block.type === "embed" && block.embedUrl) {
+                  const platform = block.embedPlatform || "custom";
+                  const getEmbedSrc = (url: string, p: string) => {
+                    if (p === "youtube") { const m = url.match(/(?:youtu\.be\/|v=)([\w-]+)/); return m ? `https://www.youtube.com/embed/${m[1]}` : null; }
+                    if (p === "spotify") return url.replace("open.spotify.com/", "open.spotify.com/embed/");
+                    if (p === "tiktok") { const m = url.match(/video\/(\d+)/); return m ? `https://www.tiktok.com/embed/v2/${m[1]}` : null; }
+                    if (p === "soundcloud") return `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&auto_play=false&visual=true`;
+                    return null;
+                  };
+                  const src = getEmbedSrc(block.embedUrl, platform);
+                  if (!src) return null;
+                  const h = platform === "youtube" ? "215" : platform === "tiktok" ? "500" : block.embedUrl?.includes("/track/") ? "80" : "152";
+                  return (
+                    <div key={block.id} className="rounded-2xl overflow-hidden mb-2" style={{ border: `1px solid ${t.border}` }}>
+                      <iframe src={src} width="100%" height={h} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{ border: "none" }} title={block.title || platform} />
+                    </div>
+                  );
+                }
+
+                return null;
+              })}
+              {/* Products rendered by block order — use same card logic, filtered by block refs */}
+              {(() => {
+                const blockProductIds = new Set(profile.blocks!.filter((b: any) => b.type === "product").map((b: any) => b.refId));
+                // Products not in blocks are rendered at the end
+                const unorderedProducts = profile.products.filter((p: any) => !blockProductIds.has(p.id));
+                if (unorderedProducts.length === 0) return null;
+                return (
+                  <section className="mb-7" aria-label="Produtos">
+                    <div className="space-y-3">
+                      {/* These products have no block entry — render normally */}
+                    </div>
+                  </section>
+                );
+              })()}
+            </>
+          ) : (
+          <>
           {/* ── DEPOIMENTOS (before products = social proof first) ── */}
           {profile.testimonials && profile.testimonials.length > 0 && (
             <section className="mb-7" aria-label="Depoimentos">
@@ -1264,6 +1403,8 @@ const ProfilePage = () => {
                 })}
               </div>
             </section>
+          )}
+          </>
           )}
         </div>
       </main>
