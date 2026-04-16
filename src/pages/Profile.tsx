@@ -162,9 +162,12 @@ const ProfilePage = () => {
   const [emailCaptured, setEmailCaptured] = useState(false);
   const [emailSubmitting, setEmailSubmitting] = useState(false);
 
-  const productStagger     = useStagger(10, 220, 80);
-  const linkStagger        = useStagger(10, 380, 55);
-  const testimonialStagger = useStagger(10, 520, 90);
+  const productCount = profile?.products?.length || 0;
+  const linkCount = profile?.links?.filter((l: any) => !l.isSocial)?.length || 0;
+  const testimonialCount = profile?.testimonials?.length || 0;
+  const productStagger     = useStagger(productCount, 220, 80);
+  const linkStagger        = useStagger(linkCount, 380, 55);
+  const testimonialStagger = useStagger(testimonialCount, 520, 90);
 
   useEffect(() => {
     (async () => {
@@ -245,12 +248,8 @@ const ProfilePage = () => {
         setProfile(found);
         setTimeout(() => setHeroVis(true), 80);
       } else {
-        const minimalProfile: ProfileData = {
-          username: slug, displayName: slug, bio: "", theme: "dark-purple",
-          links: [], products: [], testimonials: [],
-        };
-        setProfile(minimalProfile);
-        setTimeout(() => setHeroVis(true), 80);
+        // No data found anywhere — show 404
+        setNotFound(true);
       }
       setLoading(false);
     })();
@@ -902,7 +901,7 @@ const ProfilePage = () => {
       {/* 💬 WhatsApp sticky — ícone redondo limpo */}
       {profile.whatsapp && (
         <a
-          href={`https://wa.me/${profile.whatsapp}`}
+          href={`https://wa.me/${profile.whatsapp.replace(/\D/g, "")}`}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="WhatsApp"

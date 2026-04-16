@@ -434,10 +434,9 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
 
               {/* Reset button */}
               <button onClick={() => {
-                setDesign("bgImageZoom", 100);
-                setDesign("bgImagePosX", 50);
-                setDesign("bgImagePosY", 50);
-                setDesign("bgOverlay", 40);
+                const latest = { ...(designRef.current || {}), bgImageZoom: 100, bgImagePosX: 50, bgImagePosY: 50, bgOverlay: 40 };
+                designRef.current = latest;
+                updateConfig("design", latest);
               }}
                 className="w-full py-1.5 rounded-lg text-[11px] font-medium text-[hsl(var(--dash-text-subtle))] hover:text-primary border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 transition-all">
                 Resetar ajustes
@@ -554,10 +553,9 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
 
               {/* Reset */}
               <button onClick={() => {
-                setDesign("coverZoom", 100);
-                setDesign("coverPosX", 50);
-                setDesign("coverPosY", 50);
-                setDesign("coverOverlay", 0);
+                const latest = { ...(designRef.current || {}), coverZoom: 100, coverPosX: 50, coverPosY: 50, coverOverlay: 0 };
+                designRef.current = latest;
+                updateConfig("design", latest);
               }}
                 className="w-full py-1.5 rounded-lg text-[11px] font-medium text-[hsl(var(--dash-text-subtle))] hover:text-primary border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 transition-all">
                 Resetar ajustes
