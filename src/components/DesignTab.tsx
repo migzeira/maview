@@ -60,7 +60,7 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
 
   /* Verified badge inline SVG */
   const VerifiedBadge = () => ref.verified ? (
-    <svg className="inline-block ml-[2px] flex-shrink-0" width="10" height="10" viewBox="0 0 20 20" fill="none">
+    <svg className="inline-block ml-[2px] flex-shrink-0" width="13" height="13" viewBox="0 0 20 20" fill="none">
       <circle cx="10" cy="10" r="10" fill="#3B82F6"/>
       <path d="M6 10.5l2.5 2.5L14 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
@@ -68,14 +68,14 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
 
   /* Social platform icons — real brand SVGs */
   const SocialPills = ({ centered, size = "normal" }: { centered?: boolean; size?: "small" | "normal" }) => (
-    <div className={`flex gap-[3px] ${centered ? "justify-center" : ""} ${size === "normal" ? "mb-1" : "mb-0.5"}`}>
+    <div className={`flex gap-[4px] ${centered ? "justify-center" : ""} ${size === "normal" ? "mb-1.5" : "mb-1"}`}>
       {ref.socials.slice(0, 4).map((s, i) => {
         const icon = SOCIAL_ICON[s] || { color: accent, path: "M6 2a4 4 0 100 8 4 4 0 000-8z" };
-        const sz = size === "small" ? 10 : 13;
+        const sz = size === "small" ? 13 : 17;
         return (
-          <div key={i} className="rounded-[4px] flex items-center justify-center"
-            style={{ width: sz, height: sz, background: `${icon.color}15`, border: `0.5px solid ${icon.color}22` }}>
-            <svg width={sz - 4} height={sz - 4} viewBox="0 0 12 12" fill={icon.color}>
+          <div key={i} className="rounded-[5px] flex items-center justify-center"
+            style={{ width: sz, height: sz, background: `${icon.color}18`, border: `0.5px solid ${icon.color}25` }}>
+            <svg width={sz - 5} height={sz - 5} viewBox="0 0 12 12" fill={icon.color}>
               <path d={icon.path} />
             </svg>
           </div>
@@ -86,27 +86,27 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
 
   /* Stats row — social proof */
   const StatsRow = () => ref.stats && ref.stats.length > 0 ? (
-    <div className="flex justify-center gap-3 mb-1.5 px-2">
+    <div className="flex justify-center gap-4 mb-2 px-2">
       {ref.stats.map((s, i) => (
         <div key={i} className="flex flex-col items-center">
-          <span className="text-[8.5px] font-extrabold leading-none" style={{ color: textC }}>{s.value}</span>
-          <span className="text-[5px] leading-none mt-[2px] opacity-60" style={{ color: textC }}>{s.label}</span>
+          <span className="text-[11px] font-extrabold leading-none" style={{ color: textC }}>{s.value}</span>
+          <span className="text-[7px] leading-none mt-[2.5px] opacity-60" style={{ color: textC }}>{s.label}</span>
         </div>
       ))}
     </div>
   ) : null;
 
   return (
-    <button onClick={onClick} className="group flex-shrink-0 flex flex-col items-center gap-2.5 transition-all duration-500 ease-out" style={{ width: 240 }}>
+    <button onClick={onClick} className="group flex-shrink-0 flex flex-col items-center gap-2.5 transition-all duration-500 ease-out" style={{ width: 280 }}>
       {/* Phone body — premium device frame */}
       <div className="relative" style={{
         boxShadow: isActive
           ? `0 30px 80px rgba(124,58,237,0.18), 0 20px 60px rgba(0,0,0,0.35)`
           : "0 20px 60px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.15)",
-        borderRadius: 34,
+        borderRadius: 36,
         transition: "box-shadow 0.5s ease",
       }}>
-        <div className={`relative w-[225px] rounded-[32px] overflow-hidden transition-all duration-500 ${isActive ? "ring-[2.5px] ring-primary ring-offset-2 ring-offset-[hsl(var(--dash-bg))]" : "ring-1 ring-white/[0.05] group-hover:ring-white/[0.10]"}`}
+        <div className={`relative w-[270px] rounded-[34px] overflow-hidden transition-all duration-500 ${isActive ? "ring-[2.5px] ring-primary ring-offset-2 ring-offset-[hsl(var(--dash-bg))]" : "ring-1 ring-white/[0.05] group-hover:ring-white/[0.10]"}`}
           style={{ aspectRatio: "9/17", border: "2px solid #1a1a1a", boxShadow: "inset 0 0 0 0.5px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.04)" }}>
 
           {/* ── Background ── */}
@@ -126,69 +126,69 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
           </div>
 
           {/* ── Status bar (iOS) ── */}
-          <div className="absolute top-0 inset-x-0 h-[18px] z-20 flex items-center justify-between px-3.5 pt-0.5">
-            <span className="text-[6px] font-bold" style={{ color: `${textC}80` }}>9:41</span>
-            <div className="flex items-center gap-[3px]">
-              <svg width="9" height="7" viewBox="0 0 8 6" fill="none"><rect x="0" y="3" width="1.5" height="3" rx="0.5" fill={`${textC}50`}/><rect x="2.2" y="2" width="1.5" height="4" rx="0.5" fill={`${textC}50`}/><rect x="4.4" y="1" width="1.5" height="5" rx="0.5" fill={`${textC}50`}/><rect x="6.6" y="0" width="1.5" height="6" rx="0.5" fill={`${textC}50`}/></svg>
-              <svg width="11" height="7" viewBox="0 0 10 6" fill="none"><rect x="0.5" y="0.5" width="8" height="5" rx="1" stroke={`${textC}40`} strokeWidth="0.6"/><rect x="1.2" y="1.2" width="5.5" height="3.6" rx="0.5" fill={`${textC}60`}/><rect x="8.5" y="1.8" width="1" height="2.4" rx="0.5" fill={`${textC}30`}/></svg>
+          <div className="absolute top-0 inset-x-0 h-[22px] z-20 flex items-center justify-between px-4 pt-1">
+            <span className="text-[8px] font-bold" style={{ color: `${textC}80` }}>9:41</span>
+            <div className="flex items-center gap-[4px]">
+              <svg width="11" height="8" viewBox="0 0 8 6" fill="none"><rect x="0" y="3" width="1.5" height="3" rx="0.5" fill={`${textC}50`}/><rect x="2.2" y="2" width="1.5" height="4" rx="0.5" fill={`${textC}50`}/><rect x="4.4" y="1" width="1.5" height="5" rx="0.5" fill={`${textC}50`}/><rect x="6.6" y="0" width="1.5" height="6" rx="0.5" fill={`${textC}50`}/></svg>
+              <svg width="13" height="8" viewBox="0 0 10 6" fill="none"><rect x="0.5" y="0.5" width="8" height="5" rx="1" stroke={`${textC}40`} strokeWidth="0.6"/><rect x="1.2" y="1.2" width="5.5" height="3.6" rx="0.5" fill={`${textC}60`}/><rect x="8.5" y="1.8" width="1" height="2.4" rx="0.5" fill={`${textC}30`}/></svg>
             </div>
           </div>
 
           {/* ── Content ── */}
-          <div className="relative flex flex-col h-full pt-[18px]" style={{ fontFamily: `"${dd.fontHeading || "Inter"}", sans-serif` }}>
+          <div className="relative flex flex-col h-full pt-[22px]" style={{ fontFamily: `"${dd.fontHeading || "Inter"}", sans-serif` }}>
 
             {/* ── HERO LAYOUTS ── */}
             {dd.heroLayout === "hero-banner" || dd.heroLayout === "full-cover" ? (
               <>
-                <div className="w-full flex-shrink-0 relative overflow-hidden" style={{ height: dd.heroLayout === "full-cover" ? 145 : 110 }}>
+                <div className="w-full flex-shrink-0 relative overflow-hidden" style={{ height: dd.heroLayout === "full-cover" ? 170 : 130 }}>
                   <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center 15%" }} crossOrigin="anonymous" loading="lazy" />
                   <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${bg} 0%, ${bg}CC 22%, ${bg}44 48%, transparent 72%)` }} />
-                  <div className="absolute bottom-2.5 left-3.5 right-3.5">
-                    <div className="flex items-center gap-0.5">
-                      <p className="text-[14px] font-extrabold leading-tight tracking-tight" style={{ color: "#fff", textShadow: "0 1px 8px rgba(0,0,0,0.6)" }}>{ref.name}</p>
+                  <div className="absolute bottom-3 left-4 right-4">
+                    <div className="flex items-center gap-1">
+                      <p className="text-[17px] font-extrabold leading-tight tracking-tight" style={{ color: "#fff", textShadow: "0 1px 8px rgba(0,0,0,0.6)" }}>{ref.name}</p>
                       <VerifiedBadge />
                     </div>
-                    <p className="text-[6.5px] mt-0.5" style={{ color: `${accent}CC`, textShadow: "0 1px 3px rgba(0,0,0,0.4)" }}>{ref.username}</p>
-                    <p className="text-[7px] leading-snug mt-0.5 line-clamp-2 opacity-90" style={{ color: "rgba(255,255,255,0.85)", textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}>{ref.bio}</p>
+                    <p className="text-[9px] mt-0.5" style={{ color: `${accent}CC`, textShadow: "0 1px 3px rgba(0,0,0,0.4)" }}>{ref.username}</p>
+                    <p className="text-[9px] leading-snug mt-0.5 line-clamp-2 opacity-90" style={{ color: "rgba(255,255,255,0.85)", textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}>{ref.bio}</p>
                   </div>
                 </div>
-                <div className="px-3.5 mt-1.5 mb-0.5"><SocialPills /></div>
+                <div className="px-4 mt-2 mb-1"><SocialPills /></div>
                 <StatsRow />
               </>
             ) : dd.heroLayout === "side-by-side" ? (
               <>
-                <div className="flex flex-row gap-2.5 w-full px-3.5 mt-3 mb-1">
-                  <div className="w-[60px] flex-shrink-0 overflow-hidden rounded-xl" style={{ aspectRatio: "3/4", border: dd.profileBorder ? `2px solid ${dd.profileBorderColor || accent}` : "none", boxShadow: dd.profileGlow ? `0 0 14px ${dd.profileGlowColor || accent}30` : "none" }}>
+                <div className="flex flex-row gap-3 w-full px-4 mt-4 mb-1.5">
+                  <div className="w-[72px] flex-shrink-0 overflow-hidden rounded-xl" style={{ aspectRatio: "3/4", border: dd.profileBorder ? `2px solid ${dd.profileBorderColor || accent}` : "none", boxShadow: dd.profileGlow ? `0 0 16px ${dd.profileGlowColor || accent}30` : "none" }}>
                     <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center top" }} crossOrigin="anonymous" loading="lazy" />
                   </div>
                   <div className="flex flex-col justify-center min-w-0 flex-1">
-                    <div className="flex items-center gap-0.5">
-                      <p className="text-[12px] font-extrabold leading-tight tracking-tight" style={{ color: textC }}>{ref.name}</p>
+                    <div className="flex items-center gap-1">
+                      <p className="text-[14.5px] font-extrabold leading-tight tracking-tight" style={{ color: textC }}>{ref.name}</p>
                       <VerifiedBadge />
                     </div>
-                    <p className="text-[6px] mt-0.5" style={{ color: accent }}>{ref.username}</p>
-                    <p className="text-[6.5px] leading-snug mt-0.5 line-clamp-2" style={{ color: subC }}>{ref.bio}</p>
-                    <div className="mt-1.5"><SocialPills size="small" /></div>
+                    <p className="text-[8px] mt-0.5" style={{ color: accent }}>{ref.username}</p>
+                    <p className="text-[8.5px] leading-snug mt-0.5 line-clamp-2" style={{ color: subC }}>{ref.bio}</p>
+                    <div className="mt-2"><SocialPills size="small" /></div>
                   </div>
                 </div>
                 <StatsRow />
               </>
             ) : dd.heroLayout === "minimal-top" ? (
               <>
-                <div className="flex flex-row items-center gap-2 mt-3 mb-1 px-3.5">
-                  <div className="w-[26px] h-[26px] flex-shrink-0 overflow-hidden rounded-full" style={{ border: dd.profileBorder ? `1.5px solid ${dd.profileBorderColor || accent}` : "none", boxShadow: dd.profileGlow ? `0 0 10px ${dd.profileGlowColor || accent}30` : "none" }}>
+                <div className="flex flex-row items-center gap-2.5 mt-4 mb-1.5 px-4">
+                  <div className="w-[32px] h-[32px] flex-shrink-0 overflow-hidden rounded-full" style={{ border: dd.profileBorder ? `1.5px solid ${dd.profileBorderColor || accent}` : "none", boxShadow: dd.profileGlow ? `0 0 12px ${dd.profileGlowColor || accent}30` : "none" }}>
                     <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center top" }} crossOrigin="anonymous" loading="lazy" />
                   </div>
                   <div className="min-w-0">
-                    <div className="flex items-center gap-0.5">
-                      <p className="text-[11px] font-extrabold leading-tight tracking-tight" style={{ color: textC }}>{ref.name}</p>
+                    <div className="flex items-center gap-1">
+                      <p className="text-[13.5px] font-extrabold leading-tight tracking-tight" style={{ color: textC }}>{ref.name}</p>
                       <VerifiedBadge />
                     </div>
-                    <p className="text-[5.5px] leading-tight" style={{ color: accent }}>{ref.username}</p>
+                    <p className="text-[7.5px] leading-tight" style={{ color: accent }}>{ref.username}</p>
                   </div>
                 </div>
-                <p className="text-[6.5px] leading-snug px-3.5 mb-1 line-clamp-2" style={{ color: subC }}>{ref.bio}</p>
-                <div className="px-3.5"><SocialPills size="small" /></div>
+                <p className="text-[8.5px] leading-snug px-4 mb-1.5 line-clamp-2" style={{ color: subC }}>{ref.bio}</p>
+                <div className="px-4"><SocialPills size="small" /></div>
                 <StatsRow />
               </>
             ) : (
@@ -196,69 +196,69 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
               <>
                 {hasCover ? (
                   <>
-                    <div className="w-full h-[75px] flex-shrink-0 relative overflow-hidden">
+                    <div className="w-full h-[88px] flex-shrink-0 relative overflow-hidden">
                       <img src={ref.coverImage} alt="" className="w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" />
                       <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 20%, ${bg}DD)` }} />
                     </div>
-                    <div className="-mt-8 w-[58px] h-[58px] mb-1 flex-shrink-0 overflow-hidden z-10 mx-auto rounded-full" style={{ border: dd.profileBorder ? `2.5px solid ${dd.profileBorderColor || accent}` : `2px solid ${bg}`, boxShadow: dd.profileGlow ? `0 0 18px ${dd.profileGlowColor || accent}40` : `0 2px 8px rgba(0,0,0,0.3)` }}>
+                    <div className="-mt-9 w-[70px] h-[70px] mb-1.5 flex-shrink-0 overflow-hidden z-10 mx-auto rounded-full" style={{ border: dd.profileBorder ? `2.5px solid ${dd.profileBorderColor || accent}` : `2px solid ${bg}`, boxShadow: dd.profileGlow ? `0 0 22px ${dd.profileGlowColor || accent}40` : `0 2px 10px rgba(0,0,0,0.3)` }}>
                       <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center top" }} crossOrigin="anonymous" loading="lazy" />
                     </div>
                   </>
                 ) : (
-                  <div className="mt-4 w-[58px] h-[58px] mb-1 flex-shrink-0 overflow-hidden mx-auto rounded-full" style={{ border: dd.profileBorder ? `2.5px solid ${dd.profileBorderColor || accent}` : "none", boxShadow: dd.profileGlow ? `0 0 18px ${dd.profileGlowColor || accent}40` : `0 2px 8px rgba(0,0,0,0.2)` }}>
+                  <div className="mt-5 w-[70px] h-[70px] mb-1.5 flex-shrink-0 overflow-hidden mx-auto rounded-full" style={{ border: dd.profileBorder ? `2.5px solid ${dd.profileBorderColor || accent}` : "none", boxShadow: dd.profileGlow ? `0 0 22px ${dd.profileGlowColor || accent}40` : `0 2px 10px rgba(0,0,0,0.2)` }}>
                     <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center top" }} crossOrigin="anonymous" loading="lazy" />
                   </div>
                 )}
-                <div className="flex items-center justify-center gap-0.5 mb-0">
-                  <p className="text-[12.5px] font-extrabold leading-tight tracking-tight" style={{ color: dd.nameColor || textC }}>{ref.name}</p>
+                <div className="flex items-center justify-center gap-1 mb-0">
+                  <p className="text-[15.5px] font-extrabold leading-tight tracking-tight" style={{ color: dd.nameColor || textC }}>{ref.name}</p>
                   <VerifiedBadge />
                 </div>
-                <p className="text-[6px] text-center mb-0.5" style={{ color: accent }}>{ref.username}</p>
-                <p className="text-[6.5px] leading-snug text-center mb-1 px-3.5 line-clamp-2" style={{ color: subC }}>{ref.bio}</p>
+                <p className="text-[8px] text-center mb-1" style={{ color: accent }}>{ref.username}</p>
+                <p className="text-[8.5px] leading-snug text-center mb-1.5 px-4 line-clamp-2" style={{ color: subC }}>{ref.bio}</p>
                 <SocialPills centered />
                 <StatsRow />
               </>
             )}
 
             {/* ── LINKS ── */}
-            <div className="w-full space-y-[5px] mb-1.5 px-3.5">
+            <div className="w-full space-y-[6px] mb-2 px-4">
               {ref.links.slice(0, 2).map((link, i) => (
-                <div key={i} className="h-[22px] w-full flex items-center justify-center" style={{
+                <div key={i} className="h-[28px] w-full flex items-center justify-center" style={{
                   borderRadius: btnR,
                   background: dd.buttonFill === "outline" ? "transparent" : dd.buttonFill === "glass" ? `${accent}15` : dd.buttonFill === "ghost" ? "transparent" : `${accent}20`,
                   border: dd.buttonFill === "outline" ? `0.8px solid ${accent}55` : dd.buttonFill === "glass" ? `0.5px solid ${accent}25` : "none",
-                  boxShadow: dd.buttonShadow === "glow" ? `0 0 8px ${accent}20` : dd.buttonShadow === "md" ? "0 2px 6px rgba(0,0,0,0.12)" : "none",
+                  boxShadow: dd.buttonShadow === "glow" ? `0 0 10px ${accent}20` : dd.buttonShadow === "md" ? "0 2px 8px rgba(0,0,0,0.12)" : "none",
                   backdropFilter: dd.buttonFill === "glass" ? "blur(8px)" : "none",
                 }}>
-                  <span className="text-[7.5px] font-semibold tracking-wide" style={{ color: dd.buttonFill === "outline" ? accent : textC }}>{link}</span>
+                  <span className="text-[9.5px] font-semibold tracking-wide" style={{ color: dd.buttonFill === "outline" ? accent : textC }}>{link}</span>
                 </div>
               ))}
             </div>
 
             {/* ── PRODUCT CARDS ── */}
             {dd.productDisplayStyle === "compact" ? (
-              <div className="flex flex-col gap-[4px] w-full mt-auto pb-3.5 px-3.5">
+              <div className="flex flex-col gap-[5px] w-full mt-auto pb-4 px-4">
                 {ref.products.map((prod, i) => (
-                  <div key={i} className="flex flex-row items-center gap-1.5 py-[5px] px-2" style={{
+                  <div key={i} className="flex flex-row items-center gap-2 py-[6px] px-2.5" style={{
                     borderRadius: cardR,
                     background: dd.cardBg || `${i === 0 ? accent : accent2}08`,
                     border: `0.5px solid ${dd.cardBorder || `${i === 0 ? accent : accent2}18`}`,
                   }}>
                     {prod.image ? (
-                      <img src={prod.image} alt="" className="w-[20px] h-[20px] rounded-md object-cover flex-shrink-0" crossOrigin="anonymous" loading="lazy" />
+                      <img src={prod.image} alt="" className="w-[26px] h-[26px] rounded-md object-cover flex-shrink-0" crossOrigin="anonymous" loading="lazy" />
                     ) : (
-                      <div className="w-[20px] h-[20px] rounded-md flex-shrink-0 flex items-center justify-center text-[8px]" style={{ background: `${i === 0 ? accent : accent2}15` }}>
+                      <div className="w-[26px] h-[26px] rounded-md flex-shrink-0 flex items-center justify-center text-[10px]" style={{ background: `${i === 0 ? accent : accent2}15` }}>
                         {ref.products[i]?.title?.slice(0, 1)}
                       </div>
                     )}
-                    <p className="text-[7px] font-semibold truncate flex-1 min-w-0" style={{ color: textC }}>{prod.title}</p>
-                    <p className="text-[7px] font-bold flex-shrink-0" style={{ color: accent }}>{prod.price}</p>
-                    <span className="text-[6px] flex-shrink-0" style={{ color: `${textC}40` }}>›</span>
+                    <p className="text-[9px] font-semibold truncate flex-1 min-w-0" style={{ color: textC }}>{prod.title}</p>
+                    <p className="text-[9px] font-bold flex-shrink-0" style={{ color: accent }}>{prod.price}</p>
+                    <span className="text-[8px] flex-shrink-0" style={{ color: `${textC}40` }}>›</span>
                   </div>
                 ))}
               </div>
             ) : dd.productDisplayStyle === "expanded" ? (
-              <div className="flex flex-col gap-1.5 w-full mt-auto pb-3.5 px-3.5">
+              <div className="flex flex-col gap-2 w-full mt-auto pb-4 px-4">
                 {ref.products.slice(0, 1).map((prod, i) => (
                   <div key={i} className="overflow-hidden" style={{
                     borderRadius: cardR,
@@ -266,15 +266,15 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
                     border: `0.5px solid ${dd.cardBorder || `${accent}18`}`,
                   }}>
                     {prod.image ? (
-                      <img src={prod.image} alt="" className="w-full h-[42px] object-cover" crossOrigin="anonymous" loading="lazy" />
+                      <img src={prod.image} alt="" className="w-full h-[52px] object-cover" crossOrigin="anonymous" loading="lazy" />
                     ) : (
-                      <div className="w-full h-[32px]" style={{ background: `${accent}10` }} />
+                      <div className="w-full h-[40px]" style={{ background: `${accent}10` }} />
                     )}
-                    <div className="p-2">
-                      <p className="text-[8px] font-bold truncate" style={{ color: textC }}>{prod.title}</p>
+                    <div className="p-2.5">
+                      <p className="text-[10px] font-bold truncate" style={{ color: textC }}>{prod.title}</p>
                       <div className="flex items-center justify-between mt-1">
-                        <p className="text-[9px] font-extrabold" style={{ color: accent }}>{prod.price}</p>
-                        <div className="px-2 py-[3px] rounded-full text-[5.5px] font-bold" style={{ background: `${accent}20`, color: accent }}>Comprar →</div>
+                        <p className="text-[11px] font-extrabold" style={{ color: accent }}>{prod.price}</p>
+                        <div className="px-2.5 py-[4px] rounded-full text-[7px] font-bold" style={{ background: `${accent}20`, color: accent }}>Comprar →</div>
                       </div>
                     </div>
                   </div>
@@ -282,7 +282,7 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
               </div>
             ) : (
               /* callout (default) — two cards side by side */
-              <div className="flex gap-1.5 w-full mt-auto pb-3.5 px-3.5">
+              <div className="flex gap-2 w-full mt-auto pb-4 px-4">
                 {ref.products.slice(0, 2).map((prod, i) => (
                   <div key={i} className="flex-1 overflow-hidden" style={{
                     borderRadius: cardR,
@@ -290,13 +290,13 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
                     border: `0.5px solid ${dd.cardBorder || `${i === 0 ? accent : accent2}18`}`,
                   }}>
                     {prod.image ? (
-                      <img src={prod.image} alt="" className="w-full h-[34px] object-cover" crossOrigin="anonymous" loading="lazy" />
+                      <img src={prod.image} alt="" className="w-full h-[42px] object-cover" crossOrigin="anonymous" loading="lazy" />
                     ) : (
-                      <div className="w-full h-[24px]" style={{ background: `${i === 0 ? accent : accent2}10` }} />
+                      <div className="w-full h-[30px]" style={{ background: `${i === 0 ? accent : accent2}10` }} />
                     )}
-                    <div className="p-1.5">
-                      <p className="text-[7px] font-bold truncate" style={{ color: textC }}>{prod.title}</p>
-                      <p className="text-[8px] font-extrabold mt-0.5" style={{ color: accent }}>{prod.price}</p>
+                    <div className="p-2">
+                      <p className="text-[9px] font-bold truncate" style={{ color: textC }}>{prod.title}</p>
+                      <p className="text-[10px] font-extrabold mt-0.5" style={{ color: accent }}>{prod.price}</p>
                     </div>
                   </div>
                 ))}

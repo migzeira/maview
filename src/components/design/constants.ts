@@ -66,7 +66,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     ],
     stats: [{ value: "12.4k", label: "alunos" }, { value: "4.9", label: "⭐" }, { value: "320+", label: "projetos" }] },
   /* 1 — Fitness */ { name: "Lucas Santos", username: "@lucassantos", bio: "Transformo corpos e mentes em 12 semanas 💪",
-    avatar: U("photo-1583468982228-19f19b4e3b4f", 300, 300, "face"),
+    avatar: U("photo-1568602471122-7832951cc4c5", 300, 300, "face"),
     socials: ["ig", "yt", "wa"], links: ["Falar no WhatsApp →", "Baixar treino gratis →", "Agendar avaliacao →"],
     products: [
       { title: "Plano de Treino 12 Semanas", price: "R$ 97", image: U("photo-1534438327276-14e5300c3a48", 200, 150, "center") },
