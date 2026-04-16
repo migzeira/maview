@@ -21,7 +21,7 @@ import type { DesignPack } from "./design/constants";
 /* ═══════════════════════════════════════════════════════════════════
    Rich Phone Mockup — shows a reference profile with real content
    ═══════════════════════════════════════════════════════════════════ */
-function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack; isActive: boolean; onClick: () => void; liveDesign?: DesignConfig }) {
+function PhoneMockup({ pack, isActive, onClick, liveDesign, userAvatar }: { pack: DesignPack; isActive: boolean; onClick: () => void; liveDesign?: DesignConfig; userAvatar?: string }) {
   const { bg: packBg, accent: packAccent, accent2: packAccent2 } = pack.preview;
   // If this is the active pack, use the LIVE design state so edits reflect in real-time
   // BUT never leak the user's uploaded bg image into the pack preview — always show the pack's own bg
@@ -36,6 +36,8 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
   const accent = dd.accentColor || packAccent;
   const accent2 = dd.accentColor2 || packAccent2;
   const ref = REFERENCE_PROFILES[pack.refIdx % REFERENCE_PROFILES.length];
+  // When pack is active, show user's real avatar for true preview
+  const displayAvatar = (isActive && userAvatar) ? userAvatar : ref.avatar;
   const hasCover = !!ref.coverImage;
   const isLight = bg.startsWith("#f") || bg.startsWith("#e") || bg === "#ffffff";
   const textC = dd.textColor || (isLight ? "#111" : "#fff");
@@ -67,7 +69,8 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
           {/* Hero section — varies by heroLayout */}
           {dd.heroLayout === "hero-banner" ? (
             <>
-              <div className="w-full h-[30px] rounded-t-lg flex-shrink-0 relative overflow-hidden" style={{ background: `url(${ref.avatar}) center/cover no-repeat, ${accent}` }}>
+              <div className="w-full h-[44px] rounded-t-lg flex-shrink-0 relative overflow-hidden" style={{ background: `url(${displayAvatar}) center top/cover no-repeat, ${accent}` }}>
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 55%)" }} />
                 <div className="absolute bottom-0 left-0 right-0 px-2 pb-0.5">
                   <p className="text-[10px] font-bold leading-tight truncate" style={{ color: "#fff", textShadow: "0 1px 3px rgba(0,0,0,0.6)" }}>{ref.name}</p>
                 </div>
@@ -77,8 +80,8 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
           ) : dd.heroLayout === "side-by-side" ? (
             <>
               <div className="flex flex-row items-center gap-2 w-full px-3 mt-6 mb-2">
-                <div className="w-[24px] h-[24px] flex-shrink-0 overflow-hidden" style={{ borderRadius: pR, border: dd.profileBorder ? `2px solid ${dd.profileBorderColor || accent}` : "1px solid rgba(255,255,255,0.1)" }}>
-                  <img src={ref.avatar} alt="" className="w-full h-full object-cover" loading="lazy" />
+                <div className="w-[24px] h-[32px] flex-shrink-0 overflow-hidden rounded-lg" style={{ border: dd.profileBorder ? `2px solid ${dd.profileBorderColor || accent}` : "1px solid rgba(255,255,255,0.1)" }}>
+                  <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center top" }} loading="lazy" />
                 </div>
                 <div className="flex flex-col min-w-0">
                   <p className="text-[10px] font-bold leading-tight truncate" style={{ color: textC }}>{ref.name}</p>
@@ -91,7 +94,7 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
             <>
               <div className="flex flex-row items-center gap-1.5 mt-6 mb-1.5 px-3">
                 <div className="w-[16px] h-[16px] flex-shrink-0 overflow-hidden" style={{ borderRadius: pR, border: dd.profileBorder ? `1.5px solid ${dd.profileBorderColor || accent}` : "1px solid rgba(255,255,255,0.1)" }}>
-                  <img src={ref.avatar} alt="" className="w-full h-full object-cover" loading="lazy" />
+                  <img src={displayAvatar} alt="" className="w-full h-full object-cover" loading="lazy" />
                 </div>
                 <p className="text-[10px] font-bold leading-tight truncate" style={{ color: textC }}>{ref.name}</p>
               </div>
@@ -99,8 +102,8 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
             </>
           ) : dd.heroLayout === "full-cover" ? (
             <>
-              <div className="w-full h-[40px] rounded-t-lg flex-shrink-0 relative overflow-hidden" style={{ background: `url(${ref.avatar}) center/cover no-repeat` }}>
-                <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.65))" }} />
+              <div className="w-full h-[60px] rounded-t-lg flex-shrink-0 relative overflow-hidden" style={{ background: `url(${displayAvatar}) center top/cover no-repeat` }}>
+                <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${bg} 0%, transparent 55%)` }} />
                 <div className="absolute bottom-0 left-0 right-0 px-2 pb-1">
                   <p className="text-[11px] font-bold leading-tight truncate" style={{ color: "#fff", textShadow: "0 1px 4px rgba(0,0,0,0.7)" }}>{ref.name}</p>
                 </div>
@@ -117,12 +120,12 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
                     <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 30%, ${bg}DD)` }} />
                   </div>
                   <div className="-mt-6 w-14 h-14 mb-1 flex-shrink-0 overflow-hidden z-10 ring-2" style={{ borderRadius: pR, border: dd.profileBorder ? `2px solid ${dd.profileBorderColor || accent}` : "none", ringColor: bg }}>
-                    <img src={ref.avatar} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" loading="lazy" />
+                    <img src={displayAvatar} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" loading="lazy" />
                   </div>
                 </>
               ) : (
                 <div className="mt-8 w-14 h-14 mb-1.5 flex-shrink-0 overflow-hidden" style={{ borderRadius: pR, border: dd.profileBorder ? `2px solid ${dd.profileBorderColor || accent}` : "1px solid rgba(255,255,255,0.1)" }}>
-                  <img src={ref.avatar} alt="" className="w-full h-full object-cover" loading="lazy" />
+                  <img src={displayAvatar} alt="" className="w-full h-full object-cover" loading="lazy" />
                 </div>
               )}
               <p className="text-[11px] font-bold leading-tight text-center mb-0.5 px-3" style={{ color: textC }}>{ref.name}</p>
@@ -419,7 +422,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
           <div ref={carouselRef} className="flex gap-4 overflow-x-auto pb-3 pt-1 px-2 scroll-smooth snap-x" style={{ scrollbarWidth: "none" }}>
             {filteredPacks.map(pack => (
               <div key={pack.id} className="snap-center">
-                <PhoneMockup pack={pack} isActive={isPackActive(pack)} onClick={() => applyPack(pack)} liveDesign={isPackActive(pack) ? d : undefined} />
+                <PhoneMockup pack={pack} isActive={isPackActive(pack)} onClick={() => applyPack(pack)} liveDesign={isPackActive(pack) ? d : undefined} userAvatar={config.avatarUrl} />
               </div>
             ))}
           </div>

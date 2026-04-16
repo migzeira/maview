@@ -661,16 +661,17 @@ const ProfilePage = () => {
                 case "hero-banner":
                   return (
                     <>
-                      {/* Banner image */}
-                      <div className="relative w-full rounded-2xl overflow-hidden mb-4" style={{ height: 200 }}>
+                      {/* Banner image — tall enough to show face properly */}
+                      <div className="relative w-full rounded-2xl overflow-hidden mb-4" style={{ height: 260 }}>
                         {profile.avatar
                           ? <img src={profile.avatar} alt={profile.displayName}
-                              className="w-full h-full object-cover" loading="eager" decoding="async" fetchPriority="high" />
+                              className="w-full h-full object-cover" loading="eager" decoding="async" fetchPriority="high"
+                              style={{ objectPosition: "center 15%" }} />
                           : <div className="w-full h-full" style={{ background: t.accent }} />
                         }
-                        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 60%)" }} />
-                        <div className="absolute bottom-3 left-0 right-0 flex flex-col items-center">
-                          <h1 className="text-[28px] font-extrabold text-center tracking-tight text-white" style={{ fontFamily: `'${rd.fontHeading}', sans-serif`, textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}>{profile.displayName}</h1>
+                        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.70) 0%, rgba(0,0,0,0.15) 40%, transparent 70%)" }} />
+                        <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center">
+                          <h1 className="text-[28px] font-extrabold text-center tracking-tight text-white" style={{ fontFamily: `'${rd.fontHeading}', sans-serif`, textShadow: "0 2px 12px rgba(0,0,0,0.7)" }}>{profile.displayName}</h1>
                           <p className="text-[13px] font-semibold mt-0.5" style={{ color: "rgba(255,255,255,0.85)", textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}>@{profile.username.replace(/^@+/, "")}</p>
                         </div>
                       </div>
@@ -685,13 +686,14 @@ const ProfilePage = () => {
                   return (
                     <>
                       <div className="flex w-full gap-4 mb-3 items-center">
-                        {/* Left: avatar */}
-                        <div className="flex-shrink-0" style={{ width: "40%" }}>
+                        {/* Left: avatar — portrait ratio to show full face */}
+                        <div className="flex-shrink-0" style={{ width: "38%" }}>
                           {profile.avatar
                             ? <img src={profile.avatar} alt={profile.displayName}
-                                className="w-full aspect-square object-cover rounded-2xl" loading="eager" decoding="async" fetchPriority="high" />
-                            : <div className="w-full aspect-square rounded-2xl flex items-center justify-center text-3xl font-bold text-white"
-                                style={{ background: t.accent }}>{(profile.displayName || "?")[0]}</div>
+                                className="w-full object-cover rounded-2xl" loading="eager" decoding="async" fetchPriority="high"
+                                style={{ aspectRatio: "3/4", objectPosition: "center top" }} />
+                            : <div className="w-full rounded-2xl flex items-center justify-center text-3xl font-bold text-white"
+                                style={{ aspectRatio: "3/4", background: t.accent }}>{(profile.displayName || "?")[0]}</div>
                           }
                         </div>
                         {/* Right: name + bio + socials */}
@@ -761,15 +763,15 @@ const ProfilePage = () => {
                 case "full-cover":
                   return (
                     <>
-                      {/* Cover image */}
+                      {/* Cover image — portrait ratio to show full face */}
                       <div className="relative w-full rounded-2xl overflow-hidden mb-3">
                         {profile.avatar
                           ? <img src={profile.avatar} alt={profile.displayName}
                               className="w-full object-cover" loading="eager" decoding="async" fetchPriority="high"
-                              style={{ aspectRatio: "4/3" }} />
-                          : <div className="w-full" style={{ aspectRatio: "4/3", background: t.accent }} />
+                              style={{ aspectRatio: "3/4", objectPosition: "center top" }} />
+                          : <div className="w-full" style={{ aspectRatio: "3/4", background: t.accent }} />
                         }
-                        <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${t.bg} 0%, transparent 50%)` }} />
+                        <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${t.bg} 0%, ${t.bg}BB 20%, transparent 55%)` }} />
                         <h1 className="absolute bottom-3 left-4 right-4 text-[24px] font-extrabold tracking-tight text-center" style={{ color: "#ffffff", fontFamily: `'${rd.fontHeading}', sans-serif`, textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}>{profile.displayName}</h1>
                       </div>
                       <p className="text-[13px] font-semibold mb-2" style={{ color: t.accent, textShadow: tShadow }}>@{profile.username.replace(/^@+/, "")}</p>
