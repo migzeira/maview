@@ -762,65 +762,70 @@ const ProfilePage = () => {
                         </div>
                       )}
 
-                      {/* Card body */}
+                      {/* Card body — image on top, info below */}
                       <Wrapper {...(wrapperProps as any)}
-                        className={`group flex items-center gap-4 w-full px-4 py-4 transition-all duration-200 active:scale-[0.97] ${isBooking ? "cursor-pointer text-left" : ""}`}
+                        className={`group flex flex-col w-full transition-all duration-200 active:scale-[0.97] ${isBooking ? "cursor-pointer text-left" : ""}`}
                       >
-                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden flex items-center justify-center text-2xl flex-shrink-0" style={{ background: `${t.accent}08`, border: `1px solid ${t.accent}10` }}>
-                          {coverImg
-                            ? <img src={coverImg} alt={product.title} className="w-full h-full object-cover" loading="lazy" decoding="async" />
-                            : product.emoji
-                          }
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                            <p className="text-[15px] font-bold leading-snug line-clamp-2" style={{ color: c.productTitle, fontFamily: `'${rd.fontHeading}', sans-serif` }}>{product.title}</p>
-                            {/* Auto "Mais vendido" badge on first product */}
-                            {i === 0 && profile.products.length > 1 && !product.badge && (
-                              <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 flex items-center gap-0.5"
-                                style={{ background: `${t.accent}15`, color: t.text, opacity: 0.85, border: `1px solid ${t.accent}20` }}>
-                                <Flame size={9} /> Mais vendido
-                              </span>
-                            )}
-                            {product.badge && (
-                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: `${t.accent}15`, color: t.text, opacity: 0.85, border: `1px solid ${t.accent}20` }}>
-                                {product.badge}
-                              </span>
-                            )}
-                            {isBooking && (
-                              <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
-                                style={{ background: "rgba(34,197,94,0.20)", color: "#22c55e", border: "1px solid rgba(34,197,94,0.35)" }}>
-                                Agenda online
-                              </span>
-                            )}
-                            {product.urgency && <CountdownBadge accent={t.accent} badgeBg={rd.urgencyBadgeBg} badgeText={rd.urgencyBadgeText} />}
+                        {/* Product image — large, full width */}
+                        {coverImg ? (
+                          <div className="w-full overflow-hidden" style={{ borderRadius: "inherit", borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
+                            <img src={coverImg} alt={product.title} className="w-full object-cover" style={{ aspectRatio: "16/10" }} loading="lazy" decoding="async" />
                           </div>
-                          {/* Description hidden from card — shown only in detail modal */}
-                          {product.price && (
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className="text-[13px] font-bold" style={{ color: c.price }}>{product.price}</span>
-                              {product.originalPrice && <span className="text-[11px] line-through" style={{ color: c.originalPrice }}>{product.originalPrice}</span>}
-                            </div>
-                          )}
-                          {isBooking && (
-                            <p className="text-[11px] mt-1 flex items-center gap-1" style={{ color: t.sub }}>
-                              <Clock size={10} /> {(product.bookingDuration || 60) >= 60 ? `${Math.floor((product.bookingDuration || 60) / 60)}h${(product.bookingDuration || 60) % 60 || ""}` : `${product.bookingDuration}min`}
-                              {" · "}
-                              {(product.bookingDays || []).length} dias/semana
-                            </p>
-                          )}
-                        </div>
-                        {!isNone && (
-                          <div className="flex-shrink-0 flex items-center gap-1.5 px-4 py-3 min-h-[44px] text-[13px] font-semibold rounded-lg transition-colors duration-150"
-                            style={{
-                              borderRadius: buttonBorderRadius(rd.buttonShape, rd.buttonRadius),
-                              background: isWhatsApp ? "rgba(37,211,102,0.18)" : `${t.accent}18`,
-                              border: isWhatsApp ? "1px solid rgba(37,211,102,0.30)" : `1px solid ${t.accent}30`,
-                              color: isWhatsApp ? "#25d366" : t.accent,
-                            }}>
-                            {isBooking ? <Calendar size={11} /> : isWhatsApp ? <WhatsAppIcon size={13} style={{ color: "#25d366" }} /> : <ShoppingCart size={11} />} {ctaLabel}
+                        ) : (
+                          <div className="w-full flex items-center justify-center text-4xl py-8" style={{ background: `${t.accent}08` }}>
+                            {product.emoji || "📦"}
                           </div>
                         )}
+
+                        {/* Info row */}
+                        <div className="flex items-center gap-3 px-4 py-3.5">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                              <p className="text-[15px] font-bold leading-snug line-clamp-2" style={{ color: c.productTitle, fontFamily: `'${rd.fontHeading}', sans-serif` }}>{product.title}</p>
+                              {i === 0 && profile.products.length > 1 && !product.badge && (
+                                <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 flex items-center gap-0.5"
+                                  style={{ background: `${t.accent}15`, color: t.text, opacity: 0.85, border: `1px solid ${t.accent}20` }}>
+                                  <Flame size={9} /> Mais vendido
+                                </span>
+                              )}
+                              {product.badge && (
+                                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: `${t.accent}15`, color: t.text, opacity: 0.85, border: `1px solid ${t.accent}20` }}>
+                                  {product.badge}
+                                </span>
+                              )}
+                              {isBooking && (
+                                <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
+                                  style={{ background: "rgba(34,197,94,0.20)", color: "#22c55e", border: "1px solid rgba(34,197,94,0.35)" }}>
+                                  Agenda online
+                                </span>
+                              )}
+                              {product.urgency && <CountdownBadge accent={t.accent} badgeBg={rd.urgencyBadgeBg} badgeText={rd.urgencyBadgeText} />}
+                            </div>
+                            {product.price && (
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-[14px] font-bold" style={{ color: c.price }}>{product.price}</span>
+                                {product.originalPrice && <span className="text-[12px] line-through" style={{ color: c.originalPrice }}>{product.originalPrice}</span>}
+                              </div>
+                            )}
+                            {isBooking && (
+                              <p className="text-[11px] mt-1 flex items-center gap-1" style={{ color: t.sub }}>
+                                <Clock size={10} /> {(product.bookingDuration || 60) >= 60 ? `${Math.floor((product.bookingDuration || 60) / 60)}h${(product.bookingDuration || 60) % 60 || ""}` : `${product.bookingDuration}min`}
+                                {" · "}{(product.bookingDays || []).length} dias/semana
+                              </p>
+                            )}
+                          </div>
+                          {!isNone && (
+                            <div className="flex-shrink-0 flex items-center gap-1.5 px-4 py-3 min-h-[44px] text-[13px] font-semibold rounded-lg transition-colors duration-150"
+                              style={{
+                                borderRadius: buttonBorderRadius(rd.buttonShape, rd.buttonRadius),
+                                background: isWhatsApp ? "rgba(37,211,102,0.18)" : `${t.accent}18`,
+                                border: isWhatsApp ? "1px solid rgba(37,211,102,0.30)" : `1px solid ${t.accent}30`,
+                                color: isWhatsApp ? "#25d366" : t.accent,
+                              }}>
+                              {isBooking ? <Calendar size={11} /> : isWhatsApp ? <WhatsAppIcon size={13} style={{ color: "#25d366" }} /> : <ShoppingCart size={11} />} {ctaLabel}
+                            </div>
+                          )}
+                        </div>
                       </Wrapper>
                     </div>
                   );
