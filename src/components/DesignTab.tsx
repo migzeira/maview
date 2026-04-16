@@ -339,7 +339,6 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   const [showContentModal, setShowContentModal] = useState(false);
   const [pendingContent, setPendingContent] = useState<{ products: SampleProduct[]; links: SampleLink[] } | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
-  const [coverflowStyles, setCoverflowStyles] = useState<Map<number, { scale: number; opacity: number }>>(new Map());
   const bgImageInputRef = useRef<HTMLInputElement>(null);
   const coverImageInputRef = useRef<HTMLInputElement>(null);
   const designRef = useRef(config.design);
@@ -356,58 +355,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     if (d.fontBody && d.fontBody !== "Inter") loadFont(d.fontBody);
   }, [d.fontHeading, d.fontBody]);
 
-  /* ── Coverflow scroll handler: scale/opacity based on distance from center ── */
-  const updateCoverflow = useCallback(() => {
-    const el = carouselRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const items = el.children;
-    const newMap = new Map<number, { scale: number; opacity: number }>();
-    // Find closest card to center first
-    let minDist = Infinity;
-    for (let i = 0; i < items.length; i++) {
-      const child = items[i] as HTMLElement;
-      const childRect = child.getBoundingClientRect();
-      const childCenterX = childRect.left + childRect.width / 2;
-      const dist = Math.abs(childCenterX - centerX);
-      if (dist < minDist) minDist = dist;
-    }
-    // Now set scale/opacity relative to card width (240px)
-    const cardW = 260; // card width + gap
-    for (let i = 0; i < items.length; i++) {
-      const child = items[i] as HTMLElement;
-      const childRect = child.getBoundingClientRect();
-      const childCenterX = childRect.left + childRect.width / 2;
-      const dist = Math.abs(childCenterX - centerX);
-      // Cards within ~half a card width of center = full size
-      const deadzone = cardW * 0.4;
-      const effectiveDist = Math.max(0, dist - deadzone);
-      const maxDist = cardW * 1.5;
-      const t = Math.min(effectiveDist / maxDist, 1); // 0 = center zone, 1 = far
-      const scale = 1 - t * 0.12; // 1.0 → 0.88
-      const opacity = 1 - t * 0.25; // 1.0 → 0.75
-      newMap.set(i, { scale: Math.max(scale, 0.88), opacity: Math.max(opacity, 0.75) });
-    }
-    setCoverflowStyles(newMap);
-  }, []);
 
-  useEffect(() => {
-    const el = carouselRef.current;
-    if (!el) return;
-    const handler = () => requestAnimationFrame(updateCoverflow);
-    el.addEventListener("scroll", handler, { passive: true });
-    // Initial calculation — multiple attempts for layout settle
-    const t1 = setTimeout(handler, 50);
-    const t2 = setTimeout(handler, 300);
-    window.addEventListener("resize", handler);
-    return () => {
-      el.removeEventListener("scroll", handler);
-      window.removeEventListener("resize", handler);
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
-  }, [updateCoverflow, packFilter]);
 
   const accent = d.accentColor || currentTheme.accent;
 
@@ -586,29 +534,13 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
             <ChevronRight size={16} />
           </button>
 
-          {/* Coverflow carousel — Apple-style with depth & perspective */}
-          <div style={{
-            maskImage: "linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%)",
-            WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%)",
-          }}>
-            <div ref={carouselRef} className="flex gap-5 overflow-x-auto pb-4 pt-2 px-6 scroll-smooth snap-x snap-mandatory" style={{ scrollbarWidth: "none", perspective: "1200px" }}>
-              {filteredPacks.map((pack, idx) => {
-                const cf = coverflowStyles.get(idx);
-                const s = cf?.scale ?? 1;
-                const o = cf?.opacity ?? 1;
-                return (
-                  <div key={pack.id} className="snap-center" style={{
-                    transform: `scale(${s})`,
-                    opacity: o,
-                    transition: "transform 500ms ease, opacity 500ms ease",
-                    transformOrigin: "center center",
-                    willChange: "transform, opacity",
-                  }}>
-                    <PhoneMockup pack={pack} isActive={isPackActive(pack)} onClick={() => applyPack(pack)} liveDesign={isPackActive(pack) ? d : undefined} />
-                  </div>
-                );
-              })}
-            </div>
+          {/* Template carousel — clean horizontal scroll */}
+          <div ref={carouselRef} className="flex gap-5 overflow-x-auto pb-4 pt-2 px-4 scroll-smooth snap-x snap-mandatory" style={{ scrollbarWidth: "none" }}>
+            {filteredPacks.map(pack => (
+              <div key={pack.id} className="snap-center">
+                <PhoneMockup pack={pack} isActive={isPackActive(pack)} onClick={() => applyPack(pack)} liveDesign={isPackActive(pack) ? d : undefined} />
+              </div>
+            ))}
           </div>
         </div>
 
