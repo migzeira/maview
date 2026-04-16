@@ -22,12 +22,18 @@ import type { DesignPack } from "./design/constants";
    Premium Phone Mockup — realistic device with dense creator content
    ═══════════════════════════════════════════════════════════════════ */
 
-const SOCIAL_PILL: Record<string, { label: string; color: string }> = {
-  ig: { label: "IG", color: "#E1306C" }, tt: { label: "TK", color: "#00f2ea" },
-  yt: { label: "YT", color: "#FF0000" }, wa: { label: "WA", color: "#25D366" },
-  li: { label: "IN", color: "#0A66C2" }, gh: { label: "GH", color: "#f0f0f0" },
-  tw: { label: "X", color: "#1DA1F2" }, pin: { label: "PI", color: "#E60023" },
-  sc: { label: "SC", color: "#ff5500" }, be: { label: "BE", color: "#1769FF" },
+/* Real brand SVG icons for social platforms (12×12 viewBox) */
+const SOCIAL_ICON: Record<string, { color: string; path: string }> = {
+  ig: { color: "#E1306C", path: "M8 1.5H4A2.5 2.5 0 001.5 4v4A2.5 2.5 0 004 10.5h4A2.5 2.5 0 0010.5 8V4A2.5 2.5 0 008 1.5zM6 8.2a2.2 2.2 0 110-4.4 2.2 2.2 0 010 4.4zm2.6-4a.55.55 0 110-1.1.55.55 0 010 1.1zM6 4.6a1.4 1.4 0 100 2.8 1.4 1.4 0 000-2.8z" },
+  tt: { color: "#00f2ea", path: "M9.5 3.5A2.5 2.5 0 017 1h-1.5v6.25a1.25 1.25 0 11-.88-1.19V4.5A2.75 2.75 0 107 7.25V4.3A4 4 0 009.5 5V3.5z" },
+  yt: { color: "#FF0000", path: "M11 4.2s-.1-.8-.5-1.1c-.4-.4-.9-.4-.9-.4H2.4s-.5 0-.9.4C1.1 3.4 1 4.2 1 4.2S.9 5.1.9 6v.8c0 .9.1 1.8.1 1.8s.1.8.5 1.1c.4.4 1 .4 1.2.4H9.6c.5 0 .9-.4.9-.4s.4-.4.5-1.1c0 0 .1-.9.1-1.8V6c0-.9-.1-1.8-.1-1.8zM4.8 8V4.5L7.8 6.2 4.8 8z" },
+  wa: { color: "#25D366", path: "M6 1a5 5 0 00-4.35 7.48L1 11l2.6-.68A5 5 0 106 1zm2.8 7.1c-.12.34-.7.65-1 .69-.25.04-.57.06-3.05-.95a7.4 7.4 0 01-2.5-2.2c-.38-.51-.8-1.35-.81-2.05 0-.7.36-1.04.5-1.19.13-.14.28-.17.38-.17h.27c.09 0 .2-.03.32.24.12.28.42.96.45 1.03.04.07.06.15.01.24-.05.09-.07.15-.14.23l-.22.25c-.07.07-.15.15-.06.3.08.15.38.63.82 1.02.56.5 1.04.66 1.19.73.14.08.23.07.32-.04.09-.1.38-.44.48-.6.1-.15.2-.12.34-.07.13.05.85.4.99.47.15.07.24.11.28.17.04.06.04.34-.08.68z" },
+  li: { color: "#0A66C2", path: "M2.5 4.5h1.8v5.5H2.5zM3.4 2a1 1 0 110 2 1 1 0 010-2zM5.5 4.5h1.7v.75h.03c.24-.45.82-.92 1.68-.92C10.5 4.33 11 5.4 11 7v3H9.2V7.3c0-.57-.01-1.3-.8-1.3-.8 0-.92.62-.92 1.27V10H5.5z" },
+  gh: { color: "#f0f0f0", path: "M6 1C3.24 1 1 3.24 1 6c0 2.21 1.44 4.08 3.43 4.75.25.05.34-.11.34-.24v-.86c-1.4.3-1.69-.67-1.69-.67-.23-.58-.56-.73-.56-.73-.46-.31.03-.31.03-.31.5.04.77.52.77.52.45.77 1.18.55 1.47.42.05-.33.18-.55.32-.67-1.11-.13-2.28-.56-2.28-2.48 0-.55.2-1 .52-1.35-.05-.13-.23-.64.05-1.33 0 0 .42-.14 1.39.52a4.8 4.8 0 012.52 0c.96-.65 1.38-.52 1.38-.52.28.69.1 1.2.05 1.33.33.35.52.8.52 1.35 0 1.93-1.17 2.35-2.29 2.48.18.16.34.46.34.93v1.37c0 .13.09.29.34.24A5 5 0 0011 6C11 3.24 8.76 1 6 1z" },
+  tw: { color: "#1DA1F2", path: "M10.5 3.5c-.35.15-.72.26-1.1.3.4-.24.7-.6.85-1.05-.37.22-.78.38-1.22.47A1.93 1.93 0 007.6 2.5c-1.07 0-1.93.87-1.93 1.93 0 .15.02.3.05.44A5.48 5.48 0 011.7 2.8a1.93 1.93 0 00.6 2.58c-.32-.01-.62-.1-.88-.25v.03a1.93 1.93 0 001.55 1.89c-.16.04-.34.07-.52.07-.13 0-.25-.01-.37-.04.25.78.98 1.35 1.84 1.37a3.88 3.88 0 01-2.87.8A5.46 5.46 0 004 10c3.56 0 5.5-2.95 5.5-5.5v-.25c.38-.27.7-.61.96-1z" },
+  pin: { color: "#E60023", path: "M6 1a5 5 0 00-1.82 9.66c-.01-.42.01-1.07.1-1.59l.78-3.3s-.2-.39-.2-.97c0-.91.53-1.59 1.18-1.59.56 0 .83.42.83.92 0 .56-.36 1.4-.54 2.18-.15.65.33 1.18.97 1.18 1.16 0 2.06-1.23 2.06-3 0-1.57-1.13-2.66-2.74-2.66A2.84 2.84 0 003.78 4.7c0 .55.21 1.14.48 1.46.05.06.06.12.04.18l-.18.73c-.03.12-.1.14-.22.09-.83-.39-1.35-1.59-1.35-2.56 0-2.09 1.52-4 4.38-4 2.3 0 4.09 1.64 4.09 3.83 0 2.29-1.44 4.13-3.44 4.13-.67 0-1.3-.35-1.52-.76l-.41 1.57c-.14.53-.5 1.13-.77 1.52A5 5 0 006 1z" },
+  sc: { color: "#ff5500", path: "M1 7.5s0-3 2.5-4.5c1.5-.9 3-.8 3-.8V1L10 4.5 6.5 8V6.5S4 6 2.5 7.5c-.8.8-1 2-1 2V7.5z" },
+  be: { color: "#1769FF", path: "M1 3h3.5a1.5 1.5 0 011.37 2.13A1.75 1.75 0 014.75 9H1V3zm1.2 2.3h2.1a.6.6 0 000-1.2H2.2v1.2zm0 2.5h2.55a.75.75 0 000-1.5H2.2v1.5zM7 3h4v1h-4zM7 5.5h3.5a1.5 1.5 0 011.5 1.5v.5A1.5 1.5 0 0110.5 9H7V5.5zm1.2 1.2v1.1h2.1a.55.55 0 000-1.1H8.2z" },
 };
 
 function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack; isActive: boolean; onClick: () => void; liveDesign?: DesignConfig }) {
@@ -60,15 +66,18 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
     </svg>
   ) : null;
 
-  /* Social platform pills */
+  /* Social platform icons — real brand SVGs */
   const SocialPills = ({ centered, size = "normal" }: { centered?: boolean; size?: "small" | "normal" }) => (
     <div className={`flex gap-[3px] ${centered ? "justify-center" : ""} ${size === "normal" ? "mb-1" : "mb-0.5"}`}>
       {ref.socials.slice(0, 4).map((s, i) => {
-        const pill = SOCIAL_PILL[s] || { label: s.toUpperCase().slice(0, 2), color: accent };
+        const icon = SOCIAL_ICON[s] || { color: accent, path: "M6 2a4 4 0 100 8 4 4 0 000-8z" };
+        const sz = size === "small" ? 10 : 13;
         return (
-          <div key={i} className={`rounded-[3px] flex items-center justify-center font-extrabold ${size === "small" ? "px-[3px] py-[1px] text-[4px]" : "px-1 py-[1.5px] text-[5px]"}`}
-            style={{ background: `${pill.color}18`, color: pill.color, border: `0.5px solid ${pill.color}25` }}>
-            {pill.label}
+          <div key={i} className="rounded-[4px] flex items-center justify-center"
+            style={{ width: sz, height: sz, background: `${icon.color}15`, border: `0.5px solid ${icon.color}22` }}>
+            <svg width={sz - 4} height={sz - 4} viewBox="0 0 12 12" fill={icon.color}>
+              <path d={icon.path} />
+            </svg>
           </div>
         );
       })}
@@ -88,16 +97,17 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
   ) : null;
 
   return (
-    <button onClick={onClick} className={`group flex-shrink-0 flex flex-col items-center gap-2.5 transition-all duration-500 ease-out ${isActive ? "scale-[1.05] z-10" : "opacity-[0.75] group-hover:opacity-100 hover:scale-[1.03]"}`} style={{ width: 240 }}>
-      {/* Phone body — 15% larger, premium device frame */}
+    <button onClick={onClick} className="group flex-shrink-0 flex flex-col items-center gap-2.5 transition-all duration-500 ease-out" style={{ width: 240 }}>
+      {/* Phone body — premium device frame */}
       <div className="relative" style={{
-        filter: isActive
-          ? `drop-shadow(0 10px 25px rgba(0,0,0,0.45)) drop-shadow(0 0 40px ${accent}15)`
-          : "drop-shadow(0 4px 12px rgba(0,0,0,0.25)) drop-shadow(0 10px 20px rgba(0,0,0,0.12))",
-        transition: "filter 0.5s ease",
+        boxShadow: isActive
+          ? `0 30px 80px rgba(124,58,237,0.18), 0 20px 60px rgba(0,0,0,0.35)`
+          : "0 20px 60px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.15)",
+        borderRadius: 34,
+        transition: "box-shadow 0.5s ease",
       }}>
-        <div className={`relative w-[225px] rounded-[28px] overflow-hidden transition-all duration-500 ${isActive ? "ring-[2.5px] ring-primary ring-offset-2 ring-offset-[hsl(var(--dash-bg))]" : "ring-1 ring-white/[0.05] group-hover:ring-white/[0.10]"}`}
-          style={{ aspectRatio: "9/17", border: "2.5px solid #18181b", boxShadow: "inset 0 0 0 0.5px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.03)" }}>
+        <div className={`relative w-[225px] rounded-[32px] overflow-hidden transition-all duration-500 ${isActive ? "ring-[2.5px] ring-primary ring-offset-2 ring-offset-[hsl(var(--dash-bg))]" : "ring-1 ring-white/[0.05] group-hover:ring-white/[0.10]"}`}
+          style={{ aspectRatio: "9/17", border: "2px solid #1a1a1a", boxShadow: "inset 0 0 0 0.5px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.04)" }}>
 
           {/* ── Background ── */}
           <div className="absolute inset-0" style={{ background: dd.bgType === "gradient" ? `linear-gradient(to bottom, ${(dd.bgGradient as [string, string])?.[0] || bg}, ${(dd.bgGradient as [string, string])?.[1] || bg})` : bg }}>
@@ -329,6 +339,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   const [showContentModal, setShowContentModal] = useState(false);
   const [pendingContent, setPendingContent] = useState<{ products: SampleProduct[]; links: SampleLink[] } | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
+  const [coverflowStyles, setCoverflowStyles] = useState<Map<number, { scale: number; opacity: number }>>(new Map());
   const bgImageInputRef = useRef<HTMLInputElement>(null);
   const coverImageInputRef = useRef<HTMLInputElement>(null);
   const designRef = useRef(config.design);
@@ -344,6 +355,43 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     if (d.fontHeading && d.fontHeading !== "Inter") loadFont(d.fontHeading);
     if (d.fontBody && d.fontBody !== "Inter") loadFont(d.fontBody);
   }, [d.fontHeading, d.fontBody]);
+
+  /* ── Coverflow scroll handler: scale/opacity based on distance from center ── */
+  const updateCoverflow = useCallback(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const items = el.children;
+    const newMap = new Map<number, { scale: number; opacity: number }>();
+    for (let i = 0; i < items.length; i++) {
+      const child = items[i] as HTMLElement;
+      const childRect = child.getBoundingClientRect();
+      const childCenterX = childRect.left + childRect.width / 2;
+      const dist = Math.abs(childCenterX - centerX);
+      const maxDist = rect.width * 0.55;
+      const t = Math.min(dist / maxDist, 1); // 0 = center, 1 = far edge
+      const scale = 1 - t * 0.16; // 1.0 → 0.84
+      const opacity = 1 - t * 0.3; // 1.0 → 0.7
+      newMap.set(i, { scale: Math.max(scale, 0.84), opacity: Math.max(opacity, 0.7) });
+    }
+    setCoverflowStyles(newMap);
+  }, []);
+
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const handler = () => requestAnimationFrame(updateCoverflow);
+    el.addEventListener("scroll", handler, { passive: true });
+    // Initial calculation
+    const timer = setTimeout(handler, 100);
+    window.addEventListener("resize", handler);
+    return () => {
+      el.removeEventListener("scroll", handler);
+      window.removeEventListener("resize", handler);
+      clearTimeout(timer);
+    };
+  }, [updateCoverflow, packFilter]);
 
   const accent = d.accentColor || currentTheme.accent;
 
@@ -522,17 +570,28 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
             <ChevronRight size={16} />
           </button>
 
-          {/* Carousel with fade edges (Apple-style mask) */}
+          {/* Coverflow carousel — Apple-style with depth & perspective */}
           <div style={{
-            maskImage: "linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)",
-            WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)",
+            maskImage: "linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%)",
+            WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%)",
           }}>
-            <div ref={carouselRef} className="flex gap-5 overflow-x-auto pb-4 pt-2 px-4 scroll-smooth snap-x snap-mandatory" style={{ scrollbarWidth: "none" }}>
-              {filteredPacks.map(pack => (
-                <div key={pack.id} className="snap-center">
-                  <PhoneMockup pack={pack} isActive={isPackActive(pack)} onClick={() => applyPack(pack)} liveDesign={isPackActive(pack) ? d : undefined} />
-                </div>
-              ))}
+            <div ref={carouselRef} className="flex gap-5 overflow-x-auto pb-4 pt-2 px-6 scroll-smooth snap-x snap-mandatory" style={{ scrollbarWidth: "none", perspective: "1200px" }}>
+              {filteredPacks.map((pack, idx) => {
+                const cf = coverflowStyles.get(idx);
+                const s = cf?.scale ?? 1;
+                const o = cf?.opacity ?? 1;
+                return (
+                  <div key={pack.id} className="snap-center" style={{
+                    transform: `scale(${s})`,
+                    opacity: o,
+                    transition: "transform 500ms ease, opacity 500ms ease",
+                    transformOrigin: "center center",
+                    willChange: "transform, opacity",
+                  }}>
+                    <PhoneMockup pack={pack} isActive={isPackActive(pack)} onClick={() => applyPack(pack)} liveDesign={isPackActive(pack) ? d : undefined} />
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
