@@ -1479,38 +1479,31 @@ const DashboardPagina = () => {
               if (block.type === "product") {
                 const p = config.products.find(pr => pr.id === block.refId);
                 if (!p || !p.active || !isScheduledActive(p)) return null;
-                const coverImg = p.images?.[0] || (p as any).imageUrl;
-                const pProductTitle = d.productTitleColor || pText;
-                const pPrice = d.priceColor || pAccent;
-                const pOrigPrice = d.originalPriceColor || pSub;
                 return (
-                  <div key={block.id} className="overflow-hidden mb-2 transition-all hover:scale-[1.01]"
+                  <div key={block.id} className="flex items-center gap-2.5 p-2.5 mb-2 transition-all hover:scale-[1.01]"
                     style={{ ...pBtnStyle }}>
-                    {/* Image on top — matches public vitrine layout */}
-                    {coverImg ? (
-                      <div className="w-full overflow-hidden" style={{ borderRadius: "inherit", borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
-                        <img src={coverImg} alt={p.title} className="w-full object-cover" style={{ aspectRatio: "16/10" }} />
+                    {(p.images?.length > 0) ? (
+                      <div className="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0">
+                        <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover" />
                       </div>
                     ) : (
-                      <div className="w-full flex items-center justify-center text-xl py-4" style={{ background: `${pAccent}08` }}>
-                        {p.emoji || "📦"}
-                      </div>
+                      <span className="text-base flex-shrink-0">{p.emoji}</span>
                     )}
-                    {/* Info below */}
-                    <div className="flex items-center gap-2 px-2.5 py-2">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-semibold truncate" style={{ color: pProductTitle, fontFamily: `'${pFontH}', sans-serif` }}>{p.title}</p>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                          {p.price && <span className="text-[9px] font-bold" style={{ color: pPrice }}>{p.price}</span>}
-                          {p.originalPrice && <span className="text-[8px] line-through" style={{ color: pOrigPrice }}>{p.originalPrice}</span>}
-                        </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold truncate" style={{ color: d.productTitleColor || pText, fontFamily: `'${pFontH}', sans-serif` }}>{p.title}</p>
+                      <div className="flex items-center gap-2">
+                        {p.originalPrice && (
+                          <span className="text-[9px] line-through" style={{ color: d.originalPriceColor || pSub }}>{p.originalPrice}</span>
+                        )}
+                        {p.price && <p className="text-[10px] font-bold" style={{ color: d.priceColor || pAccent }}>{p.price}</p>}
                       </div>
-                      {p.badge && (
-                        <span className="text-[7px] font-bold px-1 py-0.5 rounded-full" style={{ background: pAccent + "20", color: pAccent }}>
-                          {p.badge}
-                        </span>
-                      )}
                     </div>
+                    {p.badge && (
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: pAccent + "25", color: pAccent }}>
+                        {p.badge}
+                      </span>
+                    )}
+                    {p.urgency && <Clock size={10} style={{ color: pAccent2 }} />}
                   </div>
                 );
               }
