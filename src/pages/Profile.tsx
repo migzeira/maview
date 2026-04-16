@@ -766,7 +766,7 @@ const ProfilePage = () => {
                       <Wrapper {...(wrapperProps as any)}
                         className={`group flex items-center gap-4 w-full px-4 py-4 transition-all duration-200 active:scale-[0.97] ${isBooking ? "cursor-pointer text-left" : ""}`}
                       >
-                        <div className="w-14 h-14 rounded-xl overflow-hidden flex items-center justify-center text-2xl flex-shrink-0" style={{ background: `${t.accent}08`, border: `1px solid ${t.accent}10` }}>
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden flex items-center justify-center text-2xl flex-shrink-0" style={{ background: `${t.accent}08`, border: `1px solid ${t.accent}10` }}>
                           {coverImg
                             ? <img src={coverImg} alt={product.title} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                             : product.emoji

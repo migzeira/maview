@@ -175,7 +175,8 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     if (prev.coverImageUrl && isUserUpload(prev.coverImageUrl as string)) preserved.coverImageUrl = prev.coverImageUrl;
     if (prev.profileBorderColor) preserved.profileBorderColor = prev.profileBorderColor;
     if (prev.profileGlowColor) preserved.profileGlowColor = prev.profileGlowColor;
-    const latest = { ...pack.config.design, ...preserved };
+    // Ensure profileGlow is always on unless pack explicitly disables it
+    const latest = { profileGlow: true, ...pack.config.design, ...preserved };
     designRef.current = latest;
     updateConfig("design", latest);
     if (pack.config.design.fontHeading) loadFont(pack.config.design.fontHeading);

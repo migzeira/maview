@@ -154,7 +154,7 @@ export interface DesignPack {
 export const DESIGN_PACKS: DesignPack[] = [
   { id: "pure-black", label: "Preto Puro", desc: "Minimalista e contrastante", category: "minimal", refIdx: 1,
     preview: { bg: "#000000", accent: "#ffffff", accent2: "#a0a0a0" },
-    config: { theme: "pure-black", design: { bgType: "solid", bgColor: "#000000", bgEffect: "", buttonShape: "square", buttonFill: "outline", buttonShadow: "none", buttonRadius: 4, fontHeading: "Space Grotesk", fontBody: "JetBrains Mono", profileShape: "circle", profileBorder: true, profileBorderColor: "#ffffff", profileSize: 88, accentColor: "#ffffff", accentColor2: "#a0a0a0" } } },
+    config: { theme: "pure-black", design: { bgType: "solid", bgColor: "#000000", bgEffect: "", buttonShape: "square", buttonFill: "outline", buttonShadow: "none", buttonRadius: 4, fontHeading: "Space Grotesk", fontBody: "JetBrains Mono", profileShape: "circle", profileBorder: true, profileBorderColor: "#ffffff", profileGlow: true, profileGlowColor: "#ffffff", profileSize: 88, accentColor: "#ffffff", accentColor2: "#a0a0a0", textColor: "#ffffff", subtextColor: "rgba(255,255,255,0.65)", nameColor: "#ffffff" } } },
   { id: "luxury-dark", label: "Luxury", desc: "Elegante e sofisticado", category: "dark", refIdx: 0,
     preview: { bg: "#080612", accent: "#a855f7", accent2: "#ec4899" },
     config: { theme: "dark-purple", design: { bgType: "gradient", bgGradient: ["#080612", "#1a0a2e"], bgGradientDir: "to-b", buttonShape: "soft", buttonFill: "solid", buttonShadow: "md", buttonRadius: 14, fontHeading: "Playfair Display", fontBody: "Lora", profileShape: "circle", profileBorder: true, profileBorderColor: "#a855f7", profileSize: 96, accentColor: "#a855f7", accentColor2: "#ec4899" } } },
