@@ -766,7 +766,7 @@ const ProfilePage = () => {
                       <Wrapper {...(wrapperProps as any)}
                         className={`group flex items-center gap-4 w-full px-4 py-4 transition-all duration-200 active:scale-[0.97] ${isBooking ? "cursor-pointer text-left" : ""}`}
                       >
-                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden flex items-center justify-center text-2xl flex-shrink-0" style={{ background: `${t.accent}08`, border: `1px solid ${t.accent}10` }}>
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden flex items-center justify-center text-2xl flex-shrink-0" style={{ background: `${t.accent}08`, border: `1px solid ${t.accent}10` }}>
                           {coverImg
                             ? <img src={coverImg} alt={product.title} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                             : product.emoji
@@ -795,7 +795,7 @@ const ProfilePage = () => {
                             )}
                             {product.urgency && <CountdownBadge accent={t.accent} badgeBg={rd.urgencyBadgeBg} badgeText={rd.urgencyBadgeText} />}
                           </div>
-                          {product.description && <p className="text-[12px] line-clamp-2" style={{ color: c.productDesc }}>{product.description}</p>}
+                          {/* Description hidden from card — shown only in detail modal */}
                           {product.price && (
                             <div className="flex items-center gap-2 mt-1">
                               <span className="text-[13px] font-bold" style={{ color: c.price }}>{product.price}</span>
