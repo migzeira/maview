@@ -5,7 +5,7 @@ import {
   TrendingUp, Users, DollarSign, Sparkles,
   Instagram, Palette, Globe, Sun, Moon,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { checkUsername as checkUsernameAvail } from "@/lib/vitrine-sync";
 import { toast } from "sonner";
@@ -960,9 +960,9 @@ const Login = () => {
 
             <p className="text-center text-xs text-maview-muted mt-5">
               Ao continuar, você concorda com os{" "}
-              <a href="/termos" className="hover:text-maview-purple transition-colors underline underline-offset-2">Termos de Uso</a>
+              <Link to="/termos" className="hover:text-maview-purple transition-colors underline underline-offset-2">Termos de Uso</Link>
               {" "}e a{" "}
-              <a href="/privacidade" className="hover:text-maview-purple transition-colors underline underline-offset-2">Política de Privacidade</a>.
+              <Link to="/privacidade" className="hover:text-maview-purple transition-colors underline underline-offset-2">Política de Privacidade</Link>.
             </p>
             </>}
           </div>
@@ -1119,9 +1119,10 @@ const Login = () => {
               >
                 {/* Realistic phone frame */}
                 <div className="relative mx-auto" style={{
-                  filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.25)) drop-shadow(0 2px 8px rgba(0,0,0,0.15))",
+                  boxShadow: "0 20px 60px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.12)",
+                  borderRadius: 34,
                 }}>
-                  <div className="relative rounded-[20px] sm:rounded-[24px] overflow-hidden transition-all duration-500 group-hover:shadow-[0_0_30px_rgba(168,85,247,0.15)]"
+                  <div className="relative rounded-[24px] sm:rounded-[32px] overflow-hidden transition-all duration-500 group-hover:shadow-[0_0_30px_rgba(168,85,247,0.15)]"
                     style={{ aspectRatio: "9/16.5", border: "2px solid #1a1a1e", boxShadow: "inset 0 0 0 0.5px rgba(255,255,255,0.06)" }}>
 
                     {/* Background */}
@@ -1152,12 +1153,16 @@ const Login = () => {
                         </p>
                       )}
 
-                      {/* Social icons */}
+                      {/* Social icons — real brand SVGs */}
                       <div className="flex gap-1 mb-2">
-                        {[0, 1, 2].map(j => (
-                          <div key={j} className="w-[12px] h-[12px] sm:w-[14px] sm:h-[14px] rounded-full flex items-center justify-center"
-                            style={{ background: `${tpl.theme.accent}18`, border: `0.5px solid ${tpl.theme.accent}25` }}>
-                            <div className="w-[5px] h-[5px] sm:w-[6px] sm:h-[6px] rounded-full" style={{ background: tpl.theme.accent }} />
+                        {[
+                          { c: "#E1306C", d: "M8 1.5H4A2.5 2.5 0 001.5 4v4A2.5 2.5 0 004 10.5h4A2.5 2.5 0 0010.5 8V4A2.5 2.5 0 008 1.5zM6 8.2a2.2 2.2 0 110-4.4 2.2 2.2 0 010 4.4zm2.6-4a.55.55 0 110-1.1.55.55 0 010 1.1zM6 4.6a1.4 1.4 0 100 2.8 1.4 1.4 0 000-2.8z" },
+                          { c: "#FF0000", d: "M11 4.2s-.1-.8-.5-1.1c-.4-.4-.9-.4-.9-.4H2.4s-.5 0-.9.4C1.1 3.4 1 4.2 1 4.2S.9 5.1.9 6v.8c0 .9.1 1.8.1 1.8s.1.8.5 1.1c.4.4 1 .4 1.2.4H9.6c.5 0 .9-.4.9-.4s.4-.4.5-1.1c0 0 .1-.9.1-1.8V6c0-.9-.1-1.8-.1-1.8zM4.8 8V4.5L7.8 6.2 4.8 8z" },
+                          { c: "#00f2ea", d: "M9.5 3.5A2.5 2.5 0 017 1h-1.5v6.25a1.25 1.25 0 11-.88-1.19V4.5A2.75 2.75 0 107 7.25V4.3A4 4 0 009.5 5V3.5z" },
+                        ].map((icon, j) => (
+                          <div key={j} className="w-[13px] h-[13px] sm:w-[15px] sm:h-[15px] rounded-[3px] flex items-center justify-center"
+                            style={{ background: `${icon.c}15`, border: `0.5px solid ${icon.c}22` }}>
+                            <svg width={8} height={8} viewBox="0 0 12 12" fill={icon.c}><path d={icon.d} /></svg>
                           </div>
                         ))}
                       </div>
@@ -1254,8 +1259,8 @@ const Login = () => {
             <div>
               <p className="text-maview-text text-sm font-bold mb-3">Suporte</p>
               <div className="space-y-2">
-                <a href="/termos" className="block text-maview-muted text-sm hover:text-maview-purple transition-colors">Termos de Uso</a>
-                <a href="/privacidade" className="block text-maview-muted text-sm hover:text-maview-purple transition-colors">Política de Privacidade</a>
+                <Link to="/termos" className="block text-maview-muted text-sm hover:text-maview-purple transition-colors">Termos de Uso</Link>
+                <Link to="/privacidade" className="block text-maview-muted text-sm hover:text-maview-purple transition-colors">Política de Privacidade</Link>
                 <a href="mailto:suporte@maview.app" className="block text-maview-muted text-sm hover:text-maview-purple transition-colors">suporte@maview.app</a>
                 <a href="https://instagram.com/maview.app" target="_blank" rel="noopener noreferrer" className="block text-maview-muted text-sm hover:text-maview-purple transition-colors">@maview.app</a>
               </div>
