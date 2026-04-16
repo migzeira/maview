@@ -64,25 +64,71 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
         </div>
 
         <div className="relative flex flex-col items-center h-full" style={{ fontFamily: `"${dd.fontHeading || "Inter"}", sans-serif` }}>
-          {/* Cover image */}
-          {hasCover ? (
+          {/* Hero section — varies by heroLayout */}
+          {dd.heroLayout === "hero-banner" ? (
             <>
-              <div className="w-full h-[70px] flex-shrink-0 relative overflow-hidden">
-                <img src={ref.coverImage} alt="" className="w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" />
-                <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 30%, ${bg}DD)` }} />
+              <div className="w-full h-[30px] rounded-t-lg flex-shrink-0 relative overflow-hidden" style={{ background: `url(${ref.avatar}) center/cover no-repeat, ${accent}` }}>
+                <div className="absolute bottom-0 left-0 right-0 px-2 pb-0.5">
+                  <p className="text-[10px] font-bold leading-tight truncate" style={{ color: "#fff", textShadow: "0 1px 3px rgba(0,0,0,0.6)" }}>{ref.name}</p>
+                </div>
               </div>
-              <div className="-mt-6 w-14 h-14 mb-1 flex-shrink-0 overflow-hidden z-10 ring-2" style={{ borderRadius: pR, border: dd.profileBorder ? `2px solid ${dd.profileBorderColor || accent}` : "none", ringColor: bg }}>
-                <img src={ref.avatar} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" loading="lazy" />
+              <p className="text-[7px] leading-tight text-center mb-2 px-3 mt-1 line-clamp-2" style={{ color: subC }}>{ref.bio}</p>
+            </>
+          ) : dd.heroLayout === "side-by-side" ? (
+            <>
+              <div className="flex flex-row items-center gap-2 w-full px-3 mt-6 mb-2">
+                <div className="w-[24px] h-[24px] flex-shrink-0 overflow-hidden" style={{ borderRadius: pR, border: dd.profileBorder ? `2px solid ${dd.profileBorderColor || accent}` : "1px solid rgba(255,255,255,0.1)" }}>
+                  <img src={ref.avatar} alt="" className="w-full h-full object-cover" loading="lazy" />
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <p className="text-[10px] font-bold leading-tight truncate" style={{ color: textC }}>{ref.name}</p>
+                  <div className="h-[4px] w-[40px] rounded-full mt-0.5" style={{ background: `${subC}40` }} />
+                  <div className="h-[4px] w-[28px] rounded-full mt-0.5" style={{ background: `${subC}25` }} />
+                </div>
               </div>
             </>
+          ) : dd.heroLayout === "minimal-top" ? (
+            <>
+              <div className="flex flex-row items-center gap-1.5 mt-6 mb-1.5 px-3">
+                <div className="w-[16px] h-[16px] flex-shrink-0 overflow-hidden" style={{ borderRadius: pR, border: dd.profileBorder ? `1.5px solid ${dd.profileBorderColor || accent}` : "1px solid rgba(255,255,255,0.1)" }}>
+                  <img src={ref.avatar} alt="" className="w-full h-full object-cover" loading="lazy" />
+                </div>
+                <p className="text-[10px] font-bold leading-tight truncate" style={{ color: textC }}>{ref.name}</p>
+              </div>
+              <div className="h-[4px] w-[36px] rounded-full mb-2" style={{ background: `${subC}30` }} />
+            </>
+          ) : dd.heroLayout === "full-cover" ? (
+            <>
+              <div className="w-full h-[40px] rounded-t-lg flex-shrink-0 relative overflow-hidden" style={{ background: `url(${ref.avatar}) center/cover no-repeat` }}>
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.65))" }} />
+                <div className="absolute bottom-0 left-0 right-0 px-2 pb-1">
+                  <p className="text-[11px] font-bold leading-tight truncate" style={{ color: "#fff", textShadow: "0 1px 4px rgba(0,0,0,0.7)" }}>{ref.name}</p>
+                </div>
+              </div>
+              <p className="text-[7px] leading-tight text-center mb-2 px-3 mt-1 line-clamp-2" style={{ color: subC }}>{ref.bio}</p>
+            </>
           ) : (
-            <div className="mt-8 w-14 h-14 mb-1.5 flex-shrink-0 overflow-hidden" style={{ borderRadius: pR, border: dd.profileBorder ? `2px solid ${dd.profileBorderColor || accent}` : "1px solid rgba(255,255,255,0.1)" }}>
-              <img src={ref.avatar} alt="" className="w-full h-full object-cover" loading="lazy" />
-            </div>
+            /* classic (default) */
+            <>
+              {hasCover ? (
+                <>
+                  <div className="w-full h-[70px] flex-shrink-0 relative overflow-hidden">
+                    <img src={ref.coverImage} alt="" className="w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" />
+                    <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 30%, ${bg}DD)` }} />
+                  </div>
+                  <div className="-mt-6 w-14 h-14 mb-1 flex-shrink-0 overflow-hidden z-10 ring-2" style={{ borderRadius: pR, border: dd.profileBorder ? `2px solid ${dd.profileBorderColor || accent}` : "none", ringColor: bg }}>
+                    <img src={ref.avatar} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" loading="lazy" />
+                  </div>
+                </>
+              ) : (
+                <div className="mt-8 w-14 h-14 mb-1.5 flex-shrink-0 overflow-hidden" style={{ borderRadius: pR, border: dd.profileBorder ? `2px solid ${dd.profileBorderColor || accent}` : "1px solid rgba(255,255,255,0.1)" }}>
+                  <img src={ref.avatar} alt="" className="w-full h-full object-cover" loading="lazy" />
+                </div>
+              )}
+              <p className="text-[11px] font-bold leading-tight text-center mb-0.5 px-3" style={{ color: textC }}>{ref.name}</p>
+              <p className="text-[7px] leading-tight text-center mb-2 px-3 line-clamp-2" style={{ color: subC }}>{ref.bio}</p>
+            </>
           )}
-
-          <p className="text-[11px] font-bold leading-tight text-center mb-0.5 px-3" style={{ color: textC }}>{ref.name}</p>
-          <p className="text-[7px] leading-tight text-center mb-2 px-3 line-clamp-2" style={{ color: subC }}>{ref.bio}</p>
           <div className="flex gap-1.5 mb-2.5">
             {ref.socials.map((_, i) => (
               <div key={i} className="w-4 h-4 rounded-full" style={{ background: `${accent}35`, border: `0.5px solid ${accent}50` }} />
@@ -100,24 +146,66 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
               </div>
             ))}
           </div>
-          <div className="flex gap-1.5 w-full mt-auto pb-3 px-2.5">
-            {ref.products.map((prod, i) => (
-              <div key={i} className="flex-1 rounded-lg overflow-hidden" style={{
-                background: dd.cardBg || `${i === 0 ? accent : accent2}10`,
-                border: `0.5px solid ${dd.cardBorder || `${i === 0 ? accent : accent2}20`}`,
-              }}>
-                {prod.image ? (
-                  <img src={prod.image} alt="" className="w-full h-[28px] object-cover" crossOrigin="anonymous" loading="lazy" />
-                ) : (
-                  <div className="w-full h-[20px]" style={{ background: `${i === 0 ? accent : accent2}12` }} />
-                )}
-                <div className="p-1 px-1.5">
-                  <p className="text-[6px] font-semibold truncate" style={{ color: textC }}>{prod.title}</p>
-                  <p className="text-[6.5px] font-bold" style={{ color: accent }}>{prod.price}</p>
+          {/* Product cards — varies by productDisplayStyle */}
+          {dd.productDisplayStyle === "compact" ? (
+            <div className="flex flex-col gap-1 w-full mt-auto pb-3 px-2.5">
+              {ref.products.map((prod, i) => (
+                <div key={i} className="flex flex-row items-center gap-1 h-[16px] rounded" style={{
+                  background: dd.cardBg || `${i === 0 ? accent : accent2}10`,
+                  border: `0.5px solid ${dd.cardBorder || `${i === 0 ? accent : accent2}20`}`,
+                  padding: "0 4px",
+                }}>
+                  {prod.image ? (
+                    <img src={prod.image} alt="" className="w-[14px] h-[14px] rounded object-cover flex-shrink-0" crossOrigin="anonymous" loading="lazy" />
+                  ) : (
+                    <div className="w-[14px] h-[14px] rounded flex-shrink-0" style={{ background: `${i === 0 ? accent : accent2}18` }} />
+                  )}
+                  <p className="text-[6px] font-semibold truncate flex-1 min-w-0" style={{ color: textC }}>{prod.title}</p>
+                  <p className="text-[6px] font-bold flex-shrink-0" style={{ color: accent }}>{prod.price}</p>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : dd.productDisplayStyle === "expanded" ? (
+            <div className="flex gap-1.5 w-full mt-auto pb-3 px-2.5">
+              {ref.products.map((prod, i) => (
+                <div key={i} className="flex-1 rounded-lg overflow-hidden" style={{
+                  background: dd.cardBg || `${i === 0 ? accent : accent2}10`,
+                  border: `0.5px solid ${dd.cardBorder || `${i === 0 ? accent : accent2}20`}`,
+                }}>
+                  {prod.image ? (
+                    <img src={prod.image} alt="" className="w-full h-[36px] object-cover" crossOrigin="anonymous" loading="lazy" />
+                  ) : (
+                    <div className="w-full h-[28px]" style={{ background: `${i === 0 ? accent : accent2}12` }} />
+                  )}
+                  <div className="p-1 px-1.5">
+                    <p className="text-[7px] font-semibold truncate" style={{ color: textC }}>{prod.title}</p>
+                    <div className="h-[3px] w-[70%] rounded-full mt-0.5 mb-0.5" style={{ background: `${subC}25` }} />
+                    <p className="text-[7.5px] font-bold" style={{ color: accent }}>{prod.price}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            /* callout (default) */
+            <div className="flex gap-1.5 w-full mt-auto pb-3 px-2.5">
+              {ref.products.map((prod, i) => (
+                <div key={i} className="flex-1 rounded-lg overflow-hidden" style={{
+                  background: dd.cardBg || `${i === 0 ? accent : accent2}10`,
+                  border: `0.5px solid ${dd.cardBorder || `${i === 0 ? accent : accent2}20`}`,
+                }}>
+                  {prod.image ? (
+                    <img src={prod.image} alt="" className="w-full h-[28px] object-cover" crossOrigin="anonymous" loading="lazy" />
+                  ) : (
+                    <div className="w-full h-[20px]" style={{ background: `${i === 0 ? accent : accent2}12` }} />
+                  )}
+                  <div className="p-1 px-1.5">
+                    <p className="text-[6px] font-semibold truncate" style={{ color: textC }}>{prod.title}</p>
+                    <p className="text-[6.5px] font-bold" style={{ color: accent }}>{prod.price}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       <div className="text-center mt-1">

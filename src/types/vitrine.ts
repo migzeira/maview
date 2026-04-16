@@ -13,6 +13,8 @@ export type ButtonFill = "solid" | "outline" | "glass" | "ghost";
 export type ButtonShadow = "none" | "sm" | "md" | "glow";
 export type ProfileShape = "circle" | "rounded" | "square" | "hexagon";
 export type FontFamily = string;
+export type HeroLayout = "classic" | "hero-banner" | "side-by-side" | "minimal-top" | "full-cover";
+export type ProductDisplayStyle = "callout" | "compact" | "expanded";
 
 export interface DesignConfig {
   // Background
@@ -74,6 +76,8 @@ export interface DesignConfig {
 
   // Layout
   layout?: "stack" | "cards" | "grid" | "bento" | "magazine" | "minimal";
+  heroLayout?: HeroLayout;
+  productDisplayStyle?: ProductDisplayStyle;
 
   // Text readability
   textShadow: number;         // 0=off, 1-10 intensity of text shadow for readability
@@ -119,6 +123,10 @@ export interface ProductItem {
   couponCode?: string;
   couponDiscount?: number; // percentage (0-100) or fixed cents
   couponType?: "percent" | "fixed";
+  /* Product card enhancements */
+  rating?: number;        // 1-5 with decimals (e.g. 4.8)
+  subtitle?: string;      // Short line visible on card
+  stockCount?: number;    // Quantity in stock (e.g. 5)
 }
 
 export interface LinkItem {
@@ -277,6 +285,7 @@ export interface ProfileData {
   testimonials?: TestimonialItem[];
   stats?: { label: string; value: string }[];
   embeds?: EmbedItem[];
+  blocks?: VitrineBlock[];
 }
 
 /* ── Extended DesignConfig with new fields ── */

@@ -1,5 +1,5 @@
 import type React from "react";
-import type { ThemeDef, DesignConfig, GradientDir, ButtonShape, ButtonFill, ProfileShape } from "@/types/vitrine";
+import type { ThemeDef, DesignConfig, GradientDir, ButtonShape, ButtonFill, ProfileShape, HeroLayout, ProductDisplayStyle } from "@/types/vitrine";
 
 /* ─── Themes ──────────────────────────────────────────────────── */
 export const THEMES: Record<string, ThemeDef> = {
@@ -61,6 +61,8 @@ export interface ResolvedDesign {
   profileShape: ProfileShape; profileBorder: boolean; profileBorderColor: string; profileGlow: boolean; profileGlowColor: string; profileSize: number;
   textShadow: number;  // 0=off, 1-10 intensity
   hideWatermark: boolean;
+  heroLayout: HeroLayout;
+  productDisplayStyle: ProductDisplayStyle;
 }
 
 export function resolveDesign(theme: ThemeDef, design?: Partial<DesignConfig>): ResolvedDesign {
@@ -113,6 +115,8 @@ export function resolveDesign(theme: ThemeDef, design?: Partial<DesignConfig>): 
     profileSize: d.profileSize ?? 88,
     textShadow: typeof d.textShadow === "number" ? d.textShadow : (d.textShadow ? 5 : 0),
     hideWatermark: d.hideWatermark ?? false,
+    heroLayout: (d.heroLayout as HeroLayout) || "classic",
+    productDisplayStyle: (d.productDisplayStyle as ProductDisplayStyle) || "callout",
   };
 
   // Auto-contrast: if bg has overlay or is image/effect, auto-adjust text

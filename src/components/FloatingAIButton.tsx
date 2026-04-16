@@ -19,12 +19,12 @@ const FloatingAIButton = () => {
       <button
         onClick={() => setOpen(prev => !prev)}
         className={`
-          fixed bottom-5 right-5 z-[99] w-16 h-16 rounded-full
+          fixed bottom-5 right-5 z-[99] w-10 h-10 rounded-full
           bg-gradient-to-br from-[#6D28D9] to-[#8B5CF6]
           shadow-[0_4px_20px_rgba(109,40,217,0.4)]
           hover:shadow-[0_6px_28px_rgba(109,40,217,0.55)]
           hover:scale-[1.08] transition-all duration-200 ease-in-out
-          flex items-center justify-center p-1.5
+          flex items-center justify-center p-1
           ${open ? "rotate-[10deg]" : ""}
         `}
         aria-label="Abrir IA Maview"

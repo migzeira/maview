@@ -174,6 +174,30 @@ function AdvancedContent({ design: d, currentTheme, accent, avatarUrl, displayNa
             Formato, borda e efeito de brilho ao redor da sua foto.
           </p>
 
+          {/* Hero layout selector */}
+          <div>
+            <p className="text-[10px] font-medium text-[hsl(var(--dash-text-muted))] mb-1.5">Layout do perfil</p>
+            <div className="grid grid-cols-5 gap-2">
+              {([
+                { value: "classic", icon: "\ud83d\udcf1", label: "Classico" },
+                { value: "hero-banner", icon: "\ud83d\uddbc\ufe0f", label: "Banner" },
+                { value: "side-by-side", icon: "\u2194\ufe0f", label: "Lado a lado" },
+                { value: "minimal-top", icon: "\ud83d\udd39", label: "Compact" },
+                { value: "full-cover", icon: "\ud83c\udfde\ufe0f", label: "Cover" },
+              ] as const).map(opt => (
+                <button key={opt.value} onClick={() => setDesign("heroLayout", opt.value)}
+                  className={`px-2 py-2 rounded-lg text-center text-[11px] font-medium cursor-pointer transition-all ${
+                    (d.heroLayout || "classic") === opt.value
+                      ? "bg-primary/15 text-primary ring-2 ring-primary/40"
+                      : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))]"
+                  }`}>
+                  <span className="block text-base leading-none mb-0.5">{opt.icon}</span>
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Shape selector */}
           <div>
             <p className="text-[10px] font-medium text-[hsl(var(--dash-text-muted))] mb-1.5">Formato</p>
@@ -502,6 +526,28 @@ function AdvancedContent({ design: d, currentTheme, accent, avatarUrl, displayNa
           <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] leading-relaxed">
             Fundo e borda dos cards de produtos, links e depoimentos.
           </p>
+          {/* Product display style selector */}
+          <div>
+            <p className="text-[10px] font-medium text-[hsl(var(--dash-text-muted))] mb-1.5">Estilo de exibicao</p>
+            <div className="grid grid-cols-3 gap-2">
+              {([
+                { value: "callout", icon: "\ud83d\udccb", label: "Card" },
+                { value: "compact", icon: "\ud83d\udccf", label: "Linha" },
+                { value: "expanded", icon: "\ud83d\udcd0", label: "Grande" },
+              ] as const).map(opt => (
+                <button key={opt.value} onClick={() => setDesign("productDisplayStyle", opt.value)}
+                  className={`px-2 py-2 rounded-lg text-center text-[11px] font-medium cursor-pointer transition-all ${
+                    (d.productDisplayStyle || "callout") === opt.value
+                      ? "bg-primary/15 text-primary ring-2 ring-primary/40"
+                      : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))]"
+                  }`}>
+                  <span className="block text-base leading-none mb-0.5">{opt.icon}</span>
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div>
               <ColorPicker value={d.cardBg || currentTheme.card || "#13102a"} onChange={v => setDesign("cardBg", v)} label="Fundo do card" />

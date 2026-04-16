@@ -2410,6 +2410,41 @@ const DashboardPagina = () => {
                             </div>
                           </div>
                         </div>
+
+                        {/* Subtítulo */}
+                        <div>
+                          <label className={labelCls}>
+                            Subtítulo (aparece no card)
+                          </label>
+                          <input type="text" className={inputCls} maxLength={100}
+                            value={productForm.subtitle || ""}
+                            onChange={e => setProductForm(f => f ? { ...f, subtitle: e.target.value } : f)}
+                            placeholder="Ex: Guia completo com 30 técnicas" />
+                        </div>
+
+                        {/* Avaliação */}
+                        <div>
+                          <label className={labelCls}>
+                            Avaliação ⭐
+                          </label>
+                          <input type="number" className={inputCls}
+                            min={0} max={5} step={0.1}
+                            value={productForm.rating || ""}
+                            onChange={e => setProductForm(f => f ? { ...f, rating: e.target.value ? parseFloat(e.target.value) : undefined } : f)}
+                            placeholder="4.8" />
+                        </div>
+
+                        {/* Estoque */}
+                        <div>
+                          <label className={labelCls}>
+                            Estoque (deixe vazio se ilimitado)
+                          </label>
+                          <input type="number" className={inputCls}
+                            min={0}
+                            value={productForm.stockCount ?? ""}
+                            onChange={e => setProductForm(f => f ? { ...f, stockCount: e.target.value ? parseInt(e.target.value) : undefined } : f)}
+                            placeholder="Ex: 10" />
+                        </div>
                       </div>
                     )}
 
@@ -2859,6 +2894,11 @@ const DashboardPagina = () => {
                                   {display.badge}
                                 </span>
                               )}
+                              {display.hasToggle && (display.active !== false ? (
+                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-green-500/20 text-green-400 border border-green-500/30 flex-shrink-0">Publicado</span>
+                              ) : (
+                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 flex-shrink-0">Rascunho</span>
+                              ))}
                             </div>
                             <div className="flex items-center gap-2">
                               {display.subtitle && (

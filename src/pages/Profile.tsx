@@ -528,10 +528,9 @@ const ProfilePage = () => {
 
           {/* ── HERO ── */}
           <div className="flex flex-col items-center mb-7 transition-all duration-500" style={{ opacity: heroVis ? 1 : 0, transform: heroVis ? "translateY(0)" : "translateY(12px)" }}>
-            {/* Avatar */}
             {(() => {
+              // Shared helpers
               const glowC = rd.profileGlowColor || rd.profileBorderColor || t.accent;
-              // Parse hex to rgba for reliable cross-browser glow
               const hexToRgba = (hex: string, a: number) => {
                 const h = hex.replace("#", "");
                 const r = parseInt(h.slice(0, 2), 16) || 0;
@@ -539,28 +538,108 @@ const ProfilePage = () => {
                 const b = parseInt(h.slice(4, 6), 16) || 0;
                 return `rgba(${r},${g},${b},${a})`;
               };
-              const showGlow = true; // always show glow on public vitrine
-              return (
+
+              // Shared bio block
+              const BioBlock = ({ center = true }: { center?: boolean }) => (
+                profile.bio ? (
+                  <div className={`max-w-[300px] mb-3 ${center ? "text-center" : ""}`}>
+                    <p className={`text-[14px] leading-relaxed ${bioExpanded ? "" : "line-clamp-3"}`} style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif`, textShadow: tShadow }}>{profile.bio}</p>
+                    {profile.bio.length > 120 && !bioExpanded && (
+                      <button onClick={() => setBioExpanded(true)} className="text-[12px] font-medium mt-1 transition-colors hover:opacity-80" style={{ color: t.accent }}>ver mais</button>
+                    )}
+                  </div>
+                ) : null
+              );
+
+              // Shared stats block
+              const StatsBlock = () => (
+                profile.stats ? (
+                  <div className="flex items-center gap-5 mb-4">
+                    {profile.stats.map(({ label, value }) => (
+                      <div key={label} className="flex flex-col items-center">
+                        <span className="text-base font-bold" style={{ color: t.text }}>{value}</span>
+                        <span className="text-[11px] font-medium mt-0.5" style={{ color: t.sub }}>{label}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : null
+              );
+
+              // Shared socials + share row
+              const SocialsRow = () => (
+                <div className="flex items-center gap-3">
+                  {socialLinks.map(link => {
+                    const Icon = getIcon(link.icon);
+                    const brandColor = BRAND_COLORS[link.icon];
+                    const hasGrad = hasBrandGradient(link.icon);
+                    const useBrand = rd.socialIconStyle !== "custom" && rd.socialIconStyle !== "theme";
+                    const iconColor = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
+                      ? rd.socialIconCustomColor
+                      : rd.socialIconStyle === "theme" ? t.text
+                      : (brandColor || t.text);
+                    const iconBg = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
+                      ? `${rd.socialIconCustomColor}15`
+                      : rd.socialIconStyle === "theme" ? `${t.accent}15`
+                      : (hasGrad && useBrand) ? BRAND_GRADIENTS[link.icon]
+                      : (brandColor ? `${brandColor}18` : `${t.accent}15`);
+                    const iconBorder = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
+                      ? `1.5px solid ${rd.socialIconCustomColor}25`
+                      : rd.socialIconStyle === "theme" ? `1.5px solid ${t.accent}22`
+                      : (brandColor ? `1.5px solid ${brandColor}25` : `1.5px solid ${t.accent}22`);
+                    const finalIconColor = (hasGrad && useBrand) ? "#ffffff" : iconColor;
+                    return (
+                      <a key={link.id} href={sanitizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
+                        className="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
+                        style={{ background: iconBg, border: iconBorder }} title={link.title}
+                        aria-label={link.title || "Social link"}>
+                        <Icon size={18} style={{ color: finalIconColor }} />
+                      </a>
+                    );
+                  })}
+                  {profile.whatsapp && (() => {
+                    const waColor = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
+                      ? rd.socialIconCustomColor : rd.socialIconStyle === "theme" ? t.text : "#25d366";
+                    const waBg = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
+                      ? `${rd.socialIconCustomColor}15` : rd.socialIconStyle === "theme" ? `${t.accent}15` : "rgba(37,211,102,0.15)";
+                    const waBorder = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
+                      ? `1.5px solid ${rd.socialIconCustomColor}25` : rd.socialIconStyle === "theme" ? `1.5px solid ${t.accent}22` : "1.5px solid rgba(37,211,102,0.25)";
+                    return (
+                      <a href={`https://wa.me/${profile.whatsapp!.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"
+                        className="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
+                        style={{ background: waBg, border: waBorder }}
+                        aria-label="WhatsApp">
+                        <WhatsAppIcon size={18} style={{ color: waColor }} />
+                      </a>
+                    );
+                  })()}
+                  <button onClick={handleShare} aria-label="Compartilhar perfil"
+                    className="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
+                    style={{ background: `${t.accent}15`, border: `1.5px solid ${t.accent}22` }}>
+                    {copied ? <Check size={17} style={{ color: "#22c55e" }} /> : <Share2 size={17} style={{ color: t.text }} />}
+                  </button>
+                </div>
+              );
+
+              // Classic avatar with glow
+              const AvatarWithGlow = ({ size = rd.profileSize }: { size?: number }) => (
                 <div className="relative mb-4"
                   style={{
-                    width: rd.profileSize, height: rd.profileSize,
+                    width: size, height: size,
                     borderRadius: profileBorderRadius(rd.profileShape),
-                    boxShadow: showGlow
-                      ? `0 0 28px 10px ${hexToRgba(glowC, 0.35)}, 0 0 56px 20px ${hexToRgba(glowC, 0.15)}`
-                      : "none",
+                    boxShadow: `0 0 28px 10px ${hexToRgba(glowC, 0.35)}, 0 0 56px 20px ${hexToRgba(glowC, 0.15)}`,
                   }}>
                   {profile.avatar
                     ? <img src={profile.avatar} alt={profile.displayName}
                         className="relative object-cover z-10" loading="eager" decoding="async" fetchPriority="high"
                         style={{
-                          width: rd.profileSize, height: rd.profileSize,
+                          width: size, height: size,
                           borderRadius: profileBorderRadius(rd.profileShape),
                           clipPath: profileClip(rd.profileShape),
                           border: rd.profileBorder ? `2.5px solid ${hexToRgba(glowC, 0.5)}` : "none",
                         }} />
                     : <div className="relative z-10 flex items-center justify-center text-2xl font-bold text-white"
                         style={{
-                          width: rd.profileSize, height: rd.profileSize,
+                          width: size, height: size,
                           borderRadius: profileBorderRadius(rd.profileShape),
                           clipPath: profileClip(rd.profileShape),
                           background: t.accent,
@@ -568,89 +647,202 @@ const ProfilePage = () => {
                   }
                 </div>
               );
+
+              switch (rd.heroLayout) {
+
+                /* ── HERO-BANNER ── */
+                case "hero-banner":
+                  return (
+                    <>
+                      {/* Banner image */}
+                      <div className="relative w-full rounded-2xl overflow-hidden mb-4" style={{ height: 200 }}>
+                        {profile.avatar
+                          ? <img src={profile.avatar} alt={profile.displayName}
+                              className="w-full h-full object-cover" loading="eager" decoding="async" fetchPriority="high" />
+                          : <div className="w-full h-full" style={{ background: t.accent }} />
+                        }
+                        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 60%)" }} />
+                        <div className="absolute bottom-3 left-0 right-0 flex flex-col items-center">
+                          <h1 className="text-[28px] font-extrabold text-center tracking-tight text-white" style={{ fontFamily: `'${rd.fontHeading}', sans-serif`, textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}>{profile.displayName}</h1>
+                          <p className="text-[13px] font-semibold mt-0.5" style={{ color: "rgba(255,255,255,0.85)", textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}>@{profile.username.replace(/^@+/, "")}</p>
+                        </div>
+                      </div>
+                      <BioBlock center />
+                      <StatsBlock />
+                      <SocialsRow />
+                    </>
+                  );
+
+                /* ── SIDE-BY-SIDE ── */
+                case "side-by-side":
+                  return (
+                    <>
+                      <div className="flex w-full gap-4 mb-3 items-center">
+                        {/* Left: avatar */}
+                        <div className="flex-shrink-0" style={{ width: "40%" }}>
+                          {profile.avatar
+                            ? <img src={profile.avatar} alt={profile.displayName}
+                                className="w-full aspect-square object-cover rounded-2xl" loading="eager" decoding="async" fetchPriority="high" />
+                            : <div className="w-full aspect-square rounded-2xl flex items-center justify-center text-3xl font-bold text-white"
+                                style={{ background: t.accent }}>{(profile.displayName || "?")[0]}</div>
+                          }
+                        </div>
+                        {/* Right: name + bio + socials */}
+                        <div className="flex flex-col items-start justify-center" style={{ width: "60%" }}>
+                          <h1 className="text-[20px] font-extrabold tracking-tight mb-0.5" style={{ color: c.name, fontFamily: `'${rd.fontHeading}', sans-serif`, textShadow: tShadow }}>{profile.displayName}</h1>
+                          <p className="text-[12px] font-semibold mb-2" style={{ color: t.accent, textShadow: tShadow }}>@{profile.username.replace(/^@+/, "")}</p>
+                          {profile.bio && (
+                            <div className="mb-2">
+                              <p className={`text-[13px] leading-relaxed ${bioExpanded ? "" : "line-clamp-3"}`} style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif`, textShadow: tShadow }}>{profile.bio}</p>
+                              {profile.bio.length > 120 && !bioExpanded && (
+                                <button onClick={() => setBioExpanded(true)} className="text-[12px] font-medium mt-1 transition-colors hover:opacity-80" style={{ color: t.accent }}>ver mais</button>
+                              )}
+                            </div>
+                          )}
+                          <SocialsRow />
+                        </div>
+                      </div>
+                      <StatsBlock />
+                    </>
+                  );
+
+                /* ── MINIMAL-TOP ── */
+                case "minimal-top":
+                  return (
+                    <>
+                      {/* Compact header row */}
+                      <div className="flex items-center gap-3 w-full mb-2">
+                        {profile.avatar
+                          ? <img src={profile.avatar} alt={profile.displayName}
+                              className="object-cover rounded-full flex-shrink-0" loading="eager" decoding="async" fetchPriority="high"
+                              style={{ width: 48, height: 48 }} />
+                          : <div className="flex-shrink-0 flex items-center justify-center text-lg font-bold text-white rounded-full"
+                              style={{ width: 48, height: 48, background: t.accent }}>{(profile.displayName || "?")[0]}</div>
+                        }
+                        <div className="flex flex-col">
+                          <h1 className="text-[18px] font-extrabold tracking-tight" style={{ color: c.name, fontFamily: `'${rd.fontHeading}', sans-serif`, textShadow: tShadow }}>{profile.displayName}</h1>
+                          <p className="text-[12px] font-semibold" style={{ color: t.accent, textShadow: tShadow }}>@{profile.username.replace(/^@+/, "")}</p>
+                        </div>
+                      </div>
+                      {/* Bio compact */}
+                      {profile.bio && (
+                        <div className="w-full mb-2">
+                          <p className={`text-[13px] leading-relaxed ${bioExpanded ? "" : "line-clamp-2"}`} style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif`, textShadow: tShadow }}>{profile.bio}</p>
+                          {profile.bio.length > 120 && !bioExpanded && (
+                            <button onClick={() => setBioExpanded(true)} className="text-[12px] font-medium mt-0.5 transition-colors hover:opacity-80" style={{ color: t.accent }}>ver mais</button>
+                          )}
+                        </div>
+                      )}
+                      {/* Stats + socials on one line area */}
+                      <div className="flex items-center justify-between w-full mb-2 flex-wrap gap-2">
+                        {profile.stats && (
+                          <div className="flex items-center gap-4">
+                            {profile.stats.map(({ label, value }) => (
+                              <div key={label} className="flex items-center gap-1">
+                                <span className="text-sm font-bold" style={{ color: t.text }}>{value}</span>
+                                <span className="text-[11px] font-medium" style={{ color: t.sub }}>{label}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <SocialsRow />
+                      </div>
+                    </>
+                  );
+
+                /* ── FULL-COVER ── */
+                case "full-cover":
+                  return (
+                    <>
+                      {/* Cover image */}
+                      <div className="relative w-full rounded-2xl overflow-hidden mb-3">
+                        {profile.avatar
+                          ? <img src={profile.avatar} alt={profile.displayName}
+                              className="w-full object-cover" loading="eager" decoding="async" fetchPriority="high"
+                              style={{ aspectRatio: "4/3" }} />
+                          : <div className="w-full" style={{ aspectRatio: "4/3", background: t.accent }} />
+                        }
+                        <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${t.bg} 0%, transparent 50%)` }} />
+                        <h1 className="absolute bottom-3 left-4 right-4 text-[24px] font-extrabold tracking-tight text-center" style={{ color: "#ffffff", fontFamily: `'${rd.fontHeading}', sans-serif`, textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}>{profile.displayName}</h1>
+                      </div>
+                      <p className="text-[13px] font-semibold mb-2" style={{ color: t.accent, textShadow: tShadow }}>@{profile.username.replace(/^@+/, "")}</p>
+                      <BioBlock center />
+                      <StatsBlock />
+                      <SocialsRow />
+                    </>
+                  );
+
+                /* ── CLASSIC (default) ── */
+                case "classic":
+                default:
+                  return (
+                    <>
+                      {/* Avatar */}
+                      {(() => {
+                        const showGlow = true; // always show glow on public vitrine
+                        return (
+                          <div className="relative mb-4"
+                            style={{
+                              width: rd.profileSize, height: rd.profileSize,
+                              borderRadius: profileBorderRadius(rd.profileShape),
+                              boxShadow: showGlow
+                                ? `0 0 28px 10px ${hexToRgba(glowC, 0.35)}, 0 0 56px 20px ${hexToRgba(glowC, 0.15)}`
+                                : "none",
+                            }}>
+                            {profile.avatar
+                              ? <img src={profile.avatar} alt={profile.displayName}
+                                  className="relative object-cover z-10" loading="eager" decoding="async" fetchPriority="high"
+                                  style={{
+                                    width: rd.profileSize, height: rd.profileSize,
+                                    borderRadius: profileBorderRadius(rd.profileShape),
+                                    clipPath: profileClip(rd.profileShape),
+                                    border: rd.profileBorder ? `2.5px solid ${hexToRgba(glowC, 0.5)}` : "none",
+                                  }} />
+                              : <div className="relative z-10 flex items-center justify-center text-2xl font-bold text-white"
+                                  style={{
+                                    width: rd.profileSize, height: rd.profileSize,
+                                    borderRadius: profileBorderRadius(rd.profileShape),
+                                    clipPath: profileClip(rd.profileShape),
+                                    background: t.accent,
+                                  }}>{(profile.displayName || "?")[0]}</div>
+                            }
+                          </div>
+                        );
+                      })()}
+
+                      <h1 className="text-[22px] font-extrabold mb-1 text-center tracking-tight" style={{ color: c.name, fontFamily: `'${rd.fontHeading}', sans-serif`, textShadow: tShadow }}>{profile.displayName}</h1>
+                      <p className="text-[13px] font-semibold mb-2" style={{ color: t.accent, textShadow: tShadow }}>@{profile.username.replace(/^@+/, "")}</p>
+                      {profile.bio && (
+                        <div className="max-w-[300px] mb-3 text-center">
+                          <p className={`text-[14px] leading-relaxed ${bioExpanded ? "" : "line-clamp-3"}`} style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif`, textShadow: tShadow }}>{profile.bio}</p>
+                          {profile.bio.length > 120 && !bioExpanded && (
+                            <button onClick={() => setBioExpanded(true)} className="text-[12px] font-medium mt-1 transition-colors hover:opacity-80" style={{ color: t.accent }}>
+                              ver mais
+                            </button>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Viewer badge removed — unprofessional */}
+
+                      {/* Stats */}
+                      {profile.stats && (
+                        <div className="flex items-center gap-5 mb-4">
+                          {profile.stats.map(({ label, value }) => (
+                            <div key={label} className="flex flex-col items-center">
+                              <span className="text-base font-bold" style={{ color: t.text }}>{value}</span>
+                              <span className="text-[11px] font-medium mt-0.5" style={{ color: t.sub }}>{label}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Social + Share */}
+                      <SocialsRow />
+                    </>
+                  );
+              }
             })()}
-
-            <h1 className="text-[22px] font-extrabold mb-1 text-center tracking-tight" style={{ color: c.name, fontFamily: `'${rd.fontHeading}', sans-serif`, textShadow: tShadow }}>{profile.displayName}</h1>
-            <p className="text-[13px] font-semibold mb-2" style={{ color: t.accent, textShadow: tShadow }}>@{profile.username.replace(/^@+/, "")}</p>
-            {profile.bio && (
-              <div className="max-w-[300px] mb-3 text-center">
-                <p className={`text-[14px] leading-relaxed ${bioExpanded ? "" : "line-clamp-3"}`} style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif`, textShadow: tShadow }}>{profile.bio}</p>
-                {profile.bio.length > 120 && !bioExpanded && (
-                  <button onClick={() => setBioExpanded(true)} className="text-[12px] font-medium mt-1 transition-colors hover:opacity-80" style={{ color: t.accent }}>
-                    ver mais
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* Viewer badge removed — unprofessional */}
-
-            {/* Stats */}
-            {profile.stats && (
-              <div className="flex items-center gap-5 mb-4">
-                {profile.stats.map(({ label, value }) => (
-                  <div key={label} className="flex flex-col items-center">
-                    <span className="text-base font-bold" style={{ color: t.text }}>{value}</span>
-                    <span className="text-[11px] font-medium mt-0.5" style={{ color: t.sub }}>{label}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Social + Share */}
-            <div className="flex items-center gap-3">
-              {socialLinks.map(link => {
-                const Icon = getIcon(link.icon);
-                const brandColor = BRAND_COLORS[link.icon];
-                const hasGrad = hasBrandGradient(link.icon);
-                const useBrand = rd.socialIconStyle !== "custom" && rd.socialIconStyle !== "theme";
-                const iconColor = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
-                  ? rd.socialIconCustomColor
-                  : rd.socialIconStyle === "theme" ? t.text
-                  : (brandColor || t.text);
-                const iconBg = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
-                  ? `${rd.socialIconCustomColor}15`
-                  : rd.socialIconStyle === "theme" ? `${t.accent}15`
-                  : (hasGrad && useBrand) ? BRAND_GRADIENTS[link.icon]
-                  : (brandColor ? `${brandColor}18` : `${t.accent}15`);
-                const iconBorder = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
-                  ? `1.5px solid ${rd.socialIconCustomColor}25`
-                  : rd.socialIconStyle === "theme" ? `1.5px solid ${t.accent}22`
-                  : (brandColor ? `1.5px solid ${brandColor}25` : `1.5px solid ${t.accent}22`);
-                // For Instagram gradient bg, icon should be white
-                const finalIconColor = (hasGrad && useBrand) ? "#ffffff" : iconColor;
-                return (
-                  <a key={link.id} href={sanitizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
-                    className="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
-                    style={{ background: iconBg, border: iconBorder }} title={link.title}
-                    aria-label={link.title || "Social link"}>
-                    <Icon size={18} style={{ color: finalIconColor }} />
-                  </a>
-                );
-              })}
-              {/* WhatsApp as social icon */}
-              {profile.whatsapp && (() => {
-                const waColor = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
-                  ? rd.socialIconCustomColor : rd.socialIconStyle === "theme" ? t.text : "#25d366";
-                const waBg = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
-                  ? `${rd.socialIconCustomColor}15` : rd.socialIconStyle === "theme" ? `${t.accent}15` : "rgba(37,211,102,0.15)";
-                const waBorder = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
-                  ? `1.5px solid ${rd.socialIconCustomColor}25` : rd.socialIconStyle === "theme" ? `1.5px solid ${t.accent}22` : "1.5px solid rgba(37,211,102,0.25)";
-                return (
-                  <a href={`https://wa.me/${profile.whatsapp!.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"
-                    className="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
-                    style={{ background: waBg, border: waBorder }}
-                    aria-label="WhatsApp">
-                    <WhatsAppIcon size={18} style={{ color: waColor }} />
-                  </a>
-                );
-              })()}
-              <button onClick={handleShare} aria-label="Compartilhar perfil"
-                className="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
-                style={{ background: `${t.accent}15`, border: `1.5px solid ${t.accent}22` }}>
-                {copied ? <Check size={17} style={{ color: "#22c55e" }} /> : <Share2 size={17} style={{ color: t.text }} />}
-              </button>
-            </div>
           </div>
 
           {/* ── DEPOIMENTOS (before products = social proof first) ── */}
@@ -749,6 +941,168 @@ const ProfilePage = () => {
                   /* Card uses a fixed 16px radius — never inherits the button pill/round shape */
                   const cardRadius = rd.buttonShape === "square" ? "6px" : "16px";
 
+                  /* ── Shared badge elements ── */
+                  const ratingBadge = product.rating ? (
+                    <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 flex items-center gap-0.5"
+                      style={{ background: `${t.accent}12`, color: t.accent }}>
+                      ⭐ {product.rating}
+                    </span>
+                  ) : null;
+
+                  const stockBadge = product.stockCount != null && product.stockCount > 0 ? (
+                    <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
+                      style={{
+                        background: product.stockCount <= 3 ? "rgba(239,68,68,0.20)" : `${t.accent}12`,
+                        color: product.stockCount <= 3 ? "#f87171" : t.sub,
+                        border: product.stockCount <= 3 ? "1px solid rgba(239,68,68,0.30)" : `1px solid ${t.accent}15`,
+                      }}>
+                      {product.stockCount} restantes
+                    </span>
+                  ) : null;
+
+                  const subtitleText = product.subtitle || (product.description ? product.description.slice(0, 60) : "");
+
+                  const ctaIcon = isBooking ? <Calendar size={11} /> : isWhatsApp ? <WhatsAppIcon size={13} style={{ color: "#25d366" }} /> : <ShoppingCart size={11} />;
+
+                  /* ── COMPACT display style ── */
+                  if (rd.productDisplayStyle === "compact") {
+                    return (
+                      <div key={product.id}
+                        className="overflow-hidden"
+                        style={{
+                          borderRadius: cardRadius,
+                          background: buttonStyles(rd).background,
+                          border: buttonStyles(rd).border,
+                          boxShadow: buttonStyles(rd).boxShadow,
+                          backdropFilter: (buttonStyles(rd) as any).backdropFilter,
+                          opacity: productStagger[i] ? 1 : 0,
+                          transform: productStagger[i] ? "translateY(0)" : "translateY(8px)",
+                          transition: "opacity 0.3s ease, transform 0.3s ease",
+                        }}
+                        onMouseEnter={(e: React.MouseEvent) => onHoverIn(e.currentTarget as HTMLElement)}
+                        onMouseLeave={(e: React.MouseEvent) => onHoverOut(e.currentTarget as HTMLElement)}
+                      >
+                        <Wrapper {...(wrapperProps as any)}
+                          className={`group flex items-center gap-3 w-full px-3 py-3 transition-all duration-200 active:scale-[0.97] ${isBooking ? "cursor-pointer text-left" : ""}`}
+                        >
+                          {/* Thumbnail or emoji */}
+                          {coverImg ? (
+                            <img src={coverImg} alt={product.title} className="flex-shrink-0 object-cover" style={{ width: 40, height: 40, borderRadius: "10px" }} loading="lazy" decoding="async" />
+                          ) : (
+                            <div className="flex-shrink-0 flex items-center justify-center text-xl" style={{ width: 40, height: 40, borderRadius: "10px", background: `${t.accent}08` }}>
+                              {product.emoji || "📦"}
+                            </div>
+                          )}
+                          {/* Title */}
+                          <p className="flex-1 text-[14px] font-semibold truncate" style={{ color: c.productTitle, fontFamily: `'${rd.fontHeading}', sans-serif` }}>{product.title}</p>
+                          {/* Badges inline */}
+                          {ratingBadge}
+                          {/* Price */}
+                          {product.price && (
+                            <span className="text-[13px] font-bold flex-shrink-0" style={{ color: t.accent }}>{product.price}</span>
+                          )}
+                          {/* Arrow */}
+                          <ArrowRight size={14} style={{ color: t.sub, opacity: 0.6 }} className="flex-shrink-0" />
+                        </Wrapper>
+                      </div>
+                    );
+                  }
+
+                  /* ── EXPANDED display style ── */
+                  if (rd.productDisplayStyle === "expanded") {
+                    return (
+                      <div key={product.id}
+                        className="overflow-hidden"
+                        style={{
+                          borderRadius: cardRadius,
+                          background: buttonStyles(rd).background,
+                          border: buttonStyles(rd).border,
+                          boxShadow: buttonStyles(rd).boxShadow,
+                          backdropFilter: (buttonStyles(rd) as any).backdropFilter,
+                          opacity: productStagger[i] ? 1 : 0,
+                          transform: productStagger[i] ? "translateY(0)" : "translateY(8px)",
+                          transition: "opacity 0.3s ease, transform 0.3s ease",
+                        }}
+                        onMouseEnter={(e: React.MouseEvent) => onHoverIn(e.currentTarget as HTMLElement)}
+                        onMouseLeave={(e: React.MouseEvent) => onHoverOut(e.currentTarget as HTMLElement)}
+                      >
+                        {hasVideo && (
+                          <div className="px-3 pt-3"><MiniVideoPlayer src={product.video!} accent={t.accent} /></div>
+                        )}
+                        <Wrapper {...(wrapperProps as any)}
+                          className={`group flex flex-col w-full transition-all duration-200 active:scale-[0.97] ${isBooking ? "cursor-pointer text-left" : ""}`}
+                        >
+                          {/* Large image */}
+                          {coverImg ? (
+                            <div className="w-full overflow-hidden" style={{ borderRadius: "inherit", borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
+                              <img src={coverImg} alt={product.title} className="w-full object-cover" style={{ aspectRatio: "16/9" }} loading="lazy" decoding="async" />
+                            </div>
+                          ) : (
+                            <div className="w-full flex items-center justify-center text-5xl py-10" style={{ background: `${t.accent}08` }}>
+                              {product.emoji || "📦"}
+                            </div>
+                          )}
+                          {/* Expanded info */}
+                          <div className="px-4 pt-3.5 pb-4">
+                            <p className="text-[17px] font-bold leading-snug mb-1" style={{ color: c.productTitle, fontFamily: `'${rd.fontHeading}', sans-serif` }}>{product.title}</p>
+                            {subtitleText && (
+                              <p className="text-[13px] line-clamp-2 mb-2" style={{ color: c.productDesc }}>{subtitleText}</p>
+                            )}
+                            {/* Badges row */}
+                            <div className="flex items-center gap-2 flex-wrap mb-2">
+                              {ratingBadge}
+                              {i === 0 && profile.products.length > 1 && !product.badge && (
+                                <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 flex items-center gap-0.5"
+                                  style={{ background: `${t.accent}15`, color: t.text, opacity: 0.85, border: `1px solid ${t.accent}20` }}>
+                                  <Flame size={9} /> Mais vendido
+                                </span>
+                              )}
+                              {product.badge && (
+                                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: `${t.accent}15`, color: t.text, opacity: 0.85, border: `1px solid ${t.accent}20` }}>
+                                  {product.badge}
+                                </span>
+                              )}
+                              {isBooking && (
+                                <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0"
+                                  style={{ background: "rgba(34,197,94,0.20)", color: "#22c55e", border: "1px solid rgba(34,197,94,0.35)" }}>
+                                  Agenda online
+                                </span>
+                              )}
+                              {stockBadge}
+                              {product.urgency && <CountdownBadge accent={t.accent} badgeBg={rd.urgencyBadgeBg} badgeText={rd.urgencyBadgeText} />}
+                            </div>
+                            {/* Price large */}
+                            {product.price && (
+                              <div className="flex items-center gap-2 mb-3">
+                                <span className="text-[18px] font-extrabold" style={{ color: c.price }}>{product.price}</span>
+                                {product.originalPrice && <span className="text-[13px] line-through" style={{ color: c.originalPrice }}>{product.originalPrice}</span>}
+                              </div>
+                            )}
+                            {isBooking && (
+                              <p className="text-[11px] mb-3 flex items-center gap-1" style={{ color: t.sub }}>
+                                <Clock size={10} /> {(product.bookingDuration || 60) >= 60 ? `${Math.floor((product.bookingDuration || 60) / 60)}h${(product.bookingDuration || 60) % 60 || ""}` : `${product.bookingDuration}min`}
+                                {" · "}{(product.bookingDays || []).length} dias/semana
+                              </p>
+                            )}
+                            {/* Full-width CTA */}
+                            {!isNone && (
+                              <div className="flex items-center justify-center gap-2 w-full py-3 text-[14px] font-semibold rounded-lg transition-colors duration-150"
+                                style={{
+                                  borderRadius: buttonBorderRadius(rd.buttonShape, rd.buttonRadius),
+                                  background: isWhatsApp ? "rgba(37,211,102,0.18)" : `${t.accent}18`,
+                                  border: isWhatsApp ? "1px solid rgba(37,211,102,0.30)" : `1px solid ${t.accent}30`,
+                                  color: isWhatsApp ? "#25d366" : t.accent,
+                                }}>
+                                {ctaIcon} {ctaLabel} <ArrowRight size={12} />
+                              </div>
+                            )}
+                          </div>
+                        </Wrapper>
+                      </div>
+                    );
+                  }
+
+                  /* ── CALLOUT display style (default — original code) ── */
                   return (
                     <div key={product.id}
                       className="overflow-hidden"
@@ -792,6 +1146,7 @@ const ProfilePage = () => {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap mb-0.5">
                               <p className="text-[15px] font-bold leading-snug line-clamp-2" style={{ color: c.productTitle, fontFamily: `'${rd.fontHeading}', sans-serif` }}>{product.title}</p>
+                              {ratingBadge}
                               {i === 0 && profile.products.length > 1 && !product.badge && (
                                 <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 flex items-center gap-0.5"
                                   style={{ background: `${t.accent}15`, color: t.text, opacity: 0.85, border: `1px solid ${t.accent}20` }}>
@@ -809,8 +1164,12 @@ const ProfilePage = () => {
                                   Agenda online
                                 </span>
                               )}
+                              {stockBadge}
                               {product.urgency && <CountdownBadge accent={t.accent} badgeBg={rd.urgencyBadgeBg} badgeText={rd.urgencyBadgeText} />}
                             </div>
+                            {subtitleText && (
+                              <p className="text-[12px] line-clamp-1 mb-0.5" style={{ color: c.productDesc }}>{subtitleText}</p>
+                            )}
                             {product.price && (
                               <div className="flex items-center gap-2 mt-1">
                                 <span className="text-[14px] font-bold" style={{ color: c.price }}>{product.price}</span>
@@ -832,7 +1191,7 @@ const ProfilePage = () => {
                                 border: isWhatsApp ? "1px solid rgba(37,211,102,0.30)" : `1px solid ${t.accent}30`,
                                 color: isWhatsApp ? "#25d366" : t.accent,
                               }}>
-                              {isBooking ? <Calendar size={11} /> : isWhatsApp ? <WhatsAppIcon size={13} style={{ color: "#25d366" }} /> : <ShoppingCart size={11} />} {ctaLabel}
+                              {ctaIcon} {ctaLabel} <ArrowRight size={12} />
                             </div>
                           )}
                         </div>
