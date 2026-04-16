@@ -514,7 +514,7 @@ const ProfilePage = () => {
       </div>
 
       {/* ── Main content ── */}
-      <main className="flex-1 flex flex-col items-center px-4 pb-28 relative z-10" style={{ paddingTop: rd.coverImageUrl ? 0 : 48 }}>
+      <main className="flex-1 flex flex-col items-center px-5 pb-28 relative z-10" style={{ paddingTop: rd.coverImageUrl ? 0 : 48 }}>
         {/* Cover image banner */}
         {rd.coverImageUrl && (
           <div className="w-full max-w-[440px] relative mb-[-36px] rounded-b-2xl overflow-hidden" style={{ height: 140 }}>
@@ -565,7 +565,7 @@ const ProfilePage = () => {
                     {profile.stats.map(({ label, value }) => (
                       <div key={label} className="flex flex-col items-center">
                         <span className="text-base font-bold" style={{ color: t.text }}>{value}</span>
-                        <span className="text-[11px] font-medium mt-0.5" style={{ color: t.sub }}>{label}</span>
+                        <span className="text-[13px] font-medium mt-0.5" style={{ color: t.sub }}>{label}</span>
                       </div>
                     ))}
                   </div>
@@ -702,7 +702,7 @@ const ProfilePage = () => {
                           <p className="text-[12px] font-semibold mb-2" style={{ color: t.accent, textShadow: tShadow }}>@{profile.username.replace(/^@+/, "")}</p>
                           {profile.bio && (
                             <div className="mb-2">
-                              <p className={`text-[13px] leading-relaxed ${bioExpanded ? "" : "line-clamp-3"}`} style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif`, textShadow: tShadow }}>{profile.bio}</p>
+                              <p className={`text-[14px] leading-relaxed ${bioExpanded ? "" : "line-clamp-3"}`} style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif`, textShadow: tShadow }}>{profile.bio}</p>
                               {profile.bio.length > 120 && !bioExpanded && (
                                 <button onClick={() => setBioExpanded(true)} className="text-[12px] font-medium mt-1 transition-colors hover:opacity-80" style={{ color: t.accent }}>ver mais</button>
                               )}
@@ -729,14 +729,14 @@ const ProfilePage = () => {
                               style={{ width: 48, height: 48, background: t.accent }}>{(profile.displayName || "?")[0]}</div>
                         }
                         <div className="flex flex-col">
-                          <h1 className="text-[18px] font-extrabold tracking-tight" style={{ color: c.name, fontFamily: `'${rd.fontHeading}', sans-serif`, textShadow: tShadow }}>{profile.displayName}</h1>
+                          <h1 className="text-[20px] font-extrabold tracking-tight" style={{ color: c.name, fontFamily: `'${rd.fontHeading}', sans-serif`, textShadow: tShadow }}>{profile.displayName}</h1>
                           <p className="text-[12px] font-semibold" style={{ color: t.accent, textShadow: tShadow }}>@{profile.username.replace(/^@+/, "")}</p>
                         </div>
                       </div>
                       {/* Bio compact */}
                       {profile.bio && (
                         <div className="w-full mb-2">
-                          <p className={`text-[13px] leading-relaxed ${bioExpanded ? "" : "line-clamp-2"}`} style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif`, textShadow: tShadow }}>{profile.bio}</p>
+                          <p className={`text-[14px] leading-relaxed ${bioExpanded ? "" : "line-clamp-2"}`} style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif`, textShadow: tShadow }}>{profile.bio}</p>
                           {profile.bio.length > 120 && !bioExpanded && (
                             <button onClick={() => setBioExpanded(true)} className="text-[12px] font-medium mt-0.5 transition-colors hover:opacity-80" style={{ color: t.accent }}>ver mais</button>
                           )}
@@ -840,7 +840,7 @@ const ProfilePage = () => {
                           {profile.stats.map(({ label, value }) => (
                             <div key={label} className="flex flex-col items-center">
                               <span className="text-base font-bold" style={{ color: t.text }}>{value}</span>
-                              <span className="text-[11px] font-medium mt-0.5" style={{ color: t.sub }}>{label}</span>
+                              <span className="text-[13px] font-medium mt-0.5" style={{ color: t.sub }}>{label}</span>
                             </div>
                           ))}
                         </div>
@@ -900,7 +900,7 @@ const ProfilePage = () => {
                   const Icon = getIcon(link.icon);
                   return (
                     <a key={block.id} href={sanitizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
-                      className="group flex items-center gap-3.5 w-full px-4 py-4 font-semibold text-[14px] active:scale-[0.98] mb-2"
+                      className="group flex items-center gap-3.5 w-full px-4 py-4 font-semibold text-[15px] active:scale-[0.98] mb-2"
                       style={{ ...buttonStyles(rd), color: t.text }}
                       onMouseEnter={e => onHoverIn(e.currentTarget as HTMLElement)}
                       onMouseLeave={e => onHoverOut(e.currentTarget as HTMLElement)}
@@ -1080,7 +1080,7 @@ const ProfilePage = () => {
                   const wrapperProps = { onClick: handleClick };
 
                   /* Card uses a fixed 16px radius — never inherits the button pill/round shape */
-                  const cardRadius = rd.buttonShape === "square" ? "6px" : "16px";
+                  const cardRadius = rd.buttonShape === "square" ? "8px" : "24px";
 
                   /* ── Shared badge elements ── */
                   const ratingBadge = product.rating ? (
@@ -1227,7 +1227,7 @@ const ProfilePage = () => {
                             )}
                             {/* Full-width CTA */}
                             {!isNone && (
-                              <div className="flex items-center justify-center gap-2 w-full py-3 text-[14px] font-semibold rounded-lg transition-colors duration-150"
+                              <div className="flex items-center justify-center gap-2 w-full py-3 text-[15px] font-semibold rounded-lg transition-colors duration-150"
                                 style={{
                                   borderRadius: buttonBorderRadius(rd.buttonShape, rd.buttonRadius),
                                   background: isWhatsApp ? "rgba(37,211,102,0.18)" : `${t.accent}18`,
@@ -1325,7 +1325,7 @@ const ProfilePage = () => {
                             )}
                           </div>
                           {!isNone && (
-                            <div className="flex-shrink-0 flex items-center gap-1.5 px-4 py-3 min-h-[44px] text-[13px] font-semibold rounded-lg transition-colors duration-150"
+                            <div className="flex-shrink-0 flex items-center gap-1.5 px-4 py-3 min-h-[44px] text-[14px] font-semibold rounded-lg transition-colors duration-150"
                               style={{
                                 borderRadius: buttonBorderRadius(rd.buttonShape, rd.buttonRadius),
                                 background: isWhatsApp ? "rgba(37,211,102,0.18)" : `${t.accent}18`,
@@ -1385,7 +1385,7 @@ const ProfilePage = () => {
                   const Icon = getIcon(link.icon);
                   return (
                     <a key={link.id} href={sanitizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
-                      className="group flex items-center gap-3.5 w-full px-4 py-4 font-semibold text-[14px] active:scale-[0.98]"
+                      className="group flex items-center gap-3.5 w-full px-4 py-4 font-semibold text-[15px] active:scale-[0.98]"
                       style={{
                         ...buttonStyles(rd), color: t.text,
                         opacity: linkStagger[i] ? 1 : 0,
