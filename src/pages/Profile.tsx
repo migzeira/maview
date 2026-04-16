@@ -155,6 +155,7 @@ const ProfilePage = () => {
   const [bookingProduct, setBookingProduct] = useState<ProductItem | null>(null);
   const [pixCheckoutProduct, setPixCheckoutProduct] = useState<ProductItem | null>(null);
   const [detailProduct, setDetailProduct] = useState<ProductItem | null>(null);
+  const [detailImgIdx, setDetailImgIdx] = useState(0);
 
   /* Email capture (legacy — kept for state cleanup) */
   const [captureEmail, setCaptureEmail] = useState("");
@@ -735,6 +736,7 @@ const ProfilePage = () => {
                     if (isPixEligible) { setPixCheckoutProduct(product); return; }
                     if (bookingUsesModal) { setBookingProduct(product); return; }
                     // Open product detail modal
+                    setDetailImgIdx(0);
                     setDetailProduct(product);
                   };
 
@@ -979,7 +981,8 @@ const ProfilePage = () => {
           ? `https://wa.me/${(dp.url || "").replace(/\D/g, "")}${dp.whatsappMsg ? `?text=${encodeURIComponent(dp.whatsappMsg)}` : ""}`
           : sanitizeUrl(dp.url);
         const dpCta = dp.ctaText || (isBooking ? "Agendar agora" : isWhatsApp ? "Chamar no WhatsApp" : dp.price ? "Comprar agora" : "Ver mais");
-        const dpImg = dp.images?.[0] || dp.imageUrl;
+        const allImages = (dp.images?.length ? dp.images : dp.imageUrl ? [dp.imageUrl] : []) as string[];
+        const dpImg = allImages[0];
         const hasDiscount = dp.originalPrice && dp.price;
 
         return (
@@ -999,14 +1002,56 @@ const ProfilePage = () => {
                 <X size={16} style={{ color: t.text }} />
               </button>
 
-              {/* Product image — large hero */}
-              {dpImg ? (
-                <div className="relative w-full overflow-hidden rounded-t-3xl sm:rounded-t-3xl" style={{ aspectRatio: "4/3" }}>
-                  <img src={dpImg} alt={dp.title} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 50%, ${t.bg})` }} />
-                  {/* Badge overlay */}
+              {/* Product images — carousel */}
+              {allImages.length > 0 ? (
+                <div className="relative w-full overflow-hidden rounded-t-3xl sm:rounded-t-3xl">
+                  {/* Image carousel */}
+                  <div className="relative" style={{ aspectRatio: "4/3" }}>
+                    <img src={allImages[detailImgIdx] || allImages[0]} alt={`${dp.title} ${detailImgIdx + 1}`} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 50%, ${t.bg})` }} />
+
+                    {/* Nav arrows */}
+                    {allImages.length > 1 && (
+                      <>
+                        <button onClick={(e) => { e.stopPropagation(); setDetailImgIdx(i => i > 0 ? i - 1 : allImages.length - 1); }}
+                          className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                          style={{ background: `${t.bg}aa`, backdropFilter: "blur(8px)" }}>
+                          <ChevronLeft size={16} style={{ color: t.text }} />
+                        </button>
+                        <button onClick={(e) => { e.stopPropagation(); setDetailImgIdx(i => i < allImages.length - 1 ? i + 1 : 0); }}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                          style={{ background: `${t.bg}aa`, backdropFilter: "blur(8px)" }}>
+                          <ChevronRight size={16} style={{ color: t.text }} />
+                        </button>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Dots indicator */}
+                  {allImages.length > 1 && (
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
+                      {allImages.map((_, idx) => (
+                        <button key={idx} onClick={(e) => { e.stopPropagation(); setDetailImgIdx(idx); }}
+                          className="w-2 h-2 rounded-full transition-all duration-200"
+                          style={{
+                            background: idx === detailImgIdx ? t.accent : `${t.text}40`,
+                            transform: idx === detailImgIdx ? "scale(1.3)" : "scale(1)",
+                          }} />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Image counter */}
+                  {allImages.length > 1 && (
+                    <div className="absolute top-4 left-4 px-2.5 py-1 rounded-full text-[11px] font-semibold z-10"
+                      style={{ background: `${t.bg}cc`, color: t.text, backdropFilter: "blur(8px)" }}>
+                      {detailImgIdx + 1}/{allImages.length}
+                    </div>
+                  )}
+
+                  {/* Discount badge */}
                   {hasDiscount && (
-                    <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-[12px] font-bold"
+                    <div className="absolute top-4 right-14 px-3 py-1.5 rounded-full text-[12px] font-bold z-10"
                       style={{ background: t.accent, color: "#fff" }}>
                       {(() => {
                         const orig = parseFloat((dp.originalPrice || "").replace(/[^\d.,]/g, "").replace(",", "."));
