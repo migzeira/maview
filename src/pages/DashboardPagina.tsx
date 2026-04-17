@@ -1688,6 +1688,79 @@ const DashboardPagina = () => {
               if (block.type === "product") {
                 const p = config.products.find(pr => pr.id === block.refId);
                 if (!p || !p.active || !isScheduledActive(p)) return null;
+
+                /* ── HERO BANNER rendering ──
+                   Active when:
+                   1) p.displayStyle === "hero" explicitly, OR
+                   2) only one active product exists (auto-hero) */
+                const activeProducts = config.products.filter(pr => pr.active && isScheduledActive(pr));
+                const isHero = (p as any).displayStyle === "hero" ||
+                  (activeProducts.length === 1 && p.id === activeProducts[0].id);
+
+                if (isHero) {
+                  const coverImg = p.images?.[0] || (p as any).imageUrl;
+                  const ctaLabel = p.ctaText || (p.linkType === "whatsapp" ? "WhatsApp" : p.linkType === "booking" ? "Agendar" : p.price ? "Comprar" : "Ver mais");
+                  const isWA = p.linkType === "whatsapp";
+                  return (
+                    <div key={block.id} className="relative w-full overflow-hidden mb-2 transition-transform hover:scale-[1.01]"
+                      style={{
+                        borderRadius: pBtnRadius,
+                        height: 150,
+                        background: `linear-gradient(135deg, ${pAccent}40, ${pAccent2 || pAccent}50)`,
+                        boxShadow: `0 8px 24px rgba(0,0,0,0.18), 0 3px 10px rgba(0,0,0,0.08)`,
+                      }}>
+                      {coverImg ? (
+                        <img src={coverImg} alt={p.title} className="absolute inset-0 w-full h-full object-cover" />
+                      ) : p.emoji ? (
+                        <div className="absolute inset-0 flex items-center justify-center text-[60px] opacity-50">{p.emoji}</div>
+                      ) : null}
+                      {/* Bottom gradient for text legibility */}
+                      <div className="absolute inset-0" style={{
+                        background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.45) 28%, rgba(0,0,0,0.10) 55%, transparent 78%)",
+                      }} />
+                      {/* Badges top-left */}
+                      {(p.badge || p.urgency) && (
+                        <div className="absolute top-2 left-2 flex gap-1 z-10">
+                          {p.badge && (
+                            <span className="text-[9px] font-bold px-2 py-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.95)", color: "#0a0a0a", backdropFilter: "blur(6px)" }}>
+                              {p.badge}
+                            </span>
+                          )}
+                          {p.urgency && (
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5" style={{ background: "rgba(239,68,68,0.90)", color: "#fff" }}>
+                              <Clock size={9} /> Urgente
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      {/* Content bottom */}
+                      <div className="absolute inset-x-0 bottom-0 p-3 z-10 flex items-end justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[13px] font-extrabold leading-tight text-white" style={{ fontFamily: `'${pFontH}', sans-serif`, letterSpacing: "-0.015em", textShadow: "0 2px 6px rgba(0,0,0,0.5)" }}>
+                            {p.title}
+                          </p>
+                          {p.price && (
+                            <div className="flex items-center gap-1 mt-0.5">
+                              <span className="text-[12px] font-extrabold text-white" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.4)" }}>{p.price}</span>
+                              {p.originalPrice && <span className="text-[9px] line-through opacity-65 text-white font-light">{p.originalPrice}</span>}
+                            </div>
+                          )}
+                        </div>
+                        {p.linkType !== "none" && (
+                          <div className="flex-shrink-0 px-3 py-1.5 rounded-full text-[10px] font-extrabold whitespace-nowrap shadow-md" style={{
+                            background: isWA ? "rgba(37,211,102,0.95)" : "rgba(255,255,255,0.95)",
+                            color: isWA ? "#fff" : "#0a0a0a",
+                            backdropFilter: "blur(10px)",
+                          }}>
+                            {ctaLabel}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
+
+                /* ── DEFAULT compact row rendering ── */
                 return (
                   <div key={block.id} className="flex items-center gap-2.5 p-2.5 mb-2 transition-all hover:scale-[1.01]"
                     style={{ ...pBtnStyle }}>
