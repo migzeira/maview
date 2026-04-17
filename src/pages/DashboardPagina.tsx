@@ -1424,8 +1424,14 @@ const DashboardPagina = () => {
           <div className={`p-5 relative z-10 ${d.coverImageUrl ? "-mt-6" : ""}`}>
             {/* Profile — rendered based on headerLayoutType if set */}
             {templateAvatarConfig?.fullWidth ? (
-              /* EDGE-TO-EDGE: Full-bleed photo at top — extends up past dynamic island area */
-              <div className="relative w-full overflow-hidden -mx-5 mb-3" style={{ height: 240, marginTop: -56, borderRadius: "0 0 22px 22px" }}>
+              /* EDGE-TO-EDGE: Full-bleed photo — width extends to phone frame edges on BOTH sides */
+              <div className="relative overflow-hidden mb-3" style={{
+                width: "calc(100% + 40px)",
+                marginLeft: -20,
+                marginTop: -56,
+                height: 240,
+                borderRadius: "0 0 22px 22px",
+              }}>
                 {config.avatarUrl ? (
                   <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover" style={{ objectPosition: "center 18%" }} />
                 ) : (
@@ -1458,9 +1464,16 @@ const DashboardPagina = () => {
                 </div>
               </div>
             ) : templateAvatarConfig?.overlap ? (
-              /* ORGANIC-OVERLAP: Cover band + overlapping avatar */
+              /* ORGANIC-OVERLAP: Cover band + overlapping avatar — full width */
               <>
-                <div className="relative w-full rounded-2xl overflow-hidden -mx-5 -mt-5" style={{ height: 100, background: `linear-gradient(135deg, ${pAccent}30, ${d.accentColor2 || pAccent}20)` }}>
+                <div className="relative overflow-hidden" style={{
+                  width: "calc(100% + 40px)",
+                  marginLeft: -20,
+                  marginTop: -20,
+                  height: 100,
+                  borderRadius: "0 0 22px 22px",
+                  background: `linear-gradient(135deg, ${pAccent}30, ${d.accentColor2 || pAccent}20)`,
+                }}>
                   {config.avatarUrl && <img src={config.avatarUrl} alt="" className="w-full h-full object-cover opacity-40" style={{ filter: "blur(15px)", transform: "scale(1.2)" }} aria-hidden="true" />}
                 </div>
                 <div className="flex flex-col items-center" style={{ marginTop: -45 }}>
