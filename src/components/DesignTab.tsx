@@ -512,8 +512,22 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   /* All 8 showcase templates */
   const showcasePacks = DESIGN_PACKS;
 
-  /* Sync activeTemplateIdx with current applied theme */
+  /* Ref to remember the LAST intentionally applied pack.
+     Critical: multiple packs can share the same theme (e.g. Moda + Branding
+     both use "cream"), so theme-matching alone is ambiguous. Ref disambiguates. */
+  const appliedPackIdRef = useRef<string | null>(null);
+
+  /* Sync activeTemplateIdx when config changes externally (e.g. page load). */
   useEffect(() => {
+    /* If we remember what pack was last applied, use it to sync */
+    if (appliedPackIdRef.current) {
+      const idx = showcasePacks.findIndex(p => p.id === appliedPackIdRef.current);
+      if (idx >= 0) {
+        if (idx !== activeTemplateIdx) setActiveTemplateIdx(idx);
+        return;
+      }
+    }
+    /* External change (no ref) — fall back to theme matching */
     const matched = showcasePacks.findIndex(p =>
       config.theme === p.config.theme
       && d.fontHeading === (p.config.design.fontHeading || "Inter")
@@ -523,9 +537,14 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.theme]);
 
-  const isPackActive = (pack: DesignPack) => config.theme === pack.config.theme
-    && d.fontHeading === (pack.config.design.fontHeading || "Inter")
-    && d.bgEffect === (pack.config.design.bgEffect || "");
+  const isPackActive = (pack: DesignPack) => {
+    /* If we have a ref marker, that wins (most accurate) */
+    if (appliedPackIdRef.current) return pack.id === appliedPackIdRef.current;
+    /* Otherwise fall back to theme matching */
+    return config.theme === pack.config.theme
+      && d.fontHeading === (pack.config.design.fontHeading || "Inter")
+      && d.bgEffect === (pack.config.design.bgEffect || "");
+  };
 
   /* Arc carousel arrangement — tight spacing + circular distance for loop */
   const getArcArrangement = (packIdx: number) => {
@@ -548,8 +567,12 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     /* Loop wrap — if idx < 0 goes to last, if > length goes to first */
     const total = showcasePacks.length;
     const wrapped = ((idx % total) + total) % total;
+    const targetPack = showcasePacks[wrapped];
+    /* Mark this pack as intentionally applied — prevents useEffect from snapping
+       to a different pack that shares the same theme (e.g. Moda vs Branding) */
+    appliedPackIdRef.current = targetPack.id;
     setActiveTemplateIdx(wrapped);
-    applyPack(showcasePacks[wrapped]);
+    applyPack(targetPack);
   };
 
   const handleCopyLink = useCallback(() => {
