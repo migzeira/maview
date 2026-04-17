@@ -671,7 +671,12 @@ const ProfilePage = () => {
                  design in the live preview with 30% larger scale + zero gap.
                  ═════════════════════════════════════════════════════════════════ */
               if (rd.headerLayoutType) {
-                const verifiedBadge: JSX.Element | null = null;
+                const verifiedBadge: JSX.Element | null = (profile as any).verified ? (
+                  <svg className="inline-block ml-1.5 flex-shrink-0" width="22" height="22" viewBox="0 0 20 20" fill="none" style={{ verticalAlign: "middle", marginTop: -3 }}>
+                    <circle cx="10" cy="10" r="10" fill="#1E5BFF"/>
+                    <path d="M6 10.5l2.5 2.5L14 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ) : null;
 
                 /* BIG CIRCLE — Mateus / Vitor */
                 if (rd.headerLayoutType === "big-circle") {

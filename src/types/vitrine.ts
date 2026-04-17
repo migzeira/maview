@@ -288,6 +288,8 @@ export interface ProfileData {
   stats?: { label: string; value: string }[];
   /** Toggle to show/hide stats block in the public profile */
   showStats?: boolean;
+  /** Show verified blue badge next to name (Twitter-style) */
+  verified?: boolean;
   embeds?: EmbedItem[];
   blocks?: VitrineBlock[];
 }

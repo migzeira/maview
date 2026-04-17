@@ -1428,8 +1428,8 @@ const DashboardPagina = () => {
               <div className="relative overflow-hidden mb-3" style={{
                 width: "calc(100% + 40px)",
                 marginLeft: -20,
-                marginTop: -88,
-                height: 290,
+                marginTop: -110,
+                height: 310,
                 borderRadius: "0 0 22px 22px",
               }}>
                 {config.avatarUrl ? (
@@ -1452,6 +1452,12 @@ const DashboardPagina = () => {
                     textShadow: pBg.startsWith("#f") ? "none" : "0 2px 10px rgba(0,0,0,0.55)",
                   }}>
                     {config.displayName || "Seu Nome"}
+                    {(config as any).verified && (
+                      <svg className="inline-block ml-1 flex-shrink-0" width="18" height="18" viewBox="0 0 20 20" fill="none" style={{ verticalAlign: "middle", marginTop: -2 }}>
+                        <circle cx="10" cy="10" r="10" fill="#1E5BFF"/>
+                        <path d="M6 10.5l2.5 2.5L14 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
                   </p>
                   {config.username && (
                     <p className="text-[12px] font-medium mt-0.5" style={{
@@ -1484,7 +1490,15 @@ const DashboardPagina = () => {
                   )}
                 </div>
                 <div className="w-[55%] flex flex-col justify-center">
-                  <p className="font-bold text-[15px] leading-[1.1]" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif`, letterSpacing: "-0.02em" }}>{config.displayName || "Seu Nome"}</p>
+                  <p className="font-bold text-[15px] leading-[1.1]" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif`, letterSpacing: "-0.02em" }}>
+                    {config.displayName || "Seu Nome"}
+                    {(config as any).verified && (
+                      <svg className="inline-block ml-1 flex-shrink-0" width="14" height="14" viewBox="0 0 20 20" fill="none" style={{ verticalAlign: "middle", marginTop: -2 }}>
+                        <circle cx="10" cy="10" r="10" fill="#1E5BFF"/>
+                        <path d="M6 10.5l2.5 2.5L14 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                  </p>
                   {config.username && <p className="text-[11px] font-medium mt-0.5" style={{ color: pAccent }}>@{config.username.replace(/^@+/, "")}</p>}
                   {config.bio && <p className="text-[10.5px] leading-tight mt-1 line-clamp-3 font-light" style={{ color: pSub }}>{config.bio}</p>}
                 </div>
@@ -1516,7 +1530,15 @@ const DashboardPagina = () => {
                       </div>
                     )}
                   </div>
-                  <p className="font-extrabold text-[17px] leading-tight" style={{ color: d.nameColor || pText, fontFamily: `'${pFontH}', sans-serif`, letterSpacing: "-0.02em" }}>{config.displayName || "Seu Nome"}</p>
+                  <p className="font-extrabold text-[17px] leading-tight" style={{ color: d.nameColor || pText, fontFamily: `'${pFontH}', sans-serif`, letterSpacing: "-0.02em" }}>
+                    {config.displayName || "Seu Nome"}
+                    {(config as any).verified && (
+                      <svg className="inline-block ml-1 flex-shrink-0" width="16" height="16" viewBox="0 0 20 20" fill="none" style={{ verticalAlign: "middle", marginTop: -2 }}>
+                        <circle cx="10" cy="10" r="10" fill="#1E5BFF"/>
+                        <path d="M6 10.5l2.5 2.5L14 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                  </p>
                   {config.username && <p className="text-[11px] font-medium mt-0.5" style={{ color: pAccent }}>@{config.username.replace(/^@+/, "")}</p>}
                   {config.bio && <p className="text-[11px] text-center mt-1 px-2 line-clamp-2 font-light" style={{ color: pSub }}>{config.bio}</p>}
                 </div>
@@ -1579,7 +1601,15 @@ const DashboardPagina = () => {
                   )}
                 </div>
               )}
-              <p className="font-extrabold text-[17px]" style={{ color: d.nameColor || pText, fontFamily: `'${pFontH}', sans-serif`, textShadow: pTxtShadow, letterSpacing: "-0.02em" }}>{config.displayName || "Seu Nome"}</p>
+              <p className="font-extrabold text-[17px]" style={{ color: d.nameColor || pText, fontFamily: `'${pFontH}', sans-serif`, textShadow: pTxtShadow, letterSpacing: "-0.02em" }}>
+                {config.displayName || "Seu Nome"}
+                {(config as any).verified && (
+                  <svg className="inline-block ml-1 flex-shrink-0" width="16" height="16" viewBox="0 0 20 20" fill="none" style={{ verticalAlign: "middle", marginTop: -2 }}>
+                    <circle cx="10" cy="10" r="10" fill="#1E5BFF"/>
+                    <path d="M6 10.5l2.5 2.5L14 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </p>
               {config.username && <p className="text-[11px] font-medium mt-0.5" style={{ color: pAccent, textShadow: pTxtShadow }}>@{config.username.replace(/^@+/, "")}</p>}
               {config.bio && <p className="text-[11px] text-center mt-1.5 px-2 line-clamp-2 font-light" style={{ color: pSub, textShadow: pTxtShadow }}>{config.bio}</p>}
             </div>
@@ -3461,6 +3491,37 @@ const DashboardPagina = () => {
                       )}
                       <p className="text-[9px] text-[hsl(var(--dash-text-subtle))] ml-auto italic">Clique na foto para trocar</p>
                     </div>
+
+                    {/* ═══ VERIFIED BADGE TOGGLE — highly visible ═══ */}
+                    <button
+                      onClick={() => updateConfig("verified" as any, !(config as any).verified)}
+                      className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${
+                        (config as any).verified
+                          ? "bg-gradient-to-r from-[#1E5BFF]/15 to-[#4A8DFF]/10 border border-[#1E5BFF]/30"
+                          : "bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-[#1E5BFF]/30"
+                      }`}
+                    >
+                      {/* Big verified icon */}
+                      <div className="flex-shrink-0" style={{ width: 36, height: 36 }}>
+                        <svg width="36" height="36" viewBox="0 0 20 20" fill="none">
+                          <circle cx="10" cy="10" r="10" fill={(config as any).verified ? "#1E5BFF" : "#94a3b8"} style={{ transition: "fill 0.2s" }}/>
+                          <path d="M6 10.5l2.5 2.5L14 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                      <div className="flex-1 text-left">
+                        <p className="text-[13px] font-bold" style={{ color: (config as any).verified ? "#1E5BFF" : "hsl(var(--dash-text))" }}>
+                          {(config as any).verified ? "Selo verificado ativo" : "Ativar selo verificado"}
+                        </p>
+                        <p className="text-[10.5px] text-[hsl(var(--dash-text-subtle))] mt-0.5">
+                          {(config as any).verified
+                            ? "Aparece ao lado do seu nome em todos os designs"
+                            : "Adicione um selo azul profissional ao lado do seu nome"}
+                        </p>
+                      </div>
+                      {(config as any).verified
+                        ? <ToggleRight size={28} strokeWidth={1.5} className="text-[#1E5BFF] flex-shrink-0" />
+                        : <ToggleLeft size={28} strokeWidth={1.5} className="text-[hsl(var(--dash-text-subtle))] flex-shrink-0" />}
+                    </button>
                   </div>
                 </div>
 
