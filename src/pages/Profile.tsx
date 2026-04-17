@@ -704,24 +704,49 @@ const ProfilePage = () => {
                   );
                 }
 
-                /* EDGE-TO-EDGE — Léo / Lucas */
+                /* EDGE-TO-EDGE — Léo / Lucas — name + bio overlaid on photo */
                 if (rd.headerLayoutType === "edge-to-edge") {
+                  const isLight = rd.bg.startsWith("#f") || rd.bg.startsWith("#e") || rd.bg === "#ffffff";
                   return (
                     <>
-                      <div className="relative w-full rounded-2xl overflow-hidden mb-3" style={{ height: 300 }}>
+                      <div className="relative w-full overflow-hidden mb-3" style={{
+                        height: 360,
+                        marginLeft: "-16px",
+                        marginRight: "-16px",
+                        marginTop: "-50px",
+                        width: "calc(100% + 32px)",
+                        borderRadius: "0 0 20px 20px",
+                      }}>
                         {profile.avatar
-                          ? <img src={profile.avatar} alt={profile.displayName} className="w-full h-full object-cover" style={{ objectPosition: "center 15%" }} loading="eager" decoding="async" fetchPriority="high" />
+                          ? <img src={profile.avatar} alt={profile.displayName} className="w-full h-full object-cover" style={{ objectPosition: "center 18%" }} loading="eager" decoding="async" fetchPriority="high" />
                           : <div className="w-full h-full" style={{ background: t.accent }} />
                         }
-                        <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${t.bg} 0%, ${t.bg}F0 15%, ${t.bg}60 35%, ${t.bg}10 60%, transparent 85%)` }} />
+                        <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${t.bg} 0%, ${t.bg}F0 10%, ${t.bg}80 25%, ${t.bg}30 45%, transparent 70%)` }} />
                         <div className="absolute bottom-5 left-5 right-5">
-                          <h1 className="text-[34px] leading-[1.02] font-extrabold tracking-tight" style={{ color: t.text, textShadow: rd.bg.startsWith("#f") ? "none" : "0 2px 12px rgba(0,0,0,0.55)", fontFamily: `'${rd.fontHeading}', sans-serif`, letterSpacing: "-0.025em" }}>
+                          <h1 className="text-[30px] leading-[1.02] font-extrabold tracking-tight" style={{
+                            color: isLight ? t.text : "#fff",
+                            textShadow: isLight ? "none" : "0 2px 14px rgba(0,0,0,0.6)",
+                            fontFamily: `'${rd.fontHeading}', sans-serif`,
+                            letterSpacing: "-0.025em",
+                          }}>
                             {profile.displayName}{verifiedBadge}
                           </h1>
-                          <p className="text-[15px] font-medium mt-1" style={{ color: t.accent, letterSpacing: "0.02em", textShadow: rd.bg.startsWith("#f") ? "none" : "0 1px 4px rgba(0,0,0,0.4)" }}>@{profile.username.replace(/^@+/, "")}</p>
+                          <p className="text-[13px] font-medium mt-1" style={{
+                            color: isLight ? t.accent : `${t.accent}E0`,
+                            letterSpacing: "0.02em",
+                            textShadow: isLight ? "none" : "0 1px 4px rgba(0,0,0,0.5)",
+                          }}>@{profile.username.replace(/^@+/, "")}</p>
+                          {profile.bio && (
+                            <p className="text-[13px] leading-snug mt-2 line-clamp-2 font-light" style={{
+                              color: isLight ? t.sub : "rgba(255,255,255,0.92)",
+                              textShadow: isLight ? "none" : "0 1px 5px rgba(0,0,0,0.5)",
+                              fontFamily: `'${rd.fontBody}', sans-serif`,
+                            }}>
+                              {profile.bio}
+                            </p>
+                          )}
                         </div>
                       </div>
-                      <BioBlock />
                       <StatsBlock />
                       <SocialsRow />
                     </>

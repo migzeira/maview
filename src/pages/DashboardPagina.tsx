@@ -1424,25 +1424,51 @@ const DashboardPagina = () => {
           <div className={`p-5 relative z-10 ${d.coverImageUrl ? "-mt-6" : ""}`}>
             {/* Profile — rendered based on headerLayoutType if set */}
             {templateAvatarConfig?.fullWidth ? (
-              /* EDGE-TO-EDGE: Full-bleed photo — width extends to phone frame edges on BOTH sides */
+              /* EDGE-TO-EDGE: Full-bleed photo covering top of phone frame + name/bio/socials overlay */
               <div className="relative overflow-hidden mb-3" style={{
                 width: "calc(100% + 40px)",
                 marginLeft: -20,
-                marginTop: -56,
-                height: 240,
+                marginTop: -88,
+                height: 290,
                 borderRadius: "0 0 22px 22px",
               }}>
                 {config.avatarUrl ? (
-                  <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover" style={{ objectPosition: "center 18%" }} />
+                  <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover" style={{ objectPosition: "center 20%" }} />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center" style={{ background: pAccent }}>
                     <span className="text-white text-4xl font-bold">{config.displayName ? config.displayName[0].toUpperCase() : "?"}</span>
                   </div>
                 )}
-                <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${pBg} 0%, ${pBg}F0 12%, ${pBg}70 30%, ${pBg}20 55%, transparent 80%)` }} />
-                <div className="absolute bottom-4 left-5 right-5">
-                  <p className="font-extrabold text-[20px] leading-tight" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif`, letterSpacing: "-0.025em", textShadow: pBg.startsWith("#f") ? "none" : "0 2px 10px rgba(0,0,0,0.55)" }}>{config.displayName || "Seu Nome"}</p>
-                  {config.username && <p className="text-[12px] font-medium mt-0.5" style={{ color: pAccent, textShadow: pBg.startsWith("#f") ? "none" : "0 1px 3px rgba(0,0,0,0.3)" }}>@{config.username.replace(/^@+/, "")}</p>}
+                {/* Top gradient for status bar readability */}
+                <div className="absolute top-0 inset-x-0 h-[70px]" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, transparent 100%)" }} />
+                {/* Bottom gradient for name/bio readability */}
+                <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${pBg} 0%, ${pBg}F0 10%, ${pBg}80 25%, ${pBg}30 45%, transparent 70%)` }} />
+                {/* Content overlay — name + username + bio */}
+                <div className="absolute bottom-3 left-5 right-5">
+                  <p className="font-extrabold text-[20px] leading-tight" style={{
+                    color: pText,
+                    fontFamily: `'${pFontH}', sans-serif`,
+                    letterSpacing: "-0.025em",
+                    textShadow: pBg.startsWith("#f") ? "none" : "0 2px 10px rgba(0,0,0,0.55)",
+                  }}>
+                    {config.displayName || "Seu Nome"}
+                  </p>
+                  {config.username && (
+                    <p className="text-[12px] font-medium mt-0.5" style={{
+                      color: pAccent,
+                      textShadow: pBg.startsWith("#f") ? "none" : "0 1px 3px rgba(0,0,0,0.3)",
+                    }}>
+                      @{config.username.replace(/^@+/, "")}
+                    </p>
+                  )}
+                  {config.bio && (
+                    <p className="text-[11px] leading-snug mt-1 line-clamp-2 font-light" style={{
+                      color: pBg.startsWith("#f") ? pSub : "rgba(255,255,255,0.88)",
+                      textShadow: pBg.startsWith("#f") ? "none" : "0 1px 4px rgba(0,0,0,0.45)",
+                    }}>
+                      {config.bio}
+                    </p>
+                  )}
                 </div>
               </div>
             ) : templateAvatarConfig?.splitLayout ? (
@@ -1701,10 +1727,12 @@ const DashboardPagina = () => {
                   const coverImg = p.images?.[0] || (p as any).imageUrl;
                   const ctaLabel = p.ctaText || (p.linkType === "whatsapp" ? "WhatsApp" : p.linkType === "booking" ? "Agendar" : p.price ? "Comprar" : "Ver mais");
                   const isWA = p.linkType === "whatsapp";
+                  /* Hero banner uses FIXED radius — not pill-shape from buttonRadius (which could be 999 for DJ/Moda) */
+                  const heroRadius = d.buttonShape === "square" ? 6 : 18;
                   return (
                     <div key={block.id} className="relative w-full overflow-hidden mb-2 transition-transform hover:scale-[1.01]"
                       style={{
-                        borderRadius: pBtnRadius,
+                        borderRadius: heroRadius,
                         height: 150,
                         background: `linear-gradient(135deg, ${pAccent}40, ${pAccent2 || pAccent}50)`,
                         boxShadow: `0 8px 24px rgba(0,0,0,0.18), 0 3px 10px rgba(0,0,0,0.08)`,
