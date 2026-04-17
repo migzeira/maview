@@ -745,6 +745,43 @@ const ProfilePage = () => {
                   );
                 }
 
+                /* ORGANIC OVERLAP — circle overlapping into content */
+                if (rd.headerLayoutType === "organic-overlap") {
+                  return (
+                    <>
+                      {/* Cover band behind avatar */}
+                      <div className="w-full rounded-2xl relative overflow-hidden mb-0" style={{
+                        height: 180,
+                        background: `linear-gradient(135deg, ${t.accent}30, ${t.accent2 || t.accent}20)`,
+                      }}>
+                        {profile.avatar && (
+                          <img src={profile.avatar} alt="" className="w-full h-full object-cover opacity-40" style={{ filter: "blur(20px) saturate(120%)", transform: "scale(1.2)" }} aria-hidden="true" />
+                        )}
+                      </div>
+                      <div className="flex flex-col items-center" style={{ marginTop: -65 }}>
+                        <div className="overflow-hidden mb-3 z-10" style={{
+                          width: 130, height: 130,
+                          borderRadius: "50%",
+                          border: `4px solid ${t.bg}`,
+                          boxShadow: `0 12px 28px rgba(0,0,0,0.22), 0 0 0 2px ${hexToRgba(glowC, 0.4)}`,
+                        }}>
+                          {profile.avatar
+                            ? <img src={profile.avatar} alt={profile.displayName} className="w-full h-full object-cover" loading="eager" decoding="async" fetchPriority="high" />
+                            : <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-white" style={{ background: t.accent }}>{(profile.displayName || "?")[0]}</div>
+                          }
+                        </div>
+                        <h1 className="text-[30px] leading-[1.05] font-extrabold tracking-tight text-center" style={{ color: c.name, fontFamily: `'${rd.fontHeading}', sans-serif`, letterSpacing: "-0.025em" }}>
+                          {profile.displayName}{verifiedBadge}
+                        </h1>
+                        <p className="text-[13px] font-medium mt-1" style={{ color: t.accent, letterSpacing: "0.02em" }}>@{profile.username.replace(/^@+/, "")}</p>
+                      </div>
+                      <BioBlock center />
+                      <StatsBlock />
+                      <SocialsRow />
+                    </>
+                  );
+                }
+
                 /* SPLIT EDITORIAL — Isabela / Julia */
                 if (rd.headerLayoutType === "split-editorial") {
                   return (

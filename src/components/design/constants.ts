@@ -28,7 +28,7 @@ export interface DesignConfig {
   heroLayout?: "classic" | "hero-banner" | "side-by-side" | "minimal-top" | "full-cover";
   productDisplayStyle?: "callout" | "compact" | "expanded";
   /** Maximalist template header layout — propagates from applied pack for live preview sync */
-  headerLayoutType?: "big-circle" | "edge-to-edge" | "floating-square" | "split-editorial";
+  headerLayoutType?: "big-circle" | "edge-to-edge" | "floating-square" | "split-editorial" | "organic-overlap";
   /** CTA glow style — matches pack's ctaGlow for button visual effects */
   ctaGlow?: "accent" | "blue" | "none";
   /** Glass cards effect — backdrop blur on product cards for gradient templates */

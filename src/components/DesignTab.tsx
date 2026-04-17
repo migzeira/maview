@@ -733,262 +733,68 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
           </div>
         )}
 
-        {/* ── Background image customization (available for ALL templates) ── */}
+        {/* ═══════ FORMATO DO PERFIL — 5 options ═══════ */}
         <div className="space-y-3 p-4 rounded-2xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ImageIcon size={14} className="text-primary" />
-              <span className="text-[13px] font-bold text-[hsl(var(--dash-text))]">Imagem de fundo</span>
-            </div>
-            {d.bgImageUrl && (
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">Ativa</span>
-            )}
+          <h3 className="text-[13px] font-bold text-[hsl(var(--dash-text))]">Formato do Perfil</h3>
+          <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] -mt-1">Escolha a moldura da foto de perfil</p>
+          <div className="grid grid-cols-5 gap-2">
+            {[
+              { id: "big-circle", label: "Círculo",  preview: "circle" },
+              { id: "edge-to-edge", label: "Topo",  preview: "rect-full" },
+              { id: "floating-square", label: "Quadrado", preview: "square" },
+              { id: "split-editorial", label: "Editorial", preview: "split" },
+              { id: "organic-overlap", label: "Orgânico", preview: "overlap" },
+            ].map(opt => {
+              const isActive = (d as any).headerLayoutType === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  onClick={() => setDesign("headerLayoutType" as any, opt.id)}
+                  className={`relative flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all ${
+                    isActive
+                      ? "bg-primary/15 border-2 border-primary"
+                      : "bg-[hsl(var(--dash-surface-2))] border-2 border-transparent hover:border-primary/30"
+                  }`}
+                  title={opt.label}
+                >
+                  {/* Visual preview of shape */}
+                  <div className="w-full h-[46px] relative flex items-center justify-center">
+                    <div className="w-[32px] h-[32px] bg-[hsl(var(--dash-border))] flex-shrink-0" style={{
+                      borderRadius: opt.preview === "circle" ? "50%"
+                        : opt.preview === "rect-full" ? "0 0 6px 6px"
+                        : opt.preview === "square" ? "8px"
+                        : opt.preview === "split" ? "4px 0 0 4px"
+                        : "50%",
+                      width: opt.preview === "rect-full" ? "36px" : opt.preview === "split" ? "18px" : "32px",
+                      height: opt.preview === "rect-full" ? "22px" : opt.preview === "split" ? "34px" : "32px",
+                      transform: opt.preview === "overlap" ? "translateY(4px)" : "none",
+                      boxShadow: opt.preview === "square" ? "0 3px 6px rgba(0,0,0,0.15)" : "none",
+                    }} />
+                    {opt.preview === "split" && (
+                      <div className="w-[18px] h-[34px] flex flex-col gap-[2px] ml-[2px]">
+                        <div className="w-full h-[3px] bg-[hsl(var(--dash-border-subtle))] rounded-sm" />
+                        <div className="w-[70%] h-[2px] bg-[hsl(var(--dash-border-subtle))] rounded-sm" />
+                      </div>
+                    )}
+                    {opt.preview === "rect-full" && (
+                      <div className="absolute bottom-0 left-0 right-0 h-[8px] bg-[hsl(var(--dash-border-subtle))] rounded-b-sm" />
+                    )}
+                    {opt.preview === "overlap" && (
+                      <div className="absolute -bottom-[2px] left-1 right-1 h-[10px] bg-[hsl(var(--dash-border-subtle))] rounded-sm" />
+                    )}
+                  </div>
+                  <span className={`text-[9px] font-semibold ${isActive ? "text-primary" : "text-[hsl(var(--dash-text-muted))]"}`}>
+                    {opt.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
-
-          {/* Preview da imagem com controles */}
-          {d.bgImageUrl ? (
-            <div className="relative rounded-xl overflow-hidden h-28">
-              <div className="absolute inset-0" style={{
-                backgroundImage: `url(${d.bgImageUrl})`,
-                backgroundSize: `${d.bgImageZoom ?? 100}%`,
-                backgroundPosition: `${d.bgImagePosX ?? 50}% ${d.bgImagePosY ?? 50}%`,
-                backgroundRepeat: "no-repeat",
-                backgroundColor: "#111",
-              }} />
-              <div className="absolute inset-0" style={{ background: `rgba(0,0,0,${(d.bgOverlay ?? 40) / 100})` }} />
-              <button onClick={() => {
-                setDesign("bgImageUrl", "");
-                // Restore previous bgType if it was not image
-                if (d.bgEffect) setDesign("bgType", "effect");
-                else setDesign("bgType", "solid");
-              }}
-                className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-red-500 transition-colors">
-                <XIcon size={12} />
-              </button>
-              <button onClick={() => bgImageInputRef.current?.click()}
-                className="absolute bottom-2 right-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-[11px] font-semibold text-gray-800 hover:bg-white transition-all shadow-md">
-                <Upload size={11} /> Trocar foto
-              </button>
-              {bgUploading && (
-                <div className="absolute bottom-2 left-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/70 text-[10px] font-medium text-white">
-                  <Loader2 size={10} className="animate-spin" /> Salvando...
-                </div>
-              )}
-            </div>
-          ) : (
-            <button onClick={() => bgImageInputRef.current?.click()}
-              className="w-full h-20 rounded-xl border-2 border-dashed border-[hsl(var(--dash-border))] flex flex-col items-center justify-center gap-1.5 text-[hsl(var(--dash-text-subtle))] hover:border-primary/40 hover:text-primary transition-all">
-              <Upload size={16} />
-              <span className="text-[11px] font-medium">Adicionar imagem de fundo</span>
-            </button>
-          )}
-          <input type="file" ref={bgImageInputRef} accept="image/*" className="hidden"
-            onChange={async (e) => {
-              const f = e.target.files?.[0];
-              if (!f) return;
-              e.target.value = "";
-              // Show base64 preview immediately while uploading
-              const reader = new FileReader();
-              reader.onload = () => {
-                setDesign("bgImageUrl", reader.result as string);
-                setDesign("bgType", "image");
-                if (!d.bgOverlay || d.bgOverlay < 20) setDesign("bgOverlay", 40);
-              };
-              reader.readAsDataURL(f);
-              // Upload to Supabase Storage in background
-              setBgUploading(true);
-              const publicUrl = await uploadImage(f, "backgrounds");
-              setBgUploading(false);
-              if (publicUrl) {
-                setDesign("bgImageUrl", publicUrl);
-                // Auto-extract dominant color and apply to profile border + glow
-                try {
-                  const colors = await extractColorsFromImage(publicUrl);
-                  if (colors?.dominant) {
-                    setDesign("profileBorderColor", colors.dominant);
-                    setDesign("profileGlowColor", colors.dominant);
-                  }
-                } catch { /* color extraction is best-effort */ }
-              }
-            }}
-          />
-
-          {/* Sliders de ajuste */}
-          {d.bgImageUrl && (
-            <div className="space-y-2.5">
-              {/* Escurecimento / Opacidade */}
-              <div className="flex items-center gap-3">
-                <span className="text-[11px] text-[hsl(var(--dash-text-muted))] whitespace-nowrap w-24">Escurecimento</span>
-                <input type="range" min="0" max="90" step="5" value={d.bgOverlay ?? 40}
-                  onChange={(e) => setDesign("bgOverlay", Number(e.target.value))}
-                  className="flex-1 h-1.5 rounded-full accent-primary" />
-                <span className="text-[11px] font-semibold text-[hsl(var(--dash-text))] w-8 text-right">{d.bgOverlay ?? 40}%</span>
-              </div>
-
-              {/* Zoom */}
-              <div className="flex items-center gap-3">
-                <span className="text-[11px] text-[hsl(var(--dash-text-muted))] whitespace-nowrap w-24 flex items-center gap-1">
-                  <ZoomIn size={10} /> Zoom
-                </span>
-                <input type="range" min="100" max="300" step="5" value={d.bgImageZoom ?? 100}
-                  onChange={(e) => setDesign("bgImageZoom", Number(e.target.value))}
-                  className="flex-1 h-1.5 rounded-full accent-primary" />
-                <span className="text-[11px] font-semibold text-[hsl(var(--dash-text))] w-8 text-right">{d.bgImageZoom ?? 100}%</span>
-              </div>
-
-              {/* Posicao Horizontal */}
-              <div className="flex items-center gap-3">
-                <span className="text-[11px] text-[hsl(var(--dash-text-muted))] whitespace-nowrap w-24 flex items-center gap-1">
-                  <Move size={10} /> Horizontal
-                </span>
-                <input type="range" min="0" max="100" step="1" value={d.bgImagePosX ?? 50}
-                  onChange={(e) => setDesign("bgImagePosX", Number(e.target.value))}
-                  className="flex-1 h-1.5 rounded-full accent-primary" />
-                <span className="text-[11px] font-semibold text-[hsl(var(--dash-text))] w-8 text-right">{d.bgImagePosX ?? 50}%</span>
-              </div>
-
-              {/* Posicao Vertical */}
-              <div className="flex items-center gap-3">
-                <span className="text-[11px] text-[hsl(var(--dash-text-muted))] whitespace-nowrap w-24 flex items-center gap-1">
-                  <Move size={10} /> Vertical
-                </span>
-                <input type="range" min="0" max="100" step="1" value={d.bgImagePosY ?? 50}
-                  onChange={(e) => setDesign("bgImagePosY", Number(e.target.value))}
-                  className="flex-1 h-1.5 rounded-full accent-primary" />
-                <span className="text-[11px] font-semibold text-[hsl(var(--dash-text))] w-8 text-right">{d.bgImagePosY ?? 50}%</span>
-              </div>
-
-              {/* Reset button */}
-              <button onClick={() => {
-                const latest = { ...(designRef.current || {}), bgImageZoom: 100, bgImagePosX: 50, bgImagePosY: 50, bgOverlay: 40 };
-                designRef.current = latest;
-                updateConfig("design", latest);
-              }}
-                className="w-full py-1.5 rounded-lg text-[11px] font-medium text-[hsl(var(--dash-text-subtle))] hover:text-primary border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 transition-all">
-                Resetar ajustes
-              </button>
-            </div>
-          )}
+          <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">
+            Dica: ao escolher um template pronto, o formato é aplicado automaticamente. Você pode trocar a qualquer momento.
+          </p>
         </div>
       </div>
-
-      {/* ── Cover image (banner no topo do perfil) ── */}
-        <div className="space-y-3 p-4 rounded-2xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ImageIcon size={14} className="text-primary" />
-              <span className="text-[13px] font-bold text-[hsl(var(--dash-text))]">Imagem de capa</span>
-            </div>
-            {d.coverImageUrl && (
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">Ativa</span>
-            )}
-          </div>
-          <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] -mt-1">Foto no topo do perfil (banner). A cor do tema fica abaixo.</p>
-
-          {d.coverImageUrl ? (
-            <div className="relative rounded-xl overflow-hidden h-24">
-              <div className="absolute inset-0" style={{
-                backgroundImage: `url(${d.coverImageUrl})`,
-                backgroundSize: `${d.coverZoom ?? 100}%`,
-                backgroundPosition: `${d.coverPosX ?? 50}% ${d.coverPosY ?? 50}%`,
-                backgroundRepeat: "no-repeat",
-                backgroundColor: "#111",
-              }} />
-              <div className="absolute inset-0" style={{ background: `rgba(0,0,0,${(d.coverOverlay ?? 0) / 100})` }} />
-              <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 30%, ${d.bgColor || "#000"}DD)` }} />
-              <button onClick={() => setDesign("coverImageUrl", "")}
-                className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-red-500 transition-colors">
-                <XIcon size={12} />
-              </button>
-              <button onClick={() => coverImageInputRef.current?.click()}
-                className="absolute bottom-2 right-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/90 text-[11px] font-semibold text-gray-800 hover:bg-white transition-all shadow-md">
-                <Upload size={11} /> Trocar foto
-              </button>
-              {coverUploading && (
-                <div className="absolute bottom-2 left-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/70 text-[10px] font-medium text-white">
-                  <Loader2 size={10} className="animate-spin" /> Salvando...
-                </div>
-              )}
-            </div>
-          ) : (
-            <button onClick={() => coverImageInputRef.current?.click()}
-              className="w-full h-16 rounded-xl border-2 border-dashed border-[hsl(var(--dash-border))] flex flex-col items-center justify-center gap-1.5 text-[hsl(var(--dash-text-subtle))] hover:border-primary/40 hover:text-primary transition-all">
-              <Upload size={16} />
-              <span className="text-[11px] font-medium">Adicionar imagem de capa</span>
-            </button>
-          )}
-          <input type="file" ref={coverImageInputRef} accept="image/*" className="hidden"
-            onChange={async (e) => {
-              const f = e.target.files?.[0];
-              if (!f) return;
-              e.target.value = "";
-              const reader = new FileReader();
-              reader.onload = () => setDesign("coverImageUrl", reader.result as string);
-              reader.readAsDataURL(f);
-              setCoverUploading(true);
-              const publicUrl = await uploadImage(f, "backgrounds");
-              setCoverUploading(false);
-              if (publicUrl) setDesign("coverImageUrl", publicUrl);
-            }}
-          />
-
-          {/* Sliders de ajuste da capa */}
-          {d.coverImageUrl && (
-            <div className="space-y-2.5">
-              {/* Escurecimento */}
-              <div className="flex items-center gap-3">
-                <span className="text-[11px] text-[hsl(var(--dash-text-muted))] whitespace-nowrap w-24">Escurecimento</span>
-                <input type="range" min="0" max="90" step="5" value={d.coverOverlay ?? 0}
-                  onChange={(e) => setDesign("coverOverlay", Number(e.target.value))}
-                  className="flex-1 h-1.5 rounded-full accent-primary" />
-                <span className="text-[11px] font-semibold text-[hsl(var(--dash-text))] w-8 text-right">{d.coverOverlay ?? 0}%</span>
-              </div>
-
-              {/* Zoom */}
-              <div className="flex items-center gap-3">
-                <span className="text-[11px] text-[hsl(var(--dash-text-muted))] whitespace-nowrap w-24 flex items-center gap-1">
-                  <ZoomIn size={10} /> Zoom
-                </span>
-                <input type="range" min="100" max="300" step="5" value={d.coverZoom ?? 100}
-                  onChange={(e) => setDesign("coverZoom", Number(e.target.value))}
-                  className="flex-1 h-1.5 rounded-full accent-primary" />
-                <span className="text-[11px] font-semibold text-[hsl(var(--dash-text))] w-8 text-right">{d.coverZoom ?? 100}%</span>
-              </div>
-
-              {/* Horizontal */}
-              <div className="flex items-center gap-3">
-                <span className="text-[11px] text-[hsl(var(--dash-text-muted))] whitespace-nowrap w-24 flex items-center gap-1">
-                  <Move size={10} /> Horizontal
-                </span>
-                <input type="range" min="0" max="100" step="1" value={d.coverPosX ?? 50}
-                  onChange={(e) => setDesign("coverPosX", Number(e.target.value))}
-                  className="flex-1 h-1.5 rounded-full accent-primary" />
-                <span className="text-[11px] font-semibold text-[hsl(var(--dash-text))] w-8 text-right">{d.coverPosX ?? 50}%</span>
-              </div>
-
-              {/* Vertical */}
-              <div className="flex items-center gap-3">
-                <span className="text-[11px] text-[hsl(var(--dash-text-muted))] whitespace-nowrap w-24 flex items-center gap-1">
-                  <Move size={10} /> Vertical
-                </span>
-                <input type="range" min="0" max="100" step="1" value={d.coverPosY ?? 50}
-                  onChange={(e) => setDesign("coverPosY", Number(e.target.value))}
-                  className="flex-1 h-1.5 rounded-full accent-primary" />
-                <span className="text-[11px] font-semibold text-[hsl(var(--dash-text))] w-8 text-right">{d.coverPosY ?? 50}%</span>
-              </div>
-
-              {/* Reset */}
-              <button onClick={() => {
-                const latest = { ...(designRef.current || {}), coverZoom: 100, coverPosX: 50, coverPosY: 50, coverOverlay: 0 };
-                designRef.current = latest;
-                updateConfig("design", latest);
-              }}
-                className="w-full py-1.5 rounded-lg text-[11px] font-medium text-[hsl(var(--dash-text-subtle))] hover:text-primary border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 transition-all">
-                Resetar ajustes
-              </button>
-            </div>
-          )}
-        </div>
 
       {/* ═══════ 2. COLORS — simplified ═══════ */}
       <div className="space-y-3">

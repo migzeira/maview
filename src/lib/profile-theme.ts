@@ -64,7 +64,7 @@ export interface ResolvedDesign {
   heroLayout: HeroLayout;
   productDisplayStyle: ProductDisplayStyle;
   /** Maximalist header layout from applied showcase pack */
-  headerLayoutType?: "big-circle" | "edge-to-edge" | "floating-square" | "split-editorial";
+  headerLayoutType?: "big-circle" | "edge-to-edge" | "floating-square" | "split-editorial" | "organic-overlap";
   ctaGlow?: "accent" | "blue" | "none";
   glassCards?: boolean;
   showcaseSocialStyle?: "brand" | "mono";
