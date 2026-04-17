@@ -527,9 +527,13 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     && d.fontHeading === (pack.config.design.fontHeading || "Inter")
     && d.bgEffect === (pack.config.design.bgEffect || "");
 
-  /* Arc carousel arrangement — tight spacing to fit inside container */
+  /* Arc carousel arrangement — tight spacing + circular distance for loop */
   const getArcArrangement = (packIdx: number) => {
-    const dist = packIdx - activeTemplateIdx;
+    const total = showcasePacks.length;
+    let dist = packIdx - activeTemplateIdx;
+    /* Use shortest circular distance so looping feels natural */
+    if (dist > total / 2) dist -= total;
+    if (dist < -total / 2) dist += total;
     const presets: Record<number, { rotation: number; offsetY: number; scale: number; zIndex: number; translateX: number }> = {
       [-2]: { rotation: 14, offsetY: 40, scale: 0.72, zIndex: 1, translateX: -175 },
       [-1]: { rotation: 7, offsetY: 18, scale: 0.84, zIndex: 3, translateX: -95 },
@@ -537,13 +541,15 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
       [1]:  { rotation: -7, offsetY: 18, scale: 0.84, zIndex: 3, translateX: 95 },
       [2]:  { rotation: -14, offsetY: 40, scale: 0.72, zIndex: 1, translateX: 175 },
     };
-    return presets[dist] || { rotation: 0, offsetY: 0, scale: 0.6, zIndex: 0, translateX: dist > 0 ? 250 : -250 };
+    return presets[dist] || { rotation: 0, offsetY: 0, scale: 0.6, zIndex: 0, translateX: dist > 0 ? 250 : -250, __dist: dist } as any;
   };
 
   const goToTemplate = (idx: number) => {
-    const clamped = Math.max(0, Math.min(showcasePacks.length - 1, idx));
-    setActiveTemplateIdx(clamped);
-    applyPack(showcasePacks[clamped]);
+    /* Loop wrap — if idx < 0 goes to last, if > length goes to first */
+    const total = showcasePacks.length;
+    const wrapped = ((idx % total) + total) % total;
+    setActiveTemplateIdx(wrapped);
+    applyPack(showcasePacks[wrapped]);
   };
 
   const handleCopyLink = useCallback(() => {
@@ -594,8 +600,11 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
           <div ref={carouselRef} className="relative" style={{ width: 0, height: 560 }}>
             {showcasePacks.map((pack, i) => {
               const arr = getArcArrangement(i);
-              const dist = Math.abs(i - activeTemplateIdx);
-              const isVisible = dist <= 2;
+              const total = showcasePacks.length;
+              let rawDist = i - activeTemplateIdx;
+              if (rawDist > total / 2) rawDist -= total;
+              if (rawDist < -total / 2) rawDist += total;
+              const isVisible = Math.abs(rawDist) <= 2;
               const isCenter = i === activeTemplateIdx;
               return (
                 <div
@@ -639,8 +648,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         <div className="relative flex items-center justify-center gap-4 pt-2">
           <button
             onClick={() => goToTemplate(activeTemplateIdx - 1)}
-            disabled={activeTemplateIdx === 0}
-            className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 hover:text-primary hover:border-primary/30"
             style={{
               background: "hsl(var(--dash-surface-2))",
               border: "1px solid hsl(var(--dash-border-subtle))",
@@ -673,8 +681,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
 
           <button
             onClick={() => goToTemplate(activeTemplateIdx + 1)}
-            disabled={activeTemplateIdx === showcasePacks.length - 1}
-            className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 hover:text-primary hover:border-primary/30"
             style={{
               background: "hsl(var(--dash-surface-2))",
               border: "1px solid hsl(var(--dash-border-subtle))",
