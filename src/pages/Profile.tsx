@@ -559,9 +559,9 @@ const ProfilePage = () => {
                 ) : null
               );
 
-              // Shared stats block — larger scale when template active
+              // Shared stats block — larger scale when template active, respects showStats toggle
               const StatsBlock = () => (
-                profile.stats ? (
+                profile.stats && (profile as any).showStats !== false ? (
                   <div className={`flex items-center ${isMaximalist ? "gap-6 mb-2" : "gap-5 mb-4"}`}>
                     {profile.stats.map(({ label, value }) => (
                       <div key={label} className="flex flex-col items-center">

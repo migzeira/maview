@@ -6,7 +6,7 @@ import {
   MessageCircle, Clock, ChevronDown, ChevronUp, Eye, X, Copy, ExternalLink,
   Sparkles, Calendar, Settings, Layout, GripVertical, AlertCircle,
   TrendingUp, Zap, ArrowRight, CheckCircle2, Circle, Image, Type, Video,
-  Play, Smile, Search, Camera, MoreHorizontal, Share2,
+  Play, Smile, Search, Camera, MoreHorizontal, Share2, BarChart3,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { initialLoad, saveWithSync, forceSaveNow, onSyncStatus, uploadImage, retryPendingSync, type VitrineConfig as SyncVitrineConfig } from "@/lib/vitrine-sync";
@@ -3383,6 +3383,101 @@ const DashboardPagina = () => {
                     }
                   </p>
                 </div>
+
+                {/* ── CARD 3.5: Estatísticas (prova social — seguidores/faturamento/avaliação) ── */}
+                {(() => {
+                  const showStats = (config as any).showStats !== false && !!config.stats && config.stats.length > 0;
+                  const statsEnabled = (config as any).showStats !== false;
+                  const stats = config.stats || [
+                    { value: "", label: "Seguidores" },
+                    { value: "", label: "⭐" },
+                    { value: "", label: "Faturados" },
+                  ];
+                  const updateStat = (idx: number, field: "value" | "label", val: string) => {
+                    const next = [...(config.stats || [
+                      { value: "", label: "Seguidores" },
+                      { value: "", label: "⭐" },
+                      { value: "", label: "Faturados" },
+                    ])];
+                    // Ensure 3 slots exist
+                    while (next.length < 3) next.push({ value: "", label: "" });
+                    next[idx] = { ...next[idx], [field]: val };
+                    updateConfig("stats", next);
+                  };
+                  return (
+                    <div className="rounded-2xl border border-[hsl(var(--dash-border-subtle))] bg-[hsl(var(--dash-surface-2))]/60 p-5 space-y-3 shadow-sm">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[hsl(var(--dash-text-secondary))] text-xs font-semibold flex items-center gap-1.5">
+                          <BarChart3 size={12} className="text-primary" /> Estatísticas
+                          <span className="ml-1 text-[9px] font-normal text-[hsl(var(--dash-text-subtle))]">prova social</span>
+                        </label>
+                        {/* Toggle on/off */}
+                        <button
+                          onClick={() => updateConfig("showStats" as any, !statsEnabled)}
+                          className={`flex items-center gap-1.5 transition-all ${statsEnabled ? "text-primary" : "text-[hsl(var(--dash-text-subtle))]"}`}
+                          aria-label={statsEnabled ? "Desativar estatísticas" : "Ativar estatísticas"}
+                        >
+                          {statsEnabled
+                            ? <ToggleRight size={28} strokeWidth={1.5} />
+                            : <ToggleLeft size={28} strokeWidth={1.5} />}
+                          <span className="text-[11px] font-semibold">{statsEnabled ? "Mostrar" : "Ocultar"}</span>
+                        </button>
+                      </div>
+
+                      <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] leading-relaxed -mt-1">
+                        Exibe números de destaque abaixo da bio (ex: "+850 Negócios", "4.8 ⭐", "R$4M Faturados"). {statsEnabled ? "Deixe um campo vazio para ocultar aquela coluna." : "Desative se não quiser mostrar."}
+                      </p>
+
+                      {statsEnabled && (
+                        <div className="space-y-2.5 pt-1">
+                          {[0, 1, 2].map(idx => {
+                            const stat = stats[idx] || { value: "", label: "" };
+                            const placeholders = [
+                              { value: "+850", label: "Negócios" },
+                              { value: "4.8", label: "⭐" },
+                              { value: "R$4M", label: "Faturados" },
+                            ];
+                            return (
+                              <div key={idx} className="flex items-center gap-2">
+                                <span className="text-[10px] font-mono text-[hsl(var(--dash-text-subtle))] w-5 text-center">{idx + 1}</span>
+                                <input
+                                  type="text"
+                                  className={`${inputCls} flex-1 text-center font-bold`}
+                                  placeholder={placeholders[idx].value}
+                                  maxLength={10}
+                                  value={stat.value}
+                                  onChange={e => updateStat(idx, "value", e.target.value)}
+                                />
+                                <input
+                                  type="text"
+                                  className={`${inputCls} flex-1 text-center`}
+                                  placeholder={placeholders[idx].label}
+                                  maxLength={20}
+                                  value={stat.label}
+                                  onChange={e => updateStat(idx, "label", e.target.value)}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {statsEnabled && showStats && (
+                        <div className="mt-3 flex items-center justify-center gap-5 px-3 py-3 rounded-xl bg-[hsl(var(--dash-bg))]/50 border border-[hsl(var(--dash-border-subtle))]">
+                          {stats.slice(0, 3).filter(s => s.value).map((s, i) => (
+                            <div key={i} className="flex flex-col items-center">
+                              <span className="text-[15px] font-extrabold text-[hsl(var(--dash-text))]" style={{ letterSpacing: "-0.02em" }}>{s.value}</span>
+                              <span className="text-[10px] font-light text-[hsl(var(--dash-text-subtle))] mt-0.5" style={{ letterSpacing: "0.02em" }}>{s.label}</span>
+                            </div>
+                          ))}
+                          {stats.every(s => !s.value) && (
+                            <span className="text-[11px] text-[hsl(var(--dash-text-subtle))] italic">Preencha os valores acima para visualizar</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
 
                 {/* ── CARD 4: Redes sociais (top 5 + expandir) ── */}
                 {(() => {

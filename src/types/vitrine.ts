@@ -284,6 +284,8 @@ export interface ProfileData {
   products: ProductItem[];
   testimonials?: TestimonialItem[];
   stats?: { label: string; value: string }[];
+  /** Toggle to show/hide stats block in the public profile */
+  showStats?: boolean;
   embeds?: EmbedItem[];
   blocks?: VitrineBlock[];
 }
