@@ -527,19 +527,17 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     && d.fontHeading === (pack.config.design.fontHeading || "Inter")
     && d.bgEffect === (pack.config.design.bgEffect || "");
 
-  /* Arc carousel arrangement — based on distance from activeTemplateIdx */
+  /* Arc carousel arrangement — tight spacing to fit inside container */
   const getArcArrangement = (packIdx: number) => {
     const dist = packIdx - activeTemplateIdx;
     const presets: Record<number, { rotation: number; offsetY: number; scale: number; zIndex: number; translateX: number }> = {
-      [-3]: { rotation: 18, offsetY: 50, scale: 0.76, zIndex: 1, translateX: -540 },
-      [-2]: { rotation: 12, offsetY: 30, scale: 0.82, zIndex: 2, translateX: -380 },
-      [-1]: { rotation: 6, offsetY: 12, scale: 0.90, zIndex: 4, translateX: -210 },
-      [0]:  { rotation: 0, offsetY: -18, scale: 1.05, zIndex: 10, translateX: 0 },
-      [1]:  { rotation: -6, offsetY: 12, scale: 0.90, zIndex: 4, translateX: 210 },
-      [2]:  { rotation: -12, offsetY: 30, scale: 0.82, zIndex: 2, translateX: 380 },
-      [3]:  { rotation: -18, offsetY: 50, scale: 0.76, zIndex: 1, translateX: 540 },
+      [-2]: { rotation: 14, offsetY: 40, scale: 0.72, zIndex: 1, translateX: -175 },
+      [-1]: { rotation: 7, offsetY: 18, scale: 0.84, zIndex: 3, translateX: -95 },
+      [0]:  { rotation: 0, offsetY: -12, scale: 1.02, zIndex: 10, translateX: 0 },
+      [1]:  { rotation: -7, offsetY: 18, scale: 0.84, zIndex: 3, translateX: 95 },
+      [2]:  { rotation: -14, offsetY: 40, scale: 0.72, zIndex: 1, translateX: 175 },
     };
-    return presets[dist] || { rotation: 0, offsetY: 0, scale: 0.7, zIndex: 0, translateX: dist > 0 ? 700 : -700 };
+    return presets[dist] || { rotation: 0, offsetY: 0, scale: 0.6, zIndex: 0, translateX: dist > 0 ? 250 : -250 };
   };
 
   const goToTemplate = (idx: number) => {
@@ -584,31 +582,35 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
           )}
         </div>
 
-        {/* ═══ ARC CAROUSEL — click-to-focus premium showcase ═══ */}
-        <div className="relative flex items-end justify-center" style={{
+        {/* ═══ ARC CAROUSEL — contained, centered, symmetric ═══ */}
+        <div className="relative w-full flex items-end justify-center overflow-hidden" style={{
           perspective: "2000px",
           perspectiveOrigin: "50% 50%",
           minHeight: 620,
           paddingTop: 40,
+          maskImage: "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
         }}>
           <div ref={carouselRef} className="relative" style={{ width: 0, height: 560 }}>
             {showcasePacks.map((pack, i) => {
               const arr = getArcArrangement(i);
-              const isVisible = Math.abs(i - activeTemplateIdx) <= 3;
+              const dist = Math.abs(i - activeTemplateIdx);
+              const isVisible = dist <= 2;
               const isCenter = i === activeTemplateIdx;
               return (
                 <div
                   key={pack.id}
-                  className="absolute top-0 left-0"
+                  className="absolute top-0"
                   style={{
+                    left: "50%",
                     transform: `translateX(calc(-50% + ${arr.translateX}px)) translateY(${arr.offsetY}px) scale(${arr.scale}) rotateY(${arr.rotation}deg)`,
                     transformOrigin: "center bottom",
                     transformStyle: "preserve-3d",
                     zIndex: arr.zIndex,
                     opacity: isVisible ? 1 : 0,
                     pointerEvents: isVisible ? "auto" : "none",
-                    transition: "transform 700ms cubic-bezier(0.34, 1.4, 0.64, 1), opacity 400ms ease",
-                    filter: isCenter ? "none" : "brightness(0.85)",
+                    transition: "transform 700ms cubic-bezier(0.34, 1.4, 0.64, 1), opacity 400ms ease, filter 500ms ease",
+                    filter: isCenter ? "none" : "brightness(0.82)",
                   }}
                 >
                   <PhoneMockup
