@@ -27,6 +27,14 @@ export interface DesignConfig {
   textShadow: number; hideWatermark: boolean; layout?: string;
   heroLayout?: "classic" | "hero-banner" | "side-by-side" | "minimal-top" | "full-cover";
   productDisplayStyle?: "callout" | "compact" | "expanded";
+  /** Maximalist template header layout — propagates from applied pack for live preview sync */
+  headerLayoutType?: "big-circle" | "edge-to-edge" | "floating-square" | "split-editorial";
+  /** CTA glow style — matches pack's ctaGlow for button visual effects */
+  ctaGlow?: "accent" | "blue" | "none";
+  /** Glass cards effect — backdrop blur on product cards for gradient templates */
+  glassCards?: boolean;
+  /** Social icon style in mockup: brand colors or monochrome */
+  showcaseSocialStyle?: "brand" | "mono";
 }
 
 export interface ThemeDef { id: ThemeId; label: string; bg: string; accent: string; accent2: string; text?: string; sub?: string; card?: string; border?: string; }

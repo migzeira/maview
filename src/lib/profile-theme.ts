@@ -63,6 +63,11 @@ export interface ResolvedDesign {
   hideWatermark: boolean;
   heroLayout: HeroLayout;
   productDisplayStyle: ProductDisplayStyle;
+  /** Maximalist header layout from applied showcase pack */
+  headerLayoutType?: "big-circle" | "edge-to-edge" | "floating-square" | "split-editorial";
+  ctaGlow?: "accent" | "blue" | "none";
+  glassCards?: boolean;
+  showcaseSocialStyle?: "brand" | "mono";
 }
 
 export function resolveDesign(theme: ThemeDef, design?: Partial<DesignConfig>): ResolvedDesign {
@@ -117,6 +122,10 @@ export function resolveDesign(theme: ThemeDef, design?: Partial<DesignConfig>): 
     hideWatermark: d.hideWatermark ?? false,
     heroLayout: (d.heroLayout as HeroLayout) || "classic",
     productDisplayStyle: (d.productDisplayStyle as ProductDisplayStyle) || "callout",
+    headerLayoutType: (d as any).headerLayoutType,
+    ctaGlow: (d as any).ctaGlow,
+    glassCards: (d as any).glassCards,
+    showcaseSocialStyle: (d as any).showcaseSocialStyle,
   };
 
   // Auto-contrast: if bg has overlay or is image/effect, auto-adjust text

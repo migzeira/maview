@@ -426,7 +426,13 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     if (prev.coverImageUrl && isUserUpload(prev.coverImageUrl as string) && !isShowcase) preserved.coverImageUrl = prev.coverImageUrl;
     if (prev.profileBorderColor) preserved.profileBorderColor = prev.profileBorderColor;
     if (prev.profileGlowColor) preserved.profileGlowColor = prev.profileGlowColor;
-    const latest = { profileGlow: true, ...pack.config.design, ...preserved };
+    /* Propagate pack-level UX props to design config so Profile.tsx live preview can sync structure */
+    const packMeta: Record<string, unknown> = {};
+    if (pack.headerLayoutType) packMeta.headerLayoutType = pack.headerLayoutType;
+    if (pack.ctaGlow) packMeta.ctaGlow = pack.ctaGlow;
+    if (pack.glassCards) packMeta.glassCards = pack.glassCards;
+    if (pack.socialIconStyle) packMeta.showcaseSocialStyle = pack.socialIconStyle;
+    const latest = { profileGlow: true, ...pack.config.design, ...packMeta, ...preserved };
     designRef.current = latest;
     updateConfig("design", latest);
     if (pack.config.design.fontHeading) loadFont(pack.config.design.fontHeading);

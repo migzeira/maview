@@ -655,6 +655,126 @@ const ProfilePage = () => {
                 </div>
               );
 
+              /* ═════════════════════════════════════════════════════════════════
+                 MAXIMALIST SHOWCASE HEADER v8 — active when user applied a
+                 showcase template (has headerLayoutType). Mirrors the mockup
+                 design in the live preview with 30% larger scale + zero gap.
+                 ═════════════════════════════════════════════════════════════════ */
+              if (rd.headerLayoutType) {
+                const verifiedBadge: JSX.Element | null = null;
+
+                /* BIG CIRCLE — Mateus / Vitor */
+                if (rd.headerLayoutType === "big-circle") {
+                  return (
+                    <>
+                      <div className="flex flex-col items-center">
+                        <div className="relative mb-4" style={{
+                          width: 144, height: 144,
+                          padding: 4,
+                          borderRadius: "50%",
+                          background: `conic-gradient(from 180deg, ${t.accent}, ${rd.accent2 || t.accent}, ${t.accent})`,
+                          boxShadow: `0 8px 28px ${hexToRgba(glowC, 0.45)}, 0 2px 10px rgba(0,0,0,0.18)`,
+                        }}>
+                          <div className="w-full h-full rounded-full overflow-hidden" style={{ background: t.bg }}>
+                            {profile.avatar
+                              ? <img src={profile.avatar} alt={profile.displayName} className="w-full h-full object-cover" loading="eager" decoding="async" />
+                              : <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-white" style={{ background: t.accent }}>{(profile.displayName || "?")[0]}</div>
+                            }
+                          </div>
+                        </div>
+                        <h1 className="text-[32px] leading-[1.05] font-extrabold tracking-tight text-center" style={{ color: c.name, fontFamily: `'${rd.fontHeading}', sans-serif`, letterSpacing: "-0.025em" }}>
+                          {profile.displayName}{verifiedBadge}
+                        </h1>
+                        <p className="text-[14px] font-medium mt-1" style={{ color: t.accent, letterSpacing: "0.02em" }}>@{profile.username.replace(/^@+/, "")}</p>
+                      </div>
+                      <BioBlock center />
+                      <StatsBlock />
+                      <SocialsRow />
+                    </>
+                  );
+                }
+
+                /* EDGE-TO-EDGE — Léo / Lucas */
+                if (rd.headerLayoutType === "edge-to-edge") {
+                  return (
+                    <>
+                      <div className="relative w-full rounded-2xl overflow-hidden mb-3" style={{ height: 300 }}>
+                        {profile.avatar
+                          ? <img src={profile.avatar} alt={profile.displayName} className="w-full h-full object-cover" style={{ objectPosition: "center 15%" }} loading="eager" decoding="async" fetchPriority="high" />
+                          : <div className="w-full h-full" style={{ background: t.accent }} />
+                        }
+                        <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${t.bg} 0%, ${t.bg}F0 15%, ${t.bg}60 35%, ${t.bg}10 60%, transparent 85%)` }} />
+                        <div className="absolute bottom-5 left-5 right-5">
+                          <h1 className="text-[34px] leading-[1.02] font-extrabold tracking-tight" style={{ color: t.text, textShadow: rd.bg.startsWith("#f") ? "none" : "0 2px 12px rgba(0,0,0,0.55)", fontFamily: `'${rd.fontHeading}', sans-serif`, letterSpacing: "-0.025em" }}>
+                            {profile.displayName}{verifiedBadge}
+                          </h1>
+                          <p className="text-[15px] font-medium mt-1" style={{ color: t.accent, letterSpacing: "0.02em", textShadow: rd.bg.startsWith("#f") ? "none" : "0 1px 4px rgba(0,0,0,0.4)" }}>@{profile.username.replace(/^@+/, "")}</p>
+                        </div>
+                      </div>
+                      <BioBlock />
+                      <StatsBlock />
+                      <SocialsRow />
+                    </>
+                  );
+                }
+
+                /* FLOATING SQUARE — Beatriz / Clínica Serenity */
+                if (rd.headerLayoutType === "floating-square") {
+                  return (
+                    <>
+                      <div className="flex flex-col items-center">
+                        <div className="overflow-hidden mb-4" style={{
+                          width: 170, height: 170,
+                          borderRadius: 28,
+                          boxShadow: `0 20px 40px rgba(0,0,0,0.25), 0 8px 16px rgba(0,0,0,0.12), 0 0 0 5px ${rd.bg.startsWith("#f") ? "#fff" : "rgba(255,255,255,0.08)"}, 0 0 32px ${hexToRgba(glowC, 0.3)}`,
+                        }}>
+                          {profile.avatar
+                            ? <img src={profile.avatar} alt={profile.displayName} className="w-full h-full object-cover" style={{ objectPosition: "center top" }} loading="eager" decoding="async" fetchPriority="high" />
+                            : <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-white" style={{ background: t.accent }}>{(profile.displayName || "?")[0]}</div>
+                          }
+                        </div>
+                        <h1 className="text-[36px] leading-[1.02] font-semibold tracking-tight text-center" style={{ color: c.name, fontFamily: `'${rd.fontHeading}', serif`, letterSpacing: "-0.02em" }}>
+                          {profile.displayName}{verifiedBadge}
+                        </h1>
+                        <p className="text-[14px] font-medium mt-1" style={{ color: t.accent, letterSpacing: "0.02em" }}>@{profile.username.replace(/^@+/, "")}</p>
+                      </div>
+                      <BioBlock center />
+                      <StatsBlock />
+                      <SocialsRow />
+                    </>
+                  );
+                }
+
+                /* SPLIT EDITORIAL — Isabela / Julia */
+                if (rd.headerLayoutType === "split-editorial") {
+                  return (
+                    <>
+                      <div className="w-full flex gap-4 mb-3" style={{ height: 260 }}>
+                        <div className="w-[45%] relative overflow-hidden rounded-2xl">
+                          {profile.avatar
+                            ? <img src={profile.avatar} alt={profile.displayName} className="w-full h-full object-cover" loading="eager" decoding="async" fetchPriority="high" />
+                            : <div className="w-full h-full" style={{ background: t.accent }} />
+                          }
+                        </div>
+                        <div className="w-[55%] flex flex-col justify-center">
+                          <h1 className="text-[28px] leading-[1.05] font-bold tracking-tight" style={{ color: c.name, fontFamily: `'${rd.fontHeading}', serif`, letterSpacing: "-0.02em" }}>
+                            {profile.displayName}{verifiedBadge}
+                          </h1>
+                          <p className="text-[14px] font-medium mt-1" style={{ color: t.accent, letterSpacing: "0.02em" }}>@{profile.username.replace(/^@+/, "")}</p>
+                          {profile.bio && (
+                            <p className="text-[14px] leading-relaxed font-light mt-3 line-clamp-4" style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif` }}>
+                              {profile.bio}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <StatsBlock />
+                      <SocialsRow />
+                    </>
+                  );
+                }
+              }
+
               switch (rd.heroLayout) {
 
                 /* ── HERO-BANNER ── */
