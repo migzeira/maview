@@ -314,7 +314,7 @@ const DashboardHome = () => {
       // Save new achievements
       const updated = { ...designObj, achievements: [...saved, ...newOnes] };
       const full = { ...loadLocal(), design: updated };
-      saveWithSync(full).catch(() => {});
+      try { saveWithSync(full); } catch { /* silent */ }
     }
   }, [unlockedAchievements, cfg]);
 
