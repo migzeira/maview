@@ -1272,6 +1272,90 @@ const ProfilePage = () => {
 
                   const ctaIcon = isBooking ? <Calendar size={11} /> : isWhatsApp ? <WhatsAppIcon size={13} style={{ color: "#25d366" }} /> : <ShoppingCart size={11} />;
 
+                  /* ── HERO BANNER (per-product override) ──
+                     Activated when:
+                     1) product.displayStyle === "hero" explicitly, OR
+                     2) only one active product exists (auto-hero)
+                     Renders a large full-width image card with title + CTA overlay. */
+                  const activeProducts = profile.products.filter((p: any) => p.active !== false);
+                  const shouldRenderAsHero = (product as any).displayStyle === "hero" ||
+                    (activeProducts.length === 1 && product.id === activeProducts[0].id);
+                  if (shouldRenderAsHero) {
+                    return (
+                      <Wrapper key={product.id} {...wrapperProps}
+                        className="relative w-full overflow-hidden transition-transform active:scale-[0.98]"
+                        style={{
+                          borderRadius: cardRadius,
+                          height: 220,
+                          background: `linear-gradient(135deg, ${t.accent}40, ${t.accent2 || t.accent}50)`,
+                          boxShadow: `0 12px 32px rgba(0,0,0,0.18), 0 4px 12px rgba(0,0,0,0.10)`,
+                          opacity: productStagger[i] ? 1 : 0,
+                          transform: productStagger[i] ? "translateY(0)" : "translateY(12px)",
+                          transition: "opacity 0.3s ease, transform 0.3s ease",
+                        }}>
+                        {/* Full-bleed image background */}
+                        {coverImg ? (
+                          <img src={coverImg} alt={product.title} className="absolute inset-0 w-full h-full object-cover" loading="lazy" decoding="async" />
+                        ) : product.emoji ? (
+                          <div className="absolute inset-0 flex items-center justify-center text-[90px] opacity-50">{product.emoji}</div>
+                        ) : null}
+
+                        {/* Bottom gradient overlay for text readability */}
+                        <div className="absolute inset-0" style={{
+                          background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.45) 30%, rgba(0,0,0,0.15) 55%, transparent 80%)",
+                        }} />
+
+                        {/* Badges top-left */}
+                        {(product.badge || product.urgency) && (
+                          <div className="absolute top-3 left-3 flex gap-1.5 z-10">
+                            {product.badge && (
+                              <span className="text-[11px] font-bold px-2.5 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.95)", color: "#0a0a0a", backdropFilter: "blur(8px)" }}>
+                                {product.badge}
+                              </span>
+                            )}
+                            {product.urgency && (
+                              <span className="text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1" style={{ background: "rgba(239,68,68,0.90)", color: "#fff", backdropFilter: "blur(8px)" }}>
+                                <Flame size={10} /> Acaba em breve
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Content overlay bottom */}
+                        <div className="absolute inset-x-0 bottom-0 p-4 z-10 flex items-end justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[17px] font-extrabold leading-tight text-white" style={{ fontFamily: `'${rd.fontHeading}', sans-serif`, letterSpacing: "-0.015em", textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>
+                              {product.title}
+                            </p>
+                            {subtitleText && (
+                              <p className="text-[12px] leading-snug mt-0.5 text-white/85 line-clamp-1 font-light" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.4)" }}>
+                                {subtitleText}
+                              </p>
+                            )}
+                            {product.price && (
+                              <div className="flex items-center gap-1.5 mt-1.5">
+                                <span className="text-[16px] font-extrabold text-white" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.4)" }}>{product.price}</span>
+                                {product.originalPrice && <span className="text-[12px] line-through opacity-60 text-white font-light">{product.originalPrice}</span>}
+                                {ratingBadge && <span className="ml-1">{ratingBadge}</span>}
+                              </div>
+                            )}
+                          </div>
+                          {!isNone && (
+                            <div className="flex-shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[13px] font-extrabold whitespace-nowrap shadow-lg" style={{
+                              background: isWhatsApp ? "rgba(37,211,102,0.95)" : "rgba(255,255,255,0.95)",
+                              color: isWhatsApp ? "#fff" : "#0a0a0a",
+                              backdropFilter: "blur(12px)",
+                              letterSpacing: "-0.005em",
+                            }}>
+                              {ctaIcon}
+                              {ctaLabel}
+                            </div>
+                          )}
+                        </div>
+                      </Wrapper>
+                    );
+                  }
+
                   /* ── COMPACT display style ── */
                   if (rd.productDisplayStyle === "compact") {
                     return (
