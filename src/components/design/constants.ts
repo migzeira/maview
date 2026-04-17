@@ -48,7 +48,14 @@ export interface ReferenceProfile {
   coverImage?: string;
   verified?: boolean;
   socials: string[]; links: string[];
-  products: { title: string; price: string; image?: string }[];
+  products: {
+    title: string;
+    price: string;
+    originalPrice?: string;
+    discount?: string;
+    cta?: string;
+    image?: string;
+  }[];
   stats?: { value: string; label: string }[];
 }
 
@@ -102,88 +109,121 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     ],
     stats: [{ value: "+2.1k", label: "comissoes" }, { value: "5.0", label: "⭐" }, { value: "4.2M", label: "views" }] },
 
-  /* ── Showcase Profiles (Vitrines Prontas) — fotos reais de rosto ── */
+  /* ── Vitrines Prontas (Showcase Premium) — referência Stan Store ── */
 
-  /* 5 — Wellness */ { name: "Marina Costa", username: "@marinacosta", bio: "Te ajudo a encontrar equilibrio e paz interior 🧘", verified: true,
-    avatar: U("photo-1548690312-e3b507d8c110", 400, 500, "face"),
-    coverImage: U("photo-1506126613408-eca07ce68773", 400, 200, "center"),
-    socials: ["ig", "tt", "yt"], links: ["Agendar aula experimental →", "Falar no WhatsApp →", "Baixar meditacao gratis →"],
-    products: [
-      { title: "Plano Wellness 30 dias", price: "R$ 90/mes", image: U("photo-1544367567-0f2fcb009e0b", 200, 150, "center") },
-      { title: "Meditacao Guiada Premium", price: "R$ 39", image: U("photo-1506126613408-eca07ce68773", 200, 150, "center") },
-      { title: "Retiro Online 7 dias", price: "R$ 147", image: U("photo-1545205597-3d9d02c29597", 200, 150, "center") },
-    ],
-    stats: [{ value: "8.7k", label: "alunas" }, { value: "4.9", label: "⭐" }, { value: "R$680k", label: "faturado" }] },
-  /* 6 — Coach */ { name: "Rafael Torres", username: "@rafaeltorres", bio: "Ensino creators a monetizar sem burnout 📱", verified: true,
-    avatar: U("photo-1507003211169-0a1dd7228f2d", 400, 500, "face"),
-    coverImage: U("photo-1498050108023-c5249f4df085", 400, 200, "center"),
-    socials: ["ig", "tt", "li", "yt"], links: ["Agendar mentoria gratuita →", "Baixar guia gratis →", "Falar no WhatsApp →"],
-    products: [
-      { title: "Mentoria Creator Pro", price: "R$ 297", image: U("photo-1611162617474-5b21e879e113", 200, 150, "center") },
-      { title: "Guia de Monetizacao", price: "Gratis", image: U("photo-1460925895917-afdab827c52f", 200, 150, "center") },
-      { title: "Comunidade VIP Anual", price: "R$ 497", image: U("photo-1517694712202-14dd9538aa97", 200, 150, "center") },
-    ],
-    stats: [{ value: "+850", label: "creators" }, { value: "4.8", label: "⭐" }, { value: "R$1.2M", label: "faturado" }] },
-  /* 7 — Fashion */ { name: "Bianca Oliveira", username: "@biancaoliveira", bio: "Seu estilo e sua melhor estrategia 👗", verified: true,
-    avatar: U("photo-1529626455594-4ff0802cfb7e", 400, 500, "face"),
-    coverImage: U("photo-1469334031218-e382a71b716b", 400, 200, "center"),
-    socials: ["ig", "tt", "pin"], links: ["Agendar consultoria →", "Falar no WhatsApp →", "Ver looks do mes →"],
-    products: [
-      { title: "Consultoria de Imagem", price: "R$ 197", image: U("photo-1490481651871-ab68de25d43d", 200, 150, "center") },
-      { title: "Guia Closet Inteligente", price: "R$ 49", image: U("photo-1445205170230-053b83016050", 200, 150, "center") },
-      { title: "Curso Estilo & Marca Pessoal", price: "R$ 297", image: U("photo-1483985988355-763728e1935b", 200, 150, "center") },
-    ],
-    stats: [{ value: "+1.4k", label: "clientes" }, { value: "5.0", label: "⭐" }, { value: "12 anos", label: "exp." }] },
-  /* 8 — Fitness */ { name: "Thiago Almeida", username: "@thiagoalmeida", bio: "Resultado real, ciencia aplicada, zero achismo 💪", verified: true,
-    avatar: U("photo-1594381898411-846e7d193883", 400, 500, "face"),
-    coverImage: U("photo-1534438327276-14e5300c3a48", 400, 200, "center"),
-    socials: ["ig", "yt", "wa"], links: ["Baixar treino gratis →", "Falar no WhatsApp →", "Agendar avaliacao →"],
-    products: [
-      { title: "Plano 12 Semanas Intensivo", price: "R$ 127", image: U("photo-1571019613454-1cb2f99b2d8b", 200, 150, "center") },
-      { title: "Dieta + Treino Personalizado", price: "R$ 197", image: U("photo-1583454110551-21f2fa2afe61", 200, 150, "center") },
-      { title: "Desafio Shape 30 dias", price: "R$ 47", image: U("photo-1534438327276-14e5300c3a48", 200, 150, "center") },
-    ],
-    stats: [{ value: "+4.6k", label: "alunos" }, { value: "4.9", label: "⭐" }, { value: "CREF", label: "ativo" }] },
-  /* 9 — Fotografa */ { name: "Isabela Mendes", username: "@isabelamendes", bio: "Transformo luz em emocao 📷", verified: true,
-    avatar: U("photo-1534528741775-53994a69daeb", 400, 500, "face"),
-    coverImage: U("photo-1516035069371-29a1b244cc32", 400, 200, "center"),
-    socials: ["ig", "tt", "pin"], links: ["Agendar ensaio →", "Ver portfolio completo →", "Baixar presets gratis →"],
-    products: [
-      { title: "Pack 80 Presets Cinema", price: "R$ 59", image: U("photo-1452587925148-ce544e77e70d", 200, 150, "center") },
-      { title: "Curso Fotografia Avancada", price: "R$ 247", image: U("photo-1542038784456-1ea8e935640e", 200, 150, "center") },
-      { title: "Ensaio Premium", price: "R$ 490", image: U("photo-1471341971476-ae15ff5dd4ea", 200, 150, "center") },
-    ],
-    stats: [{ value: "+1.2k", label: "ensaios" }, { value: "5.0", label: "⭐" }, { value: "18", label: "premios" }] },
-  /* 10 — Dev */ { name: "Daniel Rocha", username: "@danielrocha", bio: "Templates que geram receita recorrente ⚡", verified: true,
+  /* 5 — Finanças (Mateus) */ { name: "Mateus Cavalcanti", username: "@mateus.financas",
+    bio: "Estratégia e liberdade financeira 💰", verified: true,
     avatar: U("photo-1472099645785-5658abf4ff4e", 400, 500, "face"),
-    coverImage: U("photo-1550751827-4bd374c3f58b", 400, 200, "center"),
-    socials: ["gh", "tw", "li"], links: ["Baixar template gratis →", "Agendar mentoria →", "Newsletter dev →"],
+    socials: ["yt", "li", "ig"],
+    links: ["Consultoria VIP →", "Baixar guia grátis →"],
     products: [
-      { title: "Template SaaS Completo", price: "R$ 149", image: U("photo-1555066931-4365d14bab8c", 200, 150, "center") },
-      { title: "Mentoria Dev Senior", price: "R$ 397", image: U("photo-1517694712202-14dd9538aa97", 200, 150, "center") },
-      { title: "Curso Arquitetura API", price: "R$ 247", image: U("photo-1461749280684-dccba630e2f6", 200, 150, "center") },
+      { title: "Consultoria VIP", price: "R$ 497", cta: "Quero agora",
+        image: U("photo-1563013544-824ae1b704d3", 600, 400, "center") },
+      { title: "Guia de Investimentos", price: "R$ 60", originalPrice: "R$ 120", discount: "50% OFF",
+        cta: "Quero agora",
+        image: U("photo-1579621970588-a35d0e7ab9b6", 300, 200, "center") },
     ],
-    stats: [{ value: "6.3k", label: "devs" }, { value: "4.9", label: "⭐" }, { value: "120+", label: "templates" }] },
-  /* 11 — Nutri */ { name: "Luana Ferreira", username: "@luanaferreira", bio: "Alimentacao inteligente para quem quer resultado 🥗", verified: true,
-    avatar: U("photo-1494790108377-be9c29b29330", 400, 500, "face"),
-    coverImage: U("photo-1490645935967-10de6ba17061", 400, 200, "center"),
-    socials: ["ig", "tt", "yt"], links: ["Agendar consulta →", "Falar no WhatsApp →", "Baixar ebook gratis →"],
+    stats: [{ value: "R$12M", label: "Faturados" }, { value: "4.9", label: "⭐" }, { value: "2.1k", label: "Alunos" }] },
+
+  /* 6 — DJ (Léo) */ { name: "Léo Dantas", username: "@leodantas.dj",
+    bio: "Transformando eventos em experiências 🎧", verified: true,
+    avatar: U("photo-1539571696357-5a69c17a67c6", 400, 500, "face"),
+    socials: ["tt", "ig", "yt", "li"],
+    links: ["Kit de Beats", "Mentoria para DJs"],
     products: [
-      { title: "Plano Alimentar Personalizado", price: "R$ 97", image: U("photo-1512621776951-a57141f2eefd", 200, 150, "center") },
-      { title: "Ebook 150 Receitas Fit", price: "R$ 39", image: U("photo-1490645935967-10de6ba17061", 200, 150, "center") },
-      { title: "Programa Detox 14 dias", price: "R$ 67", image: U("photo-1495521821757-a1efb6729352", 200, 150, "center") },
+      { title: "Kit de Beats Premium", price: "R$ 297", cta: "Baixar Pack",
+        image: U("photo-1516280440614-37939bbacd81", 600, 400, "center") },
+      { title: "Mentoria para DJs", price: "R$ 497", cta: "Agendar",
+        image: U("photo-1493225457124-a3eb161ffa5f", 300, 200, "center") },
     ],
-    stats: [{ value: "+3.8k", label: "pacientes" }, { value: "4.9", label: "⭐" }, { value: "CRN", label: "ativa" }] },
-  /* 12 — Musico */ { name: "Gabriel Santos", username: "@gabrielsantos", bio: "Beats que fazem hits 🎵", verified: true,
-    avatar: U("photo-1500648767791-00dcc994a43e", 400, 500, "face"),
-    coverImage: U("photo-1598488035139-bdbb2231ce04", 400, 200, "center"),
-    socials: ["ig", "tt", "yt", "sc"], links: ["Ouvir no Spotify →", "Encomendar beat exclusivo →", "Falar no WhatsApp →"],
+    stats: [{ value: "500+", label: "Shows" }, { value: "4.9", label: "⭐" }, { value: "3 anos", label: "exp" }] },
+
+  /* 7 — Beleza (Beatriz) — CENTRAL */ { name: "Beatriz Lins", username: "@beatrizlins.glow",
+    bio: "Especialista em beleza natural e autocuidado.", verified: true,
+    avatar: U("photo-1494790108377-be9c29b29330", 500, 600, "face"),
+    coverImage: U("photo-1522337360788-8b13dee7a37e", 600, 400, "center"),
+    socials: ["pin", "ig", "tt", "li"],
+    links: ["Natural Glow Guide", "Rotina de Skincare"],
     products: [
-      { title: "Beat Pack Premium", price: "R$ 79", image: U("photo-1470225620780-dba8ba36b745", 200, 150, "center") },
-      { title: "Curso Producao Musical", price: "R$ 197", image: U("photo-1598653222000-6b7b7a552625", 200, 150, "center") },
-      { title: "Beat Exclusivo Custom", price: "R$ 350", image: U("photo-1511379938547-c1f69419868d", 200, 150, "center") },
+      { title: "Natural Glow Guide", price: "R$ 80/mês", cta: "Inscrever-se",
+        image: U("photo-1556228453-efd6c1ff04f6", 600, 400, "center") },
+      { title: "Rotina de Skincare", price: "R$ 80", originalPrice: "R$ 120", discount: "5% OFF",
+        cta: "Quero agora",
+        image: U("photo-1570172619644-dfd03ed5d881", 300, 200, "center") },
     ],
-    stats: [{ value: "+2.5k", label: "beats" }, { value: "4.8", label: "⭐" }, { value: "1.8M", label: "plays" }] },
+    stats: [{ value: "+18k", label: "Seguidores" }, { value: "4.9", label: "⭐" }, { value: "R$450k", label: "Faturados" }] },
+
+  /* 8 — Branding (Isabela) */ { name: "Isabela Rios", username: "@isabelarios.brand",
+    bio: "Branding e posicionamento premium ✨", verified: true,
+    avatar: U("photo-1573496359142-b8d87734a5a2", 400, 500, "face"),
+    socials: ["ig", "pin", "tt", "li"],
+    links: ["The Brand Blueprint", "Sessão de Estratégia"],
+    products: [
+      { title: "The Brand Blueprint", price: "R$ 10", originalPrice: "R$ 20",
+        cta: "Agendar",
+        image: U("photo-1586282391129-76a6df230234", 600, 400, "center") },
+      { title: "Sessão de Estratégia", price: "R$ 497", cta: "Agendar",
+        image: U("photo-1561070791-2526d30994b5", 300, 200, "center") },
+    ],
+    stats: [{ value: "+120k", label: "Seguidores" }, { value: "5.0", label: "⭐" }, { value: "8 anos", label: "exp" }] },
+
+  /* 9 — Growth (Vitor) */ { name: "Vitor Meireles", username: "@vitor.growth",
+    bio: "Escalando negócios no digital 🚀", verified: true,
+    avatar: U("photo-1531427186611-ecfd6d936c79", 500, 600, "face"),
+    coverImage: U("photo-1531427186611-ecfd6d936c79", 600, 400, "center"),
+    socials: ["yt", "ig", "tt", "li"],
+    links: ["Mentoria Growth", "Guia grátis"],
+    products: [
+      { title: "Mentoria Growth 1:1", price: "R$ 997", originalPrice: "R$ 1997",
+        cta: "Mentoria VIP",
+        image: U("photo-1590602847861-f357a9332bbc", 600, 400, "center") },
+      { title: "Guia de Monetização", price: "Grátis", cta: "Baixar",
+        image: U("photo-1533174072545-7a4b6ad7a6c3", 300, 200, "center") },
+    ],
+    stats: [{ value: "+850", label: "Negócios" }, { value: "4.8", label: "⭐" }, { value: "R$4M", label: "Faturados" }] },
+
+  /* 10 — Moda (Julia) */ { name: "Julia Martins", username: "@julia.moda_premium",
+    bio: "Estilista e consultora de imagem. Especialista em estilo autoral e tendências de luxo.",
+    verified: true,
+    avatar: U("photo-1488426862026-3ee34a7d66df", 500, 600, "face"),
+    coverImage: U("photo-1529626455594-4ff0802cfb7e", 600, 400, "center"),
+    socials: ["ig", "pin", "tt", "li"],
+    links: ["Análise de Coloração", "Mentoria Online"],
+    products: [
+      { title: "Análise de Coloração Pessoal", price: "R$ 297", cta: "Comprar",
+        image: U("photo-1522335789203-aabd1fc54bc9", 600, 400, "center") },
+      { title: "Mentoria de Imagem Online", price: "R$ 497", cta: "Agendar",
+        image: U("photo-1490481651871-ab68de25d43d", 300, 200, "center") },
+    ],
+    stats: [{ value: "30k", label: "Seguidores" }, { value: "4.7", label: "⭐" }, { value: "55", label: "Clientes VIP" }] },
+
+  /* 11 — Fotografia (Lucas) */ { name: "Lucas Pereira", username: "@lucas.perfil_critico",
+    bio: "Fotógrafo de retrato e lifestyle. Capture a essência do seu momento com olhar autêntico.",
+    verified: true,
+    avatar: U("photo-1507003211169-0a1dd7228f2d", 500, 600, "face"),
+    socials: ["ig", "pin", "tt", "li"],
+    links: ["Ensaio Corporativo", "Guia de Luz Natural"],
+    products: [
+      { title: "Ensaio Corporativo", price: "R$ 497", cta: "Ver Portfolio",
+        image: U("photo-1519085360753-af0119f7cbe7", 600, 400, "center") },
+      { title: "Guia de Luz Natural", price: "R$ 97", cta: "Quero agora",
+        image: U("photo-1513151233558-d860c5398176", 300, 200, "center") },
+    ],
+    stats: [{ value: "200+", label: "Ensaios" }, { value: "5.0", label: "⭐" }, { value: "15k", label: "Alcance" }] },
+
+  /* 12 — Wellness (Clínica Serenity) */ { name: "Clínica Serenity", username: "@clinica.serenity_estetica",
+    bio: "Medicina integrativa e estética regenerativa. Cuide do seu corpo e mente com excelência.",
+    verified: true,
+    avatar: U("photo-1559839734-2b71ea197ec2", 500, 600, "face"),
+    socials: ["ig", "pin", "yt", "li"],
+    links: ["Consulta Integrativa", "Tratamento Premium"],
+    products: [
+      { title: "Consulta Integrativa", price: "R$ 380", cta: "Falar com Especialista",
+        image: U("photo-1544367567-0f2fcb009e0b", 600, 400, "center") },
+      { title: "Tratamento Estético Premium", price: "R$ 890", cta: "Agendar",
+        image: U("photo-1540555700478-4be289fbecef", 300, 200, "center") },
+    ],
+    stats: [{ value: "5k", label: "Atendimentos" }, { value: "4.8", label: "⭐" }, { value: "92%", label: "Satisfação" }] },
 ];
 
 /* ── Design Packs ─────────────────────────────────── */
@@ -197,6 +237,14 @@ export interface DesignPack {
   preview: { bg: string; accent: string; accent2: string };
   config: { theme: string; design: Partial<DesignConfig> };
   refIdx: number;
+  /** Social icon style — "brand" uses brand colors (IG pink, YT red), "mono" uses nameColor */
+  socialIconStyle?: "brand" | "mono";
+  /** Enable frosted glass (glassmorphism) on product cards — for gradient/colorful templates */
+  glassCards?: boolean;
+  /** Add blue tech glow behind CTAs — for "luxury tech" feel */
+  ctaGlow?: "accent" | "blue" | "none";
+  /** Header layout style for showcase v6.0 — determines profile hero architecture */
+  headerLayoutType?: "big-circle" | "edge-to-edge" | "floating-square" | "split-editorial";
   /** Sample content for showcase packs — populated when user has no products */
   sampleProducts?: SampleProduct[];
   sampleLinks?: SampleLink[];
@@ -249,48 +297,203 @@ export const DESIGN_PACKS: DesignPack[] = [
     preview: { bg: "#021a0f", accent: "#10b981", accent2: "#6ee7b7" },
     config: { theme: "emerald", design: { bgType: "solid", bgColor: "#021a0f", bgEffect: "", buttonShape: "rounded", buttonFill: "outline", buttonShadow: "none", buttonRadius: 12, fontHeading: "Manrope", fontBody: "Rubik", profileShape: "circle", profileBorder: false, profileGlow: true, profileGlowColor: "#10b981", profileSize: 88, accentColor: "#10b981", accentColor2: "#6ee7b7", textColor: "#ecfdf5", subtextColor: "rgba(255,255,255,0.55)", nameColor: "#ffffff", productTitleColor: "#ecfdf5", priceColor: "#10b981", originalPriceColor: "rgba(255,255,255,0.30)", descriptionColor: "rgba(255,255,255,0.50)", cardBg: "rgba(16,185,129,0.05)", cardBorder: "rgba(16,185,129,0.12)" } } },
 
-  /* ── Vitrines Prontas (Showcase) ── */
+  /* ── Vitrines Prontas (Showcase Premium) — 8 templates, ordem: Lucas, Mateus, Léo, Beatriz (centro), Isabela, Vitor, Julia, Serenity ── */
 
-  { id: "showcase-wellness", label: "Wellness", desc: "Yoga, meditacao e bem-estar", category: "showcase", refIdx: 5,
-    sampleProducts: [{ title: "Plano Wellness 30 dias", price: "R$ 90/mes", emoji: "🧘" }, { title: "Meditacao guiada", price: "R$ 29", emoji: "🕯️" }],
-    sampleLinks: [{ title: "Agende uma aula", type: "spotlight" }, { title: "Comunidade VIP", type: "link" }],
-    preview: { bg: "#faf5f0", accent: "#d97706", accent2: "#b45309" },
-    config: { theme: "cream", design: { bgType: "image", bgImageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=800&fit=crop&crop=center", bgOverlay: 50, bgColor: "#faf5f0", buttonShape: "pill", buttonFill: "glass", buttonShadow: "sm", buttonRadius: 12, fontHeading: "Outfit", fontBody: "Nunito", profileShape: "circle", profileBorder: true, profileBorderColor: "#d97706", profileGlow: true, profileGlowColor: "#d97706", profileSize: 96, accentColor: "#d97706", accentColor2: "#b45309", textColor: "#ffffff", subtextColor: "rgba(255,255,255,0.80)", nameColor: "#ffffff", productTitleColor: "#ffffff", priceColor: "#fbbf24", originalPriceColor: "rgba(255,255,255,0.40)", descriptionColor: "rgba(255,255,255,0.70)", cardBg: "rgba(0,0,0,0.40)", cardBorder: "rgba(255,255,255,0.12)", textShadow: 1, heroLayout: "hero-banner", productDisplayStyle: "expanded" } } },
-  { id: "showcase-coach", label: "Coach", desc: "Social media e marketing", category: "showcase", refIdx: 6,
-    sampleProducts: [{ title: "Coaching 1:1", price: "R$ 197", emoji: "🚀" }, { title: "Guia de Monetizacao", price: "Gratis", emoji: "📖" }],
-    sampleLinks: [{ title: "Agendar coaching", type: "spotlight" }, { title: "Newsletter gratis", type: "link" }],
-    preview: { bg: "#0a0618", accent: "#a855f7", accent2: "#ec4899" },
-    config: { theme: "dark-purple", design: { bgType: "effect", bgEffect: "ambient-glow", bgColor: "#0a0618", coverImageUrl: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&h=300&fit=crop&crop=center&q=80", buttonShape: "soft", buttonFill: "glass", buttonShadow: "glow", buttonRadius: 14, fontHeading: "Space Grotesk", fontBody: "DM Sans", profileShape: "circle", profileBorder: true, profileBorderColor: "#a855f7", profileGlow: true, profileGlowColor: "#a855f7", profileSize: 96, accentColor: "#a855f7", accentColor2: "#ec4899", textColor: "#ffffff", subtextColor: "rgba(255,255,255,0.65)", nameColor: "#ffffff", productTitleColor: "#ffffff", priceColor: "#c084fc", originalPriceColor: "rgba(255,255,255,0.35)", descriptionColor: "rgba(255,255,255,0.60)", cardBg: "rgba(168,85,247,0.08)", cardBorder: "rgba(168,85,247,0.20)", textShadow: 1, heroLayout: "side-by-side", productDisplayStyle: "callout" } } },
-  { id: "showcase-fashion", label: "Fashion", desc: "Moda e consultoria de estilo", category: "showcase", refIdx: 7,
-    sampleProducts: [{ title: "Consultoria de Imagem", price: "R$ 147", emoji: "👗" }, { title: "Closet Digital", price: "R$ 39", emoji: "✨" }],
-    sampleLinks: [{ title: "Meu closet", type: "spotlight" }, { title: "Parcerias", type: "link" }],
-    preview: { bg: "#1a0a14", accent: "#be185d", accent2: "#e11d48" },
-    config: { theme: "wine", design: { bgType: "image", bgImageUrl: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=800&fit=crop&crop=center", bgOverlay: 55, bgColor: "#1a0a14", buttonShape: "pill", buttonFill: "glass", buttonShadow: "md", buttonRadius: 12, fontHeading: "Playfair Display", fontBody: "Lora", profileShape: "circle", profileBorder: true, profileBorderColor: "#be185d", profileGlow: true, profileGlowColor: "#be185d", profileSize: 96, accentColor: "#be185d", accentColor2: "#e11d48", textColor: "#ffffff", subtextColor: "rgba(255,255,255,0.75)", nameColor: "#ffffff", productTitleColor: "#ffffff", priceColor: "#f472b6", descriptionColor: "rgba(255,255,255,0.65)", originalPriceColor: "rgba(255,255,255,0.45)", cardBg: "rgba(0,0,0,0.45)", cardBorder: "rgba(190,24,93,0.20)", textShadow: 1, heroLayout: "full-cover", productDisplayStyle: "expanded" } } },
-  { id: "showcase-fitness", label: "Fitness", desc: "Treino e transformacao", category: "showcase", refIdx: 8,
-    sampleProducts: [{ title: "Plano 12 semanas", price: "R$ 97", emoji: "💪" }, { title: "Dieta + Treino", price: "R$ 147", emoji: "🥗" }],
-    sampleLinks: [{ title: "Treino gratis", type: "spotlight" }, { title: "WhatsApp", type: "link", icon: "whatsapp" }],
-    preview: { bg: "#080808", accent: "#ef4444", accent2: "#f97316" },
-    config: { theme: "crimson", design: { bgType: "image", bgImageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=800&fit=crop&crop=center", bgOverlay: 65, bgColor: "#080808", buttonShape: "square", buttonFill: "solid", buttonShadow: "glow", buttonRadius: 6, fontHeading: "Bebas Neue", fontBody: "Poppins", profileShape: "circle", profileBorder: true, profileBorderColor: "#ef4444", profileGlow: true, profileGlowColor: "#ef4444", profileSize: 96, accentColor: "#ef4444", accentColor2: "#f97316", textColor: "#ffffff", subtextColor: "rgba(255,255,255,0.75)", nameColor: "#ffffff", productTitleColor: "#ffffff", priceColor: "#f87171", originalPriceColor: "rgba(255,255,255,0.40)", descriptionColor: "rgba(255,255,255,0.65)", cardBg: "rgba(0,0,0,0.50)", cardBorder: "rgba(239,68,68,0.20)", textShadow: 1, heroLayout: "hero-banner", productDisplayStyle: "compact" } } },
-  { id: "showcase-photo", label: "Fotografa", desc: "Fotografia e presets", category: "showcase", refIdx: 9,
-    sampleProducts: [{ title: "Pack 50 Presets", price: "R$ 49", emoji: "📸" }, { title: "Curso de Fotografia", price: "R$ 197", emoji: "🎞️" }],
-    sampleLinks: [{ title: "Booking", type: "spotlight" }, { title: "Portfolio", type: "link" }],
-    preview: { bg: "#f8f9fa", accent: "#6366f1", accent2: "#8b5cf6" },
-    config: { theme: "white", design: { bgType: "solid", bgColor: "#f8f9fa", bgEffect: "", coverImageUrl: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&h=300&fit=crop&crop=center&q=80", buttonShape: "pill", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 12, fontHeading: "Cormorant Garamond", fontBody: "Montserrat", profileShape: "circle", profileBorder: true, profileBorderColor: "#6366f1", profileGlow: true, profileGlowColor: "#6366f1", profileSize: 92, accentColor: "#6366f1", accentColor2: "#8b5cf6", textColor: "#111827", subtextColor: "#4b5563", nameColor: "#111827", productTitleColor: "#111827", priceColor: "#6366f1", originalPriceColor: "rgba(0,0,0,0.35)", descriptionColor: "#6b7280", cardBg: "#ffffff", cardBorder: "rgba(0,0,0,0.08)", heroLayout: "classic", productDisplayStyle: "callout" } } },
-  { id: "showcase-dev", label: "Developer", desc: "Tech, SaaS e mentorias", category: "showcase", refIdx: 10,
-    sampleProducts: [{ title: "Template SaaS", price: "R$ 79", emoji: "💻" }, { title: "Mentoria Dev", price: "R$ 297", emoji: "🧑‍💻" }],
-    sampleLinks: [{ title: "Newsletter", type: "spotlight" }, { title: "GitHub", type: "link", icon: "github" }],
-    preview: { bg: "#05080f", accent: "#60a5fa", accent2: "#818cf8" },
-    config: { theme: "midnight", design: { bgType: "effect", bgEffect: "matrix-grid", bgColor: "#05080f", coverImageUrl: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=600&h=300&fit=crop&crop=center&q=80", buttonShape: "square", buttonFill: "glass", buttonShadow: "glow", buttonRadius: 6, fontHeading: "JetBrains Mono", fontBody: "Space Grotesk", profileShape: "circle", profileBorder: false, profileGlow: true, profileGlowColor: "#60a5fa", profileSize: 92, accentColor: "#60a5fa", accentColor2: "#818cf8", textColor: "#e2e8f0", subtextColor: "rgba(255,255,255,0.55)", nameColor: "#ffffff", productTitleColor: "#e2e8f0", priceColor: "#60a5fa", originalPriceColor: "rgba(255,255,255,0.30)", descriptionColor: "rgba(255,255,255,0.50)", cardBg: "rgba(96,165,250,0.06)", cardBorder: "rgba(96,165,250,0.15)", textShadow: 1, heroLayout: "minimal-top", productDisplayStyle: "compact" } } },
-  { id: "showcase-nutri", label: "Nutricao", desc: "Dietas e vida saudavel", category: "showcase", refIdx: 11,
-    sampleProducts: [{ title: "Plano Alimentar", price: "R$ 67", emoji: "🥑" }, { title: "Ebook Receitas Fit", price: "R$ 29", emoji: "📗" }],
-    sampleLinks: [{ title: "Agendar consulta", type: "spotlight" }, { title: "WhatsApp", type: "link", icon: "whatsapp" }],
-    preview: { bg: "#f0fdf4", accent: "#16a34a", accent2: "#4ade80" },
-    config: { theme: "emerald", design: { bgType: "image", bgImageUrl: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=800&fit=crop&crop=center", bgOverlay: 50, bgColor: "#f0fdf4", buttonShape: "soft", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 14, fontHeading: "DM Sans", fontBody: "Inter", profileShape: "circle", profileBorder: true, profileBorderColor: "#16a34a", profileGlow: true, profileGlowColor: "#16a34a", profileSize: 92, accentColor: "#16a34a", accentColor2: "#4ade80", textColor: "#ffffff", subtextColor: "rgba(255,255,255,0.75)", nameColor: "#ffffff", productTitleColor: "#ffffff", priceColor: "#4ade80", originalPriceColor: "rgba(255,255,255,0.40)", descriptionColor: "rgba(255,255,255,0.65)", cardBg: "rgba(0,0,0,0.40)", cardBorder: "rgba(22,163,74,0.20)", textShadow: 1, heroLayout: "full-cover", productDisplayStyle: "expanded" } } },
-  { id: "showcase-music", label: "Produtor", desc: "Musica e beats", category: "showcase", refIdx: 12,
-    sampleProducts: [{ title: "Beat Pack Premium", price: "R$ 49", emoji: "🎵" }, { title: "Aula de Producao", price: "R$ 97", emoji: "🎧" }],
-    sampleLinks: [{ title: "Spotify", type: "spotlight", icon: "globe" }, { title: "SoundCloud", type: "link", icon: "globe" }],
-    preview: { bg: "#0a0010", accent: "#ff2d95", accent2: "#ff6ec7" },
-    config: { theme: "neon-pink", design: { bgType: "effect", bgEffect: "aurora", bgColor: "#0a0010", coverImageUrl: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=600&h=300&fit=crop&crop=center&q=80", buttonShape: "pill", buttonFill: "glass", buttonShadow: "glow", buttonRadius: 12, fontHeading: "Sora", fontBody: "Inter", profileShape: "circle", profileBorder: true, profileBorderColor: "#ff2d95", profileGlow: true, profileGlowColor: "#ff2d95", profileSize: 96, accentColor: "#ff2d95", accentColor2: "#ff6ec7", textColor: "#ffffff", subtextColor: "rgba(255,255,255,0.60)", nameColor: "#ffffff", productTitleColor: "#ffffff", priceColor: "#ff6ec7", originalPriceColor: "rgba(255,255,255,0.35)", descriptionColor: "rgba(255,255,255,0.55)", cardBg: "rgba(255,45,149,0.08)", cardBorder: "rgba(255,45,149,0.20)", textShadow: 1, heroLayout: "minimal-top", productDisplayStyle: "compact" } } },
+  /* 0 — Fotografia Edge-to-Edge (Lucas) */
+  { id: "showcase-fotografia", label: "Fotografia", desc: "Crisp portfolio clean", category: "showcase", refIdx: 11,
+    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "edge-to-edge",
+    sampleProducts: [
+      { title: "Ensaio Corporativo", price: "R$ 497", emoji: "📸" },
+      { title: "Guia de Luz Natural", price: "R$ 97", emoji: "📖" },
+    ],
+    sampleLinks: [{ title: "Ensaio Corporativo", type: "spotlight" }, { title: "Guia de Luz Natural", type: "link" }],
+    preview: { bg: "#ffffff", accent: "#1a1a1a", accent2: "#737373" },
+    config: { theme: "white", design: {
+      bgType: "solid", bgColor: "#ffffff",
+      buttonShape: "rounded", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 12,
+      fontHeading: "Plus Jakarta Sans", fontBody: "Plus Jakarta Sans",
+      profileShape: "circle", profileBorder: false, profileSize: 84,
+      accentColor: "#1a1a1a", accentColor2: "#737373",
+      textColor: "#0a0a0a", subtextColor: "#737373",
+      nameColor: "#0a0a0a", productTitleColor: "#0a0a0a",
+      priceColor: "#0a0a0a", originalPriceColor: "rgba(0,0,0,0.35)",
+      descriptionColor: "#737373",
+      cardBg: "#fafafa", cardBorder: "rgba(0,0,0,0.06)",
+      heroLayout: "full-cover", productDisplayStyle: "expanded",
+    }}
+  },
+
+  /* 1 — Finanças Royal Blue (Mateus) */
+  { id: "showcase-financas", label: "Finanças", desc: "Wealth management tech", category: "showcase", refIdx: 5,
+    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "big-circle",
+    sampleProducts: [
+      { title: "Consultoria VIP", price: "R$ 497", emoji: "📊" },
+      { title: "Guia de Investimentos", price: "R$ 60", emoji: "📗" },
+    ],
+    sampleLinks: [{ title: "Consultoria VIP", type: "spotlight" }, { title: "Baixar guia grátis", type: "link" }],
+    preview: { bg: "#ffffff", accent: "#1E5BFF", accent2: "#4A8DFF" },
+    config: { theme: "white", design: {
+      bgType: "solid", bgColor: "#ffffff",
+      buttonShape: "rounded", buttonFill: "solid", buttonShadow: "md", buttonRadius: 12,
+      fontHeading: "Plus Jakarta Sans", fontBody: "Plus Jakarta Sans",
+      profileShape: "circle", profileBorder: true, profileBorderColor: "#1E5BFF", profileGlow: true, profileGlowColor: "#1E5BFF",
+      profileSize: 96,
+      accentColor: "#1E5BFF", accentColor2: "#4A8DFF",
+      textColor: "#0f172a", subtextColor: "#64748b",
+      nameColor: "#0f172a", productTitleColor: "#0f172a",
+      priceColor: "#0f172a", originalPriceColor: "rgba(15,23,42,0.35)",
+      descriptionColor: "#64748b",
+      cardBg: "#fafbfc", cardBorder: "rgba(30,91,255,0.12)",
+      heroLayout: "classic", productDisplayStyle: "expanded",
+    }}
+  },
+
+  /* 2 — DJ Full-Bleed Header (Léo) */
+  { id: "showcase-dj", label: "DJ", desc: "Full-bleed glass cyber", category: "showcase", refIdx: 6,
+    socialIconStyle: "brand", glassCards: true, ctaGlow: "accent", headerLayoutType: "edge-to-edge",
+    sampleProducts: [
+      { title: "Kit de Beats Premium", price: "R$ 297", emoji: "🎵" },
+      { title: "Mentoria para DJs", price: "R$ 497", emoji: "🎧" },
+    ],
+    sampleLinks: [{ title: "Meu kit de beats", type: "spotlight" }, { title: "Agendar sessão", type: "link" }],
+    preview: { bg: "#ec4899", accent: "#ffffff", accent2: "#fbbf24" },
+    config: { theme: "neon-pink", design: {
+      bgType: "gradient", bgGradient: ["#ec4899", "#8b5cf6"], bgGradientDir: "to-br",
+      buttonShape: "pill", buttonFill: "glass", buttonShadow: "md", buttonRadius: 999,
+      fontHeading: "Plus Jakarta Sans", fontBody: "Plus Jakarta Sans",
+      profileShape: "circle", profileBorder: true, profileBorderColor: "#ffffff",
+      profileGlow: true, profileGlowColor: "#ffffff", profileSize: 80,
+      accentColor: "#ffffff", accentColor2: "#fbbf24",
+      textColor: "#ffffff", subtextColor: "rgba(255,255,255,0.88)",
+      nameColor: "#ffffff", productTitleColor: "#ffffff",
+      priceColor: "#ffffff", originalPriceColor: "rgba(255,255,255,0.55)",
+      descriptionColor: "rgba(255,255,255,0.85)",
+      cardBg: "rgba(255,255,255,0.14)", cardBorder: "rgba(255,255,255,0.22)",
+      textShadow: 1,
+      heroLayout: "full-cover", productDisplayStyle: "expanded",
+    }}
+  },
+
+  /* 3 — Beleza Glass Luxury (Beatriz — CENTRAL) */
+  { id: "showcase-beleza", label: "Beleza", desc: "Rosa pastel luxury", category: "showcase", refIdx: 7,
+    socialIconStyle: "brand", glassCards: true, ctaGlow: "accent", headerLayoutType: "floating-square",
+    sampleProducts: [
+      { title: "Rotina de Skincare", price: "R$ 80", emoji: "🌸" },
+      { title: "Guia do Brilho Natural", price: "R$ 80/mês", emoji: "✨" },
+    ],
+    sampleLinks: [{ title: "Rotina de Skincare", type: "spotlight" }, { title: "Guia do Brilho", type: "link" }],
+    preview: { bg: "#fce7f3", accent: "#be185d", accent2: "#d4a373" },
+    config: { theme: "rose", design: {
+      bgType: "solid", bgColor: "#fce7f3",
+      buttonShape: "soft", buttonFill: "solid", buttonShadow: "md", buttonRadius: 14,
+      fontHeading: "Plus Jakarta Sans", fontBody: "Plus Jakarta Sans",
+      profileShape: "circle", profileBorder: false, profileSize: 80,
+      accentColor: "#be185d", accentColor2: "#d4a373",
+      textColor: "#1a1a1a", subtextColor: "#78716c",
+      nameColor: "#1a1a1a", productTitleColor: "#1a1a1a",
+      priceColor: "#1a1a1a", originalPriceColor: "rgba(0,0,0,0.40)",
+      descriptionColor: "#78716c",
+      cardBg: "rgba(255,255,255,0.65)", cardBorder: "rgba(190,24,93,0.12)",
+      heroLayout: "full-cover", productDisplayStyle: "expanded",
+    }}
+  },
+
+  /* 4 — Branding Luxury Cream (Isabela) */
+  { id: "showcase-branding", label: "Branding", desc: "Creme minimal premium", category: "showcase", refIdx: 8,
+    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "split-editorial",
+    sampleProducts: [
+      { title: "O Mapa da Marca", price: "R$ 10", emoji: "🗺️" },
+      { title: "Sessão de Estratégia", price: "R$ 497", emoji: "💼" },
+    ],
+    sampleLinks: [{ title: "O Mapa da Marca", type: "spotlight" }, { title: "Sessão de Estratégia", type: "link" }],
+    preview: { bg: "#faf5ef", accent: "#1a1a1a", accent2: "#78350f" },
+    config: { theme: "cream", design: {
+      bgType: "solid", bgColor: "#faf5ef",
+      buttonShape: "rounded", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 10,
+      fontHeading: "Cormorant Garamond", fontBody: "Plus Jakarta Sans",
+      profileShape: "circle", profileBorder: false, profileSize: 84,
+      accentColor: "#1a1a1a", accentColor2: "#78350f",
+      textColor: "#1a1a1a", subtextColor: "#78716c",
+      nameColor: "#1a1a1a", productTitleColor: "#1a1a1a",
+      priceColor: "#1a1a1a", originalPriceColor: "rgba(0,0,0,0.40)",
+      descriptionColor: "#78716c",
+      cardBg: "#ffffff", cardBorder: "rgba(0,0,0,0.06)",
+      heroLayout: "side-by-side", productDisplayStyle: "compact",
+    }}
+  },
+
+  /* 5 — Growth Tech Maverick Dark (Vitor) */
+  { id: "showcase-growth", label: "Growth", desc: "Dark tech maverick", category: "showcase", refIdx: 9,
+    socialIconStyle: "mono", ctaGlow: "blue", headerLayoutType: "big-circle",
+    sampleProducts: [
+      { title: "Mentoria Growth 1:1", price: "R$ 997", emoji: "🚀" },
+      { title: "Guia de Monetização", price: "Grátis", emoji: "📘" },
+    ],
+    sampleLinks: [{ title: "Mentoria 1:1", type: "spotlight" }, { title: "Guia grátis", type: "link" }],
+    preview: { bg: "#050607", accent: "#ffffff", accent2: "#1E5BFF" },
+    config: { theme: "pure-black", design: {
+      bgType: "solid", bgColor: "#050607",
+      buttonShape: "rounded", buttonFill: "solid", buttonShadow: "glow", buttonRadius: 12,
+      fontHeading: "Plus Jakarta Sans", fontBody: "Plus Jakarta Sans",
+      profileShape: "circle", profileBorder: false, profileSize: 80,
+      accentColor: "#ffffff", accentColor2: "#1E5BFF",
+      textColor: "#ffffff", subtextColor: "#C9CED6",
+      nameColor: "#ffffff", productTitleColor: "#ffffff",
+      priceColor: "#ffffff", originalPriceColor: "rgba(201,206,214,0.45)",
+      descriptionColor: "#C9CED6",
+      cardBg: "rgba(255,255,255,0.05)", cardBorder: "rgba(30,91,255,0.18)",
+      heroLayout: "full-cover", productDisplayStyle: "expanded",
+    }}
+  },
+
+  /* 6 — Moda Luxury Editorial (Julia) */
+  { id: "showcase-moda", label: "Moda", desc: "Luxury editorial autoral", category: "showcase", refIdx: 10,
+    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "split-editorial",
+    sampleProducts: [
+      { title: "Análise de Coloração Pessoal", price: "R$ 297", emoji: "🎨" },
+      { title: "Mentoria de Imagem Online", price: "R$ 497", emoji: "👗" },
+    ],
+    sampleLinks: [{ title: "Análise de Coloração", type: "spotlight" }, { title: "Mentoria Online", type: "link" }],
+    preview: { bg: "#fdf6ec", accent: "#1a1a1a", accent2: "#d4a574" },
+    config: { theme: "cream", design: {
+      bgType: "gradient", bgGradient: ["#fdf6ec", "#f5e9d4"], bgGradientDir: "to-br",
+      bgColor: "#fdf6ec",
+      buttonShape: "pill", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 999,
+      fontHeading: "Cormorant Garamond", fontBody: "Plus Jakarta Sans",
+      profileShape: "circle", profileBorder: false, profileSize: 84,
+      accentColor: "#1a1a1a", accentColor2: "#d4a574",
+      textColor: "#1a1a1a", subtextColor: "#78716c",
+      nameColor: "#1a1a1a", productTitleColor: "#1a1a1a",
+      priceColor: "#1a1a1a", originalPriceColor: "rgba(0,0,0,0.40)",
+      descriptionColor: "#78716c",
+      cardBg: "#ffffff", cardBorder: "rgba(212,165,116,0.20)",
+      heroLayout: "hero-banner", productDisplayStyle: "expanded",
+    }}
+  },
+
+  /* 7 — Wellness Clínica Serenity */
+  { id: "showcase-clinica", label: "Wellness", desc: "Integrative luxury clinic", category: "showcase", refIdx: 12,
+    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "floating-square",
+    sampleProducts: [
+      { title: "Consulta Integrativa", price: "R$ 380", emoji: "🌿" },
+      { title: "Tratamento Estético Premium", price: "R$ 890", emoji: "💆" },
+    ],
+    sampleLinks: [{ title: "Consulta Integrativa", type: "spotlight" }, { title: "Tratamento Premium", type: "link" }],
+    preview: { bg: "#e8f0e4", accent: "#15803d", accent2: "#a7a381" },
+    config: { theme: "forest", design: {
+      bgType: "solid", bgColor: "#e8f0e4",
+      buttonShape: "soft", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 10,
+      fontHeading: "Cormorant Garamond", fontBody: "Plus Jakarta Sans",
+      profileShape: "circle", profileBorder: false, profileSize: 84,
+      accentColor: "#15803d", accentColor2: "#a7a381",
+      textColor: "#1a2e1a", subtextColor: "#52594a",
+      nameColor: "#1a2e1a", productTitleColor: "#1a2e1a",
+      priceColor: "#15803d", originalPriceColor: "rgba(26,46,26,0.40)",
+      descriptionColor: "#52594a",
+      cardBg: "#ffffff", cardBorder: "rgba(21,128,61,0.15)",
+      heroLayout: "side-by-side", productDisplayStyle: "expanded",
+    }}
+  },
 ];
 
 export const PACK_CATEGORIES = [
