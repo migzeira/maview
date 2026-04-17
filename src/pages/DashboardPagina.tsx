@@ -1424,25 +1424,34 @@ const DashboardPagina = () => {
           <div className={`p-5 relative z-10 ${d.coverImageUrl ? "-mt-6" : ""}`}>
             {/* Profile — rendered based on headerLayoutType if set */}
             {templateAvatarConfig?.fullWidth ? (
-              /* EDGE-TO-EDGE: Full-bleed photo covering top of phone frame + name/bio/socials overlay */
-              <div className="relative overflow-hidden mb-3" style={{
-                width: "calc(100% + 40px)",
-                marginLeft: -20,
-                marginTop: -110,
-                height: 310,
+              /* EDGE-TO-EDGE: Absolute-positioned photo covering phone top (status bar + island) */
+              <>
+              {/* Phantom spacer: reserves flow space ~160px so content below starts in right place */}
+              <div style={{ height: 200, marginTop: -20, marginBottom: 12 }} />
+              {/* Actual photo — absolute, positioned from flex-1 top, pulled up to cover chrome */}
+              <div className="absolute overflow-hidden z-[1]" style={{
+                top: -70,
+                left: -20,
+                right: -20,
+                height: 290,
                 borderRadius: "0 0 22px 22px",
               }}>
                 {config.avatarUrl ? (
-                  <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover" style={{ objectPosition: "center 20%" }} />
+                  <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover" style={{ objectPosition: "center 25%" }} />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center" style={{ background: pAccent }}>
-                    <span className="text-white text-4xl font-bold">{config.displayName ? config.displayName[0].toUpperCase() : "?"}</span>
+                  /* Fallback: use template bg gradient if available, not pAccent (which could be white) */
+                  <div className="w-full h-full flex items-center justify-center" style={{
+                    background: d.bgType === "gradient" && d.bgGradient
+                      ? `linear-gradient(135deg, ${d.bgGradient[0]}, ${d.bgGradient[1]})`
+                      : pAccent,
+                  }}>
+                    <span className="text-white text-4xl font-bold opacity-80">{config.displayName ? config.displayName[0].toUpperCase() : "?"}</span>
                   </div>
                 )}
-                {/* Top gradient for status bar readability */}
-                <div className="absolute top-0 inset-x-0 h-[70px]" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, transparent 100%)" }} />
+                {/* Top dark gradient for status bar text readability */}
+                <div className="absolute top-0 inset-x-0 h-[70px]" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.40) 0%, transparent 100%)" }} />
                 {/* Bottom gradient for name/bio readability */}
-                <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${pBg} 0%, ${pBg}F0 10%, ${pBg}80 25%, ${pBg}30 45%, transparent 70%)` }} />
+                <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${pBg} 0%, ${pBg}F0 12%, ${pBg}80 28%, ${pBg}30 48%, transparent 72%)` }} />
                 {/* Content overlay — name + username + bio */}
                 <div className="absolute bottom-3 left-5 right-5">
                   <p className="font-extrabold text-[20px] leading-tight" style={{
@@ -1477,6 +1486,7 @@ const DashboardPagina = () => {
                   )}
                 </div>
               </div>
+              </>
             ) : templateAvatarConfig?.splitLayout ? (
               /* SPLIT-EDITORIAL: 45/55 photo + info */
               <div className="flex gap-3 mb-2" style={{ height: 135 }}>
