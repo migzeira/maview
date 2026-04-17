@@ -1242,7 +1242,19 @@ const DashboardPagina = () => {
     : { background: pCard, border: `1px solid ${pBorder}`, borderRadius: pBtnRadius, boxShadow: pBtnShadow };
   const pProfileRadius = d.profileShape === "circle" ? "9999px" : d.profileShape === "rounded" ? "20%" : d.profileShape === "square" ? "6px" : "0";
   const pProfileClip = d.profileShape === "hexagon" ? "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" : undefined;
-  const pSize = Math.round((d.profileSize || 88) * 0.7); // scale down for mini preview
+  /* Template headerLayoutType overrides profile shape/size for accurate preview */
+  const headerType = (d as any).headerLayoutType as string | undefined;
+  const templateAvatarConfig = (() => {
+    switch (headerType) {
+      case "big-circle": return { width: 96, height: 96, borderRadius: "9999px", clipPath: undefined, useConicBorder: true, fullWidth: false };
+      case "floating-square": return { width: 104, height: 104, borderRadius: "20px", clipPath: undefined, useConicBorder: false, useFloatingShadow: true, fullWidth: false };
+      case "edge-to-edge": return { width: 0, height: 180, borderRadius: "0", clipPath: undefined, fullWidth: true };
+      case "split-editorial": return { width: 100, height: 135, borderRadius: "12px", clipPath: undefined, fullWidth: false, splitLayout: true };
+      case "organic-overlap": return { width: 90, height: 90, borderRadius: "9999px", clipPath: undefined, fullWidth: false, overlap: true };
+      default: return null;
+    }
+  })();
+  const pSize = templateAvatarConfig ? templateAvatarConfig.width : Math.round((d.profileSize || 88) * 0.7);
 
   /* Background CSS for preview */
   const previewBgStyle: React.CSSProperties = (() => {
@@ -1410,10 +1422,104 @@ const DashboardPagina = () => {
             </div>
           )}
           <div className={`p-5 relative z-10 ${d.coverImageUrl ? "-mt-6" : ""}`}>
-            {/* Profile */}
-            <div className="flex flex-col items-center mb-5">
-              <div className="mb-2.5 overflow-hidden"
-                style={{
+            {/* Profile — rendered based on headerLayoutType if set */}
+            {templateAvatarConfig?.fullWidth ? (
+              /* EDGE-TO-EDGE: Full-bleed photo at top with text overlay */
+              <div className="relative w-full overflow-hidden rounded-2xl -mx-5 -mt-5 mb-1" style={{ height: 180 }}>
+                {config.avatarUrl ? (
+                  <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover" style={{ objectPosition: "center 15%" }} />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center" style={{ background: pAccent }}>
+                    <span className="text-white text-3xl font-bold">{config.displayName ? config.displayName[0].toUpperCase() : "?"}</span>
+                  </div>
+                )}
+                <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${pBg} 0%, ${pBg}E0 15%, ${pBg}50 35%, transparent 70%)` }} />
+                <div className="absolute bottom-3 left-4 right-4">
+                  <p className="font-extrabold text-[18px] leading-tight" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif`, letterSpacing: "-0.02em", textShadow: pBg.startsWith("#f") ? "none" : "0 2px 8px rgba(0,0,0,0.5)" }}>{config.displayName || "Seu Nome"}</p>
+                  {config.username && <p className="text-[11px] font-medium mt-0.5" style={{ color: pAccent, textShadow: pBg.startsWith("#f") ? "none" : "0 1px 3px rgba(0,0,0,0.3)" }}>@{config.username.replace(/^@+/, "")}</p>}
+                </div>
+              </div>
+            ) : templateAvatarConfig?.splitLayout ? (
+              /* SPLIT-EDITORIAL: 45/55 photo + info */
+              <div className="flex gap-3 mb-2" style={{ height: 135 }}>
+                <div className="w-[45%] overflow-hidden rounded-xl">
+                  {config.avatarUrl ? (
+                    <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center" style={{ background: pAccent }}>
+                      <span className="text-white text-3xl font-bold">{config.displayName ? config.displayName[0].toUpperCase() : "?"}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="w-[55%] flex flex-col justify-center">
+                  <p className="font-bold text-[15px] leading-[1.1]" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif`, letterSpacing: "-0.02em" }}>{config.displayName || "Seu Nome"}</p>
+                  {config.username && <p className="text-[11px] font-medium mt-0.5" style={{ color: pAccent }}>@{config.username.replace(/^@+/, "")}</p>}
+                  {config.bio && <p className="text-[10.5px] leading-tight mt-1 line-clamp-3 font-light" style={{ color: pSub }}>{config.bio}</p>}
+                </div>
+              </div>
+            ) : templateAvatarConfig?.overlap ? (
+              /* ORGANIC-OVERLAP: Cover band + overlapping avatar */
+              <>
+                <div className="relative w-full rounded-2xl overflow-hidden -mx-5 -mt-5" style={{ height: 100, background: `linear-gradient(135deg, ${pAccent}30, ${d.accentColor2 || pAccent}20)` }}>
+                  {config.avatarUrl && <img src={config.avatarUrl} alt="" className="w-full h-full object-cover opacity-40" style={{ filter: "blur(15px)", transform: "scale(1.2)" }} aria-hidden="true" />}
+                </div>
+                <div className="flex flex-col items-center" style={{ marginTop: -45 }}>
+                  <div className="overflow-hidden mb-2 z-10" style={{
+                    width: 90, height: 90, borderRadius: "50%",
+                    border: `3px solid ${pBg}`,
+                    boxShadow: `0 8px 20px rgba(0,0,0,0.20)`,
+                  }}>
+                    {config.avatarUrl ? (
+                      <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center" style={{ background: pAccent }}>
+                        <span className="text-white text-xl font-bold">{config.displayName ? config.displayName[0].toUpperCase() : "?"}</span>
+                      </div>
+                    )}
+                  </div>
+                  <p className="font-extrabold text-[17px] leading-tight" style={{ color: d.nameColor || pText, fontFamily: `'${pFontH}', sans-serif`, letterSpacing: "-0.02em" }}>{config.displayName || "Seu Nome"}</p>
+                  {config.username && <p className="text-[11px] font-medium mt-0.5" style={{ color: pAccent }}>@{config.username.replace(/^@+/, "")}</p>}
+                  {config.bio && <p className="text-[11px] text-center mt-1 px-2 line-clamp-2 font-light" style={{ color: pSub }}>{config.bio}</p>}
+                </div>
+              </>
+            ) : (
+            <div className="flex flex-col items-center mb-3">
+              {templateAvatarConfig?.useConicBorder ? (
+                /* BIG-CIRCLE: Conic gradient metallic border */
+                <div className="mb-2.5 relative" style={{
+                  width: templateAvatarConfig.width, height: templateAvatarConfig.height,
+                  padding: 3, borderRadius: "9999px",
+                  background: `conic-gradient(from 180deg, ${pAccent}, ${d.accentColor2 || pAccent}, ${pAccent})`,
+                  boxShadow: `0 6px 20px ${pAccent}40, 0 2px 8px rgba(0,0,0,0.15)`,
+                }}>
+                  <div className="w-full h-full rounded-full overflow-hidden" style={{ background: pBg }}>
+                    {config.avatarUrl ? (
+                      <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center" style={{ background: pAccent }}>
+                        <span className="text-white text-xl font-bold">{config.displayName ? config.displayName[0].toUpperCase() : "?"}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : templateAvatarConfig?.useFloatingShadow ? (
+                /* FLOATING-SQUARE: Rounded square with deep shadow */
+                <div className="mb-2.5 overflow-hidden" style={{
+                  width: templateAvatarConfig.width, height: templateAvatarConfig.height,
+                  borderRadius: templateAvatarConfig.borderRadius,
+                  boxShadow: `0 14px 28px rgba(0,0,0,0.20), 0 6px 12px rgba(0,0,0,0.10), 0 0 0 4px ${pBg.startsWith("#f") ? "#fff" : "rgba(255,255,255,0.08)"}, 0 0 22px ${pAccent}30`,
+                }}>
+                  {config.avatarUrl ? (
+                    <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center" style={{ background: pAccent }}>
+                      <span className="text-white text-xl font-bold">{config.displayName ? config.displayName[0].toUpperCase() : "?"}</span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                /* Default circle (no template active) */
+                <div className="mb-2.5 overflow-hidden" style={{
                   width: pSize, height: pSize,
                   borderRadius: pProfileRadius,
                   clipPath: pProfileClip,
@@ -1422,55 +1528,96 @@ const DashboardPagina = () => {
                     d.profileGlow !== false ? `0 0 12px 4px ${d.profileGlowColor || d.profileBorderColor || pAccent}40` : "",
                   ].filter(Boolean).join(", ") || "none",
                 }}>
-                {config.avatarUrl ? (
-                  <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover"
-                    onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center"
-                    style={{ background: pAccent }}>
-                    <span className="text-white text-xl font-bold">
-                      {config.displayName ? config.displayName[0].toUpperCase() : "?"}
-                    </span>
-                  </div>
-                )}
-              </div>
-              <p className="font-bold text-sm" style={{ color: d.nameColor || pText, fontFamily: `'${pFontH}', sans-serif`, textShadow: pTxtShadow }}>{config.displayName || "Seu Nome"}</p>
-              {config.username && <p className="text-xs mt-0.5" style={{ color: pAccent, textShadow: pTxtShadow }}>@{config.username.replace(/^@+/, "")}</p>}
-              {config.bio && <p className="text-xs text-center mt-1.5 px-2 line-clamp-2" style={{ color: pSub, textShadow: pTxtShadow }}>{config.bio}</p>}
-              {/* Social icons row — shows real social links + WhatsApp */}
+                  {config.avatarUrl ? (
+                    <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover"
+                      onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center" style={{ background: pAccent }}>
+                      <span className="text-white text-xl font-bold">
+                        {config.displayName ? config.displayName[0].toUpperCase() : "?"}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+              <p className="font-extrabold text-[17px]" style={{ color: d.nameColor || pText, fontFamily: `'${pFontH}', sans-serif`, textShadow: pTxtShadow, letterSpacing: "-0.02em" }}>{config.displayName || "Seu Nome"}</p>
+              {config.username && <p className="text-[11px] font-medium mt-0.5" style={{ color: pAccent, textShadow: pTxtShadow }}>@{config.username.replace(/^@+/, "")}</p>}
+              {config.bio && <p className="text-[11px] text-center mt-1.5 px-2 line-clamp-2 font-light" style={{ color: pSub, textShadow: pTxtShadow }}>{config.bio}</p>}
+            </div>
+            )}
+            {/* Social + share row */}
+            <div className="flex flex-col items-center mb-3">
+              {/* Social icons row — template-matching when headerLayoutType active, user socials otherwise */}
               {(() => {
-                const BRAND_CLR: Record<string, string> = { instagram: "#E4405F", youtube: "#FF0000", twitter: "#000000", tiktok: "#000000", facebook: "#1877F2", linkedin: "#0A66C2", globe: "", link: "" };
+                const BRAND_CLR: Record<string, string> = { instagram: "#E4405F", youtube: "#FF0000", twitter: "#000000", tiktok: "#000000", facebook: "#1877F2", linkedin: "#0A66C2", pinterest: "#E60023", globe: "", link: "" };
                 const iconStyle = d.socialIconStyle || "brand";
                 const customClr = d.socialIconCustomColor || pAccent;
                 const socialLinks = config.links.filter(l => l.isSocial && l.active);
+                const iconSize = headerType ? 14 : 10;
+                const btnSize = headerType ? "w-9 h-9" : "w-7 h-7";
+
+                /* Template placeholder social icons — matches showcase pack's ref profile */
+                const templateSocialMap: Record<string, Array<{ icon: string; label: string }>> = {
+                  "showcase-financas": [{ icon: "youtube", label: "YouTube" }, { icon: "linkedin", label: "LinkedIn" }, { icon: "instagram", label: "Instagram" }],
+                  "showcase-dj": [{ icon: "tiktok", label: "TikTok" }, { icon: "instagram", label: "Instagram" }, { icon: "youtube", label: "YouTube" }, { icon: "linkedin", label: "LinkedIn" }],
+                  "showcase-beleza": [{ icon: "pinterest", label: "Pinterest" }, { icon: "instagram", label: "Instagram" }, { icon: "tiktok", label: "TikTok" }, { icon: "linkedin", label: "LinkedIn" }],
+                  "showcase-branding": [{ icon: "instagram", label: "Instagram" }, { icon: "pinterest", label: "Pinterest" }, { icon: "tiktok", label: "TikTok" }, { icon: "linkedin", label: "LinkedIn" }],
+                  "showcase-growth": [{ icon: "youtube", label: "YouTube" }, { icon: "instagram", label: "Instagram" }, { icon: "tiktok", label: "TikTok" }, { icon: "linkedin", label: "LinkedIn" }],
+                  "showcase-moda": [{ icon: "instagram", label: "Instagram" }, { icon: "pinterest", label: "Pinterest" }, { icon: "tiktok", label: "TikTok" }, { icon: "linkedin", label: "LinkedIn" }],
+                  "showcase-fotografia": [{ icon: "instagram", label: "Instagram" }, { icon: "pinterest", label: "Pinterest" }, { icon: "tiktok", label: "TikTok" }, { icon: "linkedin", label: "LinkedIn" }],
+                  "showcase-clinica": [{ icon: "instagram", label: "Instagram" }, { icon: "pinterest", label: "Pinterest" }, { icon: "youtube", label: "YouTube" }, { icon: "linkedin", label: "LinkedIn" }],
+                };
+
+                /* Infer current pack id from theme+font+headerLayoutType (lookup in DESIGN_PACKS would be cleaner) */
+                let placeholderSocials: Array<{ icon: string; label: string }> | null = null;
+                if (headerType && socialLinks.length === 0) {
+                  /* Try to match — rough heuristic by theme */
+                  const themeKey = config.theme;
+                  if (themeKey === "rose" && headerType === "floating-square") placeholderSocials = templateSocialMap["showcase-beleza"];
+                  else if (themeKey === "cream" && headerType === "split-editorial") placeholderSocials = templateSocialMap["showcase-moda"] || templateSocialMap["showcase-branding"];
+                  else if (themeKey === "cream" && headerType === "side-by-side") placeholderSocials = templateSocialMap["showcase-branding"];
+                  else if (themeKey === "neon-pink" && headerType === "edge-to-edge") placeholderSocials = templateSocialMap["showcase-dj"];
+                  else if (themeKey === "white" && headerType === "big-circle") placeholderSocials = templateSocialMap["showcase-financas"];
+                  else if (themeKey === "white" && headerType === "edge-to-edge") placeholderSocials = templateSocialMap["showcase-fotografia"];
+                  else if (themeKey === "pure-black" && headerType === "big-circle") placeholderSocials = templateSocialMap["showcase-growth"];
+                  else if (themeKey === "forest") placeholderSocials = templateSocialMap["showcase-clinica"];
+                }
+
                 const icons: React.ReactNode[] = [];
-                socialLinks.slice(0, 4).forEach(link => {
-                  const bc = BRAND_CLR[link.icon];
+
+                /* Render placeholder template icons when headerType active AND no user socials */
+                const iconsToRender = placeholderSocials || socialLinks.slice(0, 4).map(l => ({ icon: l.icon, id: l.id, label: l.title }));
+                iconsToRender.forEach((item: any, idx: number) => {
+                  const iconKey = item.icon;
+                  const bc = BRAND_CLR[iconKey];
                   const clr = iconStyle === "custom" ? customClr : iconStyle === "theme" ? pText : (bc || pText);
                   const bg = iconStyle === "custom" ? `${customClr}15` : iconStyle === "theme" ? `${pAccent}15` : (bc ? `${bc}18` : `${pAccent}15`);
                   const bdr = iconStyle === "custom" ? `1px solid ${customClr}25` : iconStyle === "theme" ? `1px solid ${pAccent}18` : (bc ? `1px solid ${bc}25` : `1px solid ${pAccent}18`);
+                  const glassShadow = headerType ? `inset 0 1px 0 rgba(255,255,255,0.2), inset 0 0 8px #4A8DFF15, 0 2px 4px rgba(0,0,0,0.10)` : "none";
                   icons.push(
-                    <div key={link.id} className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: bg, border: bdr }}>
-                      <span style={{ color: clr }}>{LINK_ICON_MAP[link.icon] || <Globe size={10} />}</span>
+                    <div key={item.id || `tpl-${idx}`} className={`${btnSize} rounded-full flex items-center justify-center transition-transform`} style={{ background: bg, border: bdr, boxShadow: glassShadow }}>
+                      <span style={{ color: clr, display: "inline-flex" }}>{LINK_ICON_MAP[iconKey] || <Globe size={iconSize} />}</span>
                     </div>
                   );
                 });
-                if (config.whatsapp) {
+                if (config.whatsapp && !placeholderSocials) {
                   const waClr = iconStyle === "custom" ? customClr : iconStyle === "theme" ? pText : "#25d366";
                   const waBg = iconStyle === "custom" ? `${customClr}15` : iconStyle === "theme" ? `${pAccent}15` : "rgba(37,211,102,0.15)";
                   const waBdr = iconStyle === "custom" ? `1px solid ${customClr}25` : iconStyle === "theme" ? `1px solid ${pAccent}18` : "1px solid rgba(37,211,102,0.25)";
                   icons.push(
-                    <div key="wa" className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: waBg, border: waBdr }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill={waClr}><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                    <div key="wa" className={`${btnSize} rounded-full flex items-center justify-center`} style={{ background: waBg, border: waBdr }}>
+                      <svg width={iconSize + 2} height={iconSize + 2} viewBox="0 0 24 24" fill={waClr}><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
                     </div>
                   );
                 }
-                icons.push(
-                  <div key="share" className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: `${pAccent}15`, border: `1px solid ${pAccent}18` }}>
-                    <Share2 size={10} style={{ color: pText }} />
-                  </div>
-                );
-                return icons.length > 0 ? <div className="flex items-center gap-1.5 mt-2.5">{icons}</div> : null;
+                if (!placeholderSocials) {
+                  icons.push(
+                    <div key="share" className={`${btnSize} rounded-full flex items-center justify-center`} style={{ background: `${pAccent}15`, border: `1px solid ${pAccent}18` }}>
+                      <Share2 size={iconSize} style={{ color: pText }} />
+                    </div>
+                  );
+                }
+                return icons.length > 0 ? <div className={`flex items-center ${headerType ? "gap-2 mt-2" : "gap-1.5 mt-2.5"}`}>{icons}</div> : null;
               })()}
             </div>
 
