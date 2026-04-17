@@ -376,7 +376,7 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
 export default function DesignTab({ config, themes, defaultDesign, updateConfig, onForceSave }: DesignTabProps) {
   const d: DesignConfig = { ...defaultDesign, ...config.design } as DesignConfig;
   const currentTheme = themes.find(t => t.id === config.theme) ?? themes[0];
-  const [packFilter, setPackFilter] = useState("all");
+  const [activeTemplateIdx, setActiveTemplateIdx] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [interacted, setInteracted] = useState<Set<number>>(new Set());
   const [saving, setSaving] = useState(false);
@@ -509,15 +509,44 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     updateConfig("design", latest);
   }, [config.avatarUrl, updateConfig]);
 
-  const scrollCarousel = (dir: "left" | "right") => {
-    carouselRef.current?.scrollBy({ left: dir === "left" ? -420 : 420, behavior: "smooth" });
-  };
+  /* All 8 showcase templates */
+  const showcasePacks = DESIGN_PACKS;
 
-  const filteredPacks = DESIGN_PACKS.filter(p => packFilter === "all" ? p.category !== "animated" : p.category === packFilter);
+  /* Sync activeTemplateIdx with current applied theme */
+  useEffect(() => {
+    const matched = showcasePacks.findIndex(p =>
+      config.theme === p.config.theme
+      && d.fontHeading === (p.config.design.fontHeading || "Inter")
+      && d.bgEffect === (p.config.design.bgEffect || "")
+    );
+    if (matched >= 0 && matched !== activeTemplateIdx) setActiveTemplateIdx(matched);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config.theme]);
 
   const isPackActive = (pack: DesignPack) => config.theme === pack.config.theme
     && d.fontHeading === (pack.config.design.fontHeading || "Inter")
     && d.bgEffect === (pack.config.design.bgEffect || "");
+
+  /* Arc carousel arrangement — based on distance from activeTemplateIdx */
+  const getArcArrangement = (packIdx: number) => {
+    const dist = packIdx - activeTemplateIdx;
+    const presets: Record<number, { rotation: number; offsetY: number; scale: number; zIndex: number; translateX: number }> = {
+      [-3]: { rotation: 18, offsetY: 50, scale: 0.76, zIndex: 1, translateX: -540 },
+      [-2]: { rotation: 12, offsetY: 30, scale: 0.82, zIndex: 2, translateX: -380 },
+      [-1]: { rotation: 6, offsetY: 12, scale: 0.90, zIndex: 4, translateX: -210 },
+      [0]:  { rotation: 0, offsetY: -18, scale: 1.05, zIndex: 10, translateX: 0 },
+      [1]:  { rotation: -6, offsetY: 12, scale: 0.90, zIndex: 4, translateX: 210 },
+      [2]:  { rotation: -12, offsetY: 30, scale: 0.82, zIndex: 2, translateX: 380 },
+      [3]:  { rotation: -18, offsetY: 50, scale: 0.76, zIndex: 1, translateX: 540 },
+    };
+    return presets[dist] || { rotation: 0, offsetY: 0, scale: 0.7, zIndex: 0, translateX: dist > 0 ? 700 : -700 };
+  };
+
+  const goToTemplate = (idx: number) => {
+    const clamped = Math.max(0, Math.min(showcasePacks.length - 1, idx));
+    setActiveTemplateIdx(clamped);
+    applyPack(showcasePacks[clamped]);
+  };
 
   const handleCopyLink = useCallback(() => {
     const username = config.username || config.displayName?.toLowerCase().replace(/\s+/g, "");
@@ -545,7 +574,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         <div className="relative flex items-center justify-between">
           <div>
             <h2 className="text-[hsl(var(--dash-text))] font-bold text-[18px] tracking-tight">Escolha seu estilo</h2>
-            <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] mt-0.5">1 clique = design completo aplicado</p>
+            <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] mt-0.5">Clique em qualquer template para aplicar · 1 clique = design completo</p>
           </div>
           {config.avatarUrl && (
             <button onClick={autoThemeFromAvatar}
@@ -555,55 +584,116 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
           )}
         </div>
 
-        <div className="relative flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-          {PACK_CATEGORIES.map(cat => (
-            <button key={cat.key} onClick={() => setPackFilter(cat.key)}
-              className={`px-3.5 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all duration-200 ${
-                packFilter === cat.key
-                  ? "bg-primary text-white shadow-lg shadow-primary/25 scale-[1.02]"
-                  : "text-[hsl(var(--dash-text-muted))] bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/20 hover:text-[hsl(var(--dash-text))]"
-              }`}>
-              {cat.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="relative">
-          {/* Navigation arrows — premium glass style */}
-          <button onClick={() => scrollCarousel("left")}
-            className="absolute -left-3 top-[42%] -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center text-[hsl(var(--dash-text-muted))] hover:text-primary transition-all duration-200 hover:scale-110 active:scale-95"
-            style={{ background: "hsl(var(--dash-surface) / 0.85)", backdropFilter: "blur(12px)", border: "1px solid hsl(var(--dash-border-subtle))", boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}>
-            <ChevronLeft size={16} />
-          </button>
-          <button onClick={() => scrollCarousel("right")}
-            className="absolute -right-3 top-[42%] -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center text-[hsl(var(--dash-text-muted))] hover:text-primary transition-all duration-200 hover:scale-110 active:scale-95"
-            style={{ background: "hsl(var(--dash-surface) / 0.85)", backdropFilter: "blur(12px)", border: "1px solid hsl(var(--dash-border-subtle))", boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}>
-            <ChevronRight size={16} />
-          </button>
-
-          {/* Template carousel — clean horizontal scroll */}
-          <div ref={carouselRef} className="flex gap-5 overflow-x-auto pb-4 pt-2 px-4 scroll-smooth snap-x snap-mandatory" style={{ scrollbarWidth: "none" }}>
-            {filteredPacks.map(pack => (
-              <div key={pack.id} className="snap-center">
-                <PhoneMockup pack={pack} isActive={isPackActive(pack)} onClick={() => applyPack(pack)} liveDesign={isPackActive(pack) ? d : undefined} />
-              </div>
-            ))}
+        {/* ═══ ARC CAROUSEL — click-to-focus premium showcase ═══ */}
+        <div className="relative flex items-end justify-center" style={{
+          perspective: "2000px",
+          perspectiveOrigin: "50% 50%",
+          minHeight: 620,
+          paddingTop: 40,
+        }}>
+          <div ref={carouselRef} className="relative" style={{ width: 0, height: 560 }}>
+            {showcasePacks.map((pack, i) => {
+              const arr = getArcArrangement(i);
+              const isVisible = Math.abs(i - activeTemplateIdx) <= 3;
+              const isCenter = i === activeTemplateIdx;
+              return (
+                <div
+                  key={pack.id}
+                  className="absolute top-0 left-0"
+                  style={{
+                    transform: `translateX(calc(-50% + ${arr.translateX}px)) translateY(${arr.offsetY}px) scale(${arr.scale}) rotateY(${arr.rotation}deg)`,
+                    transformOrigin: "center bottom",
+                    transformStyle: "preserve-3d",
+                    zIndex: arr.zIndex,
+                    opacity: isVisible ? 1 : 0,
+                    pointerEvents: isVisible ? "auto" : "none",
+                    transition: "transform 700ms cubic-bezier(0.34, 1.4, 0.64, 1), opacity 400ms ease",
+                    filter: isCenter ? "none" : "brightness(0.85)",
+                  }}
+                >
+                  <PhoneMockup
+                    pack={pack}
+                    isActive={isPackActive(pack)}
+                    onClick={() => goToTemplate(i)}
+                    liveDesign={isPackActive(pack) ? d : undefined}
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        {(() => {
-          const active = filteredPacks.find(p => isPackActive(p));
-          return active ? (
-            <div className="flex items-center justify-center gap-2 text-[12px] py-1">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ background: "hsl(var(--dash-surface-2))", border: "1px solid hsl(var(--dash-border-subtle))" }}>
-                <Check size={11} className="text-primary" />
-                <span className="text-[hsl(var(--dash-text-muted))]">Ativo:</span>
-                <span className="font-bold text-primary">{active.label}</span>
-                <span className="text-[hsl(var(--dash-text-subtle))]">&middot; {active.config.design.fontHeading}</span>
-              </div>
+        {/* ═══ Active Template Name + Desc ═══ */}
+        <div className="relative text-center -mt-2">
+          <p className="text-[20px] font-extrabold text-[hsl(var(--dash-text))] leading-tight tracking-tight transition-all duration-500" style={{ letterSpacing: "-0.02em" }}>
+            {showcasePacks[activeTemplateIdx]?.label}
+          </p>
+          <p className="text-[12px] text-[hsl(var(--dash-text-subtle))] font-light mt-0.5 transition-all duration-500">
+            {showcasePacks[activeTemplateIdx]?.desc}
+          </p>
+        </div>
+
+        {/* ═══ NAVIGATION: Dots + Arrows ═══ */}
+        <div className="relative flex items-center justify-center gap-4 pt-2">
+          <button
+            onClick={() => goToTemplate(activeTemplateIdx - 1)}
+            disabled={activeTemplateIdx === 0}
+            className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+            style={{
+              background: "hsl(var(--dash-surface-2))",
+              border: "1px solid hsl(var(--dash-border-subtle))",
+              color: "hsl(var(--dash-text-muted))",
+              backdropFilter: "blur(10px)",
+            }}
+            aria-label="Template anterior"
+          >
+            <ChevronLeft size={18} />
+          </button>
+
+          <div className="flex items-center gap-1.5">
+            {showcasePacks.map((p, i) => (
+              <button
+                key={p.id}
+                onClick={() => goToTemplate(i)}
+                className="transition-all duration-500"
+                style={{
+                  width: activeTemplateIdx === i ? 28 : 8,
+                  height: 8,
+                  borderRadius: 999,
+                  background: activeTemplateIdx === i ? "hsl(var(--primary))" : "hsl(var(--dash-border))",
+                  boxShadow: activeTemplateIdx === i ? "0 0 10px hsl(var(--primary) / 0.5)" : "none",
+                  cursor: "pointer",
+                }}
+                aria-label={`Ver template ${p.label}`}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={() => goToTemplate(activeTemplateIdx + 1)}
+            disabled={activeTemplateIdx === showcasePacks.length - 1}
+            className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+            style={{
+              background: "hsl(var(--dash-surface-2))",
+              border: "1px solid hsl(var(--dash-border-subtle))",
+              color: "hsl(var(--dash-text-muted))",
+              backdropFilter: "blur(10px)",
+            }}
+            aria-label="Próximo template"
+          >
+            <ChevronRight size={18} />
+          </button>
+        </div>
+
+        {/* Active Template indicator */}
+        {isPackActive(showcasePacks[activeTemplateIdx]) && (
+          <div className="flex items-center justify-center gap-2 text-[12px] pt-1">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ background: "hsl(var(--primary) / 0.12)", border: "1px solid hsl(var(--primary) / 0.30)" }}>
+              <Check size={11} className="text-primary" />
+              <span className="font-bold text-primary">Template aplicado</span>
             </div>
-          ) : null;
-        })()}
+          </div>
+        )}
 
         {/* ── Background image customization (available for ALL templates) ── */}
         <div className="space-y-3 p-4 rounded-2xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))]">
