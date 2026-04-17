@@ -2524,6 +2524,79 @@ const DashboardPagina = () => {
                       )}
                     </div>
 
+                    {/* ═══ APARÊNCIA DO PRODUTO (Hero Banner + CTA presets) ═══ */}
+                    <div className="rounded-xl bg-[hsl(var(--dash-accent))]/40 border border-[hsl(var(--dash-border-subtle))] p-3 space-y-3">
+                      <div className="flex items-center gap-1.5">
+                        <Layout size={11} className="text-primary" />
+                        <span className="text-[11px] font-semibold text-[hsl(var(--dash-text))]">Aparência do produto</span>
+                      </div>
+
+                      {/* ── Estilo: Padrão vs Hero Banner ── */}
+                      <div>
+                        <label className="text-[10px] font-medium text-[hsl(var(--dash-text-muted))] mb-1.5 block">Estilo de exibição</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { id: "default", label: "Padrão", desc: "Lista compacta com foto pequena", icon: "▭" },
+                            { id: "hero", label: "Hero Banner", desc: "Foto grande + botão sobre imagem", icon: "■" },
+                          ].map(opt => {
+                            const current = (productForm as any).displayStyle || "default";
+                            const isActive = current === opt.id;
+                            return (
+                              <button
+                                key={opt.id}
+                                onClick={() => setProductForm(f => f ? { ...f, displayStyle: opt.id } as any : f)}
+                                className={`flex flex-col items-center gap-1 p-2.5 rounded-lg transition-all ${
+                                  isActive
+                                    ? "bg-primary/15 border-2 border-primary"
+                                    : "bg-[hsl(var(--dash-surface-2))] border-2 border-transparent hover:border-primary/30"
+                                }`}
+                              >
+                                <span className={`text-[22px] leading-none ${isActive ? "text-primary" : "text-[hsl(var(--dash-text-muted))]"}`}>{opt.icon}</span>
+                                <span className={`text-[10.5px] font-bold ${isActive ? "text-primary" : "text-[hsl(var(--dash-text))]"}`}>{opt.label}</span>
+                                <span className="text-[8.5px] text-[hsl(var(--dash-text-subtle))] text-center leading-tight">{opt.desc}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* ── Texto do botão (CTA) com presets ── */}
+                      <div>
+                        <label className="text-[10px] font-medium text-[hsl(var(--dash-text-muted))] mb-1.5 block">
+                          Texto do botão
+                          <span className="font-normal text-[hsl(var(--dash-text-subtle))]"> — personalize ou escolha um pronto</span>
+                        </label>
+                        {/* Preset chips */}
+                        <div className="flex flex-wrap gap-1.5 mb-2">
+                          {["Quero agora", "Agendar", "Inscrever-se", "Ver portfólio", "Comprar", "Baixar", "Falar com Especialista"].map(preset => {
+                            const isActive = (productForm.ctaText || "") === preset;
+                            return (
+                              <button
+                                key={preset}
+                                onClick={() => setProductForm(f => f ? { ...f, ctaText: preset } : f)}
+                                className={`px-2.5 py-1 rounded-full text-[10px] font-semibold transition-all ${
+                                  isActive
+                                    ? "bg-primary text-white shadow-sm"
+                                    : "bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text-muted))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 hover:text-primary"
+                                }`}
+                              >
+                                {preset}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {/* Custom input */}
+                        <input
+                          type="text"
+                          className={`${inputCls} text-[12px]`}
+                          placeholder="Ou digite um texto customizado..."
+                          maxLength={30}
+                          value={productForm.ctaText || ""}
+                          onChange={e => setProductForm(f => f ? { ...f, ctaText: e.target.value } : f)}
+                        />
+                      </div>
+                    </div>
+
                     {/* ═══ MAIS OPÇÕES ═══ */}
                     <button onClick={() => setShowAdvanced(!showAdvanced)}
                       className="flex items-center gap-1.5 text-[hsl(var(--dash-text-subtle))] text-[11px] font-medium hover:text-primary transition-colors">

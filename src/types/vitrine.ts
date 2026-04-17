@@ -127,6 +127,8 @@ export interface ProductItem {
   rating?: number;        // 1-5 with decimals (e.g. 4.8)
   subtitle?: string;      // Short line visible on card
   stockCount?: number;    // Quantity in stock (e.g. 5)
+  /** Display style: "default" (compact row) or "hero" (big banner with image + CTA overlay) */
+  displayStyle?: "default" | "hero";
 }
 
 export interface LinkItem {
