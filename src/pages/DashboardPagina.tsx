@@ -1664,6 +1664,23 @@ const DashboardPagina = () => {
                 }
                 return icons.length > 0 ? <div className={`flex items-center ${headerType ? "gap-2 mt-2" : "gap-1.5 mt-2.5"}`}>{icons}</div> : null;
               })()}
+
+              {/* ── STATS ROW — respects showStats toggle ── */}
+              {(() => {
+                const statsEnabled = (config as any).showStats !== false;
+                const stats = (config.stats || []).filter((s: any) => s && s.value);
+                if (!statsEnabled || stats.length === 0) return null;
+                return (
+                  <div className={`flex items-center justify-center ${headerType ? "gap-5 mt-3" : "gap-4 mt-3"}`}>
+                    {stats.slice(0, 3).map((s: any, i: number) => (
+                      <div key={i} className="flex flex-col items-center">
+                        <span className={`${headerType ? "text-[16px]" : "text-[14px]"} font-extrabold leading-none`} style={{ color: pText, letterSpacing: "-0.02em", textShadow: pTxtShadow }}>{s.value}</span>
+                        <span className={`${headerType ? "text-[10px]" : "text-[9px]"} font-light leading-none mt-[3px]`} style={{ color: pSub, letterSpacing: "0.02em", textShadow: pTxtShadow }}>{s.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Blocks in order */}
@@ -3411,9 +3428,23 @@ const DashboardPagina = () => {
                           <BarChart3 size={12} className="text-primary" /> Estatísticas
                           <span className="ml-1 text-[9px] font-normal text-[hsl(var(--dash-text-subtle))]">prova social</span>
                         </label>
-                        {/* Toggle on/off */}
+                        {/* Toggle on/off — auto-fills with default stats when enabling empty */}
                         <button
-                          onClick={() => updateConfig("showStats" as any, !statsEnabled)}
+                          onClick={() => {
+                            const nextState = !statsEnabled;
+                            updateConfig("showStats" as any, nextState);
+                            /* When turning ON and stats are empty, auto-populate with premium defaults */
+                            if (nextState) {
+                              const isEmpty = !config.stats || config.stats.length === 0 || config.stats.every((s: any) => !s?.value);
+                              if (isEmpty) {
+                                updateConfig("stats", [
+                                  { value: "+850", label: "Seguidores" },
+                                  { value: "4.9", label: "⭐" },
+                                  { value: "R$450k", label: "Faturados" },
+                                ]);
+                              }
+                            }
+                          }}
                           className={`flex items-center gap-1.5 transition-all ${statsEnabled ? "text-primary" : "text-[hsl(var(--dash-text-subtle))]"}`}
                           aria-label={statsEnabled ? "Desativar estatísticas" : "Ativar estatísticas"}
                         >
