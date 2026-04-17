@@ -546,11 +546,12 @@ const ProfilePage = () => {
                 return `rgba(${r},${g},${b},${a})`;
               };
 
-              // Shared bio block
+              // Shared bio block — gap-zero when template active
+              const isMaximalist = !!rd.headerLayoutType;
               const BioBlock = ({ center = true }: { center?: boolean }) => (
                 profile.bio ? (
-                  <div className={`max-w-[300px] mb-3 ${center ? "text-center" : ""}`}>
-                    <p className={`text-[14px] leading-relaxed ${bioExpanded ? "" : "line-clamp-3"}`} style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif`, textShadow: tShadow }}>{profile.bio}</p>
+                  <div className={`max-w-[320px] ${isMaximalist ? "mb-1" : "mb-3"} ${center ? "text-center" : ""}`}>
+                    <p className={`${isMaximalist ? "text-[15px]" : "text-[14px]"} leading-relaxed ${bioExpanded ? "" : "line-clamp-3"}`} style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif`, textShadow: tShadow, fontWeight: isMaximalist ? 300 : 400 }}>{profile.bio}</p>
                     {profile.bio.length > 120 && !bioExpanded && (
                       <button onClick={() => setBioExpanded(true)} className="text-[12px] font-medium mt-1 transition-colors hover:opacity-80" style={{ color: t.accent }}>ver mais</button>
                     )}
@@ -558,23 +559,26 @@ const ProfilePage = () => {
                 ) : null
               );
 
-              // Shared stats block
+              // Shared stats block — larger scale when template active
               const StatsBlock = () => (
                 profile.stats ? (
-                  <div className="flex items-center gap-5 mb-4">
+                  <div className={`flex items-center ${isMaximalist ? "gap-6 mb-2" : "gap-5 mb-4"}`}>
                     {profile.stats.map(({ label, value }) => (
                       <div key={label} className="flex flex-col items-center">
-                        <span className="text-base font-bold" style={{ color: t.text }}>{value}</span>
-                        <span className="text-[13px] font-medium mt-0.5" style={{ color: t.sub }}>{label}</span>
+                        <span className={`${isMaximalist ? "text-[18px]" : "text-base"} font-extrabold`} style={{ color: t.text, letterSpacing: "-0.02em" }}>{value}</span>
+                        <span className={`${isMaximalist ? "text-[12px]" : "text-[13px]"} font-light mt-0.5`} style={{ color: t.sub, letterSpacing: "0.02em" }}>{label}</span>
                       </div>
                     ))}
                   </div>
                 ) : null
               );
 
-              // Shared socials + share row
+              // Shared socials + share row — premium glassmorphism when maximalist
+              const MAVIEW_BLUE_GLOW = "#4A8DFF";
+              const socialSize = isMaximalist ? 52 : 44;
+              const socialIconSize = isMaximalist ? 22 : 18;
               const SocialsRow = () => (
-                <div className="flex items-center gap-3">
+                <div className={`flex items-center ${isMaximalist ? "gap-2.5 mb-2" : "gap-3"}`}>
                   {socialLinks.map(link => {
                     const Icon = getIcon(link.icon);
                     const brandColor = BRAND_COLORS[link.icon];
@@ -594,12 +598,13 @@ const ProfilePage = () => {
                       : rd.socialIconStyle === "theme" ? `1.5px solid ${t.accent}22`
                       : (brandColor ? `1.5px solid ${brandColor}25` : `1.5px solid ${t.accent}22`);
                     const finalIconColor = (hasGrad && useBrand) ? "#ffffff" : iconColor;
+                    const glassShadow = isMaximalist ? `inset 0 1.5px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.15), inset 0 0 10px ${MAVIEW_BLUE_GLOW}20, 0 3px 6px rgba(0,0,0,0.14)` : "none";
                     return (
                       <a key={link.id} href={sanitizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
-                        className="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
-                        style={{ background: iconBg, border: iconBorder }} title={link.title}
+                        className="rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
+                        style={{ width: socialSize, height: socialSize, background: iconBg, border: iconBorder, boxShadow: glassShadow }} title={link.title}
                         aria-label={link.title || "Social link"}>
-                        <Icon size={18} style={{ color: finalIconColor }} />
+                        <Icon size={socialIconSize} style={{ color: finalIconColor }} />
                       </a>
                     );
                   })}
@@ -610,19 +615,24 @@ const ProfilePage = () => {
                       ? `${rd.socialIconCustomColor}15` : rd.socialIconStyle === "theme" ? `${t.accent}15` : "rgba(37,211,102,0.15)";
                     const waBorder = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
                       ? `1.5px solid ${rd.socialIconCustomColor}25` : rd.socialIconStyle === "theme" ? `1.5px solid ${t.accent}22` : "1.5px solid rgba(37,211,102,0.25)";
+                    const glassShadow = isMaximalist ? `inset 0 1.5px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.15), inset 0 0 10px ${MAVIEW_BLUE_GLOW}20, 0 3px 6px rgba(0,0,0,0.14)` : "none";
                     return (
                       <a href={`https://wa.me/${profile.whatsapp!.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"
-                        className="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
-                        style={{ background: waBg, border: waBorder }}
+                        className="rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
+                        style={{ width: socialSize, height: socialSize, background: waBg, border: waBorder, boxShadow: glassShadow }}
                         aria-label="WhatsApp">
-                        <WhatsAppIcon size={18} style={{ color: waColor }} />
+                        <WhatsAppIcon size={socialIconSize} style={{ color: waColor }} />
                       </a>
                     );
                   })()}
                   <button onClick={handleShare} aria-label="Compartilhar perfil"
-                    className="w-11 h-11 rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
-                    style={{ background: `${t.accent}15`, border: `1.5px solid ${t.accent}22` }}>
-                    {copied ? <Check size={17} style={{ color: "#22c55e" }} /> : <Share2 size={17} style={{ color: t.text }} />}
+                    className="rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
+                    style={{
+                      width: socialSize, height: socialSize,
+                      background: `${t.accent}15`, border: `1.5px solid ${t.accent}22`,
+                      boxShadow: isMaximalist ? `inset 0 1.5px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.15), inset 0 0 10px ${MAVIEW_BLUE_GLOW}20, 0 3px 6px rgba(0,0,0,0.14)` : "none",
+                    }}>
+                    {copied ? <Check size={socialIconSize - 1} style={{ color: "#22c55e" }} /> : <Share2 size={socialIconSize - 1} style={{ color: t.text }} />}
                   </button>
                 </div>
               );
