@@ -1373,9 +1373,9 @@ const DashboardPagina = () => {
   })();
 
   const phonePreview = (
-    <div className="relative mx-auto" style={{ width: 310 }}>
-      <div className="rounded-[2.8rem] border-[3px] border-[hsl(var(--dash-text))] overflow-hidden shadow-2xl flex flex-col relative"
-        style={{ aspectRatio: "9/16", ...previewBgStyle }}>
+    <div className="relative mx-auto" style={{ width: 360 }}>
+      <div className="rounded-[3rem] border-[4px] border-[hsl(var(--dash-text))] overflow-hidden shadow-2xl flex flex-col relative"
+        style={{ aspectRatio: "9/18", ...previewBgStyle }}>
         {/* Status bar */}
         <div className="flex items-center justify-between px-6 pt-3 pb-1 flex-shrink-0">
           <span className="text-[10px] font-semibold" style={{ color: "rgba(255,255,255,0.7)" }}>9:41</span>
@@ -1401,8 +1401,8 @@ const DashboardPagina = () => {
           <div className="absolute inset-0 pointer-events-none z-[1] rounded-[2.5rem]" style={{ background: `rgba(0,0,0,${(d.bgOverlay || 0) / 100})` }} />
         )}
 
-        {/* Scrollable screen content */}
-        <div className="flex-1 overflow-y-auto relative z-[2]" style={{ fontFamily: `'${pFontB}', sans-serif` }}>
+        {/* Scrollable screen content — scrollbar escondido (arrastar/mouse funciona normal) */}
+        <div className="flex-1 overflow-y-auto relative z-[2] scrollbar-none" style={{ fontFamily: `'${pFontB}', sans-serif` }}>
           {/* Effect overlay — crossfade on effect change */}
           {previewEffectOverlay && <div key={d.bgEffect} className="animate-in fade-in duration-400">{previewEffectOverlay}</div>}
           {/* Ambient glow */}

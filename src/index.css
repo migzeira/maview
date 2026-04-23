@@ -525,6 +525,17 @@ input:focus, textarea:focus, select:focus {
   background: hsla(260, 20%, 60%, 0.15);
 }
 
+/* Hide scrollbar utility — used in phone preview and tab lists */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
 /* ── Design editor: effect thumbnail hover ── */
 .effect-thumb { transition: transform 0.2s ease, box-shadow 0.2s ease; }
 .effect-thumb:hover { transform: scale(1.05); box-shadow: 0 4px 20px rgba(0,0,0,0.35); }
