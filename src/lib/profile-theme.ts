@@ -68,6 +68,8 @@ export interface ResolvedDesign {
   ctaGlow?: "accent" | "blue" | "none";
   glassCards?: boolean;
   showcaseSocialStyle?: "brand" | "mono";
+  /** Edge-to-edge gradient intensity — "minimal" para foto protagonista (DJ) */
+  edgeGradientIntensity?: "minimal" | "normal";
 }
 
 export function resolveDesign(theme: ThemeDef, design?: Partial<DesignConfig>): ResolvedDesign {
@@ -126,6 +128,7 @@ export function resolveDesign(theme: ThemeDef, design?: Partial<DesignConfig>): 
     ctaGlow: (d as any).ctaGlow,
     glassCards: (d as any).glassCards,
     showcaseSocialStyle: (d as any).showcaseSocialStyle,
+    edgeGradientIntensity: (d as any).edgeGradientIntensity,
   };
 
   // Auto-contrast: if bg has overlay or is image/effect, auto-adjust text

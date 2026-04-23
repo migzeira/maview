@@ -1452,25 +1452,29 @@ const DashboardPagina = () => {
                 )}
                 {/* Top dark gradient SUAVE (só 25% para status bar, não cobre foto) */}
                 <div className="absolute top-0 inset-x-0 h-[60px]" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, transparent 100%)" }} />
-                {/* Bottom gradient EQUILIBRADO: sólido só 15% embaixo + 55% topo clear photo */}
+                {/* Gradient com intensidade por pack: minimal (DJ) ou normal */}
                 <div className="absolute inset-0" style={{
-                  background: (() => {
-                    const h = pBg.replace("#", "");
-                    if (h.length !== 6) return `linear-gradient(to top, ${pBg} 0%, transparent 55%)`;
-                    const r = parseInt(h.slice(0, 2), 16) || 0;
-                    const g = parseInt(h.slice(2, 4), 16) || 0;
-                    const b = parseInt(h.slice(4, 6), 16) || 0;
-                    const rgba = (a: number) => `rgba(${r},${g},${b},${a})`;
-                    return `linear-gradient(to top, ${rgba(1)} 0%, ${rgba(0.92)} 15%, ${rgba(0.55)} 30%, ${rgba(0.18)} 42%, ${rgba(0)} 55%)`;
-                  })(),
+                  background: (d as any).edgeGradientIntensity === "minimal"
+                    /* MINIMAL: sombra escura levíssima só nos 10% inferiores (legibilidade mínima) */
+                    ? `linear-gradient(to top, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.18) 10%, rgba(0,0,0,0.05) 18%, transparent 28%)`
+                    : (() => {
+                      const h = pBg.replace("#", "");
+                      if (h.length !== 6) return `linear-gradient(to top, ${pBg} 0%, transparent 55%)`;
+                      const r = parseInt(h.slice(0, 2), 16) || 0;
+                      const g = parseInt(h.slice(2, 4), 16) || 0;
+                      const b = parseInt(h.slice(4, 6), 16) || 0;
+                      const rgba = (a: number) => `rgba(${r},${g},${b},${a})`;
+                      return `linear-gradient(to top, ${rgba(1)} 0%, ${rgba(0.92)} 15%, ${rgba(0.55)} 30%, ${rgba(0.18)} 42%, ${rgba(0)} 55%)`;
+                    })(),
                 }} />
                 {/* Bloco CENTRALIZADO: nome, @, bio, ícones sociais */}
                 <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center text-center px-4">
+                  {(() => { const isMinimal = (d as any).edgeGradientIntensity === "minimal"; return (<>
                   <p className="font-extrabold text-[22px] leading-tight" style={{
-                    color: pText,
+                    color: isMinimal ? "#fff" : pText,
                     fontFamily: `'${pFontH}', sans-serif`,
                     letterSpacing: "-0.025em",
-                    textShadow: pBg.startsWith("#f") ? "none" : "0 2px 10px rgba(0,0,0,0.55)",
+                    textShadow: isMinimal ? "0 2px 14px rgba(0,0,0,0.80), 0 1px 4px rgba(0,0,0,0.55)" : (pBg.startsWith("#f") ? "none" : "0 2px 10px rgba(0,0,0,0.55)"),
                   }}>
                     {config.displayName || "Seu Nome"}
                     {(config as any).verified && (
@@ -1482,8 +1486,8 @@ const DashboardPagina = () => {
                   </p>
                   {config.username && (
                     <p className="text-[13px] font-semibold mt-1" style={{
-                      color: pAccent,
-                      textShadow: pBg.startsWith("#f") ? "0 1px 2px rgba(255,255,255,0.3)" : "0 1px 3px rgba(0,0,0,0.4)",
+                      color: isMinimal ? "#fff" : pAccent,
+                      textShadow: isMinimal ? "0 1px 6px rgba(0,0,0,0.70)" : (pBg.startsWith("#f") ? "0 1px 2px rgba(255,255,255,0.3)" : "0 1px 3px rgba(0,0,0,0.4)"),
                       letterSpacing: "0.02em",
                     }}>
                       @{config.username.replace(/^@+/, "")}
@@ -1491,14 +1495,15 @@ const DashboardPagina = () => {
                   )}
                   {config.bio && (
                     <p className="text-[12.5px] leading-[1.35] mt-1.5 font-medium" style={{
-                      color: pBg.startsWith("#f") ? pText : "rgba(255,255,255,0.96)",
-                      textShadow: pBg.startsWith("#f") ? "0 1px 2px rgba(255,255,255,0.35)" : "0 1px 4px rgba(0,0,0,0.50)",
+                      color: isMinimal ? "#fff" : (pBg.startsWith("#f") ? pText : "rgba(255,255,255,0.96)"),
+                      textShadow: isMinimal ? "0 1px 6px rgba(0,0,0,0.75)" : (pBg.startsWith("#f") ? "0 1px 2px rgba(255,255,255,0.35)" : "0 1px 4px rgba(0,0,0,0.50)"),
                       maxWidth: 260,
-                      opacity: pBg.startsWith("#f") ? 0.88 : 1,
+                      opacity: isMinimal ? 1 : (pBg.startsWith("#f") ? 0.88 : 1),
                     }}>
                       {config.bio}
                     </p>
                   )}
+                  </>); })()}
                   {/* Ícones sociais centralizados INLINE dentro do edge-to-edge */}
                   <div className="flex items-center gap-1.5 mt-2.5 flex-wrap justify-center">
                     {(() => {

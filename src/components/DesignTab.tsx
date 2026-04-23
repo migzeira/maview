@@ -270,8 +270,14 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
             {headerType === "edge-to-edge" && (
               <div className="w-full flex-shrink-0 relative overflow-hidden" style={{ height: 180 }}>
                 <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center 15%" }} crossOrigin="anonymous" loading="lazy" />
-                {/* Gradient EQUILIBRADO: sólido só 15% no bottom (texto) + topo 55% totalmente limpo (foto protagonista) */}
-                <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${bg} 0%, ${bg}E8 15%, ${bg}80 30%, ${bg}25 42%, transparent 52%)` }} />
+                {/* Gradient com intensidade configurável por pack (minimal vs normal) */}
+                <div className="absolute inset-0" style={{
+                  background: pack.edgeGradientIntensity === "minimal"
+                    /* MINIMAL: só uma sombra escura mínima nos últimos 8-10% para legibilidade do texto */
+                    ? `linear-gradient(to top, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0.18) 10%, rgba(0,0,0,0.05) 18%, transparent 28%)`
+                    /* NORMAL: gradient equilibrado padrão */
+                    : `linear-gradient(to top, ${bg} 0%, ${bg}E8 15%, ${bg}80 30%, ${bg}25 42%, transparent 52%)`,
+                }} />
                 <div className="absolute bottom-2.5 left-3.5 right-3.5 flex flex-col items-center text-center">
                   <p className="text-[17px] leading-[1.02]" style={{
                     color: isLight ? textC : "#fff",
@@ -433,6 +439,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     if (pack.ctaGlow) packMeta.ctaGlow = pack.ctaGlow;
     if (pack.glassCards) packMeta.glassCards = pack.glassCards;
     if (pack.socialIconStyle) packMeta.showcaseSocialStyle = pack.socialIconStyle;
+    if (pack.edgeGradientIntensity) packMeta.edgeGradientIntensity = pack.edgeGradientIntensity;
     const latest = { profileGlow: true, ...pack.config.design, ...packMeta, ...preserved };
     designRef.current = latest;
     updateConfig("design", latest);

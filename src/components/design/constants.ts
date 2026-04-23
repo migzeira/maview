@@ -35,6 +35,8 @@ export interface DesignConfig {
   glassCards?: boolean;
   /** Social icon style in mockup: brand colors or monochrome */
   showcaseSocialStyle?: "brand" | "mono";
+  /** Edge-to-edge gradient intensity: "minimal" (quase nada, foto 100% visível) | "normal" (padrão) */
+  edgeGradientIntensity?: "minimal" | "normal";
 }
 
 export interface ThemeDef { id: ThemeId; label: string; bg: string; accent: string; accent2: string; text?: string; sub?: string; card?: string; border?: string; }
@@ -314,6 +316,7 @@ export const DESIGN_PACKS: DesignPack[] = [
   /* 2 — DJ Full-Bleed Header (Léo) */
   { id: "showcase-dj", label: "DJ", desc: "Full-bleed glass cyber", category: "showcase", refIdx: 6,
     socialIconStyle: "brand", glassCards: true, ctaGlow: "accent", headerLayoutType: "edge-to-edge",
+    edgeGradientIntensity: "minimal",
     sampleProducts: [
       { title: "Kit de Beats Premium", price: "R$ 297", emoji: "🎵" },
       { title: "Mentoria para DJs", price: "R$ 497", emoji: "🎧" },

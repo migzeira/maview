@@ -738,35 +738,40 @@ const ProfilePage = () => {
                           ? <img src={profile.avatar} alt={profile.displayName} className="w-full h-full object-cover" style={{ objectPosition: "center 18%" }} loading="eager" decoding="async" fetchPriority="high" />
                           : <div className="w-full h-full" style={{ background: t.accent }} />
                         }
-                        {/* Gradient EQUILIBRADO: sólido só no bottom 15% (text base) + topo 55% clear photo */}
+                        {/* Gradient com intensidade configurável: minimal (foto 100%) vs normal */}
                         <div className="absolute inset-0" style={{
-                          background: `linear-gradient(to top, ${bgRgba(1)} 0%, ${bgRgba(0.92)} 15%, ${bgRgba(0.55)} 30%, ${bgRgba(0.18)} 42%, ${bgRgba(0)} 55%)`
+                          background: rd.edgeGradientIntensity === "minimal"
+                            /* MINIMAL: só uma sombra escura levíssima nos 10% inferiores (legibilidade) */
+                            ? `linear-gradient(to top, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.18) 10%, rgba(0,0,0,0.05) 18%, transparent 28%)`
+                            /* NORMAL: gradient equilibrado padrão */
+                            : `linear-gradient(to top, ${bgRgba(1)} 0%, ${bgRgba(0.92)} 15%, ${bgRgba(0.55)} 30%, ${bgRgba(0.18)} 42%, ${bgRgba(0)} 55%)`,
                         }} />
                         {/* Bloco centralizado: nome, @, bio, ícones sociais — TUDO center-aligned */}
                         <div className="absolute bottom-5 left-0 right-0 flex flex-col items-center text-center px-5">
+                          {(() => { const isMinimal = rd.edgeGradientIntensity === "minimal"; return (<>
                           <h1 className="text-[30px] leading-[1.02] font-extrabold tracking-tight" style={{
-                            color: isLight ? t.text : "#fff",
-                            textShadow: isLight ? "none" : "0 2px 14px rgba(0,0,0,0.6)",
+                            color: isMinimal ? "#fff" : (isLight ? t.text : "#fff"),
+                            textShadow: isMinimal ? "0 2px 16px rgba(0,0,0,0.80), 0 1px 4px rgba(0,0,0,0.55)" : (isLight ? "none" : "0 2px 14px rgba(0,0,0,0.6)"),
                             fontFamily: `'${rd.fontHeading}', sans-serif`,
                             letterSpacing: "-0.025em",
                           }}>
                             {profile.displayName}{verifiedBadge}
                           </h1>
                           <p className="text-[14px] font-semibold mt-1.5" style={{
-                            color: t.accent,
+                            color: isMinimal ? "#fff" : t.accent,
                             letterSpacing: "0.02em",
-                            textShadow: isLight ? "0 1px 2px rgba(255,255,255,0.3)" : "0 1px 4px rgba(0,0,0,0.55)",
+                            textShadow: isMinimal ? "0 1px 6px rgba(0,0,0,0.70)" : (isLight ? "0 1px 2px rgba(255,255,255,0.3)" : "0 1px 4px rgba(0,0,0,0.55)"),
                           }}>@{profile.username.replace(/^@+/, "")}</p>
                           {profile.bio && (
                             <p className="text-[14px] leading-relaxed mt-2 font-medium max-w-[290px]" style={{
-                              color: isLight ? t.text : "rgba(255,255,255,0.97)",
-                              textShadow: isLight ? "0 1px 2px rgba(255,255,255,0.35)" : "0 1px 5px rgba(0,0,0,0.55)",
+                              color: isMinimal ? "#fff" : (isLight ? t.text : "rgba(255,255,255,0.97)"),
+                              textShadow: isMinimal ? "0 1px 6px rgba(0,0,0,0.75)" : (isLight ? "0 1px 2px rgba(255,255,255,0.35)" : "0 1px 5px rgba(0,0,0,0.55)"),
                               fontFamily: `'${rd.fontBody}', sans-serif`,
-                              opacity: isLight ? 0.88 : 1,
+                              opacity: isMinimal ? 1 : (isLight ? 0.88 : 1),
                             }}>
                               {profile.bio}
                             </p>
-                          )}
+                          )}</>); })()}
                           {/* Ícones sociais centralizados INLINE no edge-to-edge */}
                           <div className="flex items-center gap-1.5 mt-3 flex-wrap justify-center">
                             {socialLinks.length > 0 ? socialLinks.map(link => {
