@@ -270,17 +270,16 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
             {headerType === "edge-to-edge" && (
               <div className="w-full flex-shrink-0 relative overflow-hidden" style={{ height: 180 }}>
                 <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center 15%" }} crossOrigin="anonymous" loading="lazy" />
-                {/* Gradient SUAVE — foto bem mais visível (deixa o topo 55% totalmente limpo) */}
-                <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${bg} 0%, ${bg}E0 14%, ${bg}55 30%, ${bg}15 45%, transparent 60%)` }} />
+                {/* Gradient: BOTTOM 35% SÓLIDO para texto forte + topo limpo para foto vis\u00edvel */}
+                <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${bg} 0%, ${bg} 28%, ${bg}D0 40%, ${bg}50 52%, ${bg}15 62%, transparent 72%)` }} />
                 <div className="absolute bottom-2.5 left-3.5 right-3.5 flex flex-col items-center text-center">
-
                   <p className="text-[17px] leading-[1.02]" style={{
                     color: isLight ? textC : "#fff",
-                    textShadow: isLight ? "none" : "0 2px 10px rgba(0,0,0,0.50)",
+                    textShadow: isLight ? "0 1px 2px rgba(255,255,255,0.4)" : "0 2px 10px rgba(0,0,0,0.55)",
                     fontWeight: 800, letterSpacing: "-0.025em",
                   }}>{ref.name}<VerifiedBadge /></p>
-                  <p className="text-[9px] mt-0.5" style={{ color: isLight ? accent : `${accent}DD`, textShadow: isLight ? "none" : "0 1px 3px rgba(0,0,0,0.3)", fontWeight: 400, letterSpacing: "0.03em" }}>{ref.username}</p>
-                  <p className="text-[8.5px] leading-[1.3] mt-0.5 line-clamp-2" style={{ color: isLight ? subC : "rgba(255,255,255,0.9)", textShadow: isLight ? "none" : "0 1px 3px rgba(0,0,0,0.4)", fontWeight: 300 }}>{ref.bio}</p>
+                  <p className="text-[10px] mt-0.5" style={{ color: accent, textShadow: isLight ? "0 1px 1px rgba(255,255,255,0.3)" : "0 1px 3px rgba(0,0,0,0.35)", fontWeight: 600, letterSpacing: "0.02em" }}>{ref.username}</p>
+                  <p className="text-[9px] leading-[1.35] mt-1 line-clamp-2 px-1" style={{ color: isLight ? textC : "rgba(255,255,255,0.95)", textShadow: isLight ? "none" : "0 1px 3px rgba(0,0,0,0.45)", fontWeight: 500, opacity: isLight ? 0.88 : 1 }}>{ref.bio}</p>
                   <div className="mt-1.5"><SocialPills size="small" centered /></div>
                 </div>
               </div>

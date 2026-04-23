@@ -546,12 +546,12 @@ const ProfilePage = () => {
                 return `rgba(${r},${g},${b},${a})`;
               };
 
-              // Shared bio block — gap-zero when template active
+              // Shared bio block — bio REFORÇADA (medium weight, text color forte) em todos os templates
               const isMaximalist = !!rd.headerLayoutType;
               const BioBlock = ({ center = true }: { center?: boolean }) => (
                 profile.bio ? (
                   <div className={`max-w-[320px] ${isMaximalist ? "mb-1" : "mb-3"} ${center ? "text-center" : ""}`}>
-                    <p className={`${isMaximalist ? "text-[15px]" : "text-[14px]"} leading-relaxed ${bioExpanded ? "" : "line-clamp-3"}`} style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif`, textShadow: tShadow, fontWeight: isMaximalist ? 300 : 400 }}>{profile.bio}</p>
+                    <p className={`${isMaximalist ? "text-[15px]" : "text-[14px]"} leading-relaxed ${bioExpanded ? "" : "line-clamp-3"}`} style={{ color: rd.descriptionColor || (isMaximalist ? t.text : c.bio), fontFamily: `'${rd.fontBody}', sans-serif`, textShadow: tShadow, fontWeight: isMaximalist ? 500 : 400, opacity: isMaximalist ? 0.92 : 1 }}>{profile.bio}</p>
                     {profile.bio.length > 120 && !bioExpanded && (
                       <button onClick={() => setBioExpanded(true)} className="text-[12px] font-medium mt-1 transition-colors hover:opacity-80" style={{ color: t.accent }}>ver mais</button>
                     )}
@@ -738,9 +738,9 @@ const ProfilePage = () => {
                           ? <img src={profile.avatar} alt={profile.displayName} className="w-full h-full object-cover" style={{ objectPosition: "center 18%" }} loading="eager" decoding="async" fetchPriority="high" />
                           : <div className="w-full h-full" style={{ background: t.accent }} />
                         }
-                        {/* Gradient SUAVE auto-adaptativo: foto bem visível, só sombreamento leve embaixo para leitura do texto */}
+                        {/* Gradient BALANCEADO: bottom 30% sólido para bio/nome forte + topo limpo para foto */}
                         <div className="absolute inset-0" style={{
-                          background: `linear-gradient(to top, ${bgRgba(0.96)} 0%, ${bgRgba(0.82)} 16%, ${bgRgba(0.42)} 32%, ${bgRgba(0.12)} 48%, ${bgRgba(0)} 62%)`
+                          background: `linear-gradient(to top, ${bgRgba(1)} 0%, ${bgRgba(1)} 30%, ${bgRgba(0.80)} 42%, ${bgRgba(0.35)} 55%, ${bgRgba(0.10)} 65%, ${bgRgba(0)} 75%)`
                         }} />
                         {/* Bloco centralizado: nome, @, bio, ícones sociais — TUDO center-aligned */}
                         <div className="absolute bottom-5 left-0 right-0 flex flex-col items-center text-center px-5">
@@ -752,16 +752,17 @@ const ProfilePage = () => {
                           }}>
                             {profile.displayName}{verifiedBadge}
                           </h1>
-                          <p className="text-[13px] font-medium mt-1.5" style={{
-                            color: isLight ? t.accent : `${t.accent}E0`,
+                          <p className="text-[14px] font-semibold mt-1.5" style={{
+                            color: t.accent,
                             letterSpacing: "0.02em",
-                            textShadow: isLight ? "none" : "0 1px 4px rgba(0,0,0,0.5)",
+                            textShadow: isLight ? "0 1px 2px rgba(255,255,255,0.3)" : "0 1px 4px rgba(0,0,0,0.55)",
                           }}>@{profile.username.replace(/^@+/, "")}</p>
                           {profile.bio && (
-                            <p className="text-[13px] leading-relaxed mt-2 font-light max-w-[280px]" style={{
-                              color: isLight ? t.sub : "rgba(255,255,255,0.92)",
-                              textShadow: isLight ? "none" : "0 1px 5px rgba(0,0,0,0.5)",
+                            <p className="text-[14px] leading-relaxed mt-2 font-medium max-w-[290px]" style={{
+                              color: isLight ? t.text : "rgba(255,255,255,0.97)",
+                              textShadow: isLight ? "0 1px 2px rgba(255,255,255,0.35)" : "0 1px 5px rgba(0,0,0,0.55)",
                               fontFamily: `'${rd.fontBody}', sans-serif`,
+                              opacity: isLight ? 0.88 : 1,
                             }}>
                               {profile.bio}
                             </p>

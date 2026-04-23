@@ -1452,16 +1452,16 @@ const DashboardPagina = () => {
                 )}
                 {/* Top dark gradient SUAVE (só 25% para status bar, não cobre foto) */}
                 <div className="absolute top-0 inset-x-0 h-[60px]" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, transparent 100%)" }} />
-                {/* Bottom gradient SUAVE auto-adaptativo (topo 55% da foto totalmente limpo) */}
+                {/* Bottom gradient BALANCEADO (30% sólido embaixo p/ texto forte + topo limpo p/ foto) */}
                 <div className="absolute inset-0" style={{
                   background: (() => {
                     const h = pBg.replace("#", "");
-                    if (h.length !== 6) return `linear-gradient(to top, ${pBg} 0%, transparent 62%)`;
+                    if (h.length !== 6) return `linear-gradient(to top, ${pBg} 0%, transparent 70%)`;
                     const r = parseInt(h.slice(0, 2), 16) || 0;
                     const g = parseInt(h.slice(2, 4), 16) || 0;
                     const b = parseInt(h.slice(4, 6), 16) || 0;
                     const rgba = (a: number) => `rgba(${r},${g},${b},${a})`;
-                    return `linear-gradient(to top, ${rgba(0.96)} 0%, ${rgba(0.82)} 16%, ${rgba(0.42)} 32%, ${rgba(0.12)} 48%, ${rgba(0)} 62%)`;
+                    return `linear-gradient(to top, ${rgba(1)} 0%, ${rgba(1)} 30%, ${rgba(0.80)} 42%, ${rgba(0.35)} 55%, ${rgba(0.10)} 65%, ${rgba(0)} 75%)`;
                   })(),
                 }} />
                 {/* Bloco CENTRALIZADO: nome, @, bio, ícones sociais */}
@@ -1481,18 +1481,20 @@ const DashboardPagina = () => {
                     )}
                   </p>
                   {config.username && (
-                    <p className="text-[12px] font-medium mt-1" style={{
+                    <p className="text-[13px] font-semibold mt-1" style={{
                       color: pAccent,
-                      textShadow: pBg.startsWith("#f") ? "none" : "0 1px 3px rgba(0,0,0,0.3)",
+                      textShadow: pBg.startsWith("#f") ? "0 1px 2px rgba(255,255,255,0.3)" : "0 1px 3px rgba(0,0,0,0.4)",
+                      letterSpacing: "0.02em",
                     }}>
                       @{config.username.replace(/^@+/, "")}
                     </p>
                   )}
                   {config.bio && (
-                    <p className="text-[11px] leading-[1.35] mt-1.5 font-light" style={{
-                      color: pBg.startsWith("#f") ? pSub : "rgba(255,255,255,0.88)",
-                      textShadow: pBg.startsWith("#f") ? "none" : "0 1px 4px rgba(0,0,0,0.45)",
-                      maxWidth: 240,
+                    <p className="text-[12.5px] leading-[1.35] mt-1.5 font-medium" style={{
+                      color: pBg.startsWith("#f") ? pText : "rgba(255,255,255,0.96)",
+                      textShadow: pBg.startsWith("#f") ? "0 1px 2px rgba(255,255,255,0.35)" : "0 1px 4px rgba(0,0,0,0.50)",
+                      maxWidth: 260,
+                      opacity: pBg.startsWith("#f") ? 0.88 : 1,
                     }}>
                       {config.bio}
                     </p>
