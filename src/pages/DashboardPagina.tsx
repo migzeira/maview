@@ -1426,22 +1426,22 @@ const DashboardPagina = () => {
           <div className={`p-5 relative z-10 ${d.coverImageUrl ? "-mt-6" : ""}`}>
             {/* Profile — rendered based on headerLayoutType if set */}
             {templateAvatarConfig?.fullWidth ? (
-              /* EDGE-TO-EDGE: Absolute-positioned photo covering phone top (status bar + island) */
+              /* EDGE-TO-EDGE: Foto full-width no topo + tudo CENTRALIZADO overlaid (Lucas/Léo)
+                 Gradient auto-adapta a QUALQUER cor de bg (branco/vermelho/preto/custom).      */
               <>
-              {/* Phantom spacer: reserves flow space ~160px so content below starts in right place */}
-              <div style={{ height: 200, marginTop: -20, marginBottom: 12 }} />
-              {/* Actual photo — absolute, positioned from flex-1 top, pulled up to cover chrome */}
+              {/* Phantom spacer: reserves flow space para conteúdo abaixo */}
+              <div style={{ height: 260, marginTop: -20, marginBottom: 12 }} />
+              {/* Foto absolute — cobre status bar + island */}
               <div className="absolute overflow-hidden z-[1]" style={{
                 top: -70,
                 left: -20,
                 right: -20,
-                height: 290,
+                height: 360,
                 borderRadius: "0 0 22px 22px",
               }}>
                 {config.avatarUrl ? (
                   <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover" style={{ objectPosition: "center 25%" }} />
                 ) : (
-                  /* Fallback: use template bg gradient if available, not pAccent (which could be white) */
                   <div className="w-full h-full flex items-center justify-center" style={{
                     background: d.bgType === "gradient" && d.bgGradient
                       ? `linear-gradient(135deg, ${d.bgGradient[0]}, ${d.bgGradient[1]})`
@@ -1450,13 +1450,23 @@ const DashboardPagina = () => {
                     <span className="text-white text-4xl font-bold opacity-80">{config.displayName ? config.displayName[0].toUpperCase() : "?"}</span>
                   </div>
                 )}
-                {/* Top dark gradient for status bar text readability */}
+                {/* Top dark gradient for status bar readability */}
                 <div className="absolute top-0 inset-x-0 h-[70px]" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.40) 0%, transparent 100%)" }} />
-                {/* Bottom gradient for name/bio readability */}
-                <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${pBg} 0%, ${pBg}F0 12%, ${pBg}80 28%, ${pBg}30 48%, transparent 72%)` }} />
-                {/* Content overlay — name + username + bio */}
-                <div className="absolute bottom-3 left-5 right-5">
-                  <p className="font-extrabold text-[20px] leading-tight" style={{
+                {/* Bottom gradient AUTO-ADAPTATIVO — converte pBg em rgba para funcionar com qualquer cor */}
+                <div className="absolute inset-0" style={{
+                  background: (() => {
+                    const h = pBg.replace("#", "");
+                    if (h.length !== 6) return `linear-gradient(to top, ${pBg} 0%, transparent 72%)`;
+                    const r = parseInt(h.slice(0, 2), 16) || 0;
+                    const g = parseInt(h.slice(2, 4), 16) || 0;
+                    const b = parseInt(h.slice(4, 6), 16) || 0;
+                    const rgba = (a: number) => `rgba(${r},${g},${b},${a})`;
+                    return `linear-gradient(to top, ${rgba(1)} 0%, ${rgba(0.94)} 14%, ${rgba(0.55)} 32%, ${rgba(0.22)} 50%, ${rgba(0)} 72%)`;
+                  })(),
+                }} />
+                {/* Bloco CENTRALIZADO: nome, @, bio, ícones sociais */}
+                <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center text-center px-4">
+                  <p className="font-extrabold text-[22px] leading-tight" style={{
                     color: pText,
                     fontFamily: `'${pFontH}', sans-serif`,
                     letterSpacing: "-0.025em",
@@ -1464,14 +1474,14 @@ const DashboardPagina = () => {
                   }}>
                     {config.displayName || "Seu Nome"}
                     {(config as any).verified && (
-                      <svg className="inline-block ml-1 flex-shrink-0" width="18" height="18" viewBox="0 0 20 20" fill="none" style={{ verticalAlign: "middle", marginTop: -2 }}>
+                      <svg className="inline-block ml-1 flex-shrink-0" width="16" height="16" viewBox="0 0 20 20" fill="none" style={{ verticalAlign: "middle", marginTop: -2 }}>
                         <circle cx="10" cy="10" r="10" fill="#1E5BFF"/>
                         <path d="M6 10.5l2.5 2.5L14 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     )}
                   </p>
                   {config.username && (
-                    <p className="text-[12px] font-medium mt-0.5" style={{
+                    <p className="text-[12px] font-medium mt-1" style={{
                       color: pAccent,
                       textShadow: pBg.startsWith("#f") ? "none" : "0 1px 3px rgba(0,0,0,0.3)",
                     }}>
@@ -1479,13 +1489,37 @@ const DashboardPagina = () => {
                     </p>
                   )}
                   {config.bio && (
-                    <p className="text-[11px] leading-snug mt-1 line-clamp-2 font-light" style={{
+                    <p className="text-[11px] leading-[1.35] mt-1.5 font-light" style={{
                       color: pBg.startsWith("#f") ? pSub : "rgba(255,255,255,0.88)",
                       textShadow: pBg.startsWith("#f") ? "none" : "0 1px 4px rgba(0,0,0,0.45)",
+                      maxWidth: 240,
                     }}>
                       {config.bio}
                     </p>
                   )}
+                  {/* Ícones sociais centralizados INLINE dentro do edge-to-edge */}
+                  <div className="flex items-center gap-1.5 mt-2.5 flex-wrap justify-center">
+                    {(() => {
+                      const BRAND_CLR: Record<string, string> = { instagram: "#E4405F", pinterest: "#E60023", tiktok: "#000000", linkedin: "#0A66C2" };
+                      const isLight = pBg.startsWith("#f") || pBg.startsWith("#e");
+                      const socials = [
+                        { key: "instagram", Icon: Instagram },
+                        { key: "pinterest", Icon: PinterestIcon },
+                        { key: "tiktok", Icon: TikTokIcon },
+                        { key: "linkedin", Icon: LinkedInIcon },
+                      ];
+                      return socials.map(({ key, Icon }) => (
+                        <div key={key} className="rounded-full flex items-center justify-center"
+                          style={{
+                            width: 24, height: 24,
+                            background: isLight ? `${BRAND_CLR[key]}18` : "rgba(255,255,255,0.20)",
+                            border: `1px solid ${isLight ? `${BRAND_CLR[key]}30` : "rgba(255,255,255,0.30)"}`,
+                          }}>
+                          <Icon size={12} style={{ color: isLight ? BRAND_CLR[key] : "#fff" }} />
+                        </div>
+                      ));
+                    })()}
+                  </div>
                 </div>
               </div>
               </>
@@ -1668,7 +1702,7 @@ const DashboardPagina = () => {
             {/* Social + share row — socials hidden for split-editorial (rendered inside right column); stats stay */}
             <div className="flex flex-col items-center mb-3">
               {/* Social icons row — template-matching when headerLayoutType active, user socials otherwise */}
-              {!templateAvatarConfig?.splitLayout && (() => {
+              {!templateAvatarConfig?.splitLayout && !templateAvatarConfig?.fullWidth && (() => {
                 const BRAND_CLR: Record<string, string> = { instagram: "#E4405F", youtube: "#FF0000", twitter: "#000000", tiktok: "#000000", facebook: "#1877F2", linkedin: "#0A66C2", pinterest: "#E60023", globe: "", link: "" };
                 /* When template has showcaseSocialStyle === "mono", force mono rendering with nameColor */
                 const showcaseStyle = (d as any).showcaseSocialStyle as "brand" | "mono" | undefined;

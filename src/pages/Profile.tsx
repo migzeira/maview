@@ -709,13 +709,25 @@ const ProfilePage = () => {
                   );
                 }
 
-                /* EDGE-TO-EDGE — Léo / Lucas — name + bio overlaid on photo */
+                /* EDGE-TO-EDGE — Léo / Lucas — foto full-width + conteúdo CENTRALIZADO overlaid
+                   Gradient auto-adapta a QUALQUER cor de bg (branco/vermelho/preto/custom).       */
                 if (rd.headerLayoutType === "edge-to-edge") {
                   const isLight = rd.bg.startsWith("#f") || rd.bg.startsWith("#e") || rd.bg === "#ffffff";
+                  /* Converte hex → rgba para gradient robusto independente do formato da cor bg */
+                  const bgRgba = (a: number) => {
+                    const h = rd.bg.replace("#", "");
+                    if (h.length !== 6) return `rgba(0,0,0,${a})`;
+                    const r = parseInt(h.slice(0, 2), 16) || 0;
+                    const g = parseInt(h.slice(2, 4), 16) || 0;
+                    const b = parseInt(h.slice(4, 6), 16) || 0;
+                    return `rgba(${r},${g},${b},${a})`;
+                  };
+                  const eeSize = 32;
+                  const eeIconSize = 14;
                   return (
                     <>
                       <div className="relative w-full overflow-hidden mb-3" style={{
-                        height: 360,
+                        height: 420,
                         marginLeft: "-16px",
                         marginRight: "-16px",
                         marginTop: "-50px",
@@ -726,8 +738,12 @@ const ProfilePage = () => {
                           ? <img src={profile.avatar} alt={profile.displayName} className="w-full h-full object-cover" style={{ objectPosition: "center 18%" }} loading="eager" decoding="async" fetchPriority="high" />
                           : <div className="w-full h-full" style={{ background: t.accent }} />
                         }
-                        <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${t.bg} 0%, ${t.bg}F0 10%, ${t.bg}80 25%, ${t.bg}30 45%, transparent 70%)` }} />
-                        <div className="absolute bottom-5 left-5 right-5">
+                        {/* Gradient auto-adaptativo: usa a própria cor do bg em rgba (funciona com qualquer cor) */}
+                        <div className="absolute inset-0" style={{
+                          background: `linear-gradient(to top, ${bgRgba(1)} 0%, ${bgRgba(0.94)} 14%, ${bgRgba(0.55)} 32%, ${bgRgba(0.22)} 50%, ${bgRgba(0)} 72%)`
+                        }} />
+                        {/* Bloco centralizado: nome, @, bio, ícones sociais — TUDO center-aligned */}
+                        <div className="absolute bottom-5 left-0 right-0 flex flex-col items-center text-center px-5">
                           <h1 className="text-[30px] leading-[1.02] font-extrabold tracking-tight" style={{
                             color: isLight ? t.text : "#fff",
                             textShadow: isLight ? "none" : "0 2px 14px rgba(0,0,0,0.6)",
@@ -736,13 +752,13 @@ const ProfilePage = () => {
                           }}>
                             {profile.displayName}{verifiedBadge}
                           </h1>
-                          <p className="text-[13px] font-medium mt-1" style={{
+                          <p className="text-[13px] font-medium mt-1.5" style={{
                             color: isLight ? t.accent : `${t.accent}E0`,
                             letterSpacing: "0.02em",
                             textShadow: isLight ? "none" : "0 1px 4px rgba(0,0,0,0.5)",
                           }}>@{profile.username.replace(/^@+/, "")}</p>
                           {profile.bio && (
-                            <p className="text-[13px] leading-snug mt-2 line-clamp-2 font-light" style={{
+                            <p className="text-[13px] leading-relaxed mt-2 font-light max-w-[280px]" style={{
                               color: isLight ? t.sub : "rgba(255,255,255,0.92)",
                               textShadow: isLight ? "none" : "0 1px 5px rgba(0,0,0,0.5)",
                               fontFamily: `'${rd.fontBody}', sans-serif`,
@@ -750,10 +766,43 @@ const ProfilePage = () => {
                               {profile.bio}
                             </p>
                           )}
+                          {/* Ícones sociais centralizados INLINE no edge-to-edge */}
+                          <div className="flex items-center gap-1.5 mt-3 flex-wrap justify-center">
+                            {socialLinks.length > 0 ? socialLinks.map(link => {
+                              const Icon = getIcon(link.icon);
+                              const brandColor = BRAND_COLORS[link.icon];
+                              return (
+                                <a key={link.id} href={sanitizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
+                                  className="rounded-full flex items-center justify-center"
+                                  style={{
+                                    width: eeSize, height: eeSize,
+                                    background: isLight ? `${brandColor || t.accent}18` : "rgba(255,255,255,0.18)",
+                                    border: `1.5px solid ${isLight ? `${brandColor || t.accent}30` : "rgba(255,255,255,0.30)"}`,
+                                  }}>
+                                  <Icon size={eeIconSize} style={{ color: isLight ? (brandColor || t.text) : "#fff" }} />
+                                </a>
+                              );
+                            }) : (
+                              [
+                                { key: "instagram", Icon: getIcon("instagram"), color: BRAND_COLORS["instagram"] },
+                                { key: "pinterest", Icon: getIcon("pinterest"), color: BRAND_COLORS["pinterest"] },
+                                { key: "tiktok", Icon: getIcon("tiktok"), color: BRAND_COLORS["tiktok"] },
+                                { key: "linkedin", Icon: getIcon("linkedin"), color: BRAND_COLORS["linkedin"] },
+                              ].map(({ key, Icon, color }) => (
+                                <div key={key} className="rounded-full flex items-center justify-center"
+                                  style={{
+                                    width: eeSize, height: eeSize,
+                                    background: isLight ? `${color}18` : "rgba(255,255,255,0.18)",
+                                    border: `1.5px solid ${isLight ? `${color}30` : "rgba(255,255,255,0.30)"}`,
+                                  }}>
+                                  <Icon size={eeIconSize} style={{ color: isLight ? color : "#fff" }} />
+                                </div>
+                              ))
+                            )}
+                          </div>
                         </div>
                       </div>
                       <StatsBlock />
-                      <SocialsRow />
                     </>
                   );
                 }
