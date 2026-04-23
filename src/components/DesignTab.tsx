@@ -260,8 +260,8 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
                 <p className="text-[16px] leading-[1.05] mt-1.5 text-center" style={{ color: textC, fontWeight: 800, letterSpacing: "-0.02em" }}>
                   {ref.name}<VerifiedBadge />
                 </p>
-                <p className="text-[9px] text-center mt-[1px]" style={{ color: accent, fontWeight: 400, letterSpacing: "0.03em" }}>{ref.username}</p>
-                <p className="text-[8.5px] leading-[1.3] text-center mt-0.5 line-clamp-2 px-2" style={{ color: subC, fontWeight: 300 }}>{ref.bio}</p>
+                <p className="text-[9px] text-center mt-[1px]" style={{ color: accent, fontWeight: 600, letterSpacing: "0.02em" }}>{ref.username}</p>
+                <p className="text-[8.5px] leading-[1.3] text-center mt-0.5 line-clamp-2 px-2" style={{ color: textC, fontWeight: 500, opacity: 0.88 }}>{ref.bio}</p>
                 <div className="mt-1.5"><SocialPills size="small" centered /></div>
               </div>
             )}
@@ -297,8 +297,8 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
                 <p className="text-[18px] leading-[1.02] mt-2 text-center" style={{ color: textC, fontWeight: 600, letterSpacing: "-0.02em" }}>
                   {ref.name}<VerifiedBadge />
                 </p>
-                <p className="text-[9px] text-center mt-[1px]" style={{ color: accent, fontWeight: 400, letterSpacing: "0.03em" }}>{ref.username}</p>
-                <p className="text-[8.5px] leading-[1.3] text-center mt-0.5 line-clamp-2 px-2" style={{ color: subC, fontWeight: 300 }}>{ref.bio}</p>
+                <p className="text-[9px] text-center mt-[1px]" style={{ color: accent, fontWeight: 600, letterSpacing: "0.02em" }}>{ref.username}</p>
+                <p className="text-[8.5px] leading-[1.3] text-center mt-0.5 line-clamp-2 px-2" style={{ color: textC, fontWeight: 500, opacity: 0.88 }}>{ref.bio}</p>
                 <div className="mt-1.5"><SocialPills size="small" centered /></div>
               </div>
             )}
@@ -313,8 +313,8 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
                   <p className="text-[14px] leading-[1.05]" style={{ color: textC, fontWeight: 700, letterSpacing: "-0.02em" }}>
                     {ref.name}<VerifiedBadge />
                   </p>
-                  <p className="text-[8.5px] mt-0.5" style={{ color: accent, fontWeight: 400, letterSpacing: "0.03em" }}>{ref.username}</p>
-                  <p className="text-[8.5px] leading-[1.3] mt-1 line-clamp-3" style={{ color: subC, fontWeight: 300 }}>{ref.bio}</p>
+                  <p className="text-[8.5px] mt-0.5" style={{ color: accent, fontWeight: 600, letterSpacing: "0.02em" }}>{ref.username}</p>
+                  <p className="text-[8.5px] leading-[1.3] mt-1 line-clamp-3" style={{ color: textC, fontWeight: 500, opacity: 0.88 }}>{ref.bio}</p>
                   <div className="mt-1.5"><SocialPills size="small" /></div>
                 </div>
               </div>
@@ -333,7 +333,7 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
                   {ref.name}<VerifiedBadge />
                 </p>
                 <p className="text-[8px] text-center mb-1" style={{ color: accent, letterSpacing: "0.03em" }}>{ref.username}</p>
-                <p className="text-[8.5px] leading-snug text-center mb-1.5 px-4 line-clamp-2" style={{ color: subC, fontWeight: 300 }}>{ref.bio}</p>
+                <p className="text-[8.5px] leading-snug text-center mb-1.5 px-4 line-clamp-2" style={{ color: textC, fontWeight: 500, opacity: 0.88 }}>{ref.bio}</p>
                 <div className="flex justify-center"><SocialPills size="small" /></div>
               </>
             )}

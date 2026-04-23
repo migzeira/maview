@@ -902,9 +902,9 @@ const ProfilePage = () => {
                           }}>
                             {profile.displayName}{verifiedBadge}
                           </h1>
-                          <p className="text-[12px] font-medium mt-1.5" style={{ color: t.accent, letterSpacing: "0.02em" }}>@{profile.username.replace(/^@+/, "")}</p>
+                          <p className="text-[13px] font-semibold mt-1.5" style={{ color: t.accent, letterSpacing: "0.02em" }}>@{profile.username.replace(/^@+/, "")}</p>
                           {profile.bio && (
-                            <p className="text-[12px] leading-[1.4] font-light mt-2" style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif` }}>
+                            <p className="text-[13px] leading-[1.4] font-medium mt-2" style={{ color: t.text, fontFamily: `'${rd.fontBody}', sans-serif`, opacity: 0.88 }}>
                               {profile.bio}
                             </p>
                           )}

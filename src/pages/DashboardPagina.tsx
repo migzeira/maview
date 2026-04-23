@@ -1554,8 +1554,8 @@ const DashboardPagina = () => {
                       </svg>
                     )}
                   </p>
-                  {config.username && <p className="text-[10px] font-medium mt-1" style={{ color: pAccent, letterSpacing: "0.03em" }}>@{config.username.replace(/^@+/, "")}</p>}
-                  {config.bio && <p className="text-[10px] leading-[1.35] mt-1.5 font-light" style={{ color: pSub }}>{config.bio}</p>}
+                  {config.username && <p className="text-[11px] font-semibold mt-1" style={{ color: pAccent, letterSpacing: "0.02em" }}>@{config.username.replace(/^@+/, "")}</p>}
+                  {config.bio && <p className="text-[11px] leading-[1.35] mt-1.5 font-medium" style={{ color: pText, opacity: 0.88 }}>{config.bio}</p>}
                   {/* Ícones sociais REAIS — branded, compactos, dentro da coluna direita */}
                   {(() => {
                     const showcaseStyle = (d as any).showcaseSocialStyle as "brand" | "mono" | undefined;
@@ -1626,8 +1626,8 @@ const DashboardPagina = () => {
                       </svg>
                     )}
                   </p>
-                  {config.username && <p className="text-[11px] font-medium mt-0.5" style={{ color: pAccent }}>@{config.username.replace(/^@+/, "")}</p>}
-                  {config.bio && <p className="text-[11px] text-center mt-1 px-2 line-clamp-2 font-light" style={{ color: pSub }}>{config.bio}</p>}
+                  {config.username && <p className="text-[11.5px] font-semibold mt-0.5" style={{ color: pAccent, letterSpacing: "0.02em" }}>@{config.username.replace(/^@+/, "")}</p>}
+                  {config.bio && <p className="text-[11.5px] text-center mt-1 px-2 font-medium leading-[1.35]" style={{ color: pText, opacity: 0.88 }}>{config.bio}</p>}
                 </div>
               </>
             ) : (
@@ -1697,8 +1697,8 @@ const DashboardPagina = () => {
                   </svg>
                 )}
               </p>
-              {config.username && <p className="text-[12.5px] font-medium mt-1" style={{ color: pAccent, textShadow: pTxtShadow, letterSpacing: "0.02em" }}>@{config.username.replace(/^@+/, "")}</p>}
-              {config.bio && <p className="text-[12px] text-center mt-2 px-2 line-clamp-2 font-light leading-relaxed" style={{ color: pSub, textShadow: pTxtShadow }}>{config.bio}</p>}
+              {config.username && <p className="text-[12.5px] font-semibold mt-1" style={{ color: pAccent, textShadow: pTxtShadow, letterSpacing: "0.02em" }}>@{config.username.replace(/^@+/, "")}</p>}
+              {config.bio && <p className="text-[12px] text-center mt-2 px-2 font-medium leading-relaxed" style={{ color: pText, textShadow: pTxtShadow, opacity: 0.88 }}>{config.bio}</p>}
             </div>
             )}
             {/* Social + share row — socials hidden for split-editorial (rendered inside right column); stats stay */}
