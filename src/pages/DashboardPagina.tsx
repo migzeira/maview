@@ -1488,9 +1488,9 @@ const DashboardPagina = () => {
               </div>
               </>
             ) : templateAvatarConfig?.splitLayout ? (
-              /* SPLIT-EDITORIAL: 50/50 editorial magazine — large prominent photo */
-              <div className="flex gap-3 mb-3" style={{ height: 260 }}>
-                <div className="w-[50%] overflow-hidden rounded-2xl" style={{ boxShadow: "0 10px 24px rgba(0,0,0,0.18), 0 4px 10px rgba(0,0,0,0.08)" }}>
+              /* SPLIT-EDITORIAL: 45/55 editorial magazine — photo dominates, socials INSIDE */
+              <div className="flex gap-3 mb-2" style={{ height: 300 }}>
+                <div className="w-[45%] overflow-hidden rounded-2xl flex-shrink-0" style={{ boxShadow: "0 12px 28px rgba(0,0,0,0.22), 0 5px 12px rgba(0,0,0,0.10)" }}>
                   {config.avatarUrl ? (
                     <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover" style={{ objectPosition: "center center" }} />
                   ) : (
@@ -1499,7 +1499,7 @@ const DashboardPagina = () => {
                     </div>
                   )}
                 </div>
-                <div className="w-[50%] flex flex-col justify-center">
+                <div className="w-[55%] flex flex-col justify-center min-w-0">
                   <p className="font-bold text-[22px] leading-[1.02]" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif`, letterSpacing: "-0.03em" }}>
                     {config.displayName || "Seu Nome"}
                     {(config as any).verified && (
@@ -1509,8 +1509,8 @@ const DashboardPagina = () => {
                       </svg>
                     )}
                   </p>
-                  {config.username && <p className="text-[13px] font-medium mt-1.5" style={{ color: pAccent, letterSpacing: "0.02em" }}>@{config.username.replace(/^@+/, "")}</p>}
-                  {config.bio && <p className="text-[12.5px] leading-relaxed mt-2.5 line-clamp-4 font-light" style={{ color: pSub }}>{config.bio}</p>}
+                  {config.username && <p className="text-[12.5px] font-medium mt-1.5" style={{ color: pAccent, letterSpacing: "0.02em" }}>@{config.username.replace(/^@+/, "")}</p>}
+                  {config.bio && <p className="text-[12px] leading-relaxed mt-2 line-clamp-4 font-light" style={{ color: pSub }}>{config.bio}</p>}
                 </div>
               </div>
             ) : templateAvatarConfig?.overlap ? (
