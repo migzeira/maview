@@ -738,9 +738,9 @@ const ProfilePage = () => {
                           ? <img src={profile.avatar} alt={profile.displayName} className="w-full h-full object-cover" style={{ objectPosition: "center 18%" }} loading="eager" decoding="async" fetchPriority="high" />
                           : <div className="w-full h-full" style={{ background: t.accent }} />
                         }
-                        {/* Gradient BALANCEADO: bottom 30% sólido para bio/nome forte + topo limpo para foto */}
+                        {/* Gradient EQUILIBRADO: sólido só no bottom 15% (text base) + topo 55% clear photo */}
                         <div className="absolute inset-0" style={{
-                          background: `linear-gradient(to top, ${bgRgba(1)} 0%, ${bgRgba(1)} 30%, ${bgRgba(0.80)} 42%, ${bgRgba(0.35)} 55%, ${bgRgba(0.10)} 65%, ${bgRgba(0)} 75%)`
+                          background: `linear-gradient(to top, ${bgRgba(1)} 0%, ${bgRgba(0.92)} 15%, ${bgRgba(0.55)} 30%, ${bgRgba(0.18)} 42%, ${bgRgba(0)} 55%)`
                         }} />
                         {/* Bloco centralizado: nome, @, bio, ícones sociais — TUDO center-aligned */}
                         <div className="absolute bottom-5 left-0 right-0 flex flex-col items-center text-center px-5">

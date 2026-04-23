@@ -1452,16 +1452,16 @@ const DashboardPagina = () => {
                 )}
                 {/* Top dark gradient SUAVE (só 25% para status bar, não cobre foto) */}
                 <div className="absolute top-0 inset-x-0 h-[60px]" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, transparent 100%)" }} />
-                {/* Bottom gradient BALANCEADO (30% sólido embaixo p/ texto forte + topo limpo p/ foto) */}
+                {/* Bottom gradient EQUILIBRADO: sólido só 15% embaixo + 55% topo clear photo */}
                 <div className="absolute inset-0" style={{
                   background: (() => {
                     const h = pBg.replace("#", "");
-                    if (h.length !== 6) return `linear-gradient(to top, ${pBg} 0%, transparent 70%)`;
+                    if (h.length !== 6) return `linear-gradient(to top, ${pBg} 0%, transparent 55%)`;
                     const r = parseInt(h.slice(0, 2), 16) || 0;
                     const g = parseInt(h.slice(2, 4), 16) || 0;
                     const b = parseInt(h.slice(4, 6), 16) || 0;
                     const rgba = (a: number) => `rgba(${r},${g},${b},${a})`;
-                    return `linear-gradient(to top, ${rgba(1)} 0%, ${rgba(1)} 30%, ${rgba(0.80)} 42%, ${rgba(0.35)} 55%, ${rgba(0.10)} 65%, ${rgba(0)} 75%)`;
+                    return `linear-gradient(to top, ${rgba(1)} 0%, ${rgba(0.92)} 15%, ${rgba(0.55)} 30%, ${rgba(0.18)} 42%, ${rgba(0)} 55%)`;
                   })(),
                 }} />
                 {/* Bloco CENTRALIZADO: nome, @, bio, ícones sociais */}

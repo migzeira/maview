@@ -270,8 +270,8 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
             {headerType === "edge-to-edge" && (
               <div className="w-full flex-shrink-0 relative overflow-hidden" style={{ height: 180 }}>
                 <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center 15%" }} crossOrigin="anonymous" loading="lazy" />
-                {/* Gradient: BOTTOM 35% SÓLIDO para texto forte + topo limpo para foto vis\u00edvel */}
-                <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${bg} 0%, ${bg} 28%, ${bg}D0 40%, ${bg}50 52%, ${bg}15 62%, transparent 72%)` }} />
+                {/* Gradient EQUILIBRADO: sólido só 15% no bottom (texto) + topo 55% totalmente limpo (foto protagonista) */}
+                <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${bg} 0%, ${bg}E8 15%, ${bg}80 30%, ${bg}25 42%, transparent 52%)` }} />
                 <div className="absolute bottom-2.5 left-3.5 right-3.5 flex flex-col items-center text-center">
                   <p className="text-[17px] leading-[1.02]" style={{
                     color: isLight ? textC : "#fff",
