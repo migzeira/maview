@@ -152,7 +152,7 @@ function Toggle({ on, onToggle, label, desc }: { on: boolean; onToggle: () => vo
 }
 
 /* ─── Main content ──────────────────────────────────────────── */
-function AdvancedContent({ design: d, currentTheme, accent, avatarUrl, displayName, setDesign, onBgColorChange }: Omit<AdvancedDrawerProps, "open" | "onOpenChange">) {
+export function AdvancedContent({ design: d, currentTheme, accent, avatarUrl, displayName, setDesign, onBgColorChange }: Omit<AdvancedDrawerProps, "open" | "onOpenChange">) {
   const bgImageInputRef = useRef<HTMLInputElement>(null);
   const bgVideoInputRef = useRef<HTMLInputElement>(null);
   const coverImageInputRef = useRef<HTMLInputElement>(null);
