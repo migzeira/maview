@@ -298,23 +298,23 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
                 <div className="absolute bottom-2.5 left-3.5 right-3.5 flex flex-col items-center text-center">
                   {(() => {
                     const isMinimalPack = pack.edgeGradientIntensity === "minimal";
-                    /* Multi-layer outline para visibilidade máxima sobre qualquer foto */
-                    const outlineShadow = "-0.7px -0.7px 0 rgba(0,0,0,0.55), 0.7px -0.7px 0 rgba(0,0,0,0.55), -0.7px 0.7px 0 rgba(0,0,0,0.55), 0.7px 0.7px 0 rgba(0,0,0,0.55), 0 1px 5px rgba(0,0,0,0.85), 0 2px 10px rgba(0,0,0,0.55)";
+                    /* Drop-shadow LIMPO profissional (sem outline amador) — sombra suave com profundidade */
+                    const cleanShadow = "0 2px 10px rgba(0,0,0,0.55), 0 1px 3px rgba(0,0,0,0.40)";
                     return (<>
                       <p className="text-[17px] leading-[1.02]" style={{
                         color: isMinimalPack ? "#fff" : (isLight ? textC : "#fff"),
-                        textShadow: isMinimalPack ? outlineShadow : (isLight ? "0 1px 2px rgba(255,255,255,0.4)" : "0 2px 10px rgba(0,0,0,0.55)"),
-                        fontWeight: 800, letterSpacing: "-0.025em",
+                        textShadow: isMinimalPack ? cleanShadow : (isLight ? "0 1px 2px rgba(255,255,255,0.4)" : "0 2px 10px rgba(0,0,0,0.55)"),
+                        fontWeight: 900, letterSpacing: "-0.025em",
                       }}>{ref.name}<VerifiedBadge /></p>
                       <p className="text-[10px] mt-0.5" style={{
                         color: isMinimalPack ? "#fff" : accent,
-                        textShadow: isMinimalPack ? outlineShadow : (isLight ? "0 1px 1px rgba(255,255,255,0.3)" : "0 1px 3px rgba(0,0,0,0.35)"),
-                        fontWeight: 700, letterSpacing: "0.02em"
+                        textShadow: isMinimalPack ? cleanShadow : (isLight ? "0 1px 1px rgba(255,255,255,0.3)" : "0 1px 3px rgba(0,0,0,0.35)"),
+                        fontWeight: 800, letterSpacing: "0.02em"
                       }}>{ref.username}</p>
                       <p className="text-[9px] leading-[1.35] mt-1 line-clamp-2 px-1" style={{
                         color: isMinimalPack ? "#fff" : (isLight ? textC : "rgba(255,255,255,0.95)"),
-                        textShadow: isMinimalPack ? outlineShadow : (isLight ? "none" : "0 1px 3px rgba(0,0,0,0.45)"),
-                        fontWeight: 600,
+                        textShadow: isMinimalPack ? cleanShadow : (isLight ? "none" : "0 1px 3px rgba(0,0,0,0.45)"),
+                        fontWeight: 700,
                         opacity: isMinimalPack ? 1 : (isLight ? 0.88 : 1)
                       }}>{ref.bio}</p>
                       <div className="mt-1.5"><SocialPills size="small" centered whiteGlass={isMinimalPack} /></div>

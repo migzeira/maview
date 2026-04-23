@@ -750,28 +750,31 @@ const ProfilePage = () => {
                         <div className="absolute bottom-5 left-0 right-0 flex flex-col items-center text-center px-5">
                           {(() => {
                             const isMinimal = rd.edgeGradientIntensity === "minimal";
-                            /* Multi-layer shadow forma "outline" sutil + sombra forte — visível sobre QUALQUER foto */
-                            const minimalShadow = "-1px -1px 0 rgba(0,0,0,0.55), 1px -1px 0 rgba(0,0,0,0.55), -1px 1px 0 rgba(0,0,0,0.55), 1px 1px 0 rgba(0,0,0,0.55), 0 2px 12px rgba(0,0,0,0.85), 0 4px 20px rgba(0,0,0,0.55)";
+                            /* Drop-shadow LIMPO profissional — sem outline, só sombra suave com profundidade */
+                            const cleanShadow = "0 2px 12px rgba(0,0,0,0.55), 0 1px 3px rgba(0,0,0,0.40)";
                             return (<>
-                            <h1 className="text-[30px] leading-[1.02] font-extrabold tracking-tight" style={{
+                            <h1 className="text-[30px] leading-[1.02] tracking-tight" style={{
                               color: isMinimal ? "#fff" : (isLight ? t.text : "#fff"),
-                              textShadow: isMinimal ? minimalShadow : (isLight ? "none" : "0 2px 14px rgba(0,0,0,0.6)"),
+                              textShadow: isMinimal ? cleanShadow : (isLight ? "none" : "0 2px 14px rgba(0,0,0,0.6)"),
                               fontFamily: `'${rd.fontHeading}', sans-serif`,
                               letterSpacing: "-0.025em",
+                              fontWeight: 900,
                             }}>
                               {profile.displayName}{verifiedBadge}
                             </h1>
-                            <p className="text-[14px] font-bold mt-1.5" style={{
+                            <p className="text-[14px] mt-1.5" style={{
                               color: isMinimal ? "#fff" : t.accent,
                               letterSpacing: "0.02em",
-                              textShadow: isMinimal ? minimalShadow : (isLight ? "0 1px 2px rgba(255,255,255,0.3)" : "0 1px 4px rgba(0,0,0,0.55)"),
+                              textShadow: isMinimal ? cleanShadow : (isLight ? "0 1px 2px rgba(255,255,255,0.3)" : "0 1px 4px rgba(0,0,0,0.55)"),
+                              fontWeight: 800,
                             }}>@{profile.username.replace(/^@+/, "")}</p>
                             {profile.bio && (
-                              <p className="text-[14px] leading-relaxed mt-2 font-semibold max-w-[290px]" style={{
+                              <p className="text-[14px] leading-relaxed mt-2 max-w-[290px]" style={{
                                 color: isMinimal ? "#fff" : (isLight ? t.text : "rgba(255,255,255,0.97)"),
-                                textShadow: isMinimal ? minimalShadow : (isLight ? "0 1px 2px rgba(255,255,255,0.35)" : "0 1px 5px rgba(0,0,0,0.55)"),
+                                textShadow: isMinimal ? cleanShadow : (isLight ? "0 1px 2px rgba(255,255,255,0.35)" : "0 1px 5px rgba(0,0,0,0.55)"),
                                 fontFamily: `'${rd.fontBody}', sans-serif`,
                                 opacity: isMinimal ? 1 : (isLight ? 0.88 : 1),
+                                fontWeight: 700,
                               }}>
                                 {profile.bio}
                               </p>

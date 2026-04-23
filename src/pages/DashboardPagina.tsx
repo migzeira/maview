@@ -1471,14 +1471,15 @@ const DashboardPagina = () => {
                 <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center text-center px-4">
                   {(() => {
                     const isMinimal = (d as any).edgeGradientIntensity === "minimal";
-                    /* Multi-layer outline — texto super visível sobre qualquer foto */
-                    const minimalShadow = "-1px -1px 0 rgba(0,0,0,0.55), 1px -1px 0 rgba(0,0,0,0.55), -1px 1px 0 rgba(0,0,0,0.55), 1px 1px 0 rgba(0,0,0,0.55), 0 2px 12px rgba(0,0,0,0.85), 0 4px 20px rgba(0,0,0,0.55)";
+                    /* Drop-shadow LIMPO profissional — sem outline, só sombra com profundidade */
+                    const cleanShadow = "0 2px 12px rgba(0,0,0,0.55), 0 1px 3px rgba(0,0,0,0.40)";
                     return (<>
-                    <p className="font-extrabold text-[22px] leading-tight" style={{
+                    <p className="text-[22px] leading-tight" style={{
                       color: isMinimal ? "#fff" : pText,
                       fontFamily: `'${pFontH}', sans-serif`,
                       letterSpacing: "-0.025em",
-                      textShadow: isMinimal ? minimalShadow : (pBg.startsWith("#f") ? "none" : "0 2px 10px rgba(0,0,0,0.55)"),
+                      textShadow: isMinimal ? cleanShadow : (pBg.startsWith("#f") ? "none" : "0 2px 10px rgba(0,0,0,0.55)"),
+                      fontWeight: 900,
                     }}>
                       {config.displayName || "Seu Nome"}
                       {(config as any).verified && (
@@ -1489,20 +1490,22 @@ const DashboardPagina = () => {
                       )}
                     </p>
                     {config.username && (
-                      <p className="text-[13px] font-bold mt-1" style={{
+                      <p className="text-[13px] mt-1" style={{
                         color: isMinimal ? "#fff" : pAccent,
-                        textShadow: isMinimal ? minimalShadow : (pBg.startsWith("#f") ? "0 1px 2px rgba(255,255,255,0.3)" : "0 1px 3px rgba(0,0,0,0.4)"),
+                        textShadow: isMinimal ? cleanShadow : (pBg.startsWith("#f") ? "0 1px 2px rgba(255,255,255,0.3)" : "0 1px 3px rgba(0,0,0,0.4)"),
                         letterSpacing: "0.02em",
+                        fontWeight: 800,
                       }}>
                         @{config.username.replace(/^@+/, "")}
                       </p>
                     )}
                     {config.bio && (
-                      <p className="text-[12.5px] leading-[1.35] mt-1.5 font-semibold" style={{
+                      <p className="text-[12.5px] leading-[1.35] mt-1.5" style={{
                         color: isMinimal ? "#fff" : (pBg.startsWith("#f") ? pText : "rgba(255,255,255,0.96)"),
-                        textShadow: isMinimal ? minimalShadow : (pBg.startsWith("#f") ? "0 1px 2px rgba(255,255,255,0.35)" : "0 1px 4px rgba(0,0,0,0.50)"),
+                        textShadow: isMinimal ? cleanShadow : (pBg.startsWith("#f") ? "0 1px 2px rgba(255,255,255,0.35)" : "0 1px 4px rgba(0,0,0,0.50)"),
                         maxWidth: 260,
                         opacity: isMinimal ? 1 : (pBg.startsWith("#f") ? 0.88 : 1),
+                        fontWeight: 700,
                       }}>
                         {config.bio}
                       </p>
