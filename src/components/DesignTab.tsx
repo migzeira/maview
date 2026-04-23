@@ -75,13 +75,30 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
     </svg>
   ) : null;
 
-  /* Glass/clay social icons — premium physical button feel */
-  const SocialPills = ({ centered, size = "normal" }: { centered?: boolean; size?: "small" | "normal" }) => (
+  /* Glass/clay social icons — premium physical button feel
+     whiteGlass prop: força bolha branca opaca (edge-to-edge minimal sobre foto) */
+  const SocialPills = ({ centered, size = "normal", whiteGlass }: { centered?: boolean; size?: "small" | "normal"; whiteGlass?: boolean }) => (
     <div className={`flex gap-[6px] ${centered ? "justify-center" : ""}`}>
       {ref.socials.slice(0, 4).map((s, i) => {
         const icon = SOCIAL_ICON[s] || { color: accent, path: "M6 2a4 4 0 100 8 4 4 0 000-8z" };
         const iconColor = socialStyle === "mono" ? monoColor : icon.color;
         const sz = size === "small" ? 22 : 26;
+        /* White glass mode — fundo branco sólido 92%, ícone em cor brand, para uso sobre foto */
+        if (whiteGlass) {
+          return (
+            <div key={i} className="rounded-full flex items-center justify-center"
+              style={{
+                width: sz, height: sz,
+                background: "rgba(255,255,255,0.92)",
+                border: "1.5px solid rgba(255,255,255,0.95)",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.28), 0 0 0 1px rgba(255,255,255,0.15)",
+              }}>
+              <svg width={sz - 10} height={sz - 10} viewBox="0 0 12 12" fill={icon.color}>
+                <path d={icon.path} />
+              </svg>
+            </div>
+          );
+        }
         return (
           <div key={i} className="rounded-full flex items-center justify-center"
             style={{
@@ -279,14 +296,30 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
                     : `linear-gradient(to top, ${bg} 0%, ${bg}E8 15%, ${bg}80 30%, ${bg}25 42%, transparent 52%)`,
                 }} />
                 <div className="absolute bottom-2.5 left-3.5 right-3.5 flex flex-col items-center text-center">
-                  <p className="text-[17px] leading-[1.02]" style={{
-                    color: isLight ? textC : "#fff",
-                    textShadow: isLight ? "0 1px 2px rgba(255,255,255,0.4)" : "0 2px 10px rgba(0,0,0,0.55)",
-                    fontWeight: 800, letterSpacing: "-0.025em",
-                  }}>{ref.name}<VerifiedBadge /></p>
-                  <p className="text-[10px] mt-0.5" style={{ color: accent, textShadow: isLight ? "0 1px 1px rgba(255,255,255,0.3)" : "0 1px 3px rgba(0,0,0,0.35)", fontWeight: 600, letterSpacing: "0.02em" }}>{ref.username}</p>
-                  <p className="text-[9px] leading-[1.35] mt-1 line-clamp-2 px-1" style={{ color: isLight ? textC : "rgba(255,255,255,0.95)", textShadow: isLight ? "none" : "0 1px 3px rgba(0,0,0,0.45)", fontWeight: 500, opacity: isLight ? 0.88 : 1 }}>{ref.bio}</p>
-                  <div className="mt-1.5"><SocialPills size="small" centered /></div>
+                  {(() => {
+                    const isMinimalPack = pack.edgeGradientIntensity === "minimal";
+                    /* Multi-layer outline para visibilidade máxima sobre qualquer foto */
+                    const outlineShadow = "-0.7px -0.7px 0 rgba(0,0,0,0.55), 0.7px -0.7px 0 rgba(0,0,0,0.55), -0.7px 0.7px 0 rgba(0,0,0,0.55), 0.7px 0.7px 0 rgba(0,0,0,0.55), 0 1px 5px rgba(0,0,0,0.85), 0 2px 10px rgba(0,0,0,0.55)";
+                    return (<>
+                      <p className="text-[17px] leading-[1.02]" style={{
+                        color: isMinimalPack ? "#fff" : (isLight ? textC : "#fff"),
+                        textShadow: isMinimalPack ? outlineShadow : (isLight ? "0 1px 2px rgba(255,255,255,0.4)" : "0 2px 10px rgba(0,0,0,0.55)"),
+                        fontWeight: 800, letterSpacing: "-0.025em",
+                      }}>{ref.name}<VerifiedBadge /></p>
+                      <p className="text-[10px] mt-0.5" style={{
+                        color: isMinimalPack ? "#fff" : accent,
+                        textShadow: isMinimalPack ? outlineShadow : (isLight ? "0 1px 1px rgba(255,255,255,0.3)" : "0 1px 3px rgba(0,0,0,0.35)"),
+                        fontWeight: 700, letterSpacing: "0.02em"
+                      }}>{ref.username}</p>
+                      <p className="text-[9px] leading-[1.35] mt-1 line-clamp-2 px-1" style={{
+                        color: isMinimalPack ? "#fff" : (isLight ? textC : "rgba(255,255,255,0.95)"),
+                        textShadow: isMinimalPack ? outlineShadow : (isLight ? "none" : "0 1px 3px rgba(0,0,0,0.45)"),
+                        fontWeight: 600,
+                        opacity: isMinimalPack ? 1 : (isLight ? 0.88 : 1)
+                      }}>{ref.bio}</p>
+                      <div className="mt-1.5"><SocialPills size="small" centered whiteGlass={isMinimalPack} /></div>
+                    </>);
+                  })()}
                 </div>
               </div>
             )}
