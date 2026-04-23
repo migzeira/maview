@@ -1244,13 +1244,14 @@ const DashboardPagina = () => {
   const pProfileClip = d.profileShape === "hexagon" ? "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" : undefined;
   /* Template headerLayoutType overrides profile shape/size for accurate preview */
   const headerType = (d as any).headerLayoutType as string | undefined;
+  /* Template dimensions — proportional to showcase (270px) × 1.15 ratio for 310px preview phone */
   const templateAvatarConfig = (() => {
     switch (headerType) {
-      case "big-circle": return { width: 116, height: 116, borderRadius: "9999px", clipPath: undefined, useConicBorder: true, fullWidth: false };
-      case "floating-square": return { width: 128, height: 128, borderRadius: "22px", clipPath: undefined, useConicBorder: false, useFloatingShadow: true, fullWidth: false };
+      case "big-circle": return { width: 100, height: 100, borderRadius: "9999px", clipPath: undefined, useConicBorder: true, fullWidth: false };
+      case "floating-square": return { width: 118, height: 118, borderRadius: "20px", clipPath: undefined, useConicBorder: false, useFloatingShadow: true, fullWidth: false };
       case "edge-to-edge": return { width: 0, height: 180, borderRadius: "0", clipPath: undefined, fullWidth: true };
-      case "split-editorial": return { width: 120, height: 160, borderRadius: "12px", clipPath: undefined, fullWidth: false, splitLayout: true };
-      case "organic-overlap": return { width: 104, height: 104, borderRadius: "9999px", clipPath: undefined, fullWidth: false, overlap: true };
+      case "split-editorial": return { width: 120, height: 180, borderRadius: "12px", clipPath: undefined, fullWidth: false, splitLayout: true };
+      case "organic-overlap": return { width: 106, height: 106, borderRadius: "9999px", clipPath: undefined, fullWidth: false, overlap: true };
       default: return null;
     }
   })();
@@ -1488,29 +1489,29 @@ const DashboardPagina = () => {
               </div>
               </>
             ) : templateAvatarConfig?.splitLayout ? (
-              /* SPLIT-EDITORIAL: 45/55 editorial magazine — photo dominates, socials INSIDE */
-              <div className="flex gap-3 mb-2" style={{ height: 300 }}>
-                <div className="w-[45%] overflow-hidden rounded-2xl flex-shrink-0" style={{ boxShadow: "0 12px 28px rgba(0,0,0,0.22), 0 5px 12px rgba(0,0,0,0.10)" }}>
+              /* SPLIT-EDITORIAL: 45/55 — showcase × 1.15 proportions */
+              <div className="flex gap-3 mb-2" style={{ height: 200 }}>
+                <div className="w-[45%] overflow-hidden rounded-xl flex-shrink-0" style={{ boxShadow: "0 8px 18px rgba(0,0,0,0.16), 0 3px 8px rgba(0,0,0,0.08)" }}>
                   {config.avatarUrl ? (
                     <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover" style={{ objectPosition: "center center" }} />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center" style={{ background: pAccent }}>
-                      <span className="text-white text-5xl font-bold">{config.displayName ? config.displayName[0].toUpperCase() : "?"}</span>
+                      <span className="text-white text-3xl font-bold">{config.displayName ? config.displayName[0].toUpperCase() : "?"}</span>
                     </div>
                   )}
                 </div>
-                <div className="w-[55%] flex flex-col justify-center min-w-0">
-                  <p className="font-bold text-[22px] leading-[1.02]" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif`, letterSpacing: "-0.03em" }}>
+                <div className="w-[55%] flex flex-col justify-center min-w-0 px-1">
+                  <p className="text-[17px] leading-[1.05]" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif`, fontWeight: 700, letterSpacing: "-0.02em" }}>
                     {config.displayName || "Seu Nome"}
                     {(config as any).verified && (
-                      <svg className="inline-block ml-1 flex-shrink-0" width="18" height="18" viewBox="0 0 20 20" fill="none" style={{ verticalAlign: "middle", marginTop: -3 }}>
+                      <svg className="inline-block ml-1 flex-shrink-0" width="14" height="14" viewBox="0 0 20 20" fill="none" style={{ verticalAlign: "middle", marginTop: -2 }}>
                         <circle cx="10" cy="10" r="10" fill="#1E5BFF"/>
                         <path d="M6 10.5l2.5 2.5L14 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     )}
                   </p>
-                  {config.username && <p className="text-[12.5px] font-medium mt-1.5" style={{ color: pAccent, letterSpacing: "0.02em" }}>@{config.username.replace(/^@+/, "")}</p>}
-                  {config.bio && <p className="text-[12px] leading-relaxed mt-2 line-clamp-4 font-light" style={{ color: pSub }}>{config.bio}</p>}
+                  {config.username && <p className="text-[10.5px] font-normal mt-0.5" style={{ color: pAccent, letterSpacing: "0.03em" }}>@{config.username.replace(/^@+/, "")}</p>}
+                  {config.bio && <p className="text-[10.5px] leading-[1.3] mt-1.5 line-clamp-3 font-light" style={{ color: pSub }}>{config.bio}</p>}
                 </div>
               </div>
             ) : templateAvatarConfig?.overlap ? (
@@ -1556,35 +1557,35 @@ const DashboardPagina = () => {
             ) : (
             <div className="flex flex-col items-center mb-3">
               {templateAvatarConfig?.useConicBorder ? (
-                /* BIG-CIRCLE: Conic gradient metallic border */
-                <div className="mb-3 relative" style={{
+                /* BIG-CIRCLE: showcase 84px × 1.15 = 100px */
+                <div className="mb-2 relative" style={{
                   width: templateAvatarConfig.width, height: templateAvatarConfig.height,
-                  padding: 4, borderRadius: "9999px",
+                  padding: 3, borderRadius: "9999px",
                   background: `conic-gradient(from 180deg, ${pAccent}, ${d.accentColor2 || pAccent}, ${pAccent})`,
-                  boxShadow: `0 8px 24px ${pAccent}45, 0 3px 10px rgba(0,0,0,0.18)`,
+                  boxShadow: `0 7px 22px ${pAccent}45, 0 2px 8px rgba(0,0,0,0.15)`,
                 }}>
                   <div className="w-full h-full rounded-full overflow-hidden" style={{ background: pBg }}>
                     {config.avatarUrl ? (
                       <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center" style={{ background: pAccent }}>
-                        <span className="text-white text-2xl font-bold">{config.displayName ? config.displayName[0].toUpperCase() : "?"}</span>
+                        <span className="text-white text-xl font-bold">{config.displayName ? config.displayName[0].toUpperCase() : "?"}</span>
                       </div>
                     )}
                   </div>
                 </div>
               ) : templateAvatarConfig?.useFloatingShadow ? (
-                /* FLOATING-SQUARE: Rounded square with deep shadow */
-                <div className="mb-3 overflow-hidden" style={{
+                /* FLOATING-SQUARE: showcase 100px × 1.15 = 118px */
+                <div className="mb-2 overflow-hidden" style={{
                   width: templateAvatarConfig.width, height: templateAvatarConfig.height,
                   borderRadius: templateAvatarConfig.borderRadius,
-                  boxShadow: `0 18px 36px rgba(0,0,0,0.22), 0 8px 16px rgba(0,0,0,0.12), 0 0 0 5px ${pBg.startsWith("#f") ? "#fff" : "rgba(255,255,255,0.08)"}, 0 0 28px ${pAccent}35`,
+                  boxShadow: `0 14px 30px rgba(0,0,0,0.22), 0 5px 12px rgba(0,0,0,0.12), 0 0 0 4px ${pBg.startsWith("#f") ? "#fff" : "rgba(255,255,255,0.08)"}, 0 0 22px ${pAccent}32`,
                 }}>
                   {config.avatarUrl ? (
                     <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center" style={{ background: pAccent }}>
-                      <span className="text-white text-2xl font-bold">{config.displayName ? config.displayName[0].toUpperCase() : "?"}</span>
+                      <span className="text-white text-xl font-bold">{config.displayName ? config.displayName[0].toUpperCase() : "?"}</span>
                     </div>
                   )}
                 </div>
