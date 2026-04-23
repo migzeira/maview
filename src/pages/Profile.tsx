@@ -822,28 +822,35 @@ const ProfilePage = () => {
                   );
                 }
 
-                /* SPLIT EDITORIAL — Isabela / Julia — editorial magazine dominant photo */
+                /* SPLIT EDITORIAL — Isabela / Julia — editorial magazine dominant photo
+                   Layout: foto grande no topo (aspect 4/5), TUDO centralizado abaixo
+                   (nome, @username, bio completa sem cortar, ícones sociais)            */
                 if (rd.headerLayoutType === "split-editorial") {
                   return (
                     <>
-                      <div className="w-full flex gap-4 mb-4" style={{ height: 440 }}>
-                        <div className="w-[45%] relative overflow-hidden rounded-3xl flex-shrink-0" style={{ boxShadow: "0 20px 48px rgba(0,0,0,0.22), 0 8px 20px rgba(0,0,0,0.10)" }}>
-                          {profile.avatar
-                            ? <img src={profile.avatar} alt={profile.displayName} className="w-full h-full object-cover" loading="eager" decoding="async" fetchPriority="high" />
-                            : <div className="w-full h-full" style={{ background: t.accent }} />
-                          }
-                        </div>
-                        <div className="w-[55%] flex flex-col justify-center min-w-0">
-                          <h1 className="text-[34px] leading-[1.02] font-bold tracking-tight" style={{ color: c.name, fontFamily: `'${rd.fontHeading}', serif`, letterSpacing: "-0.03em" }}>
-                            {profile.displayName}{verifiedBadge}
-                          </h1>
-                          <p className="text-[15px] font-medium mt-2" style={{ color: t.accent, letterSpacing: "0.02em" }}>@{profile.username.replace(/^@+/, "")}</p>
-                          {profile.bio && (
-                            <p className="text-[14px] leading-relaxed font-light mt-3 line-clamp-6" style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif` }}>
-                              {profile.bio}
-                            </p>
-                          )}
-                        </div>
+                      {/* Editorial dominant photo — full-width portrait moldura, mais para cima */}
+                      <div className="w-full overflow-hidden rounded-[28px] mb-5" style={{
+                        aspectRatio: "4/5",
+                        maxHeight: 520,
+                        marginTop: -10,
+                        boxShadow: "0 20px 48px rgba(0,0,0,0.22), 0 8px 20px rgba(0,0,0,0.10)",
+                      }}>
+                        {profile.avatar
+                          ? <img src={profile.avatar} alt={profile.displayName} className="w-full h-full object-cover" loading="eager" decoding="async" fetchPriority="high" />
+                          : <div className="w-full h-full" style={{ background: t.accent }} />
+                        }
+                      </div>
+                      {/* Centered textual block — name, @, full bio (sem line-clamp) */}
+                      <div className="flex flex-col items-center text-center w-full px-3 mb-3">
+                        <h1 className="text-[34px] leading-[1.02] font-bold tracking-tight" style={{ color: c.name, fontFamily: `'${rd.fontHeading}', serif`, letterSpacing: "-0.03em" }}>
+                          {profile.displayName}{verifiedBadge}
+                        </h1>
+                        <p className="text-[15px] font-medium mt-2" style={{ color: t.accent, letterSpacing: "0.02em" }}>@{profile.username.replace(/^@+/, "")}</p>
+                        {profile.bio && (
+                          <p className="text-[14px] leading-relaxed font-light mt-3 max-w-[320px]" style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif` }}>
+                            {profile.bio}
+                          </p>
+                        )}
                       </div>
                       <StatsBlock />
                       <SocialsRow />
