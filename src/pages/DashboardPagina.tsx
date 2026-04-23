@@ -1488,29 +1488,29 @@ const DashboardPagina = () => {
               </div>
               </>
             ) : templateAvatarConfig?.splitLayout ? (
-              /* SPLIT-EDITORIAL: 45/55 photo + info */
-              <div className="flex gap-3 mb-2" style={{ height: 135 }}>
-                <div className="w-[45%] overflow-hidden rounded-xl">
+              /* SPLIT-EDITORIAL: 50/50 editorial magazine layout — large */
+              <div className="flex gap-3 mb-3" style={{ height: 220 }}>
+                <div className="w-[50%] overflow-hidden rounded-2xl" style={{ boxShadow: "0 6px 16px rgba(0,0,0,0.12)" }}>
                   {config.avatarUrl ? (
-                    <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                    <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover" style={{ objectPosition: "center center" }} />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center" style={{ background: pAccent }}>
-                      <span className="text-white text-3xl font-bold">{config.displayName ? config.displayName[0].toUpperCase() : "?"}</span>
+                      <span className="text-white text-4xl font-bold">{config.displayName ? config.displayName[0].toUpperCase() : "?"}</span>
                     </div>
                   )}
                 </div>
-                <div className="w-[55%] flex flex-col justify-center">
-                  <p className="font-bold text-[15px] leading-[1.1]" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif`, letterSpacing: "-0.02em" }}>
+                <div className="w-[50%] flex flex-col justify-center">
+                  <p className="font-bold text-[18px] leading-[1.05]" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif`, letterSpacing: "-0.025em" }}>
                     {config.displayName || "Seu Nome"}
                     {(config as any).verified && (
-                      <svg className="inline-block ml-1 flex-shrink-0" width="14" height="14" viewBox="0 0 20 20" fill="none" style={{ verticalAlign: "middle", marginTop: -2 }}>
+                      <svg className="inline-block ml-1 flex-shrink-0" width="16" height="16" viewBox="0 0 20 20" fill="none" style={{ verticalAlign: "middle", marginTop: -2 }}>
                         <circle cx="10" cy="10" r="10" fill="#1E5BFF"/>
                         <path d="M6 10.5l2.5 2.5L14 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     )}
                   </p>
-                  {config.username && <p className="text-[11px] font-medium mt-0.5" style={{ color: pAccent }}>@{config.username.replace(/^@+/, "")}</p>}
-                  {config.bio && <p className="text-[10.5px] leading-tight mt-1 line-clamp-3 font-light" style={{ color: pSub }}>{config.bio}</p>}
+                  {config.username && <p className="text-[12px] font-medium mt-1" style={{ color: pAccent, letterSpacing: "0.02em" }}>@{config.username.replace(/^@+/, "")}</p>}
+                  {config.bio && <p className="text-[12px] leading-snug mt-2 line-clamp-4 font-light" style={{ color: pSub }}>{config.bio}</p>}
                 </div>
               </div>
             ) : templateAvatarConfig?.overlap ? (

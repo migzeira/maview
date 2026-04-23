@@ -822,24 +822,24 @@ const ProfilePage = () => {
                   );
                 }
 
-                /* SPLIT EDITORIAL — Isabela / Julia */
+                /* SPLIT EDITORIAL — Isabela / Julia — large editorial magazine layout */
                 if (rd.headerLayoutType === "split-editorial") {
                   return (
                     <>
-                      <div className="w-full flex gap-4 mb-3" style={{ height: 260 }}>
-                        <div className="w-[45%] relative overflow-hidden rounded-2xl">
+                      <div className="w-full flex gap-4 mb-4" style={{ height: 380 }}>
+                        <div className="w-[50%] relative overflow-hidden rounded-3xl" style={{ boxShadow: "0 16px 40px rgba(0,0,0,0.18), 0 6px 16px rgba(0,0,0,0.08)" }}>
                           {profile.avatar
                             ? <img src={profile.avatar} alt={profile.displayName} className="w-full h-full object-cover" loading="eager" decoding="async" fetchPriority="high" />
                             : <div className="w-full h-full" style={{ background: t.accent }} />
                           }
                         </div>
-                        <div className="w-[55%] flex flex-col justify-center">
-                          <h1 className="text-[28px] leading-[1.05] font-bold tracking-tight" style={{ color: c.name, fontFamily: `'${rd.fontHeading}', serif`, letterSpacing: "-0.02em" }}>
+                        <div className="w-[50%] flex flex-col justify-center">
+                          <h1 className="text-[32px] leading-[1.02] font-bold tracking-tight" style={{ color: c.name, fontFamily: `'${rd.fontHeading}', serif`, letterSpacing: "-0.025em" }}>
                             {profile.displayName}{verifiedBadge}
                           </h1>
-                          <p className="text-[14px] font-medium mt-1" style={{ color: t.accent, letterSpacing: "0.02em" }}>@{profile.username.replace(/^@+/, "")}</p>
+                          <p className="text-[15px] font-medium mt-1.5" style={{ color: t.accent, letterSpacing: "0.02em" }}>@{profile.username.replace(/^@+/, "")}</p>
                           {profile.bio && (
-                            <p className="text-[14px] leading-relaxed font-light mt-3 line-clamp-4" style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif` }}>
+                            <p className="text-[14px] leading-relaxed font-light mt-3 line-clamp-5" style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif` }}>
                               {profile.bio}
                             </p>
                           )}
