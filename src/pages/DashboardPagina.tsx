@@ -1469,62 +1469,83 @@ const DashboardPagina = () => {
                 }} />
                 {/* Bloco CENTRALIZADO: nome, @, bio, ícones sociais */}
                 <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center text-center px-4">
-                  {(() => { const isMinimal = (d as any).edgeGradientIntensity === "minimal"; return (<>
-                  <p className="font-extrabold text-[22px] leading-tight" style={{
-                    color: isMinimal ? "#fff" : pText,
-                    fontFamily: `'${pFontH}', sans-serif`,
-                    letterSpacing: "-0.025em",
-                    textShadow: isMinimal ? "0 2px 14px rgba(0,0,0,0.80), 0 1px 4px rgba(0,0,0,0.55)" : (pBg.startsWith("#f") ? "none" : "0 2px 10px rgba(0,0,0,0.55)"),
-                  }}>
-                    {config.displayName || "Seu Nome"}
-                    {(config as any).verified && (
-                      <svg className="inline-block ml-1 flex-shrink-0" width="16" height="16" viewBox="0 0 20 20" fill="none" style={{ verticalAlign: "middle", marginTop: -2 }}>
-                        <circle cx="10" cy="10" r="10" fill="#1E5BFF"/>
-                        <path d="M6 10.5l2.5 2.5L14 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
+                  {(() => {
+                    const isMinimal = (d as any).edgeGradientIntensity === "minimal";
+                    /* Multi-layer outline — texto super visível sobre qualquer foto */
+                    const minimalShadow = "-1px -1px 0 rgba(0,0,0,0.55), 1px -1px 0 rgba(0,0,0,0.55), -1px 1px 0 rgba(0,0,0,0.55), 1px 1px 0 rgba(0,0,0,0.55), 0 2px 12px rgba(0,0,0,0.85), 0 4px 20px rgba(0,0,0,0.55)";
+                    return (<>
+                    <p className="font-extrabold text-[22px] leading-tight" style={{
+                      color: isMinimal ? "#fff" : pText,
+                      fontFamily: `'${pFontH}', sans-serif`,
+                      letterSpacing: "-0.025em",
+                      textShadow: isMinimal ? minimalShadow : (pBg.startsWith("#f") ? "none" : "0 2px 10px rgba(0,0,0,0.55)"),
+                    }}>
+                      {config.displayName || "Seu Nome"}
+                      {(config as any).verified && (
+                        <svg className="inline-block ml-1 flex-shrink-0" width="16" height="16" viewBox="0 0 20 20" fill="none" style={{ verticalAlign: "middle", marginTop: -2 }}>
+                          <circle cx="10" cy="10" r="10" fill="#1E5BFF"/>
+                          <path d="M6 10.5l2.5 2.5L14 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                    </p>
+                    {config.username && (
+                      <p className="text-[13px] font-bold mt-1" style={{
+                        color: isMinimal ? "#fff" : pAccent,
+                        textShadow: isMinimal ? minimalShadow : (pBg.startsWith("#f") ? "0 1px 2px rgba(255,255,255,0.3)" : "0 1px 3px rgba(0,0,0,0.4)"),
+                        letterSpacing: "0.02em",
+                      }}>
+                        @{config.username.replace(/^@+/, "")}
+                      </p>
                     )}
-                  </p>
-                  {config.username && (
-                    <p className="text-[13px] font-semibold mt-1" style={{
-                      color: isMinimal ? "#fff" : pAccent,
-                      textShadow: isMinimal ? "0 1px 6px rgba(0,0,0,0.70)" : (pBg.startsWith("#f") ? "0 1px 2px rgba(255,255,255,0.3)" : "0 1px 3px rgba(0,0,0,0.4)"),
-                      letterSpacing: "0.02em",
-                    }}>
-                      @{config.username.replace(/^@+/, "")}
-                    </p>
-                  )}
-                  {config.bio && (
-                    <p className="text-[12.5px] leading-[1.35] mt-1.5 font-medium" style={{
-                      color: isMinimal ? "#fff" : (pBg.startsWith("#f") ? pText : "rgba(255,255,255,0.96)"),
-                      textShadow: isMinimal ? "0 1px 6px rgba(0,0,0,0.75)" : (pBg.startsWith("#f") ? "0 1px 2px rgba(255,255,255,0.35)" : "0 1px 4px rgba(0,0,0,0.50)"),
-                      maxWidth: 260,
-                      opacity: isMinimal ? 1 : (pBg.startsWith("#f") ? 0.88 : 1),
-                    }}>
-                      {config.bio}
-                    </p>
-                  )}
-                  </>); })()}
-                  {/* Ícones sociais centralizados INLINE dentro do edge-to-edge */}
+                    {config.bio && (
+                      <p className="text-[12.5px] leading-[1.35] mt-1.5 font-semibold" style={{
+                        color: isMinimal ? "#fff" : (pBg.startsWith("#f") ? pText : "rgba(255,255,255,0.96)"),
+                        textShadow: isMinimal ? minimalShadow : (pBg.startsWith("#f") ? "0 1px 2px rgba(255,255,255,0.35)" : "0 1px 4px rgba(0,0,0,0.50)"),
+                        maxWidth: 260,
+                        opacity: isMinimal ? 1 : (pBg.startsWith("#f") ? 0.88 : 1),
+                      }}>
+                        {config.bio}
+                      </p>
+                    )}
+                    </>); })()}
+                  {/* Ícones sociais — respeita showcaseSocialStyle do pack + glass effect sobre foto */}
                   <div className="flex items-center gap-1.5 mt-2.5 flex-wrap justify-center">
                     {(() => {
+                      const isMinimal = (d as any).edgeGradientIntensity === "minimal";
+                      const showcaseStyle = (d as any).showcaseSocialStyle as "brand" | "mono" | undefined;
+                      const useMono = showcaseStyle === "mono";
+                      const monoColor = d.nameColor || pText;
                       const BRAND_CLR: Record<string, string> = { instagram: "#E4405F", pinterest: "#E60023", tiktok: "#000000", linkedin: "#0A66C2" };
-                      const isLight = pBg.startsWith("#f") || pBg.startsWith("#e");
                       const socials = [
                         { key: "instagram", Icon: Instagram },
                         { key: "pinterest", Icon: PinterestIcon },
                         { key: "tiktok", Icon: TikTokIcon },
                         { key: "linkedin", Icon: LinkedInIcon },
                       ];
-                      return socials.map(({ key, Icon }) => (
-                        <div key={key} className="rounded-full flex items-center justify-center"
-                          style={{
-                            width: 24, height: 24,
-                            background: isLight ? `${BRAND_CLR[key]}18` : "rgba(255,255,255,0.20)",
-                            border: `1px solid ${isLight ? `${BRAND_CLR[key]}30` : "rgba(255,255,255,0.30)"}`,
-                          }}>
-                          <Icon size={12} style={{ color: isLight ? BRAND_CLR[key] : "#fff" }} />
-                        </div>
-                      ));
+                      return socials.map(({ key, Icon }) => {
+                        const brandClr = BRAND_CLR[key];
+                        const iconColor = useMono ? monoColor : brandClr;
+                        /* Minimal: bolha branca glass sobre foto, ícone na cor brand (bem visível) */
+                        const bg = isMinimal
+                          ? "rgba(255,255,255,0.92)"
+                          : useMono
+                            ? (pBg.startsWith("#f") ? "rgba(15,23,42,0.05)" : "rgba(255,255,255,0.10)")
+                            : `${brandClr}22`;
+                        const bdr = isMinimal
+                          ? "1.5px solid rgba(255,255,255,0.95)"
+                          : useMono
+                            ? `1px solid ${monoColor}22`
+                            : `1px solid ${brandClr}40`;
+                        const shadow = isMinimal
+                          ? "0 2px 10px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.15)"
+                          : "none";
+                        return (
+                          <div key={key} className="rounded-full flex items-center justify-center"
+                            style={{ width: 26, height: 26, background: bg, border: bdr, boxShadow: shadow }}>
+                            <Icon size={13} style={{ color: iconColor }} />
+                          </div>
+                        );
+                      });
                     })()}
                   </div>
                 </div>
@@ -1561,12 +1582,12 @@ const DashboardPagina = () => {
                   </p>
                   {config.username && <p className="text-[11px] font-semibold mt-1" style={{ color: pAccent, letterSpacing: "0.02em" }}>@{config.username.replace(/^@+/, "")}</p>}
                   {config.bio && <p className="text-[11px] leading-[1.35] mt-1.5 font-medium" style={{ color: pText, opacity: 0.88 }}>{config.bio}</p>}
-                  {/* Ícones sociais REAIS — branded, compactos, dentro da coluna direita */}
+                  {/* Ícones sociais REAIS branded — respeita showcaseSocialStyle (brand vs mono) */}
                   {(() => {
                     const showcaseStyle = (d as any).showcaseSocialStyle as "brand" | "mono" | undefined;
+                    const useMono = showcaseStyle === "mono";
                     const monoColor = d.nameColor || pText;
                     const BRAND_CLR: Record<string, string> = { instagram: "#E4405F", pinterest: "#E60023", tiktok: "#000000", linkedin: "#0A66C2" };
-                    /* Real branded social icons — 4 plataformas do template split-editorial */
                     const socialsToRender = [
                       { key: "instagram", Icon: Instagram },
                       { key: "pinterest", Icon: PinterestIcon },
@@ -1576,17 +1597,18 @@ const DashboardPagina = () => {
                     return (
                       <div className="flex items-center gap-1.5 mt-2.5 flex-wrap justify-center">
                         {socialsToRender.map(({ key, Icon }) => {
-                          const clr = showcaseStyle === "mono" ? monoColor : BRAND_CLR[key];
-                          const bg = showcaseStyle === "mono"
-                            ? (pBg.startsWith("#f") ? "rgba(15,23,42,0.05)" : "rgba(255,255,255,0.08)")
-                            : `${BRAND_CLR[key]}15`;
-                          const bdr = showcaseStyle === "mono"
-                            ? `1px solid ${monoColor}20`
-                            : `1px solid ${BRAND_CLR[key]}22`;
+                          const brandClr = BRAND_CLR[key];
+                          const iconColor = useMono ? monoColor : brandClr;
+                          const bg = useMono
+                            ? (pBg.startsWith("#f") ? "rgba(15,23,42,0.05)" : "rgba(255,255,255,0.10)")
+                            : `${brandClr}22`;
+                          const bdr = useMono
+                            ? `1px solid ${monoColor}22`
+                            : `1px solid ${brandClr}40`;
                           return (
                             <div key={key} className="rounded-full flex items-center justify-center"
-                              style={{ width: 24, height: 24, background: bg, border: bdr }}>
-                              <Icon size={12} style={{ color: clr }} />
+                              style={{ width: 26, height: 26, background: bg, border: bdr }}>
+                              <Icon size={13} style={{ color: iconColor }} />
                             </div>
                           );
                         })}

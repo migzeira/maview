@@ -748,63 +748,99 @@ const ProfilePage = () => {
                         }} />
                         {/* Bloco centralizado: nome, @, bio, ícones sociais — TUDO center-aligned */}
                         <div className="absolute bottom-5 left-0 right-0 flex flex-col items-center text-center px-5">
-                          {(() => { const isMinimal = rd.edgeGradientIntensity === "minimal"; return (<>
-                          <h1 className="text-[30px] leading-[1.02] font-extrabold tracking-tight" style={{
-                            color: isMinimal ? "#fff" : (isLight ? t.text : "#fff"),
-                            textShadow: isMinimal ? "0 2px 16px rgba(0,0,0,0.80), 0 1px 4px rgba(0,0,0,0.55)" : (isLight ? "none" : "0 2px 14px rgba(0,0,0,0.6)"),
-                            fontFamily: `'${rd.fontHeading}', sans-serif`,
-                            letterSpacing: "-0.025em",
-                          }}>
-                            {profile.displayName}{verifiedBadge}
-                          </h1>
-                          <p className="text-[14px] font-semibold mt-1.5" style={{
-                            color: isMinimal ? "#fff" : t.accent,
-                            letterSpacing: "0.02em",
-                            textShadow: isMinimal ? "0 1px 6px rgba(0,0,0,0.70)" : (isLight ? "0 1px 2px rgba(255,255,255,0.3)" : "0 1px 4px rgba(0,0,0,0.55)"),
-                          }}>@{profile.username.replace(/^@+/, "")}</p>
-                          {profile.bio && (
-                            <p className="text-[14px] leading-relaxed mt-2 font-medium max-w-[290px]" style={{
-                              color: isMinimal ? "#fff" : (isLight ? t.text : "rgba(255,255,255,0.97)"),
-                              textShadow: isMinimal ? "0 1px 6px rgba(0,0,0,0.75)" : (isLight ? "0 1px 2px rgba(255,255,255,0.35)" : "0 1px 5px rgba(0,0,0,0.55)"),
-                              fontFamily: `'${rd.fontBody}', sans-serif`,
-                              opacity: isMinimal ? 1 : (isLight ? 0.88 : 1),
+                          {(() => {
+                            const isMinimal = rd.edgeGradientIntensity === "minimal";
+                            /* Multi-layer shadow forma "outline" sutil + sombra forte — visível sobre QUALQUER foto */
+                            const minimalShadow = "-1px -1px 0 rgba(0,0,0,0.55), 1px -1px 0 rgba(0,0,0,0.55), -1px 1px 0 rgba(0,0,0,0.55), 1px 1px 0 rgba(0,0,0,0.55), 0 2px 12px rgba(0,0,0,0.85), 0 4px 20px rgba(0,0,0,0.55)";
+                            return (<>
+                            <h1 className="text-[30px] leading-[1.02] font-extrabold tracking-tight" style={{
+                              color: isMinimal ? "#fff" : (isLight ? t.text : "#fff"),
+                              textShadow: isMinimal ? minimalShadow : (isLight ? "none" : "0 2px 14px rgba(0,0,0,0.6)"),
+                              fontFamily: `'${rd.fontHeading}', sans-serif`,
+                              letterSpacing: "-0.025em",
                             }}>
-                              {profile.bio}
-                            </p>
-                          )}</>); })()}
-                          {/* Ícones sociais centralizados INLINE no edge-to-edge */}
+                              {profile.displayName}{verifiedBadge}
+                            </h1>
+                            <p className="text-[14px] font-bold mt-1.5" style={{
+                              color: isMinimal ? "#fff" : t.accent,
+                              letterSpacing: "0.02em",
+                              textShadow: isMinimal ? minimalShadow : (isLight ? "0 1px 2px rgba(255,255,255,0.3)" : "0 1px 4px rgba(0,0,0,0.55)"),
+                            }}>@{profile.username.replace(/^@+/, "")}</p>
+                            {profile.bio && (
+                              <p className="text-[14px] leading-relaxed mt-2 font-semibold max-w-[290px]" style={{
+                                color: isMinimal ? "#fff" : (isLight ? t.text : "rgba(255,255,255,0.97)"),
+                                textShadow: isMinimal ? minimalShadow : (isLight ? "0 1px 2px rgba(255,255,255,0.35)" : "0 1px 5px rgba(0,0,0,0.55)"),
+                                fontFamily: `'${rd.fontBody}', sans-serif`,
+                                opacity: isMinimal ? 1 : (isLight ? 0.88 : 1),
+                              }}>
+                                {profile.bio}
+                              </p>
+                            )}
+                          </>); })()}
+                          {/* Ícones sociais centralizados INLINE — sempre em brand colors (ou mono se pack define) */}
                           <div className="flex items-center gap-1.5 mt-3 flex-wrap justify-center">
-                            {socialLinks.length > 0 ? socialLinks.map(link => {
-                              const Icon = getIcon(link.icon);
-                              const brandColor = BRAND_COLORS[link.icon];
-                              return (
-                                <a key={link.id} href={sanitizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
-                                  className="rounded-full flex items-center justify-center"
-                                  style={{
-                                    width: eeSize, height: eeSize,
-                                    background: isLight ? `${brandColor || t.accent}18` : "rgba(255,255,255,0.18)",
-                                    border: `1.5px solid ${isLight ? `${brandColor || t.accent}30` : "rgba(255,255,255,0.30)"}`,
-                                  }}>
-                                  <Icon size={eeIconSize} style={{ color: isLight ? (brandColor || t.text) : "#fff" }} />
-                                </a>
-                              );
-                            }) : (
-                              [
+                            {(() => {
+                              const isMinimal = rd.edgeGradientIntensity === "minimal";
+                              const useMono = rd.showcaseSocialStyle === "mono";
+                              const monoColor = rd.nameColor || t.text;
+
+                              /* Estilos para cada ícone — bolha glass branca sobre foto (minimal)
+                                 ou bolha com brand color tint (normal) ou mono (se pack define) */
+                              const iconStyle = (brandColor: string) => {
+                                if (isMinimal) {
+                                  return {
+                                    bg: "rgba(255,255,255,0.92)",
+                                    border: "1.5px solid rgba(255,255,255,0.95)",
+                                    shadow: "0 2px 10px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.15)",
+                                    color: brandColor,
+                                  };
+                                }
+                                if (useMono) {
+                                  return {
+                                    bg: isLight ? "rgba(15,23,42,0.05)" : "rgba(255,255,255,0.10)",
+                                    border: `1.5px solid ${monoColor}22`,
+                                    shadow: "none",
+                                    color: monoColor,
+                                  };
+                                }
+                                return {
+                                  bg: `${brandColor}22`,
+                                  border: `1.5px solid ${brandColor}40`,
+                                  shadow: "none",
+                                  color: brandColor,
+                                };
+                              };
+
+                              if (socialLinks.length > 0) {
+                                return socialLinks.map(link => {
+                                  const Icon = getIcon(link.icon);
+                                  const brandColor = BRAND_COLORS[link.icon] || t.accent;
+                                  const s = iconStyle(brandColor);
+                                  return (
+                                    <a key={link.id} href={sanitizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
+                                      className="rounded-full flex items-center justify-center"
+                                      style={{ width: eeSize, height: eeSize, background: s.bg, border: s.border, boxShadow: s.shadow }}>
+                                      <Icon size={eeIconSize} style={{ color: s.color }} />
+                                    </a>
+                                  );
+                                });
+                              }
+                              /* Placeholder template icons */
+                              return [
                                 { key: "instagram", Icon: getIcon("instagram"), color: BRAND_COLORS["instagram"] },
                                 { key: "pinterest", Icon: getIcon("pinterest"), color: BRAND_COLORS["pinterest"] },
                                 { key: "tiktok", Icon: getIcon("tiktok"), color: BRAND_COLORS["tiktok"] },
                                 { key: "linkedin", Icon: getIcon("linkedin"), color: BRAND_COLORS["linkedin"] },
-                              ].map(({ key, Icon, color }) => (
-                                <div key={key} className="rounded-full flex items-center justify-center"
-                                  style={{
-                                    width: eeSize, height: eeSize,
-                                    background: isLight ? `${color}18` : "rgba(255,255,255,0.18)",
-                                    border: `1.5px solid ${isLight ? `${color}30` : "rgba(255,255,255,0.30)"}`,
-                                  }}>
-                                  <Icon size={eeIconSize} style={{ color: isLight ? color : "#fff" }} />
-                                </div>
-                              ))
-                            )}
+                              ].map(({ key, Icon, color }) => {
+                                const s = iconStyle(color);
+                                return (
+                                  <div key={key} className="rounded-full flex items-center justify-center"
+                                    style={{ width: eeSize, height: eeSize, background: s.bg, border: s.border, boxShadow: s.shadow }}>
+                                    <Icon size={eeIconSize} style={{ color: s.color }} />
+                                  </div>
+                                );
+                              });
+                            })()}
                           </div>
                         </div>
                       </div>
