@@ -822,38 +822,84 @@ const ProfilePage = () => {
                   );
                 }
 
-                /* SPLIT EDITORIAL — Isabela / Julia — editorial magazine dominant photo
-                   Layout: foto grande no topo (aspect 4/5), TUDO centralizado abaixo
-                   (nome, @username, bio completa sem cortar, ícones sociais)            */
+                /* SPLIT EDITORIAL — Isabela / Julia — SPLIT LAYOUT fiel ao template
+                   Layout: foto portrait à esquerda (45%) + coluna direita (55%) com
+                   TUDO centralizado: nome, @, bio completa, ícones sociais compactos.
+                   Stats row abaixo spanning full width.                                  */
                 if (rd.headerLayoutType === "split-editorial") {
+                  const sSize = 34;
+                  const sIconSize = 14;
                   return (
                     <>
-                      {/* Editorial dominant photo — full-width portrait moldura, mais para cima */}
-                      <div className="w-full overflow-hidden rounded-[28px] mb-5" style={{
-                        aspectRatio: "4/5",
-                        maxHeight: 520,
-                        marginTop: -10,
-                        boxShadow: "0 20px 48px rgba(0,0,0,0.22), 0 8px 20px rgba(0,0,0,0.10)",
-                      }}>
-                        {profile.avatar
-                          ? <img src={profile.avatar} alt={profile.displayName} className="w-full h-full object-cover" loading="eager" decoding="async" fetchPriority="high" />
-                          : <div className="w-full h-full" style={{ background: t.accent }} />
-                        }
-                      </div>
-                      {/* Centered textual block — name, @, full bio (sem line-clamp) */}
-                      <div className="flex flex-col items-center text-center w-full px-3 mb-3">
-                        <h1 className="text-[34px] leading-[1.02] font-bold tracking-tight" style={{ color: c.name, fontFamily: `'${rd.fontHeading}', serif`, letterSpacing: "-0.03em" }}>
-                          {profile.displayName}{verifiedBadge}
-                        </h1>
-                        <p className="text-[15px] font-medium mt-2" style={{ color: t.accent, letterSpacing: "0.02em" }}>@{profile.username.replace(/^@+/, "")}</p>
-                        {profile.bio && (
-                          <p className="text-[14px] leading-relaxed font-light mt-3 max-w-[320px]" style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif` }}>
-                            {profile.bio}
-                          </p>
-                        )}
+                      <div className="w-full flex gap-3 mb-5" style={{ minHeight: 340 }}>
+                        {/* Foto portrait à esquerda */}
+                        <div className="w-[45%] relative overflow-hidden rounded-3xl flex-shrink-0" style={{
+                          aspectRatio: "3/4",
+                          boxShadow: "0 20px 48px rgba(0,0,0,0.22), 0 8px 20px rgba(0,0,0,0.10)",
+                        }}>
+                          {profile.avatar
+                            ? <img src={profile.avatar} alt={profile.displayName} className="w-full h-full object-cover" loading="eager" decoding="async" fetchPriority="high" />
+                            : <div className="w-full h-full flex items-center justify-center" style={{ background: t.accent }}>
+                                <span className="text-white text-4xl font-bold">{(profile.displayName || "?")[0]}</span>
+                              </div>
+                          }
+                        </div>
+                        {/* Coluna direita — tudo centralizado */}
+                        <div className="w-[55%] flex flex-col items-center justify-center text-center min-w-0">
+                          <h1 className="font-bold tracking-tight" style={{
+                            fontSize: 24, lineHeight: 1.0,
+                            color: c.name, fontFamily: `'${rd.fontHeading}', serif`, letterSpacing: "-0.03em",
+                          }}>
+                            {profile.displayName}{verifiedBadge}
+                          </h1>
+                          <p className="text-[12px] font-medium mt-1.5" style={{ color: t.accent, letterSpacing: "0.02em" }}>@{profile.username.replace(/^@+/, "")}</p>
+                          {profile.bio && (
+                            <p className="text-[12px] leading-[1.4] font-light mt-2" style={{ color: c.bio, fontFamily: `'${rd.fontBody}', sans-serif` }}>
+                              {profile.bio}
+                            </p>
+                          )}
+                          {/* Ícones sociais compactos — dentro da coluna direita */}
+                          <div className="flex items-center gap-2 mt-3.5 flex-wrap justify-center">
+                            {socialLinks.map(link => {
+                              const Icon = getIcon(link.icon);
+                              const brandColor = BRAND_COLORS[link.icon];
+                              const hasGrad = hasBrandGradient(link.icon);
+                              const useBrand = rd.socialIconStyle !== "custom" && rd.socialIconStyle !== "theme";
+                              const iconColor = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
+                                ? rd.socialIconCustomColor
+                                : rd.socialIconStyle === "theme" ? t.text
+                                : (brandColor || t.text);
+                              const iconBg = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
+                                ? `${rd.socialIconCustomColor}15`
+                                : rd.socialIconStyle === "theme" ? `${t.accent}15`
+                                : (hasGrad && useBrand) ? BRAND_GRADIENTS[link.icon]
+                                : (brandColor ? `${brandColor}18` : `${t.accent}15`);
+                              const iconBorder = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
+                                ? `1.5px solid ${rd.socialIconCustomColor}25`
+                                : rd.socialIconStyle === "theme" ? `1.5px solid ${t.accent}22`
+                                : (brandColor ? `1.5px solid ${brandColor}25` : `1.5px solid ${t.accent}22`);
+                              const finalIconColor = (hasGrad && useBrand) ? "#ffffff" : iconColor;
+                              return (
+                                <a key={link.id} href={sanitizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
+                                  className="rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
+                                  style={{ width: sSize, height: sSize, background: iconBg, border: iconBorder }}
+                                  title={link.title} aria-label={link.title || "Social link"}>
+                                  <Icon size={sIconSize} style={{ color: finalIconColor }} />
+                                </a>
+                              );
+                            })}
+                            {profile.whatsapp && (
+                              <a href={`https://wa.me/${profile.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"
+                                className="rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
+                                style={{ width: sSize, height: sSize, background: "rgba(37,211,102,0.15)", border: "1.5px solid rgba(37,211,102,0.25)" }}
+                                aria-label="WhatsApp">
+                                <WhatsAppIcon size={sIconSize} style={{ color: "#25d366" }} />
+                              </a>
+                            )}
+                          </div>
+                        </div>
                       </div>
                       <StatsBlock />
-                      <SocialsRow />
                     </>
                   );
                 }

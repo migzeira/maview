@@ -1489,14 +1489,12 @@ const DashboardPagina = () => {
               </div>
               </>
             ) : templateAvatarConfig?.splitLayout ? (
-              /* EDITORIAL-CENTERED: Foto retrato full-width no topo + tudo centralizado abaixo
-                 (Julia / Isabela — idêntico ao template Stan Store)                            */
-              <>
-                <div className="w-full overflow-hidden rounded-2xl mb-3" style={{
-                  aspectRatio: "4/5",
-                  maxHeight: 280,
-                  marginTop: -6,
-                  boxShadow: "0 12px 26px rgba(0,0,0,0.18), 0 5px 12px rgba(0,0,0,0.08)",
+              /* SPLIT-EDITORIAL: Foto portrait à esquerda (45%) + coluna direita (55%)
+                 com tudo centralizado — fiel ao template Isabela Rios / Julia Martins     */
+              <div className="flex gap-2.5 mb-3" style={{ minHeight: 200 }}>
+                <div className="w-[45%] overflow-hidden rounded-2xl flex-shrink-0" style={{
+                  aspectRatio: "3/4",
+                  boxShadow: "0 10px 22px rgba(0,0,0,0.18), 0 4px 10px rgba(0,0,0,0.08)",
                 }}>
                   {config.avatarUrl ? (
                     <img src={config.avatarUrl} alt="avatar" className="w-full h-full object-cover" style={{ objectPosition: "center center" }} />
@@ -1506,20 +1504,32 @@ const DashboardPagina = () => {
                     </div>
                   )}
                 </div>
-                <div className="flex flex-col items-center text-center w-full mb-2 px-2">
-                  <p className="text-[20px] leading-[1.04]" style={{ color: pText, fontFamily: `'${pFontH}', sans-serif`, fontWeight: 700, letterSpacing: "-0.02em" }}>
+                <div className="w-[55%] flex flex-col items-center justify-center text-center min-w-0 px-1">
+                  <p className="leading-[1.0]" style={{
+                    fontSize: 17, color: pText, fontFamily: `'${pFontH}', sans-serif`,
+                    fontWeight: 700, letterSpacing: "-0.02em",
+                  }}>
                     {config.displayName || "Seu Nome"}
                     {(config as any).verified && (
-                      <svg className="inline-block ml-1 flex-shrink-0" width="16" height="16" viewBox="0 0 20 20" fill="none" style={{ verticalAlign: "middle", marginTop: -2 }}>
+                      <svg className="inline-block ml-1 flex-shrink-0" width="13" height="13" viewBox="0 0 20 20" fill="none" style={{ verticalAlign: "middle", marginTop: -1 }}>
                         <circle cx="10" cy="10" r="10" fill="#1E5BFF"/>
                         <path d="M6 10.5l2.5 2.5L14 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     )}
                   </p>
-                  {config.username && <p className="text-[11.5px] font-medium mt-1" style={{ color: pAccent, letterSpacing: "0.03em" }}>@{config.username.replace(/^@+/, "")}</p>}
-                  {config.bio && <p className="text-[11px] leading-[1.35] mt-2 font-light" style={{ color: pSub, maxWidth: 260 }}>{config.bio}</p>}
+                  {config.username && <p className="text-[10px] font-medium mt-1" style={{ color: pAccent, letterSpacing: "0.03em" }}>@{config.username.replace(/^@+/, "")}</p>}
+                  {config.bio && <p className="text-[10px] leading-[1.35] mt-1.5 font-light" style={{ color: pSub }}>{config.bio}</p>}
+                  {/* Ícones sociais compactos centralizados dentro da coluna direita */}
+                  <div className="flex items-center gap-1.5 mt-2.5 flex-wrap justify-center">
+                    {["instagram", "pinterest", "tiktok", "linkedin"].slice(0, 4).map(iconName => (
+                      <div key={iconName} className="rounded-full flex items-center justify-center"
+                        style={{ width: 22, height: 22, background: `${pAccent}15`, border: `1px solid ${pAccent}25` }}>
+                        <div style={{ width: 10, height: 10, borderRadius: "50%", background: pAccent, opacity: 0.55 }} />
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </>
+              </div>
             ) : templateAvatarConfig?.overlap ? (
               /* ORGANIC-OVERLAP: Cover band + overlapping avatar — full width */
               <>
@@ -1631,10 +1641,10 @@ const DashboardPagina = () => {
               {config.bio && <p className="text-[12px] text-center mt-2 px-2 line-clamp-2 font-light leading-relaxed" style={{ color: pSub, textShadow: pTxtShadow }}>{config.bio}</p>}
             </div>
             )}
-            {/* Social + share row */}
+            {/* Social + share row — socials hidden for split-editorial (rendered inside right column); stats stay */}
             <div className="flex flex-col items-center mb-3">
               {/* Social icons row — template-matching when headerLayoutType active, user socials otherwise */}
-              {(() => {
+              {!templateAvatarConfig?.splitLayout && (() => {
                 const BRAND_CLR: Record<string, string> = { instagram: "#E4405F", youtube: "#FF0000", twitter: "#000000", tiktok: "#000000", facebook: "#1877F2", linkedin: "#0A66C2", pinterest: "#E60023", globe: "", link: "" };
                 /* When template has showcaseSocialStyle === "mono", force mono rendering with nameColor */
                 const showcaseStyle = (d as any).showcaseSocialStyle as "brand" | "mono" | undefined;
