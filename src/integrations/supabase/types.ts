@@ -14,6 +14,141 @@ export type Database = {
   }
   public: {
     Tables: {
+      events: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string | null
+          device: string | null
+          event_type: string
+          id: string
+          metadata: Json | null
+          referrer: string | null
+          vitrine_id: string | null
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          device?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          referrer?: string | null
+          vitrine_id?: string | null
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          device?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          referrer?: string | null
+          vitrine_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_vitrine_id_fkey"
+            columns: ["vitrine_id"]
+            isOneToOne: false
+            referencedRelation: "vitrines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          metadata: Json | null
+          name: string | null
+          source: string | null
+          vitrine_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          metadata?: Json | null
+          name?: string | null
+          source?: string | null
+          vitrine_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          metadata?: Json | null
+          name?: string | null
+          source?: string | null
+          vitrine_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_vitrine_id_fkey"
+            columns: ["vitrine_id"]
+            isOneToOne: false
+            referencedRelation: "vitrines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          amount: number
+          buyer_email: string | null
+          buyer_name: string | null
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          payment_id: string | null
+          payment_method: string | null
+          payment_status: string | null
+          product_title: string | null
+          updated_at: string | null
+          vitrine_id: string
+        }
+        Insert: {
+          amount: number
+          buyer_email?: string | null
+          buyer_name?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          payment_id?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          product_title?: string | null
+          updated_at?: string | null
+          vitrine_id: string
+        }
+        Update: {
+          amount?: number
+          buyer_email?: string | null
+          buyer_name?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          payment_id?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          product_title?: string | null
+          updated_at?: string | null
+          vitrine_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_vitrine_id_fkey"
+            columns: ["vitrine_id"]
+            isOneToOne: false
+            referencedRelation: "vitrines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -52,94 +187,58 @@ export type Database = {
       }
       vitrines: {
         Row: {
+          avatar_url: string | null
+          bio: string | null
+          blocks: Json | null
+          created_at: string | null
+          design: Json | null
+          display_name: string | null
           id: string
+          links: Json | null
+          products: Json | null
+          published: boolean | null
+          testimonials: Json | null
+          theme: string | null
+          updated_at: string | null
           user_id: string
           username: string
-          display_name: string | null
-          bio: string | null
-          avatar_url: string | null
           whatsapp: string | null
-          theme: string
-          design: Json
-          products: Json
-          links: Json
-          testimonials: Json
-          blocks: Json
-          published: boolean
-          created_at: string
-          updated_at: string
         }
         Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          blocks?: Json | null
+          created_at?: string | null
+          design?: Json | null
+          display_name?: string | null
           id?: string
+          links?: Json | null
+          products?: Json | null
+          published?: boolean | null
+          testimonials?: Json | null
+          theme?: string | null
+          updated_at?: string | null
           user_id: string
           username: string
-          display_name?: string | null
-          bio?: string | null
-          avatar_url?: string | null
           whatsapp?: string | null
-          theme?: string
-          design?: Json
-          products?: Json
-          links?: Json
-          testimonials?: Json
-          blocks?: Json
-          published?: boolean
-          created_at?: string
-          updated_at?: string
         }
         Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          blocks?: Json | null
+          created_at?: string | null
+          design?: Json | null
+          display_name?: string | null
           id?: string
+          links?: Json | null
+          products?: Json | null
+          published?: boolean | null
+          testimonials?: Json | null
+          theme?: string | null
+          updated_at?: string | null
           user_id?: string
           username?: string
-          display_name?: string | null
-          bio?: string | null
-          avatar_url?: string | null
           whatsapp?: string | null
-          theme?: string
-          design?: Json
-          products?: Json
-          links?: Json
-          testimonials?: Json
-          blocks?: Json
-          published?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      events: {
-        Row: {
-          id: string
-          vitrine_id: string | null
-          event_type: string
-          referrer: string | null
-          country: string | null
-          city: string | null
-          device: string | null
-          metadata: Json
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          vitrine_id?: string | null
-          event_type: string
-          referrer?: string | null
-          country?: string | null
-          city?: string | null
-          device?: string | null
-          metadata?: Json
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          vitrine_id?: string | null
-          event_type?: string
-          referrer?: string | null
-          country?: string | null
-          city?: string | null
-          device?: string | null
-          metadata?: Json
-          created_at?: string
         }
         Relationships: []
       }
