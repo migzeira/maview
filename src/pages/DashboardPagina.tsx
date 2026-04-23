@@ -1429,14 +1429,14 @@ const DashboardPagina = () => {
               /* EDGE-TO-EDGE: Foto full-width no topo + tudo CENTRALIZADO overlaid (Lucas/Léo)
                  Gradient auto-adapta a QUALQUER cor de bg (branco/vermelho/preto/custom).      */
               <>
-              {/* Phantom spacer: reserves flow space para conteúdo abaixo */}
-              <div style={{ height: 260, marginTop: -20, marginBottom: 12 }} />
-              {/* Foto absolute — cobre status bar + island */}
+              {/* Phantom spacer: reserva espaço no flow para conteúdo abaixo (DEVE ser >= photo height - 70 para não sobrepor) */}
+              <div style={{ height: 290, marginTop: -20, marginBottom: 12 }} />
+              {/* Foto absolute — cobre status bar + island (height 340 = vai de -70 até 270 = não sobrepõe spacer 290) */}
               <div className="absolute overflow-hidden z-[1]" style={{
                 top: -70,
                 left: -20,
                 right: -20,
-                height: 360,
+                height: 340,
                 borderRadius: "0 0 22px 22px",
               }}>
                 {config.avatarUrl ? (
@@ -1450,18 +1450,18 @@ const DashboardPagina = () => {
                     <span className="text-white text-4xl font-bold opacity-80">{config.displayName ? config.displayName[0].toUpperCase() : "?"}</span>
                   </div>
                 )}
-                {/* Top dark gradient for status bar readability */}
-                <div className="absolute top-0 inset-x-0 h-[70px]" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.40) 0%, transparent 100%)" }} />
-                {/* Bottom gradient AUTO-ADAPTATIVO — converte pBg em rgba para funcionar com qualquer cor */}
+                {/* Top dark gradient SUAVE (só 25% para status bar, não cobre foto) */}
+                <div className="absolute top-0 inset-x-0 h-[60px]" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, transparent 100%)" }} />
+                {/* Bottom gradient SUAVE auto-adaptativo (topo 55% da foto totalmente limpo) */}
                 <div className="absolute inset-0" style={{
                   background: (() => {
                     const h = pBg.replace("#", "");
-                    if (h.length !== 6) return `linear-gradient(to top, ${pBg} 0%, transparent 72%)`;
+                    if (h.length !== 6) return `linear-gradient(to top, ${pBg} 0%, transparent 62%)`;
                     const r = parseInt(h.slice(0, 2), 16) || 0;
                     const g = parseInt(h.slice(2, 4), 16) || 0;
                     const b = parseInt(h.slice(4, 6), 16) || 0;
                     const rgba = (a: number) => `rgba(${r},${g},${b},${a})`;
-                    return `linear-gradient(to top, ${rgba(1)} 0%, ${rgba(0.94)} 14%, ${rgba(0.55)} 32%, ${rgba(0.22)} 50%, ${rgba(0)} 72%)`;
+                    return `linear-gradient(to top, ${rgba(0.96)} 0%, ${rgba(0.82)} 16%, ${rgba(0.42)} 32%, ${rgba(0.12)} 48%, ${rgba(0)} 62%)`;
                   })(),
                 }} />
                 {/* Bloco CENTRALIZADO: nome, @, bio, ícones sociais */}

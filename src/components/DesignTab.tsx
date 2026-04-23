@@ -270,8 +270,10 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
             {headerType === "edge-to-edge" && (
               <div className="w-full flex-shrink-0 relative overflow-hidden" style={{ height: 180 }}>
                 <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center 15%" }} crossOrigin="anonymous" loading="lazy" />
-                <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${bg} 0%, ${bg}F0 12%, ${bg}90 30%, ${bg}30 55%, transparent 80%)` }} />
-                <div className="absolute bottom-2.5 left-3.5 right-3.5">
+                {/* Gradient SUAVE — foto bem mais visível (deixa o topo 55% totalmente limpo) */}
+                <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${bg} 0%, ${bg}E0 14%, ${bg}55 30%, ${bg}15 45%, transparent 60%)` }} />
+                <div className="absolute bottom-2.5 left-3.5 right-3.5 flex flex-col items-center text-center">
+
                   <p className="text-[17px] leading-[1.02]" style={{
                     color: isLight ? textC : "#fff",
                     textShadow: isLight ? "none" : "0 2px 10px rgba(0,0,0,0.50)",
@@ -279,7 +281,7 @@ function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack
                   }}>{ref.name}<VerifiedBadge /></p>
                   <p className="text-[9px] mt-0.5" style={{ color: isLight ? accent : `${accent}DD`, textShadow: isLight ? "none" : "0 1px 3px rgba(0,0,0,0.3)", fontWeight: 400, letterSpacing: "0.03em" }}>{ref.username}</p>
                   <p className="text-[8.5px] leading-[1.3] mt-0.5 line-clamp-2" style={{ color: isLight ? subC : "rgba(255,255,255,0.9)", textShadow: isLight ? "none" : "0 1px 3px rgba(0,0,0,0.4)", fontWeight: 300 }}>{ref.bio}</p>
-                  <div className="mt-1.5"><SocialPills size="small" /></div>
+                  <div className="mt-1.5"><SocialPills size="small" centered /></div>
                 </div>
               </div>
             )}

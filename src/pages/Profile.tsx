@@ -738,9 +738,9 @@ const ProfilePage = () => {
                           ? <img src={profile.avatar} alt={profile.displayName} className="w-full h-full object-cover" style={{ objectPosition: "center 18%" }} loading="eager" decoding="async" fetchPriority="high" />
                           : <div className="w-full h-full" style={{ background: t.accent }} />
                         }
-                        {/* Gradient auto-adaptativo: usa a própria cor do bg em rgba (funciona com qualquer cor) */}
+                        {/* Gradient SUAVE auto-adaptativo: foto bem visível, só sombreamento leve embaixo para leitura do texto */}
                         <div className="absolute inset-0" style={{
-                          background: `linear-gradient(to top, ${bgRgba(1)} 0%, ${bgRgba(0.94)} 14%, ${bgRgba(0.55)} 32%, ${bgRgba(0.22)} 50%, ${bgRgba(0)} 72%)`
+                          background: `linear-gradient(to top, ${bgRgba(0.96)} 0%, ${bgRgba(0.82)} 16%, ${bgRgba(0.42)} 32%, ${bgRgba(0.12)} 48%, ${bgRgba(0)} 62%)`
                         }} />
                         {/* Bloco centralizado: nome, @, bio, ícones sociais — TUDO center-aligned */}
                         <div className="absolute bottom-5 left-0 right-0 flex flex-col items-center text-center px-5">
