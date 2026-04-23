@@ -2,13 +2,16 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Sparkles, Check, Loader2, Save, ChevronDown } from "lucide-react";
 
 import {
-  type DesignConfig, type DesignTabProps, type SampleProduct, type SampleLink,
-  DESIGN_PACKS, REFERENCE_PROFILES, GOOGLE_FONTS,
+  type DesignConfig, type DesignTabProps,
+  DESIGN_PACKS, GOOGLE_FONTS,
 } from "./design/constants";
 import { loadFont } from "./design/utils";
 import { AdvancedContent } from "./design/AdvancedDrawer";
 import { PhoneMockup } from "./design/PhoneMockup";
 import type { DesignPack } from "./design/constants";
+
+/* Lista de nomes de fontes como strings — evita qualquer risco de renderizar objeto */
+const FONT_NAMES: string[] = GOOGLE_FONTS.map(f => f.name);
 
 /* ═══════════════════════════════════════════════════════════════════════════
    DesignTab v2 — Stan-style editor: SIMPLES no default, PODEROSO no avançado
@@ -355,8 +358,8 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
           className="w-full px-4 py-2.5 rounded-xl bg-[hsl(var(--dash-bg))] border border-[hsl(var(--dash-border))] text-[13px] font-medium focus:outline-none focus:ring-2 focus:ring-primary/40"
           style={{ fontFamily: `'${d.fontHeading || "Inter"}', sans-serif` }}
         >
-          {GOOGLE_FONTS.map(f => (
-            <option key={f.name} value={f.name} style={{ fontFamily: `'${f.name}', sans-serif` }}>{f.name}</option>
+          {FONT_NAMES.map(name => (
+            <option key={name} value={name} style={{ fontFamily: `'${name}', sans-serif` }}>{name}</option>
           ))}
         </select>
       </div>
