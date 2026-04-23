@@ -8,6 +8,7 @@ import {
   TrendingUp, Zap, ArrowRight, CheckCircle2, Circle, Image, Type, Video,
   Play, Smile, Search, Camera, MoreHorizontal, Share2, BarChart3,
 } from "lucide-react";
+import { PinterestIcon, TikTokIcon, LinkedInIcon } from "@/components/profile/ProfileIcons";
 import { supabase } from "@/integrations/supabase/client";
 import { initialLoad, saveWithSync, forceSaveNow, onSyncStatus, uploadImage, retryPendingSync, type VitrineConfig as SyncVitrineConfig } from "@/lib/vitrine-sync";
 import { useHistory } from "@/hooks/useHistory";
@@ -1519,15 +1520,38 @@ const DashboardPagina = () => {
                   </p>
                   {config.username && <p className="text-[10px] font-medium mt-1" style={{ color: pAccent, letterSpacing: "0.03em" }}>@{config.username.replace(/^@+/, "")}</p>}
                   {config.bio && <p className="text-[10px] leading-[1.35] mt-1.5 font-light" style={{ color: pSub }}>{config.bio}</p>}
-                  {/* Ícones sociais compactos centralizados dentro da coluna direita */}
-                  <div className="flex items-center gap-1.5 mt-2.5 flex-wrap justify-center">
-                    {["instagram", "pinterest", "tiktok", "linkedin"].slice(0, 4).map(iconName => (
-                      <div key={iconName} className="rounded-full flex items-center justify-center"
-                        style={{ width: 22, height: 22, background: `${pAccent}15`, border: `1px solid ${pAccent}25` }}>
-                        <div style={{ width: 10, height: 10, borderRadius: "50%", background: pAccent, opacity: 0.55 }} />
+                  {/* Ícones sociais REAIS — branded, compactos, dentro da coluna direita */}
+                  {(() => {
+                    const showcaseStyle = (d as any).showcaseSocialStyle as "brand" | "mono" | undefined;
+                    const monoColor = d.nameColor || pText;
+                    const BRAND_CLR: Record<string, string> = { instagram: "#E4405F", pinterest: "#E60023", tiktok: "#000000", linkedin: "#0A66C2" };
+                    /* Real branded social icons — 4 plataformas do template split-editorial */
+                    const socialsToRender = [
+                      { key: "instagram", Icon: Instagram },
+                      { key: "pinterest", Icon: PinterestIcon },
+                      { key: "tiktok", Icon: TikTokIcon },
+                      { key: "linkedin", Icon: LinkedInIcon },
+                    ];
+                    return (
+                      <div className="flex items-center gap-1.5 mt-2.5 flex-wrap justify-center">
+                        {socialsToRender.map(({ key, Icon }) => {
+                          const clr = showcaseStyle === "mono" ? monoColor : BRAND_CLR[key];
+                          const bg = showcaseStyle === "mono"
+                            ? (pBg.startsWith("#f") ? "rgba(15,23,42,0.05)" : "rgba(255,255,255,0.08)")
+                            : `${BRAND_CLR[key]}15`;
+                          const bdr = showcaseStyle === "mono"
+                            ? `1px solid ${monoColor}20`
+                            : `1px solid ${BRAND_CLR[key]}22`;
+                          return (
+                            <div key={key} className="rounded-full flex items-center justify-center"
+                              style={{ width: 24, height: 24, background: bg, border: bdr }}>
+                              <Icon size={12} style={{ color: clr }} />
+                            </div>
+                          );
+                        })}
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })()}
                 </div>
               </div>
             ) : templateAvatarConfig?.overlap ? (

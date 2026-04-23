@@ -858,43 +858,75 @@ const ProfilePage = () => {
                               {profile.bio}
                             </p>
                           )}
-                          {/* Ícones sociais compactos — dentro da coluna direita */}
+                          {/* Ícones sociais compactos — dentro da coluna direita.
+                             Se usuário ainda não adicionou socials, mostra placeholder com 4 ícones
+                             template (Instagram, Pinterest, TikTok, LinkedIn) fiel ao mockup.       */}
                           <div className="flex items-center gap-2 mt-3.5 flex-wrap justify-center">
-                            {socialLinks.map(link => {
-                              const Icon = getIcon(link.icon);
-                              const brandColor = BRAND_COLORS[link.icon];
-                              const hasGrad = hasBrandGradient(link.icon);
-                              const useBrand = rd.socialIconStyle !== "custom" && rd.socialIconStyle !== "theme";
-                              const iconColor = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
-                                ? rd.socialIconCustomColor
-                                : rd.socialIconStyle === "theme" ? t.text
-                                : (brandColor || t.text);
-                              const iconBg = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
-                                ? `${rd.socialIconCustomColor}15`
-                                : rd.socialIconStyle === "theme" ? `${t.accent}15`
-                                : (hasGrad && useBrand) ? BRAND_GRADIENTS[link.icon]
-                                : (brandColor ? `${brandColor}18` : `${t.accent}15`);
-                              const iconBorder = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
-                                ? `1.5px solid ${rd.socialIconCustomColor}25`
-                                : rd.socialIconStyle === "theme" ? `1.5px solid ${t.accent}22`
-                                : (brandColor ? `1.5px solid ${brandColor}25` : `1.5px solid ${t.accent}22`);
-                              const finalIconColor = (hasGrad && useBrand) ? "#ffffff" : iconColor;
-                              return (
-                                <a key={link.id} href={sanitizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
-                                  className="rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
-                                  style={{ width: sSize, height: sSize, background: iconBg, border: iconBorder }}
-                                  title={link.title} aria-label={link.title || "Social link"}>
-                                  <Icon size={sIconSize} style={{ color: finalIconColor }} />
-                                </a>
-                              );
-                            })}
-                            {profile.whatsapp && (
-                              <a href={`https://wa.me/${profile.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"
-                                className="rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
-                                style={{ width: sSize, height: sSize, background: "rgba(37,211,102,0.15)", border: "1.5px solid rgba(37,211,102,0.25)" }}
-                                aria-label="WhatsApp">
-                                <WhatsAppIcon size={sIconSize} style={{ color: "#25d366" }} />
-                              </a>
+                            {socialLinks.length > 0 ? (
+                              <>
+                                {socialLinks.map(link => {
+                                  const Icon = getIcon(link.icon);
+                                  const brandColor = BRAND_COLORS[link.icon];
+                                  const hasGrad = hasBrandGradient(link.icon);
+                                  const useBrand = rd.socialIconStyle !== "custom" && rd.socialIconStyle !== "theme";
+                                  const iconColor = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
+                                    ? rd.socialIconCustomColor
+                                    : rd.socialIconStyle === "theme" ? t.text
+                                    : (brandColor || t.text);
+                                  const iconBg = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
+                                    ? `${rd.socialIconCustomColor}15`
+                                    : rd.socialIconStyle === "theme" ? `${t.accent}15`
+                                    : (hasGrad && useBrand) ? BRAND_GRADIENTS[link.icon]
+                                    : (brandColor ? `${brandColor}18` : `${t.accent}15`);
+                                  const iconBorder = rd.socialIconStyle === "custom" && rd.socialIconCustomColor
+                                    ? `1.5px solid ${rd.socialIconCustomColor}25`
+                                    : rd.socialIconStyle === "theme" ? `1.5px solid ${t.accent}22`
+                                    : (brandColor ? `1.5px solid ${brandColor}25` : `1.5px solid ${t.accent}22`);
+                                  const finalIconColor = (hasGrad && useBrand) ? "#ffffff" : iconColor;
+                                  return (
+                                    <a key={link.id} href={sanitizeUrl(link.url)} target="_blank" rel="noopener noreferrer"
+                                      className="rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
+                                      style={{ width: sSize, height: sSize, background: iconBg, border: iconBorder }}
+                                      title={link.title} aria-label={link.title || "Social link"}>
+                                      <Icon size={sIconSize} style={{ color: finalIconColor }} />
+                                    </a>
+                                  );
+                                })}
+                                {profile.whatsapp && (
+                                  <a href={`https://wa.me/${profile.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"
+                                    className="rounded-full flex items-center justify-center transition-all duration-150 hover:scale-110 active:scale-95"
+                                    style={{ width: sSize, height: sSize, background: "rgba(37,211,102,0.15)", border: "1.5px solid rgba(37,211,102,0.25)" }}
+                                    aria-label="WhatsApp">
+                                    <WhatsAppIcon size={sIconSize} style={{ color: "#25d366" }} />
+                                  </a>
+                                )}
+                              </>
+                            ) : (
+                              /* Placeholder template socials — fiel ao mockup */
+                              (() => {
+                                const placeholder = [
+                                  { key: "instagram", Icon: getIcon("instagram"), color: BRAND_COLORS["instagram"] },
+                                  { key: "pinterest", Icon: getIcon("pinterest"), color: BRAND_COLORS["pinterest"] },
+                                  { key: "tiktok", Icon: getIcon("tiktok"), color: BRAND_COLORS["tiktok"] },
+                                  { key: "linkedin", Icon: getIcon("linkedin"), color: BRAND_COLORS["linkedin"] },
+                                ];
+                                const useMono = rd.showcaseSocialStyle === "mono";
+                                return placeholder.map(({ key, Icon, color }) => {
+                                  const clr = useMono ? (rd.nameColor || t.text) : color;
+                                  const bg = useMono
+                                    ? (t.bg.startsWith("#f") ? "rgba(15,23,42,0.05)" : "rgba(255,255,255,0.08)")
+                                    : `${color}18`;
+                                  const bdr = useMono
+                                    ? `1.5px solid ${rd.nameColor || t.text}20`
+                                    : `1.5px solid ${color}25`;
+                                  return (
+                                    <div key={key} className="rounded-full flex items-center justify-center"
+                                      style={{ width: sSize, height: sSize, background: bg, border: bdr }}>
+                                      <Icon size={sIconSize} style={{ color: clr }} />
+                                    </div>
+                                  );
+                                });
+                              })()
                             )}
                           </div>
                         </div>
