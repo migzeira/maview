@@ -356,7 +356,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
           style={{ fontFamily: `'${d.fontHeading || "Inter"}', sans-serif` }}
         >
           {GOOGLE_FONTS.map(f => (
-            <option key={f} value={f} style={{ fontFamily: `'${f}', sans-serif` }}>{f}</option>
+            <option key={f.name} value={f.name} style={{ fontFamily: `'${f.name}', sans-serif` }}>{f.name}</option>
           ))}
         </select>
       </div>
