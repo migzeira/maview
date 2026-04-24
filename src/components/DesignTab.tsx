@@ -128,6 +128,8 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   const [activePackIdx, setActivePackIdx] = useState(0);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [proModeOpen, setProModeOpen] = useState(false);
+  const [dirty, setDirty] = useState(false);
+  const [initialDesign] = useState(() => JSON.stringify(config.design || {}));
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [justApplied, setJustApplied] = useState<string | null>(null);
@@ -139,7 +141,19 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     const latest = { ...(designRef.current || {}), [key]: value };
     designRef.current = latest;
     updateConfig("design", latest);
-  }, [updateConfig]);
+    setDirty(JSON.stringify(latest) !== initialDesign);
+  }, [updateConfig, initialDesign]);
+
+  const handleCancel = useCallback(() => {
+    try {
+      const parsed = JSON.parse(initialDesign);
+      designRef.current = parsed;
+      updateConfig("design", parsed);
+      setDirty(false);
+    } catch (e) {
+      console.error("Cancel failed:", e);
+    }
+  }, [initialDesign, updateConfig]);
 
   useEffect(() => {
     if (d.fontHeading && d.fontHeading !== "Inter") loadFont(d.fontHeading);
@@ -199,6 +213,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     try {
       if (onForceSave) await onForceSave();
       setSaveSuccess(true);
+      setDirty(false);
       setTimeout(() => setSaveSuccess(false), 2000);
     } catch (e) {
       console.error("Save failed:", e);
@@ -211,27 +226,34 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   const accent2 = d.accentColor2 || currentTheme.accent2 || "#ffffff";
 
   return (
-    <div className="space-y-6">
-      {/* ═══ HEADER: título + Save ─── */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-[hsl(var(--dash-text))] font-bold text-[20px] tracking-tight">Escolha seu estilo</h2>
-          <p className="text-[hsl(var(--dash-text-subtle))] text-[12px] mt-0.5">
-            1 clique aplica tudo · cor + fonte + layout otimizados
+    <div className="space-y-6 pb-24">
+      {/* ═══ BANNER DE STATUS DA VITRINE ─── */}
+      <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
+        dirty
+          ? "bg-amber-500/10 border-amber-500/30"
+          : saveSuccess
+            ? "bg-emerald-500/10 border-emerald-500/30"
+            : "bg-emerald-500/5 border-emerald-500/20"
+      }`}>
+        <div className={`w-2 h-2 rounded-full ${dirty ? "bg-amber-500 animate-pulse" : "bg-emerald-500"}`} />
+        <div className="flex-1">
+          <p className={`text-[13px] font-semibold ${dirty ? "text-amber-600" : "text-emerald-600"}`}>
+            {dirty ? "Alterações não salvas" : saveSuccess ? "Alterações salvas com sucesso" : "Sua vitrine está LIVE"}
+          </p>
+          <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] mt-0.5">
+            {dirty
+              ? "Clique em \"Salvar\" no rodapé para publicar as mudanças"
+              : "Todas as alterações já aparecem na sua página pública"}
           </p>
         </div>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-[13px] transition-all ${
-            saveSuccess
-              ? "bg-emerald-500 text-white"
-              : "bg-primary text-primary-foreground hover:scale-105 active:scale-95"
-          }`}
-        >
-          {saving ? <Loader2 size={14} className="animate-spin" /> : saveSuccess ? <Check size={14} /> : <Save size={14} />}
-          {saving ? "Salvando..." : saveSuccess ? "Salvo!" : "Salvar"}
-        </button>
+      </div>
+
+      {/* ═══ HEADER ─── */}
+      <div>
+        <h2 className="text-[hsl(var(--dash-text))] font-bold text-[24px] tracking-tight">Escolha seu estilo</h2>
+        <p className="text-[hsl(var(--dash-text-subtle))] text-[13px] mt-1">
+          8 templates premium prontos · 1 clique aplica tudo (cor + fonte + layout)
+        </p>
       </div>
 
       {/* ═══ 1) CAROUSEL DE TEMPLATES PREMIUM — 8 showcase, grandes e chamativos ─── */}
@@ -389,6 +411,48 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         <p className="text-[10px] text-[hsl(var(--dash-text-subtle))]">
           Preview ao vivo na direita · mudanças aplicam instantaneamente
         </p>
+      </div>
+
+      {/* ═══ RODAPÉ FIXO CANCEL/SAVE (estilo Stan Store) ═══ */}
+      <div className="fixed bottom-0 left-0 right-0 md:left-[260px] z-40 bg-[hsl(var(--dash-surface))]/95 backdrop-blur-xl border-t border-[hsl(var(--dash-border))] px-6 py-3.5 flex items-center justify-between gap-3 shadow-2xl">
+        <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] flex items-center gap-2">
+          {dirty ? (
+            <>
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+              Você tem alterações não salvas
+            </>
+          ) : (
+            <>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              Tudo sincronizado
+            </>
+          )}
+        </p>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleCancel}
+            disabled={!dirty}
+            className={`px-5 py-2.5 rounded-xl font-semibold text-[13px] transition-all ${
+              dirty
+                ? "bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-accent))] active:scale-95"
+                : "bg-transparent text-[hsl(var(--dash-text-subtle))] cursor-not-allowed opacity-50"
+            }`}
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-[13px] transition-all shadow-lg ${
+              saveSuccess
+                ? "bg-emerald-500 text-white"
+                : "bg-primary text-primary-foreground hover:scale-105 active:scale-95 hover:shadow-primary/30"
+            }`}
+          >
+            {saving ? <Loader2 size={14} className="animate-spin" /> : saveSuccess ? <Check size={14} /> : <Save size={14} />}
+            {saving ? "Salvando..." : saveSuccess ? "Salvo!" : "Salvar"}
+          </button>
+        </div>
       </div>
     </div>
   );
