@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { ChevronDown, Palette, Square, User as UserIcon, Type, Sparkles, Image as ImageIcon, Video, Layers, Settings2, Circle, Hexagon } from "lucide-react";
+import { ChevronDown, Palette, Square, User as UserIcon, Type, Image as ImageIcon, Layers, Settings2, Circle, Hexagon } from "lucide-react";
 import type { DesignConfig, BgType, ProfileShape, ButtonShape, ButtonFill, ButtonShadow, GradientDir } from "./constants";
-import { SOLID_COLORS, GRADIENT_PRESETS, BG_PATTERNS, BG_EFFECTS, GOOGLE_FONTS, FONT_PAIRS } from "./constants";
+import { SOLID_COLORS, GRADIENT_PRESETS, BG_PATTERNS } from "./constants";
 import { ColorPicker } from "./utils";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -88,9 +88,7 @@ function FundoSection({ design: d, setDesign }: { design: DesignConfig; setDesig
     { id: "solid", label: "Sólido", icon: <div className="w-full h-full" style={{ background: "#6366f1" }} /> },
     { id: "gradient", label: "Gradient", icon: <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #f093fb, #f5576c)" }} /> },
     { id: "image", label: "Imagem", icon: <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-900"><ImageIcon size={20} className="text-white/60" /></div> },
-    { id: "effect", label: "Efeito", icon: <div className="w-full h-full flex items-center justify-center" style={{ background: "conic-gradient(from 180deg, #a855f7, #ec4899, #6366f1, #a855f7)" }}><Sparkles size={20} className="text-white" /></div> },
     { id: "pattern", label: "Padrão", icon: <div className="w-full h-full bg-slate-800" style={{ backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.2) 1px, transparent 1px)", backgroundSize: "8px 8px" }} /> },
-    { id: "video", label: "Vídeo", icon: <div className="w-full h-full flex items-center justify-center bg-black"><Video size={20} className="text-white/60" /></div> },
   ];
 
   return (
@@ -168,25 +166,9 @@ function FundoSection({ design: d, setDesign }: { design: DesignConfig; setDesig
         </div>
       )}
 
-      {d.bgType === "effect" && (
-        <div>
-          <p className="text-[10px] font-medium text-[hsl(var(--dash-text-subtle))] mb-2">40+ efeitos animados disponíveis no Modo Pro</p>
-          <div className="grid grid-cols-3 gap-2">
-            {BG_EFFECTS.slice(0, 12).map(ef => (
-              <button key={ef.id} onClick={() => setDesign("bgEffect", ef.id)}
-                className={`px-2 py-2.5 rounded-lg text-[10px] font-medium transition-all ${
-                  d.bgEffect === ef.id ? "bg-primary/15 text-primary ring-1 ring-primary" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] hover:ring-1 hover:ring-primary/30"
-                }`}>
-                {ef.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {(d.bgType === "image" || d.bgType === "video") && (
+      {d.bgType === "image" && (
         <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] bg-[hsl(var(--dash-accent))]/30 rounded-lg px-3 py-2.5">
-          Upload disponível no <strong>Modo Pro</strong> (botão no final desta seção).
+          Upload de imagem disponível no <strong>Modo Pro</strong> (botão no final desta seção).
         </p>
       )}
     </div>

@@ -126,7 +126,6 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   const currentTheme = themes.find(t => t.id === config.theme) ?? themes[0];
 
   const [activePackIdx, setActivePackIdx] = useState(0);
-  const [categoryIdx, setCategoryIdx] = useState(0);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [proModeOpen, setProModeOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -147,16 +146,8 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     if (d.fontBody && d.fontBody !== "Inter") loadFont(d.fontBody);
   }, [d.fontHeading, d.fontBody]);
 
-  /* ── Categorias de templates (estilo "Mínimas" do Stan) ── */
-  const CATEGORIES = [
-    { id: "showcase", label: "Premium", emoji: "✨" },
-    { id: "bold", label: "Bold", emoji: "🔥" },
-    { id: "light", label: "Clean", emoji: "⚪" },
-    { id: "dark", label: "Dark", emoji: "🌑" },
-    { id: "animated", label: "Animated", emoji: "🎨" },
-  ];
-  const currentCategory = CATEGORIES[categoryIdx];
-  const filteredPacks = DESIGN_PACKS.filter(p => p.category === currentCategory.id);
+  /* Foco 100% nos 8 templates premium (showcase) — sem categorias, sem distração */
+  const filteredPacks = DESIGN_PACKS.filter(p => p.category === "showcase");
 
   /* ── Aplicar pack (mesma lógica do OLD, zero perda) ── */
   const applyPack = useCallback((pack: DesignPack) => {
@@ -243,47 +234,47 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         </button>
       </div>
 
-      {/* ═══ 1) CAROUSEL DE TEMPLATES ─── */}
-      <div className="relative rounded-3xl bg-gradient-to-br from-[hsl(var(--dash-surface))] to-[hsl(var(--dash-accent))]/30 border border-[hsl(var(--dash-border-subtle))] p-5 overflow-hidden">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-[hsl(var(--dash-text))] font-semibold text-[14px] flex items-center gap-2">
-            <Sparkles size={14} className="text-primary" /> Templates
-          </h3>
+      {/* ═══ 1) CAROUSEL DE TEMPLATES PREMIUM — 8 showcase, grandes e chamativos ─── */}
+      <div className="relative rounded-3xl bg-gradient-to-br from-[hsl(var(--dash-surface))] via-[hsl(var(--dash-bg))] to-[hsl(var(--dash-accent))]/30 border border-[hsl(var(--dash-border-subtle))] p-6 overflow-hidden">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-[hsl(var(--dash-text))] font-bold text-[18px] flex items-center gap-2 tracking-tight">
+              <Sparkles size={18} className="text-primary" /> 8 Templates Premium
+            </h3>
+            <p className="text-[12px] text-[hsl(var(--dash-text-subtle))] mt-0.5">
+              Clique em qualquer um para aplicar · layout + cores + fonte prontos
+            </p>
+          </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => scrollCarousel("left")}
-              className="w-8 h-8 rounded-full bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border))] hover:scale-110 active:scale-90 transition-all flex items-center justify-center"
+              className="w-10 h-10 rounded-full bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border))] hover:scale-110 active:scale-90 transition-all flex items-center justify-center shadow-sm"
               aria-label="Voltar"
             >
-              <ChevronLeft size={14} />
+              <ChevronLeft size={16} />
             </button>
             <button
               onClick={() => scrollCarousel("right")}
-              className="w-8 h-8 rounded-full bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border))] hover:scale-110 active:scale-90 transition-all flex items-center justify-center"
+              className="w-10 h-10 rounded-full bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border))] hover:scale-110 active:scale-90 transition-all flex items-center justify-center shadow-sm"
               aria-label="Avançar"
             >
-              <ChevronRight size={14} />
+              <ChevronRight size={16} />
             </button>
           </div>
         </div>
 
-        {/* Template cards — horizontal scroll */}
+        {/* Template cards — horizontal scroll grande e chamativo */}
         <div
           ref={carouselRef}
-          className="flex gap-4 overflow-x-auto pb-3 scrollbar-none snap-x snap-mandatory"
-          style={{ scrollPaddingLeft: 16 }}
+          className="flex gap-6 overflow-x-auto pb-6 pt-2 scrollbar-none snap-x snap-mandatory"
+          style={{ scrollPaddingLeft: 24 }}
         >
           {filteredPacks.map((pack, idx) => {
             const isActive = idx === activePackIdx;
             const isJustApplied = justApplied === pack.id;
             return (
               <div key={pack.id} className="flex-shrink-0 snap-start">
-                <div
-                  className={`relative transition-all duration-300 ${isJustApplied ? "animate-in zoom-in-95" : ""}`}
-                  style={{
-                    transform: isJustApplied ? "scale(1.04)" : "scale(1)",
-                  }}
-                >
+                <div className={`relative transition-all duration-300 ${isJustApplied ? "animate-in zoom-in-95" : ""}`}>
                   <PhoneMockup
                     pack={pack}
                     isActive={isActive}
@@ -293,35 +284,23 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
                     }}
                     liveDesign={isActive ? d : undefined}
                   />
+                  {/* Badge "Aplicado!" destacado em verde */}
                   {isJustApplied && (
-                    <div className="absolute top-2 right-2 bg-emerald-500 text-white rounded-full px-2 py-1 text-[10px] font-bold flex items-center gap-1 animate-in fade-in zoom-in-50 duration-200 shadow-lg">
-                      <Check size={10} /> Aplicado!
+                    <div className="absolute top-4 right-4 bg-emerald-500 text-white rounded-full px-3 py-1.5 text-[11px] font-bold flex items-center gap-1 animate-in fade-in zoom-in-50 duration-200 shadow-xl">
+                      <Check size={12} /> Aplicado!
                     </div>
                   )}
+                  {/* Nome do template destacado abaixo */}
+                  <div className="mt-3 text-center">
+                    <p className={`text-[14px] font-bold ${isActive ? "text-primary" : "text-[hsl(var(--dash-text))]"}`}>
+                      {pack.label}
+                    </p>
+                    <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] mt-0.5">{pack.desc}</p>
+                  </div>
                 </div>
               </div>
             );
           })}
-        </div>
-
-        {/* Categoria selector — estilo "Mínimas" do Stan */}
-        <div className="flex items-center justify-center gap-3 mt-3">
-          <button
-            onClick={() => setCategoryIdx((categoryIdx - 1 + CATEGORIES.length) % CATEGORIES.length)}
-            className="w-7 h-7 rounded-full bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border))] hover:scale-110 transition-all flex items-center justify-center"
-          >
-            <ChevronLeft size={12} />
-          </button>
-          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border))]">
-            <span className="text-base leading-none">{currentCategory.emoji}</span>
-            <span className="text-[12px] font-semibold text-[hsl(var(--dash-text))]">{currentCategory.label}</span>
-          </div>
-          <button
-            onClick={() => setCategoryIdx((categoryIdx + 1) % CATEGORIES.length)}
-            className="w-7 h-7 rounded-full bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border))] hover:scale-110 transition-all flex items-center justify-center"
-          >
-            <ChevronRight size={12} />
-          </button>
         </div>
       </div>
 

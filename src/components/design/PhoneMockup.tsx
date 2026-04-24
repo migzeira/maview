@@ -205,17 +205,17 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
   ) : null;
 
   return (
-    <button onClick={onClick} className="group flex-shrink-0 flex flex-col items-center gap-2.5 transition-all duration-500 ease-out" style={{ width: 280 }}>
-      {/* Phone body — premium device frame */}
+    <button onClick={onClick} className="group flex-shrink-0 flex flex-col items-center gap-3 transition-all duration-500 ease-out hover:-translate-y-1" style={{ width: 340, transform: isActive ? "scale(1.03)" : "scale(1)" }}>
+      {/* Phone body — premium device frame LARGE (Stan-style chamativo) */}
       <div className="relative" style={{
         boxShadow: isActive
-          ? `0 30px 80px rgba(124,58,237,0.18), 0 20px 60px rgba(0,0,0,0.35)`
-          : "0 20px 60px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.15)",
-        borderRadius: 36,
-        transition: "box-shadow 0.5s ease",
+          ? `0 40px 100px rgba(124,58,237,0.30), 0 20px 60px rgba(0,0,0,0.45), 0 0 0 3px hsl(var(--primary))`
+          : "0 25px 70px rgba(0,0,0,0.18), 0 10px 28px rgba(0,0,0,0.20)",
+        borderRadius: 42,
+        transition: "box-shadow 0.5s ease, transform 0.3s ease",
       }}>
-        <div className={`relative w-[270px] rounded-[34px] overflow-hidden transition-all duration-500 ${isActive ? "ring-[2.5px] ring-primary ring-offset-2 ring-offset-[hsl(var(--dash-bg))]" : "ring-1 ring-white/[0.05] group-hover:ring-white/[0.10]"}`}
-          style={{ aspectRatio: "9/17", border: "2px solid #1a1a1a", boxShadow: "inset 0 0 0 0.5px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.04)" }}>
+        <div className={`relative w-[330px] rounded-[40px] overflow-hidden transition-all duration-500 ${isActive ? "ring-2 ring-primary ring-offset-4 ring-offset-[hsl(var(--dash-bg))]" : "ring-1 ring-white/[0.06] group-hover:ring-white/[0.14]"}`}
+          style={{ aspectRatio: "9/18", border: "3px solid #0f0f0f", boxShadow: "inset 0 0 0 0.5px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.05)" }}>
 
           {/* ── Background ── */}
           <div className="absolute inset-0" style={{ background: dd.bgType === "gradient" ? `linear-gradient(to bottom, ${(dd.bgGradient as [string, string])?.[0] || bg}, ${(dd.bgGradient as [string, string])?.[1] || bg})` : bg }}>
@@ -230,7 +230,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
             {dd.bgType === "image" && (dd.bgOverlay ?? 0) > 0 && (
               <div className="absolute inset-0" style={{ background: `rgba(0,0,0,${(dd.bgOverlay || 0) / 100})` }} />
             )}
-            {dd.bgEffect && <div className="absolute inset-0 opacity-60 overflow-hidden">{getEffectPreviewElements(dd.bgEffect, accent)}</div>}
+            {/* Efeitos animados removidos — foco 100% nos 8 templates premium */}
           </div>
 
           {/* ── Status bar (iOS) ── */}
