@@ -3,16 +3,14 @@ import { ChevronLeft, ChevronRight, Sparkles, Check, Loader2, Save, ChevronDown 
 
 import {
   type DesignConfig, type DesignTabProps,
-  DESIGN_PACKS, GOOGLE_FONTS,
+  DESIGN_PACKS,
 } from "./design/constants";
 import { loadFont } from "./design/utils";
 import AdvancedDrawer from "./design/AdvancedDrawer";
 import AdvancedEditor from "./design/AdvancedEditor";
+import FontPicker from "./design/FontPicker";
 import { PhoneMockup } from "./design/PhoneMockup";
 import type { DesignPack } from "./design/constants";
-
-/* Lista de nomes de fontes como strings — evita qualquer risco de renderizar objeto */
-const FONT_NAMES: string[] = GOOGLE_FONTS.map(f => f.name);
 
 /* ═══════════════════════════════════════════════════════════════════════════
    DesignTab v2 — Stan-style editor: SIMPLES no default, PODEROSO no avançado
@@ -346,24 +344,17 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         </div>
       </div>
 
-      {/* ═══ 3) FONTE — 1 dropdown ─── */}
+      {/* ═══ 3) FONTE — dropdown customizado com cada fonte na sua própria tipografia ─── */}
       <div className="rounded-3xl bg-[hsl(var(--dash-surface))]/60 border border-[hsl(var(--dash-border-subtle))] p-5">
         <h3 className="text-[hsl(var(--dash-text))] font-semibold text-[14px] mb-3">Fonte</h3>
-        <select
+        <FontPicker
           value={d.fontHeading || "Inter"}
-          onChange={e => {
-            const font = e.target.value;
+          onChange={(font) => {
             loadFont(font);
             setDesign("fontHeading", font);
             setDesign("fontBody", font);
           }}
-          className="w-full px-4 py-2.5 rounded-xl bg-[hsl(var(--dash-bg))] border border-[hsl(var(--dash-border))] text-[13px] font-medium focus:outline-none focus:ring-2 focus:ring-primary/40"
-          style={{ fontFamily: `'${d.fontHeading || "Inter"}', sans-serif` }}
-        >
-          {FONT_NAMES.map(name => (
-            <option key={name} value={name} style={{ fontFamily: `'${name}', sans-serif` }}>{name}</option>
-          ))}
-        </select>
+        />
       </div>
 
       {/* ═══ 4) ACCORDION AVANÇADO — todo o poder escondido ─── */}
