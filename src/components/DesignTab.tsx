@@ -6,7 +6,8 @@ import {
   DESIGN_PACKS, GOOGLE_FONTS,
 } from "./design/constants";
 import { loadFont } from "./design/utils";
-import { AdvancedContent } from "./design/AdvancedDrawer";
+import AdvancedDrawer from "./design/AdvancedDrawer";
+import AdvancedEditor from "./design/AdvancedEditor";
 import { PhoneMockup } from "./design/PhoneMockup";
 import type { DesignPack } from "./design/constants";
 
@@ -129,6 +130,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   const [activePackIdx, setActivePackIdx] = useState(0);
   const [categoryIdx, setCategoryIdx] = useState(0);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [proModeOpen, setProModeOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [justApplied, setJustApplied] = useState<string | null>(null);
@@ -389,19 +391,28 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         </button>
 
         {showAdvanced && (
-          <div className="border-t border-[hsl(var(--dash-border-subtle))] p-4 animate-in slide-in-from-top-4 duration-300">
-            <AdvancedContent
+          <div className="border-t border-[hsl(var(--dash-border-subtle))] p-4 animate-in slide-in-from-top-4 duration-300 bg-[hsl(var(--dash-bg))]/30">
+            <AdvancedEditor
               design={d}
-              currentTheme={currentTheme}
-              accent={accent}
               setDesign={setDesign}
-              avatarUrl={config.avatarUrl}
-              displayName={config.displayName}
-              onBgColorChange={(color) => setDesign("bgColor", color)}
+              onOpenProMode={() => setProModeOpen(true)}
             />
           </div>
         )}
       </div>
+
+      {/* Modo Pro: Drawer/Sheet com TODO o poder do AdvancedContent original (50+ controles) */}
+      <AdvancedDrawer
+        open={proModeOpen}
+        onOpenChange={setProModeOpen}
+        design={d}
+        currentTheme={currentTheme}
+        accent={accent}
+        setDesign={setDesign}
+        avatarUrl={config.avatarUrl}
+        displayName={config.displayName}
+        onBgColorChange={(color) => setDesign("bgColor", color)}
+      />
 
       {/* ═══ Footer hint ─── */}
       <div className="text-center py-4">
