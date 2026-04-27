@@ -180,8 +180,9 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
       if (prev.bgImagePosY !== undefined) preserved.bgImagePosY = prev.bgImagePosY;
     }
     if (prev.coverImageUrl && isUserUpload(prev.coverImageUrl as string) && !isShowcase) preserved.coverImageUrl = prev.coverImageUrl;
-    if (prev.profileBorderColor) preserved.profileBorderColor = prev.profileBorderColor;
-    if (prev.profileGlowColor) preserved.profileGlowColor = prev.profileGlowColor;
+    /* Cores de profile/glow só preservadas para non-showcase (showcase tem identidade visual completa) */
+    if (prev.profileBorderColor && !isShowcase) preserved.profileBorderColor = prev.profileBorderColor;
+    if (prev.profileGlowColor && !isShowcase) preserved.profileGlowColor = prev.profileGlowColor;
     const packMeta: Record<string, unknown> = {};
     if (pack.headerLayoutType) packMeta.headerLayoutType = pack.headerLayoutType;
     if (pack.ctaGlow) packMeta.ctaGlow = pack.ctaGlow;

@@ -2159,13 +2159,22 @@ const DashboardPagina = () => {
               const pack = DESIGN_PACKS.find(p => p.id === packId);
               if (!pack) return;
               updateConfig("theme", pack.config.theme as ThemeId);
+              /* IDENTICO ao applyPack do DesignTab — todos os campos premium sincronizados */
               const packMeta: Record<string, unknown> = {};
               if (pack.headerLayoutType) packMeta.headerLayoutType = pack.headerLayoutType;
               if (pack.ctaGlow) packMeta.ctaGlow = pack.ctaGlow;
               if (pack.glassCards) packMeta.glassCards = pack.glassCards;
               if (pack.socialIconStyle) packMeta.showcaseSocialStyle = pack.socialIconStyle;
+              const eg = (pack as unknown as { edgeGradientIntensity?: string }).edgeGradientIntensity;
+              if (eg) packMeta.edgeGradientIntensity = eg;
               const latest = { profileGlow: true, ...pack.config.design, ...packMeta };
               updateConfig("design", latest);
+              /* Carrega fontes dinamicamente */
+              if (pack.config.design.fontHeading) {
+                const { loadFont } = await import("@/components/design/utils");
+                loadFont(pack.config.design.fontHeading);
+                if (pack.config.design.fontBody) loadFont(pack.config.design.fontBody);
+              }
             } catch (e) { console.error("Pack apply failed:", e); }
           }}
           onComplete={completeOnboarding}
