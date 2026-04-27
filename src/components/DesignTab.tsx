@@ -323,60 +323,40 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
 
   return (
     <div className="space-y-5">
-      {/* ═══ HEADER limpo (estilo Stan) ─── */}
-      <div>
-        <h2 className="text-[hsl(var(--dash-text))] font-bold text-[22px] tracking-tight">Editar Design</h2>
-        <p className="text-[hsl(var(--dash-text-subtle))] text-[13px] mt-0.5">
-          Escolha um template, ajuste cores e fonte. Mudanças aparecem em tempo real.
-        </p>
-      </div>
+      {/* ═══ CAROUSEL TEMPLATES — sem chrome desnecessário, estilo Stan puro ─── */}
+      <div className="relative">
+        {/* Setas flutuantes nas laterais (estilo Stan) — só aparecem em hover desktop */}
+        <button
+          onClick={() => {
+            const nextIdx = (activePackIdx - 1 + filteredPacks.length) % filteredPacks.length;
+            setActivePackIdx(nextIdx);
+            applyPackWithFeedback(filteredPacks[nextIdx]);
+            const card = carouselRef.current?.children[nextIdx] as HTMLElement;
+            if (card) card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+          }}
+          className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-[hsl(var(--dash-surface))]/95 backdrop-blur border border-[hsl(var(--dash-border))] hover:bg-primary hover:text-white hover:border-primary transition-all items-center justify-center shadow-lg"
+          aria-label="Template anterior"
+        >
+          <ChevronLeft size={16} />
+        </button>
+        <button
+          onClick={() => {
+            const nextIdx = (activePackIdx + 1) % filteredPacks.length;
+            setActivePackIdx(nextIdx);
+            applyPackWithFeedback(filteredPacks[nextIdx]);
+            const card = carouselRef.current?.children[nextIdx] as HTMLElement;
+            if (card) card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+          }}
+          className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-[hsl(var(--dash-surface))]/95 backdrop-blur border border-[hsl(var(--dash-border))] hover:bg-primary hover:text-white hover:border-primary transition-all items-center justify-center shadow-lg"
+          aria-label="Próximo template"
+        >
+          <ChevronRight size={16} />
+        </button>
 
-      {/* ═══ 1) CAROUSEL DE TEMPLATES PREMIUM — perspective + snap + dots ─── */}
-      <div className="relative rounded-3xl bg-[hsl(var(--dash-surface))]/40 border border-[hsl(var(--dash-border-subtle))] overflow-hidden">
-        {/* Header minimalista */}
-        <div className="flex items-center justify-between px-6 pt-5 pb-2">
-          <div>
-            <h3 className="text-[hsl(var(--dash-text))] font-bold text-[16px] flex items-center gap-2 tracking-tight">
-              <Sparkles size={15} className="text-primary" /> 8 Templates Premium
-            </h3>
-            <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] mt-0.5">
-              {filteredPacks[activePackIdx]?.label} · {activePackIdx + 1}/{filteredPacks.length}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                const nextIdx = (activePackIdx - 1 + filteredPacks.length) % filteredPacks.length;
-                setActivePackIdx(nextIdx);
-                applyPackWithFeedback(filteredPacks[nextIdx]); /* CLICK = badge */
-                const card = carouselRef.current?.children[nextIdx] as HTMLElement;
-                if (card) card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-              }}
-              className="w-10 h-10 rounded-full bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border))] hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center shadow-sm hover:shadow-lg hover:shadow-primary/20"
-              aria-label="Voltar"
-            >
-              <ChevronLeft size={15} />
-            </button>
-            <button
-              onClick={() => {
-                const nextIdx = (activePackIdx + 1) % filteredPacks.length;
-                setActivePackIdx(nextIdx);
-                applyPackWithFeedback(filteredPacks[nextIdx]); /* CLICK = badge */
-                const card = carouselRef.current?.children[nextIdx] as HTMLElement;
-                if (card) card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-              }}
-              className="w-10 h-10 rounded-full bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border))] hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center shadow-sm hover:shadow-lg hover:shadow-primary/20"
-              aria-label="Avançar"
-            >
-              <ChevronRight size={15} />
-            </button>
-          </div>
-        </div>
-
-        {/* Template cards — Stan-style: muitos visíveis, suave fade nos laterais */}
+        {/* Template cards — protagonistas absolutos */}
         <div
           ref={carouselRef}
-          className="flex gap-3 overflow-x-auto pb-4 pt-4 scrollbar-none snap-x snap-mandatory px-6"
+          className="flex gap-3 overflow-x-auto pb-2 pt-2 scrollbar-none snap-x snap-mandatory px-2"
         >
           {filteredPacks.map((pack, idx) => {
             const isActive = idx === activePackIdx;
@@ -438,15 +418,18 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
           })}
         </div>
 
-        {/* Nome + descrição do ATIVO — animado */}
-        <div className="text-center pb-6 px-6">
-          <p className="text-[16px] font-bold text-[hsl(var(--dash-text))] transition-all duration-300" key={`name-${activePackIdx}`}
+        {/* Nome + descrição do ATIVO — protagonista visual */}
+        <div className="text-center pt-1 pb-2 px-4">
+          <p className="text-[20px] font-extrabold text-[hsl(var(--dash-text))] tracking-tight transition-all duration-300" key={`name-${activePackIdx}`}
              style={{ animation: "fadeSlideUp 0.3s ease both" }}>
             {filteredPacks[activePackIdx]?.label}
           </p>
-          <p className="text-[12px] text-[hsl(var(--dash-text-subtle))] mt-0.5" key={`desc-${activePackIdx}`}
+          <p className="text-[13px] text-[hsl(var(--dash-text-muted))] mt-1 max-w-[320px] mx-auto leading-snug" key={`desc-${activePackIdx}`}
              style={{ animation: "fadeSlideUp 0.3s ease 0.05s both" }}>
             {filteredPacks[activePackIdx]?.desc}
+          </p>
+          <p className="text-[10px] font-semibold text-[hsl(var(--dash-text-subtle))] uppercase tracking-wider mt-2">
+            {activePackIdx + 1} / {filteredPacks.length}
           </p>
         </div>
       </div>
