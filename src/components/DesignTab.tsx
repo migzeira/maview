@@ -163,77 +163,6 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   /* Foco 100% nos 8 templates premium (showcase) — sem categorias, sem distração */
   const filteredPacks = DESIGN_PACKS.filter(p => p.category === "showcase");
 
-  /* ─── Auto-detect central card on scroll (estilo Stan natural) ─── */
-  useEffect(() => {
-    const carousel = carouselRef.current;
-    if (!carousel) return;
-    let scrollTimer: ReturnType<typeof setTimeout> | null = null;
-    const onScroll = () => {
-      if (scrollTimer) clearTimeout(scrollTimer);
-      scrollTimer = setTimeout(() => {
-        if (!carousel) return;
-        const center = carousel.scrollLeft + carousel.clientWidth / 2;
-        let closestIdx = 0;
-        let closestDist = Infinity;
-        Array.from(carousel.children).forEach((child, idx) => {
-          const el = child as HTMLElement;
-          const cardCenter = el.offsetLeft + el.offsetWidth / 2;
-          const dist = Math.abs(cardCenter - center);
-          if (dist < closestDist) { closestDist = dist; closestIdx = idx; }
-        });
-        if (closestIdx !== activePackIdx && filteredPacks[closestIdx]) {
-          setActivePackIdx(closestIdx);
-          applyPack(filteredPacks[closestIdx]);
-        }
-      }, 150); /* Debounce — espera scroll parar */
-    };
-    carousel.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      carousel.removeEventListener("scroll", onScroll);
-      if (scrollTimer) clearTimeout(scrollTimer);
-    };
-  }, [activePackIdx, filteredPacks, applyPack]);
-
-  /* Auto-detecta template central durante scroll (estilo Stan)
-     Quando user arrasta com mouse/touch, o template mais próximo do centro vira ativo */
-  useEffect(() => {
-    const container = carouselRef.current;
-    if (!container) return;
-    let scrollTimeout: ReturnType<typeof setTimeout>;
-
-    const detectCenter = () => {
-      const containerRect = container.getBoundingClientRect();
-      const containerCenter = containerRect.left + containerRect.width / 2;
-      let closestIdx = 0;
-      let closestDistance = Infinity;
-      Array.from(container.children).forEach((child, idx) => {
-        const childRect = (child as HTMLElement).getBoundingClientRect();
-        const childCenter = childRect.left + childRect.width / 2;
-        const distance = Math.abs(containerCenter - childCenter);
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closestIdx = idx;
-        }
-      });
-      if (closestIdx !== activePackIdx) {
-        setActivePackIdx(closestIdx);
-        applyPack(filteredPacks[closestIdx]);
-      }
-    };
-
-    const onScroll = () => {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(detectCenter, 150);
-    };
-
-    container.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      container.removeEventListener("scroll", onScroll);
-      clearTimeout(scrollTimeout);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activePackIdx, filteredPacks.length]);
-
   /* ── Aplicar pack (mesma lógica do OLD, zero perda) ── */
   const applyPack = useCallback((pack: DesignPack) => {
     updateConfig("theme", pack.config.theme);
@@ -271,6 +200,37 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     setJustApplied(pack.id);
     setTimeout(() => setJustApplied(null), 1600);
   }, [updateConfig]);
+
+  /* ─── Auto-detect central card on scroll (estilo Stan natural) ─── */
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+    let scrollTimer: ReturnType<typeof setTimeout> | null = null;
+    const onScroll = () => {
+      if (scrollTimer) clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        if (!carousel) return;
+        const center = carousel.scrollLeft + carousel.clientWidth / 2;
+        let closestIdx = 0;
+        let closestDist = Infinity;
+        Array.from(carousel.children).forEach((child, idx) => {
+          const el = child as HTMLElement;
+          const cardCenter = el.offsetLeft + el.offsetWidth / 2;
+          const dist = Math.abs(cardCenter - center);
+          if (dist < closestDist) { closestDist = dist; closestIdx = idx; }
+        });
+        if (closestIdx !== activePackIdx && filteredPacks[closestIdx]) {
+          setActivePackIdx(closestIdx);
+          applyPack(filteredPacks[closestIdx]);
+        }
+      }, 150);
+    };
+    carousel.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      carousel.removeEventListener("scroll", onScroll);
+      if (scrollTimer) clearTimeout(scrollTimer);
+    };
+  }, [activePackIdx, filteredPacks, applyPack]);
 
   /* ── Navegação do carousel ── */
   const scrollCarousel = (dir: "left" | "right") => {
