@@ -2197,44 +2197,53 @@ const DashboardPagina = () => {
         {/* ── LEFT PANEL ── */}
         <div className="min-w-0" ref={leftPanelRef}>
 
-          {/* Tabs row — protagonista do topo, com undo/redo discretos à direita */}
-          <div className="flex items-center gap-2 mb-5">
-            <div className="flex-1 flex gap-1 p-1 glass-card rounded-2xl overflow-x-auto scrollbar-none">
+          {/* Tabs — segmented control estilo iOS Settings, underline animado */}
+          <div className="flex items-center justify-between gap-2 mb-5 border-b border-[hsl(var(--dash-border-subtle))]">
+            <div className="flex items-center gap-1">
               {TABS.map(tab => {
                 const count = tabCounts[tab.id] ?? 0;
+                const isActive = activeTab === tab.id;
                 return (
                   <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                    className={`flex-1 flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-semibold transition-all whitespace-nowrap ${
-                      activeTab === tab.id
-                        ? "bg-white dark:bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text))] shadow-sm border border-[hsl(var(--dash-border-subtle))]"
-                        : "text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))]"
+                    className={`relative flex items-center gap-1.5 px-4 py-3 text-[14px] font-semibold transition-colors whitespace-nowrap ${
+                      isActive
+                        ? "text-[hsl(var(--dash-text))]"
+                        : "text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text-muted))]"
                     }`}>
                     {tab.icon}
                     {tab.label}
                     {count > 0 && (
-                      <span className="ml-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-primary/10 text-primary leading-none">
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none transition-colors ${
+                        isActive ? "bg-primary/15 text-primary" : "bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text-subtle))]"
+                      }`}>
                         {count}
                       </span>
+                    )}
+                    {/* Underline animado — só na tab ativa */}
+                    {isActive && (
+                      <span className="absolute -bottom-px left-2 right-2 h-[2px] bg-primary rounded-full" />
                     )}
                   </button>
                 );
               })}
             </div>
-            {/* Undo / Redo (compactos) */}
-            <button onClick={handleUndo} disabled={!canUndoConfig}
-              className="p-2 rounded-xl text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] disabled:opacity-30 disabled:cursor-default transition-all flex-shrink-0"
-              title="Desfazer (Ctrl+Z)" aria-label="Desfazer">
-              <Undo2 size={16} />
-            </button>
-            <button onClick={handleRedo} disabled={!canRedoConfig}
-              className="p-2 rounded-xl text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] disabled:opacity-30 disabled:cursor-default transition-all flex-shrink-0"
-              title="Refazer (Ctrl+Y)" aria-label="Refazer">
-              <Redo2 size={16} />
-            </button>
+            {/* Undo / Redo (compactos, alinhados à direita) */}
+            <div className="flex items-center gap-1 pb-1">
+              <button onClick={handleUndo} disabled={!canUndoConfig}
+                className="p-1.5 rounded-lg text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] disabled:opacity-30 disabled:cursor-default transition-all"
+                title="Desfazer (Ctrl+Z)" aria-label="Desfazer">
+                <Undo2 size={15} />
+              </button>
+              <button onClick={handleRedo} disabled={!canRedoConfig}
+                className="p-1.5 rounded-lg text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] disabled:opacity-30 disabled:cursor-default transition-all"
+                title="Refazer (Ctrl+Y)" aria-label="Refazer">
+                <Redo2 size={15} />
+              </button>
+            </div>
           </div>
 
-          {/* Tab content */}
-          <div className="glass-card rounded-2xl p-5 md:p-6 relative">
+          {/* Tab content — sem card wrapper, conteúdo respira (estilo iOS Settings) */}
+          <div className="relative px-1">
 
             {/* ═══════════════ TAB: VITRINE ═══════════════ */}
             {activeTab === "vitrine" && (
