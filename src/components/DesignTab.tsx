@@ -353,84 +353,95 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
           <ChevronRight size={16} />
         </button>
 
-        {/* Template cards — protagonistas absolutos */}
-        <div
-          ref={carouselRef}
-          className="flex gap-3 overflow-x-auto pb-2 pt-2 scrollbar-none snap-x snap-mandatory px-2"
-        >
+        {/* Único phone ativo — centralizado, sem distração lateral */}
+        <div ref={carouselRef} className="flex justify-center py-4 px-2 min-h-[480px]">
           {filteredPacks.map((pack, idx) => {
-            const isActive = idx === activePackIdx;
+            if (idx !== activePackIdx) return null; // só renderiza o ativo
             const isJustApplied = justApplied === pack.id;
             return (
               <div
                 key={pack.id}
-                className="flex-shrink-0 snap-center transition-all duration-300 ease-out"
-                style={{
-                  transform: isActive ? "scale(1)" : "scale(0.92)",
-                  opacity: isActive ? 1 : 0.6,
-                }}
+                className="relative animate-in fade-in zoom-in-95 duration-300"
               >
-                <div className={`relative transition-all duration-300 ${isJustApplied ? "animate-in zoom-in-95" : ""}`}>
-                  <PhoneMockup
-                    pack={pack}
-                    isActive={isActive}
-                    onClick={() => {
-                      setActivePackIdx(idx);
-                      applyPackWithFeedback(pack); /* CLICK = mostra badge */
-                      const card = carouselRef.current?.children[idx] as HTMLElement;
-                      if (card) card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-                    }}
-                    liveDesign={isActive ? d : undefined}
-                  />
-                  {/* Badge "Aplicado!" destacado em verde */}
-                  {isJustApplied && (
-                    <div className="absolute top-4 right-4 bg-emerald-500 text-white rounded-full px-3 py-1.5 text-[11px] font-bold flex items-center gap-1 animate-in fade-in zoom-in-50 duration-200 shadow-xl">
-                      <Check size={12} /> Aplicado!
-                    </div>
-                  )}
-                </div>
+                <PhoneMockup
+                  pack={pack}
+                  isActive={true}
+                  onClick={() => applyPackWithFeedback(pack)}
+                  liveDesign={d}
+                />
+                {isJustApplied && (
+                  <div className="absolute top-4 right-4 bg-emerald-500 text-white rounded-full px-3 py-1.5 text-[11px] font-bold flex items-center gap-1 animate-in fade-in zoom-in-50 duration-200 shadow-xl">
+                    <Check size={12} /> Aplicado!
+                  </div>
+                )}
               </div>
             );
           })}
         </div>
 
-        {/* Dots de paginação — premium */}
-        <div className="flex items-center justify-center gap-2 pb-5">
+        {/* Nome + desc do ativo */}
+        <div className="text-center pb-4 px-4">
+          <p className="text-[22px] font-extrabold text-[hsl(var(--dash-text))] tracking-tight transition-all duration-300" key={`name-${activePackIdx}`}
+             style={{ animation: "fadeSlideUp 0.3s ease both" }}>
+            {filteredPacks[activePackIdx]?.label}
+          </p>
+          <p className="text-[13px] text-[hsl(var(--dash-text-muted))] mt-1 max-w-[340px] mx-auto leading-snug" key={`desc-${activePackIdx}`}
+             style={{ animation: "fadeSlideUp 0.3s ease 0.05s both" }}>
+            {filteredPacks[activePackIdx]?.desc}
+          </p>
+        </div>
+
+        {/* Régua de thumbnails — mini-phones coloridos com a paleta de cada template */}
+        <div className="flex items-center justify-center gap-2.5 pb-2 px-2 overflow-x-auto scrollbar-none">
           {filteredPacks.map((p, idx) => {
             const isActive = idx === activePackIdx;
+            const c1 = p.config.design.accentColor || "#7C3AED";
+            const c2 = p.config.design.accentColor2 || c1;
             return (
               <button
                 key={p.id}
                 onClick={() => {
                   setActivePackIdx(idx);
-                  applyPackWithFeedback(p); /* CLICK em dot = mostra badge */
-                  const card = carouselRef.current?.children[idx] as HTMLElement;
-                  if (card) card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+                  applyPackWithFeedback(p);
                 }}
-                className={`transition-all duration-300 rounded-full ${
-                  isActive
-                    ? "w-8 h-2 bg-primary shadow-md shadow-primary/40"
-                    : "w-2 h-2 bg-[hsl(var(--dash-border))] hover:bg-[hsl(var(--dash-text-muted))]"
+                className={`group relative flex-shrink-0 transition-all duration-300 ${
+                  isActive ? "scale-110" : "scale-100 opacity-60 hover:opacity-100 hover:scale-105"
                 }`}
-                aria-label={`Ver template ${p.label}`}
-              />
+                title={p.label}
+                aria-label={`Aplicar template ${p.label}`}
+              >
+                {/* Mini phone shape com gradient da paleta */}
+                <div
+                  className={`relative w-[36px] h-[58px] rounded-[10px] overflow-hidden border-2 transition-all ${
+                    isActive ? "border-primary shadow-lg shadow-primary/30" : "border-[hsl(var(--dash-border))]"
+                  }`}
+                  style={{ background: `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)` }}
+                >
+                  {/* Notch */}
+                  <div className="absolute top-1 left-1/2 -translate-x-1/2 w-3 h-1 rounded-full bg-black/40" />
+                  {/* Avatar dot */}
+                  <div className="absolute top-3 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-white/40" />
+                  {/* Mini cards */}
+                  <div className="absolute bottom-1.5 left-1.5 right-1.5 space-y-1">
+                    <div className="h-1.5 rounded bg-white/40" />
+                    <div className="h-1.5 rounded bg-white/30" />
+                  </div>
+                  {/* Check ativo */}
+                  {isActive && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center shadow-md">
+                      <Check size={9} className="text-white" strokeWidth={3} />
+                    </div>
+                  )}
+                </div>
+                {/* Label embaixo */}
+                <span className={`block text-[9px] font-semibold mt-1 transition-colors ${
+                  isActive ? "text-primary" : "text-[hsl(var(--dash-text-subtle))] group-hover:text-[hsl(var(--dash-text-muted))]"
+                }`}>
+                  {p.label}
+                </span>
+              </button>
             );
           })}
-        </div>
-
-        {/* Nome + descrição do ATIVO — protagonista visual */}
-        <div className="text-center pt-1 pb-2 px-4">
-          <p className="text-[20px] font-extrabold text-[hsl(var(--dash-text))] tracking-tight transition-all duration-300" key={`name-${activePackIdx}`}
-             style={{ animation: "fadeSlideUp 0.3s ease both" }}>
-            {filteredPacks[activePackIdx]?.label}
-          </p>
-          <p className="text-[13px] text-[hsl(var(--dash-text-muted))] mt-1 max-w-[320px] mx-auto leading-snug" key={`desc-${activePackIdx}`}
-             style={{ animation: "fadeSlideUp 0.3s ease 0.05s both" }}>
-            {filteredPacks[activePackIdx]?.desc}
-          </p>
-          <p className="text-[10px] font-semibold text-[hsl(var(--dash-text-subtle))] uppercase tracking-wider mt-2">
-            {activePackIdx + 1} / {filteredPacks.length}
-          </p>
         </div>
       </div>
 
