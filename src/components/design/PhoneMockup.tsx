@@ -161,7 +161,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
             borderRadius: radius,
           }}>
             {link.image ? (
-              <img src={link.image} alt="" className="w-[28px] h-[28px] flex-shrink-0 object-cover" style={{ borderRadius: Math.max(4, radius - 6) }} crossOrigin="anonymous" loading="lazy" />
+              <img src={link.image} alt="" className="w-[28px] h-[28px] flex-shrink-0 object-cover" style={{ borderRadius: Math.max(4, radius - 6) }} crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
             ) : (
               <div className="w-[28px] h-[28px] flex-shrink-0 flex items-center justify-center text-[11px]" style={{
                 background: `${accent}20`,
@@ -181,11 +181,14 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
     </div>
   ) : null;
   const renderHeroBanner = () => heroProduct ? (
-    <div className="relative w-full overflow-hidden rounded-[14px]" style={{ height: 135, boxShadow: cardDepthShadow }}>
-      {heroProduct.image ? (
-        <img src={heroProduct.image} alt="" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" />
-      ) : (
-        <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${accent}40, ${accent2}50)` }} />
+    <div className="relative w-full overflow-hidden rounded-[14px]" style={{
+      height: 135,
+      boxShadow: cardDepthShadow,
+      /* Sempre tem gradient fallback — img sobrepõe quando carrega */
+      background: `linear-gradient(135deg, ${accent}, ${accent2 || accent})`,
+    }}>
+      {heroProduct.image && (
+        <img src={heroProduct.image} alt="" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
       )}
       <div className="absolute inset-0" style={{
         background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.50) 25%, rgba(0,0,0,0.15) 55%, transparent 80%)",
@@ -218,11 +221,13 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
 
   /* HERO XL — versão gigante para layout "single-hero" (portfolio/lookbook focus) */
   const renderHeroXL = () => heroProduct ? (
-    <div className="relative w-full overflow-hidden rounded-[16px]" style={{ height: 220, boxShadow: cardDepthShadow }}>
-      {heroProduct.image ? (
-        <img src={heroProduct.image} alt="" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" />
-      ) : (
-        <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${accent}40, ${accent2}50)` }} />
+    <div className="relative w-full overflow-hidden rounded-[16px]" style={{
+      height: 220,
+      boxShadow: cardDepthShadow,
+      background: `linear-gradient(135deg, ${accent}, ${accent2 || accent})`,
+    }}>
+      {heroProduct.image && (
+        <img src={heroProduct.image} alt="" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
       )}
       <div className="absolute inset-0" style={{
         background: "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 30%, rgba(0,0,0,0.10) 65%, transparent 85%)",
@@ -259,7 +264,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
       {gridProducts.slice(0, 4).map((p, i) => (
         <div key={i} className="overflow-hidden" style={{ borderRadius: 10, ...productCardStyle, boxShadow: cardDepthShadow }}>
           {p.image ? (
-            <img src={p.image} alt="" className="w-full h-[58px] object-cover" crossOrigin="anonymous" loading="lazy" />
+            <img src={p.image} alt="" className="w-full h-[58px] object-cover" crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
           ) : (
             <div className="w-full h-[58px]" style={{ background: `${accent}20` }} />
           )}
@@ -288,7 +293,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
       {/* Author */}
       <div className="flex items-center gap-1.5">
         {ref.testimonial.avatar && (
-          <img src={ref.testimonial.avatar} alt="" className="w-[20px] h-[20px] rounded-full object-cover flex-shrink-0" crossOrigin="anonymous" loading="lazy" />
+          <img src={ref.testimonial.avatar} alt="" className="w-[20px] h-[20px] rounded-full object-cover flex-shrink-0" crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
         )}
         <div className="min-w-0">
           <p className="text-[8.5px] truncate" style={{ color: textC, fontWeight: 800, letterSpacing: "-0.01em" }}>{ref.testimonial.author}</p>
@@ -300,51 +305,77 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
     </div>
   ) : null;
 
-  /* VIDEO HERO — frame de vídeo "tocando" estilo YouTube embed (sem play overlay) */
+  /* VIDEO HERO — frame cinematográfico com chrome YouTube refinado */
   const renderVideoHero = () => ref.video ? (
-    <div className="relative w-full overflow-hidden rounded-[12px] bg-black" style={{ height: 158, boxShadow: cardDepthShadow }}>
+    <div className="relative w-full overflow-hidden rounded-[14px]" style={{
+      height: 175,
+      boxShadow: cardDepthShadow,
+      /* Fallback gradient se a img não carregar */
+      background: `linear-gradient(135deg, ${accent}, ${accent2 || accent}, #000)`,
+    }}>
       {/* Frame do vídeo */}
-      <img src={ref.video.thumbnail} alt="" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" />
+      <img src={ref.video.thumbnail} alt="" className="absolute inset-0 w-full h-full object-cover"
+        crossOrigin="anonymous" loading="lazy"
+        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
 
-      {/* Title overlay top — aparece SÓ no início do vídeo (estilo YouTube) */}
-      <div className="absolute top-0 inset-x-0 px-3 pt-2 pb-6" style={{
-        background: "linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.20) 60%, transparent 100%)",
-      }}>
-        <p className="text-[10.5px] text-white leading-tight line-clamp-2" style={{ fontWeight: 700, letterSpacing: "-0.015em", textShadow: "0 1px 3px rgba(0,0,0,0.65)" }}>
+      {/* Vignette cinematográfico — escurece bordas + topo + base pra texto sempre legível */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.10) 30%, rgba(0,0,0,0.10) 65%, rgba(0,0,0,0.85) 100%)",
+      }} />
+
+      {/* Live indicator com label "AO VIVO" — top-right premium */}
+      {ref.video.views && (
+        <div className="absolute top-2.5 right-2.5 flex items-center gap-1 px-1.5 py-[3px] rounded-[3px]" style={{
+          background: "#FF0000", boxShadow: "0 2px 8px rgba(255,0,0,0.4)",
+        }}>
+          <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
+          <span className="text-[7px] font-extrabold text-white tracking-wider" style={{ letterSpacing: "0.08em" }}>AO VIVO</span>
+        </div>
+      )}
+
+      {/* Title — protagonista (centro vertical, bigger, dramatic) */}
+      <div className="absolute top-2.5 left-2.5 right-16 z-10">
+        <p className="text-[12px] text-white leading-[1.15] line-clamp-2" style={{ fontWeight: 800, letterSpacing: "-0.025em", textShadow: "0 2px 10px rgba(0,0,0,0.85), 0 1px 3px rgba(0,0,0,0.7)" }}>
           {ref.video.title}
         </p>
+        {ref.video.views && (
+          <p className="text-[8.5px] text-white/85 mt-1 font-semibold tabular-nums" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.7)" }}>
+            {ref.video.views} assistindo agora
+          </p>
+        )}
       </div>
 
-      {/* YouTube control bar real — estilo player tocando */}
+      {/* YouTube player chrome — estilo real refinado */}
       <div className="absolute bottom-0 inset-x-0">
-        {/* Progress bar vermelha (parcialmente tocada) */}
-        <div className="relative w-full h-[3px] bg-white/25">
+        {/* Progress bar — finíssima, com red bar + scrubber dot + buffered grey ahead */}
+        <div className="relative w-full h-[2.5px] bg-white/20">
+          <div className="absolute top-0 left-0 h-full bg-white/35" style={{ width: "55%" }} />
           <div className="absolute top-0 left-0 h-full" style={{ width: "38%", background: "#FF0000" }} />
-          <div className="absolute top-1/2 -translate-y-1/2 w-[8px] h-[8px] rounded-full bg-[#FF0000] shadow-md" style={{ left: "calc(38% - 4px)" }} />
+          <div className="absolute top-1/2 -translate-y-1/2 w-[7px] h-[7px] rounded-full bg-[#FF0000]" style={{ left: "calc(38% - 3.5px)", boxShadow: "0 0 0 1.5px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.5)" }} />
         </div>
-        {/* Bottom chrome bar */}
-        <div className="flex items-center justify-between px-2 py-1.5" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.35) 100%)" }}>
-          {/* Left: pause icon (vídeo em reprodução) + tempo */}
-          <div className="flex items-center gap-1.5">
-            <svg width="9" height="9" viewBox="0 0 24 24" fill="#fff"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
-            <span className="text-[7.5px] text-white font-medium tabular-nums" style={{ letterSpacing: "0.01em" }}>
+        {/* Chrome bottom — pause + tempo + volume + YT logo */}
+        <div className="flex items-center justify-between px-2.5 py-1.5">
+          <div className="flex items-center gap-2">
+            {/* Pause icon (vídeo TOCANDO) */}
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="#fff" style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.6))" }}>
+              <rect x="6" y="4" width="4" height="16" rx="0.5"/><rect x="14" y="4" width="4" height="16" rx="0.5"/>
+            </svg>
+            {/* Volume icon */}
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="#fff" style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.6))" }}>
+              <path d="M3 10v4h4l5 5V5L7 10H3zm13.5 2c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+            </svg>
+            {/* Tempo */}
+            <span className="text-[8px] text-white font-semibold tabular-nums" style={{ letterSpacing: "0.02em", textShadow: "0 1px 2px rgba(0,0,0,0.7)" }}>
               4:42 / {ref.video.duration || "12:34"}
             </span>
           </div>
-          {/* Right: YouTube logo */}
-          <div className="flex items-center gap-0.5">
-            <svg width="13" height="9" viewBox="0 0 24 17" fill="#FF0000"><path d="M23.498 2.654a2.99 2.99 0 0 0-2.108-2.117C19.522.04 12 .04 12 .04s-7.522 0-9.39.497A2.99 2.99 0 0 0 .502 2.654C0 4.532 0 8.45 0 8.45s0 3.918.502 5.796a2.99 2.99 0 0 0 2.108 2.117C4.478 16.86 12 16.86 12 16.86s7.522 0 9.39-.497a2.99 2.99 0 0 0 2.108-2.117C24 12.368 24 8.45 24 8.45s0-3.918-.502-5.796z"/><path fill="#fff" d="M9.5 12.18l6.5-3.73-6.5-3.73v7.46z"/></svg>
-          </div>
+          {/* Right: YT logo oficial */}
+          <svg width="14" height="10" viewBox="0 0 24 17" style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.5))" }}>
+            <path fill="#FF0000" d="M23.498 2.654a2.99 2.99 0 0 0-2.108-2.117C19.522.04 12 .04 12 .04s-7.522 0-9.39.497A2.99 2.99 0 0 0 .502 2.654C0 4.532 0 8.45 0 8.45s0 3.918.502 5.796a2.99 2.99 0 0 0 2.108 2.117C4.478 16.86 12 16.86 12 16.86s7.522 0 9.39-.497a2.99 2.99 0 0 0 2.108-2.117C24 12.368 24 8.45 24 8.45s0-3.918-.502-5.796z"/>
+            <path fill="#fff" d="M9.5 12.18l6.5-3.73-6.5-3.73v7.46z"/>
+          </svg>
         </div>
       </div>
-
-      {/* Live "ao vivo" indicator (subtle, top-right) — opcional, dá vibe de transmissão */}
-      {ref.video.views && (
-        <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-[2px] rounded" style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
-          <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-          <span className="text-[7.5px] font-bold text-white" style={{ letterSpacing: "0.04em" }}>{ref.video.views}</span>
-        </div>
-      )}
     </div>
   ) : null;
 
@@ -392,7 +423,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
     <div className="overflow-hidden" style={{ borderRadius: 14, ...productCardStyle, boxShadow: cardDepthShadow }}>
       <div className="flex items-center gap-2 p-2">
         {secondaryProduct.image ? (
-          <img src={secondaryProduct.image} alt="" className="w-[44px] h-[44px] rounded-[9px] object-cover flex-shrink-0" crossOrigin="anonymous" loading="lazy" />
+          <img src={secondaryProduct.image} alt="" className="w-[44px] h-[44px] rounded-[9px] object-cover flex-shrink-0" crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
         ) : (
           <div className="w-[44px] h-[44px] rounded-[9px] flex-shrink-0" style={{ background: `${accent}15` }} />
         )}
@@ -467,7 +498,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
                   boxShadow: `0 6px 20px ${accent}40, 0 2px 6px rgba(0,0,0,0.15)`,
                 }}>
                   <div className="w-full h-full rounded-full overflow-hidden" style={{ background: bg }}>
-                    <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center top" }} crossOrigin="anonymous" loading="lazy" />
+                    <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center top" }} crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
                   </div>
                 </div>
                 <p className="text-[16px] leading-[1.05] mt-1.5 text-center" style={{ color: textC, fontWeight: 800, letterSpacing: "-0.02em" }}>
@@ -482,7 +513,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
             {/* ═══ HEADER: Edge_to_Edge_Header (Léo, Lucas) ═══ */}
             {headerType === "edge-to-edge" && (
               <div className="w-full flex-shrink-0 relative overflow-hidden" style={{ height: 180 }}>
-                <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center 15%" }} crossOrigin="anonymous" loading="lazy" />
+                <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center 15%" }} crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
                 {/* Gradient com intensidade configurável por pack (minimal vs normal) */}
                 <div className="absolute inset-0" style={{
                   background: pack.edgeGradientIntensity === "minimal"
@@ -527,7 +558,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
                   borderRadius: 18,
                   boxShadow: `0 12px 24px rgba(0,0,0,0.20), 0 4px 8px rgba(0,0,0,0.10), 0 0 0 3px ${isLight ? "#fff" : "rgba(255,255,255,0.08)"}, 0 0 18px ${accent}28`,
                 }}>
-                  <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center top" }} crossOrigin="anonymous" loading="lazy" />
+                  <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center top" }} crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
                 </div>
                 <p className="text-[18px] leading-[1.02] mt-2 text-center" style={{ color: textC, fontWeight: 600, letterSpacing: "-0.02em" }}>
                   {ref.name}<VerifiedBadge />
@@ -542,7 +573,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
             {headerType === "split-editorial" && (
               <div className="w-full flex-shrink-0 flex" style={{ height: 155 }}>
                 <div className="w-[45%] relative overflow-hidden">
-                  <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center center" }} crossOrigin="anonymous" loading="lazy" />
+                  <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center center" }} crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
                 </div>
                 <div className="w-[55%] flex flex-col justify-center px-2.5">
                   <p className="text-[14px] leading-[1.05]" style={{ color: textC, fontWeight: 700, letterSpacing: "-0.02em" }}>
@@ -562,7 +593,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
                   border: dd.profileBorder ? `2.5px solid ${dd.profileBorderColor || accent}` : "none",
                   boxShadow: dd.profileGlow ? `0 0 22px ${dd.profileGlowColor || accent}40` : "0 2px 10px rgba(0,0,0,0.2)",
                 }}>
-                  <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center top" }} crossOrigin="anonymous" loading="lazy" />
+                  <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center top" }} crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
                 </div>
                 <p className="text-[15px] leading-tight text-center mb-1" style={{ color: dd.nameColor || textC, fontWeight: 800, letterSpacing: "-0.02em" }}>
                   {ref.name}<VerifiedBadge />
@@ -602,7 +633,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
                         return (
                           <div className="flex items-center gap-2 pr-2.5 pl-1 py-1 overflow-hidden" style={{ ...productCardStyle, borderRadius: radius }}>
                             {link.image ? (
-                              <img src={link.image} alt="" className="w-[28px] h-[28px] flex-shrink-0 object-cover" style={{ borderRadius: Math.max(4, radius - 6) }} crossOrigin="anonymous" loading="lazy" />
+                              <img src={link.image} alt="" className="w-[28px] h-[28px] flex-shrink-0 object-cover" style={{ borderRadius: Math.max(4, radius - 6) }} crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
                             ) : (
                               <div className="w-[28px] h-[28px] flex-shrink-0" style={{ background: `${accent}20`, borderRadius: Math.max(4, radius - 6) }} />
                             )}
