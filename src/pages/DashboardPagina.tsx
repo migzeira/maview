@@ -67,10 +67,11 @@ const LINK_ICON_MAP: Record<LinkItem["icon"], React.ReactNode> = {
   link:      <Link2 size={14} />,
 };
 
+/* Tabs estilo Stan Store: 'Loja / Páginas / Editar Design' */
 const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
-  { id: "vitrine", label: "Vitrine",  icon: <Package size={15} /> },
-  { id: "perfil",  label: "Perfil",   icon: <User size={15} /> },
-  { id: "design",  label: "Design",   icon: <Palette size={15} /> },
+  { id: "vitrine", label: "Loja",         icon: <Package size={15} /> },
+  { id: "perfil",  label: "Perfil",       icon: <User size={15} /> },
+  { id: "design",  label: "Editar Design", icon: <Palette size={15} /> },
 ];
 
 

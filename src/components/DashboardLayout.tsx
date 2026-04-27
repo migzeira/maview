@@ -348,22 +348,44 @@ const DashboardLayout = ({ children }: Props) => {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top bar */}
-        <header className="h-14 flex items-center justify-between px-4 md:px-6 border-b border-[hsl(var(--dash-border-subtle))] flex-shrink-0 bg-[hsl(var(--dash-surface))]/80 backdrop-blur-xl z-10">
+        {/* Top bar — URL bar PROEMINENTE estilo Stan ('stan.store/fzandre__') */}
+        <header className="h-16 flex items-center justify-between px-4 md:px-6 border-b border-[hsl(var(--dash-border-subtle))] flex-shrink-0 bg-[hsl(var(--dash-surface))]/80 backdrop-blur-xl z-10">
+          {/* Esquerda: menu mobile */}
           <div className="flex items-center gap-3">
             <button onClick={() => setMobileOpen(true)} className="md:hidden p-2 -ml-2 touch-target text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))] transition-colors" aria-label="Abrir menu">
               <Menu size={20} />
             </button>
-            <button
-              onClick={copyLink}
-              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 transition-all text-detail text-[hsl(var(--dash-text-muted))] font-mono"
-            >
-              {profileUrl}
-              {copied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} className="opacity-40" />}
-            </button>
-
           </div>
 
+          {/* CENTRO: URL bar destacada (estilo Stan) */}
+          <button
+            onClick={copyLink}
+            className="hidden sm:flex items-center gap-2.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[hsl(var(--dash-surface-2))] to-[hsl(var(--dash-surface-2))]/60 border border-[hsl(var(--dash-border))] hover:border-primary/40 hover:shadow-md hover:shadow-primary/10 transition-all group"
+            title="Clique para copiar"
+          >
+            {/* Indicador LIVE pulsante */}
+            <div className="flex items-center gap-1.5">
+              <div className="relative w-2 h-2">
+                <div className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-50" />
+                <div className="relative w-2 h-2 rounded-full bg-emerald-500" />
+              </div>
+              <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Live</span>
+            </div>
+            {/* Separador */}
+            <div className="w-px h-4 bg-[hsl(var(--dash-border))]" />
+            {/* URL */}
+            <span className="text-[13px] font-mono font-semibold text-[hsl(var(--dash-text))] group-hover:text-primary transition-colors">
+              {profileUrl}
+            </span>
+            {/* Copy icon */}
+            {copied ? (
+              <Check size={14} className="text-emerald-500" />
+            ) : (
+              <Copy size={14} className="text-[hsl(var(--dash-text-subtle))] group-hover:text-primary transition-colors" />
+            )}
+          </button>
+
+          {/* Direita: notifications + dark mode + ver vitrine */}
           <div className="flex items-center gap-2">
             <NotificationCenter />
             <button
@@ -376,11 +398,11 @@ const DashboardLayout = ({ children }: Props) => {
             </button>
             <button
               onClick={openVitrine}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg btn-primary-gradient text-[13px] font-medium transition-transform active:scale-95"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg btn-primary-gradient text-[13px] font-semibold transition-transform active:scale-95 shadow-md"
               aria-label="Ver vitrine"
             >
-              <ExternalLink size={12} />
-              <span className="hidden sm:inline">Ver vitrine</span>
+              <ExternalLink size={13} />
+              <span className="hidden sm:inline">Abrir página</span>
             </button>
           </div>
         </header>
