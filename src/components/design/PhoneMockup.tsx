@@ -378,17 +378,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
           <div className="absolute bottom-[5px] left-1/2 -translate-x-1/2 w-[38%] h-[3px] rounded-full z-20" style={{ background: `${textC}20` }} />
         </div>
       </div>
-
-      {/* Pack label */}
-      <div className="text-center">
-        <p className={`text-[13px] font-bold transition-colors duration-300 ${isActive ? "text-primary" : "text-[hsl(var(--dash-text))] group-hover:text-[hsl(var(--dash-text))]"}`}
-          style={{ fontFamily: `"${dd.fontHeading || "Inter"}", sans-serif` }}>
-          {pack.label}
-        </p>
-        <p className={`text-[10px] transition-colors duration-300 ${isActive ? "text-primary/60" : "text-[hsl(var(--dash-text-subtle))]"}`}>
-          {pack.desc}
-        </p>
-      </div>
+      {/* Nome do pack renderizado externamente no DesignTab — evita duplicação */}
     </button>
   );
 }
