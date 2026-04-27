@@ -138,21 +138,36 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
   /* Hero banner — primary product with full-bleed image + pill CTA */
   const heroProduct = ref.products[0];
   const secondaryProduct = ref.products[1];
-  /* Links como pills clicáveis (Linktree-style) — entre hero e secondary, máx 2 */
+  /* Links como pills clicáveis estilo Stan (thumbnail + título + seta), máx 2 */
   const linkPills = (ref.links || []).slice(0, 2);
   const renderLinkPills = () => linkPills.length > 0 ? (
     <div className="space-y-[5px]">
-      {linkPills.map((linkText, i) => (
-        <div key={i} className="flex items-center justify-between gap-1.5 px-3 py-[7px]" style={{
-          ...productCardStyle,
-          borderRadius: dd.buttonShape === "pill" ? 999 : (dd.buttonShape === "square" ? 4 : 12),
-        }}>
-          <span className="text-[9px] truncate flex-1" style={{ color: textC, fontWeight: 700, letterSpacing: "-0.005em" }}>
-            {linkText.replace(/\s*→\s*$/, "")}
-          </span>
-          <span className="text-[10px] flex-shrink-0" style={{ color: accent, fontWeight: 800 }}>→</span>
-        </div>
-      ))}
+      {linkPills.map((linkRaw, i) => {
+        const link = typeof linkRaw === "string" ? { title: linkRaw.replace(/\s*→\s*$/, ""), image: undefined } : linkRaw;
+        const radius = dd.buttonShape === "pill" ? 999 : (dd.buttonShape === "square" ? 6 : 12);
+        return (
+          <div key={i} className="flex items-center gap-2 pr-2.5 pl-1 py-1 overflow-hidden" style={{
+            ...productCardStyle,
+            borderRadius: radius,
+          }}>
+            {link.image ? (
+              <img src={link.image} alt="" className="w-[28px] h-[28px] flex-shrink-0 object-cover" style={{ borderRadius: Math.max(4, radius - 6) }} crossOrigin="anonymous" loading="lazy" />
+            ) : (
+              <div className="w-[28px] h-[28px] flex-shrink-0 flex items-center justify-center text-[11px]" style={{
+                background: `${accent}20`,
+                borderRadius: Math.max(4, radius - 6),
+                color: accent,
+              }}>
+                {link.title.match(/^(\p{Emoji})/u)?.[1] || "→"}
+              </div>
+            )}
+            <span className="text-[9px] truncate flex-1" style={{ color: textC, fontWeight: 700, letterSpacing: "-0.005em" }}>
+              {link.title.replace(/^(\p{Emoji}\s*)/u, "")}
+            </span>
+            <span className="text-[10px] flex-shrink-0" style={{ color: accent, fontWeight: 800 }}>→</span>
+          </div>
+        );
+      })}
     </div>
   ) : null;
   const renderHeroBanner = () => heroProduct ? (

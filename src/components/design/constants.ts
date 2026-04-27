@@ -53,11 +53,12 @@ export interface DesignTabProps {
 
 /* ── Reference profiles for phone mockups ─────────── */
 
+export type RefLink = string | { title: string; image?: string };
 export interface ReferenceProfile {
   name: string; username: string; bio: string; avatar: string;
   coverImage?: string;
   verified?: boolean;
-  socials: string[]; links: string[];
+  socials: string[]; links: RefLink[];
   products: {
     title: string;
     price: string;
@@ -125,7 +126,10 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     bio: "Estratégia e liberdade financeira 💰", verified: true,
     avatar: U("photo-1472099645785-5658abf4ff4e", 400, 500, "face"),
     socials: ["yt", "li", "ig"],
-    links: ["📊 Análise de carteira grátis", "💎 Newsletter VIP semanal"],
+    links: [
+      { title: "Análise de carteira grátis", image: U("photo-1611974789855-9c2a0a7236a3", 80, 80, "center") },
+      { title: "Newsletter VIP semanal", image: U("photo-1554224155-6726b3ff858f", 80, 80, "center") },
+    ],
     products: [
       { title: "Consultoria VIP", price: "R$ 497", cta: "Quero agora",
         image: U("photo-1563013544-824ae1b704d3", 600, 400, "center") },
@@ -139,7 +143,10 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     bio: "Transformando eventos em experiências 🎧", verified: true,
     avatar: U("photo-1539571696357-5a69c17a67c6", 400, 500, "face"),
     socials: ["tt", "ig", "yt", "li"],
-    links: ["🎧 Beat pack grátis essa semana", "🎤 Aula experimental sem custo"],
+    links: [
+      { title: "Beat pack grátis essa semana", image: U("photo-1493225457124-a3eb161ffa5f", 80, 80, "center") },
+      { title: "Aula experimental sem custo", image: U("photo-1571266028243-d220bc56b8b7", 80, 80, "center") },
+    ],
     products: [
       { title: "Kit de Beats Premium", price: "R$ 297", cta: "Baixar Pack",
         image: U("photo-1516280440614-37939bbacd81", 600, 400, "center") },
@@ -153,7 +160,10 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     avatar: U("photo-1494790108377-be9c29b29330", 500, 600, "face"),
     coverImage: U("photo-1522337360788-8b13dee7a37e", 600, 400, "center"),
     socials: ["pin", "ig", "tt", "li"],
-    links: ["✨ Quiz: descubra seu skincare", "🌸 Newsletter beauty semanal"],
+    links: [
+      { title: "Quiz: descubra seu skincare", image: U("photo-1570172619644-dfd03ed5d881", 80, 80, "center") },
+      { title: "Newsletter beauty semanal", image: U("photo-1556228720-195a672e8a03", 80, 80, "center") },
+    ],
     products: [
       { title: "Natural Glow Guide", price: "R$ 80/mês", cta: "Inscrever-se",
         image: U("photo-1556228453-efd6c1ff04f6", 600, 400, "center") },
@@ -167,7 +177,10 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     bio: "Branding e posicionamento premium ✨", verified: true,
     avatar: U("photo-1573496359142-b8d87734a5a2", 400, 500, "face"),
     socials: ["ig", "pin", "tt", "li"],
-    links: ["📐 Auditoria de marca grátis", "💌 Conteúdo semanal de branding"],
+    links: [
+      { title: "Auditoria de marca grátis", image: U("photo-1561070791-2526d30994b5", 80, 80, "center") },
+      { title: "Conteúdo semanal de branding", image: U("photo-1586282391129-76a6df230234", 80, 80, "center") },
+    ],
     products: [
       { title: "The Brand Blueprint", price: "R$ 10", originalPrice: "R$ 20",
         cta: "Agendar",
@@ -182,7 +195,10 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     avatar: U("photo-1531427186611-ecfd6d936c79", 500, 600, "face"),
     coverImage: U("photo-1531427186611-ecfd6d936c79", 600, 400, "center"),
     socials: ["yt", "ig", "tt", "li"],
-    links: ["🚀 Diagnóstico de tráfego grátis", "📈 Case studies dos top alunos"],
+    links: [
+      { title: "Diagnóstico de tráfego grátis", image: U("photo-1460925895917-afdab827c52f", 80, 80, "center") },
+      { title: "Case studies dos top alunos", image: U("photo-1551288049-bebda4e38f71", 80, 80, "center") },
+    ],
     products: [
       { title: "Mentoria Growth 1:1", price: "R$ 997", originalPrice: "R$ 1997",
         cta: "Mentoria VIP",
@@ -198,7 +214,10 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     avatar: U("photo-1488426862026-3ee34a7d66df", 500, 600, "face"),
     coverImage: U("photo-1529626455594-4ff0802cfb7e", 600, 400, "center"),
     socials: ["ig", "pin", "tt", "li"],
-    links: ["🎨 Teste de estilo grátis", "👗 Lookbook da temporada"],
+    links: [
+      { title: "Teste de estilo grátis", image: U("photo-1490481651871-ab68de25d43d", 80, 80, "center") },
+      { title: "Lookbook da temporada", image: U("photo-1529626455594-4ff0802cfb7e", 80, 80, "center") },
+    ],
     products: [
       { title: "Análise de Coloração Pessoal", price: "R$ 297", cta: "Comprar",
         image: U("photo-1522335789203-aabd1fc54bc9", 600, 400, "center") },
@@ -212,7 +231,10 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     verified: true,
     avatar: U("photo-1507003211169-0a1dd7228f2d", 500, 600, "face"),
     socials: ["ig", "pin", "tt", "li"],
-    links: ["📸 Portfolio completo aqui", "🎁 Presets gratuitos pra editar"],
+    links: [
+      { title: "Portfolio completo aqui", image: U("photo-1542038784456-1ea8e935640e", 80, 80, "center") },
+      { title: "Presets gratuitos pra editar", image: U("photo-1452587925148-ce544e77e70d", 80, 80, "center") },
+    ],
     products: [
       { title: "Ensaio Corporativo", price: "R$ 497", cta: "Ver Portfolio",
         image: U("photo-1519085360753-af0119f7cbe7", 600, 400, "center") },
@@ -226,7 +248,10 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     verified: true,
     avatar: U("photo-1559839734-2b71ea197ec2", 500, 600, "face"),
     socials: ["ig", "pin", "yt", "li"],
-    links: ["🌿 Quiz: qual tratamento ideal", "📞 Falar com especialista agora"],
+    links: [
+      { title: "Quiz: qual tratamento ideal", image: U("photo-1540555700478-4be289fbecef", 80, 80, "center") },
+      { title: "Falar com especialista agora", image: U("photo-1559757175-5700dde675bc", 80, 80, "center") },
+    ],
     products: [
       { title: "Consulta Integrativa", price: "R$ 380", cta: "Falar com Especialista",
         image: U("photo-1544367567-0f2fcb009e0b", 600, 400, "center") },
