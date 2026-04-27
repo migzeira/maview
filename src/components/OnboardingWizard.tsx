@@ -14,20 +14,20 @@ interface OnboardingProps {
   theme: string;
   onUpdate: (key: string, value: string) => void;
   onSelectTheme: (themeId: string) => void;
+  onApplyPack?: (packId: string) => void;
   onComplete: () => void;
 }
 
-/* ── Theme palette for step 1 ──────────────────── */
-const STYLE_PACKS = [
-  { id: "dark-purple", label: "Roxo Escuro",  bg: "#080612", accent: "#a855f7", accent2: "#ec4899" },
-  { id: "midnight",    label: "Meia Noite",   bg: "#05080f", accent: "#60a5fa", accent2: "#818cf8" },
-  { id: "ocean",       label: "Oceano",       bg: "#020c14", accent: "#06b6d4", accent2: "#22d3ee" },
-  { id: "forest",      label: "Floresta",     bg: "#050f05", accent: "#4ade80", accent2: "#34d399" },
-  { id: "rose",        label: "Rosa",         bg: "#100509", accent: "#f43f5e", accent2: "#fb7185" },
-  { id: "gold",        label: "Ouro",         bg: "#0c0a04", accent: "#eab308", accent2: "#d97706" },
-  { id: "neon-pink",   label: "Neon Pink",    bg: "#0a0010", accent: "#ff2d95", accent2: "#ff6ec7" },
-  { id: "white",       label: "Branco",       bg: "#f8f9fa", accent: "#6366f1", accent2: "#8b5cf6" },
-  { id: "pure-black",  label: "Preto Puro",   bg: "#000000", accent: "#ffffff", accent2: "#a0a0a0" },
+/* ── 8 Templates Premium Showcase (igual aba Design) ──────────────── */
+const SHOWCASE_PACKS = [
+  { id: "showcase-financas", emoji: "💼", label: "Finanças",    nicho: "Consultor / Mentor",   bg: "#ffffff", accent: "#6366f1", accent2: "#8b5cf6", theme: "white" },
+  { id: "showcase-dj",       emoji: "🎧", label: "DJ / Música", nicho: "Artista / Produtor",   bg: "#0a0010", accent: "#ec4899", accent2: "#8b5cf6", theme: "neon-pink" },
+  { id: "showcase-beleza",   emoji: "💄", label: "Beleza",      nicho: "Estética / Maquiagem", bg: "#100509", accent: "#f43f5e", accent2: "#fb7185", theme: "rose" },
+  { id: "showcase-branding", emoji: "✨", label: "Branding",    nicho: "Designer / Agência",   bg: "#faf7f2", accent: "#d97706", accent2: "#b45309", theme: "cream" },
+  { id: "showcase-growth",   emoji: "🚀", label: "Growth",      nicho: "Marketing / SaaS",     bg: "#000000", accent: "#ffffff", accent2: "#a0a0a0", theme: "pure-black" },
+  { id: "showcase-moda",     emoji: "👗", label: "Moda",        nicho: "Estilista / Influencer", bg: "#faf7f2", accent: "#d97706", accent2: "#b45309", theme: "cream" },
+  { id: "showcase-fotografia", emoji: "📸", label: "Fotografia", nicho: "Fotógrafo / Visual",  bg: "#f8f9fa", accent: "#6366f1", accent2: "#8b5cf6", theme: "white" },
+  { id: "showcase-clinica",  emoji: "🌿", label: "Wellness",    nicho: "Clínica / Saúde",      bg: "#050f05", accent: "#4ade80", accent2: "#34d399", theme: "forest" },
 ];
 
 /* ── AI bio suggestions ────────────────────────── */
@@ -41,12 +41,12 @@ const AI_BIO_IDEAS = [
 
 const OnboardingWizard = ({
   displayName, username, bio, avatarUrl, theme,
-  onUpdate, onSelectTheme, onComplete,
+  onUpdate, onSelectTheme, onApplyPack, onComplete,
 }: OnboardingProps) => {
   const [step, setStep] = useState(0);
   const [localName, setLocalName] = useState(displayName || "");
   const [localBio, setLocalBio] = useState(bio || "");
-  const [selectedTheme, setSelectedTheme] = useState(theme || "dark-purple");
+  const [selectedPack, setSelectedPack] = useState<string>("showcase-financas");
   const [previewAvatar, setPreviewAvatar] = useState(avatarUrl || "");
   const [copied, setCopied] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -56,10 +56,11 @@ const OnboardingWizard = ({
     ? `${window.location.origin}/${username.replace(/^@/, "")}`
     : "";
 
-  /* ── Step 1: Apply theme ──────────── */
-  const handleThemeSelect = (id: string) => {
-    setSelectedTheme(id);
-    onSelectTheme(id);
+  /* ── Step 1: Apply showcase pack (template completo) ──────────── */
+  const handlePackSelect = (pack: typeof SHOWCASE_PACKS[0]) => {
+    setSelectedPack(pack.id);
+    onSelectTheme(pack.theme);
+    if (onApplyPack) onApplyPack(pack.id);
   };
 
   /* ── Step 2: Avatar upload ────────── */
@@ -146,43 +147,55 @@ const OnboardingWizard = ({
             ))}
           </div>
 
-          {/* ════ STEP 0: Choose style ════ */}
+          {/* ════ STEP 0: Escolha seu nicho (template premium) ════ */}
           {step === 0 && (
             <div style={{ animation: "fadeSlideUp 0.3s ease both" }}>
-              <div className="text-center mb-6">
+              <div className="text-center mb-5">
                 <div className="w-14 h-14 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-3">
-                  <Palette size={24} className="text-primary" />
+                  <Sparkles size={24} className="text-primary" />
                 </div>
-                <h2 className="text-[hsl(var(--dash-text))] text-xl font-bold">Escolha seu estilo</h2>
-                <p className="text-[hsl(var(--dash-text-muted))] text-sm mt-1">1 clique define o visual da sua vitrine</p>
+                <h2 className="text-[hsl(var(--dash-text))] text-xl font-bold">Qual seu nicho?</h2>
+                <p className="text-[hsl(var(--dash-text-muted))] text-sm mt-1">
+                  Vamos sugerir o template ideal · você pode trocar depois
+                </p>
               </div>
 
-              <div className="grid grid-cols-3 gap-2.5 mb-6">
-                {STYLE_PACKS.map(t => (
-                  <button key={t.id} onClick={() => handleThemeSelect(t.id)}
-                    className={`relative rounded-xl p-3 border-2 transition-all duration-200 group ${
-                      selectedTheme === t.id
-                        ? "border-primary shadow-lg shadow-primary/20 scale-[1.03]"
-                        : "border-transparent hover:border-[hsl(var(--dash-border))]"
-                    }`}>
-                    <div className="w-full aspect-[3/4] rounded-lg overflow-hidden mb-2"
-                      style={{ background: t.bg }}>
-                      <div className="p-2 flex flex-col items-center gap-1 pt-3">
-                        <div className="w-5 h-5 rounded-full" style={{ background: `linear-gradient(135deg, ${t.accent}, ${t.accent2})` }} />
-                        <div className="w-10 h-1 rounded-full mt-1" style={{ background: t.accent + "60" }} />
-                        <div className="w-8 h-1 rounded-full" style={{ background: t.accent + "30" }} />
-                        <div className="w-full h-2 rounded mt-2" style={{ background: t.accent + "15", border: `1px solid ${t.accent}30` }} />
-                        <div className="w-full h-2 rounded" style={{ background: t.accent + "10", border: `1px solid ${t.accent}20` }} />
+              <div className="grid grid-cols-2 gap-2.5 mb-6 max-h-[400px] overflow-y-auto scrollbar-none px-1 py-1">
+                {SHOWCASE_PACKS.map(p => {
+                  const active = selectedPack === p.id;
+                  return (
+                    <button key={p.id} onClick={() => handlePackSelect(p)}
+                      className={`relative rounded-2xl p-3 border-2 transition-all duration-200 group text-left ${
+                        active
+                          ? "border-primary shadow-lg shadow-primary/20 scale-[1.02] bg-primary/5"
+                          : "border-[hsl(var(--dash-border-subtle))] hover:border-primary/40 bg-[hsl(var(--dash-surface-2))]"
+                      }`}>
+                      {/* Mini-preview da vitrine */}
+                      <div className="w-full aspect-[3/4] rounded-xl overflow-hidden mb-2.5 relative shadow-md"
+                        style={{ background: p.bg }}>
+                        <div className="absolute inset-0 p-3 flex flex-col items-center justify-center gap-1.5">
+                          <div className="text-2xl">{p.emoji}</div>
+                          <div className="w-7 h-7 rounded-full" style={{ background: `linear-gradient(135deg, ${p.accent}, ${p.accent2})` }} />
+                          <div className="w-12 h-1 rounded-full mt-1" style={{ background: p.accent + "70" }} />
+                          <div className="w-9 h-1 rounded-full" style={{ background: p.accent + "40" }} />
+                          <div className="w-full h-3 rounded mt-1" style={{ background: p.accent + "20", border: `1px solid ${p.accent}40` }} />
+                          <div className="w-full h-3 rounded" style={{ background: p.accent + "15", border: `1px solid ${p.accent}30` }} />
+                        </div>
                       </div>
-                    </div>
-                    <p className="text-[10px] text-[hsl(var(--dash-text-muted))] font-medium text-center truncate">{t.label}</p>
-                    {selectedTheme === t.id && (
-                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
-                        <Check size={10} className="text-white" />
+                      <div>
+                        <p className={`text-[12px] font-bold ${active ? "text-primary" : "text-[hsl(var(--dash-text))]"}`}>
+                          {p.emoji} {p.label}
+                        </p>
+                        <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] mt-0.5 truncate">{p.nicho}</p>
                       </div>
-                    )}
-                  </button>
-                ))}
+                      {active && (
+                        <div className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-primary rounded-full flex items-center justify-center shadow-lg ring-2 ring-[hsl(var(--dash-surface))]">
+                          <Check size={12} className="text-white" />
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}

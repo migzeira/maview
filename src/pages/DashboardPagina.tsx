@@ -2147,6 +2147,21 @@ const DashboardPagina = () => {
           theme={config.theme}
           onUpdate={(key, value) => updateConfig(key as keyof VitrineConfig, value)}
           onSelectTheme={(id) => updateConfig("theme", id as ThemeId)}
+          onApplyPack={async (packId) => {
+            try {
+              const { DESIGN_PACKS } = await import("@/components/design/constants");
+              const pack = DESIGN_PACKS.find(p => p.id === packId);
+              if (!pack) return;
+              updateConfig("theme", pack.config.theme as ThemeId);
+              const packMeta: Record<string, unknown> = {};
+              if (pack.headerLayoutType) packMeta.headerLayoutType = pack.headerLayoutType;
+              if (pack.ctaGlow) packMeta.ctaGlow = pack.ctaGlow;
+              if (pack.glassCards) packMeta.glassCards = pack.glassCards;
+              if (pack.socialIconStyle) packMeta.showcaseSocialStyle = pack.socialIconStyle;
+              const latest = { profileGlow: true, ...pack.config.design, ...packMeta };
+              updateConfig("design", latest);
+            } catch (e) { console.error("Pack apply failed:", e); }
+          }}
           onComplete={completeOnboarding}
         />
       )}
