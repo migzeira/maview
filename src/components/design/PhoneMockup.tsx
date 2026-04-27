@@ -1,6 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════════
    Premium Phone Mockup — realistic device with dense creator content
    ═══════════════════════════════════════════════════════════════════ */
+import { useState, useEffect } from "react";
 import type { DesignConfig } from "@/types/vitrine";
 import type { DesignPack } from "./constants";
 import { REFERENCE_PROFILES } from "./constants";
@@ -20,6 +21,13 @@ const SOCIAL_ICON: Record<string, { color: string; path: string }> = {
 };
 
 export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: DesignPack; isActive: boolean; onClick: () => void; liveDesign?: DesignConfig }) {
+  /* Anim one-shot: stats só fazem o "punch" UMA vez por mount, depois ficam quietas (fix do blink ao re-clicar) */
+  const [statsAnimating, setStatsAnimating] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setStatsAnimating(false), 700);
+    return () => clearTimeout(t);
+  }, []);
+
   const { bg: packBg, accent: packAccent, accent2: packAccent2 } = pack.preview;
   const dd = (isActive && liveDesign) ? {
     ...liveDesign,
@@ -106,15 +114,15 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
     </div>
   );
 
-  /* Stats row — Stan-style com hairline separators + entrada animada (punch stagger) */
+  /* Stats row — Stan-style com hairline separators + entrada animada (punch ONE-SHOT no mount) */
   const StatsRow = () => ref.stats && ref.stats.length > 0 ? (
-    <div className="flex items-center justify-center px-3 mt-1.5" key={`stats-${pack.id}-${isActive ? "on" : "off"}`}>
+    <div className="flex items-center justify-center px-3 mt-1.5">
       {ref.stats.map((s, i) => (
         <div key={i} className="flex items-center">
           {i > 0 && (
-            <div className="w-px h-[18px] mx-3" style={{ background: `${textC}15`, animation: isActive ? `fadeIn 0.4s ease ${0.15 + i * 0.08}s both` : undefined }} />
+            <div className="w-px h-[18px] mx-3" style={{ background: `${textC}15`, animation: statsAnimating ? `fadeIn 0.4s ease ${0.15 + i * 0.08}s both` : undefined }} />
           )}
-          <div className="flex flex-col items-center" style={{ animation: isActive ? `statPunch 0.5s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.08}s both` : undefined }}>
+          <div className="flex flex-col items-center" style={{ animation: statsAnimating ? `statPunch 0.5s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.08}s both` : undefined }}>
             <span className="text-[11px] font-extrabold leading-none tabular-nums" style={{ color: textC, letterSpacing: "-0.025em" }}>{s.value}</span>
             <span className="text-[7px] leading-none mt-[3px] uppercase opacity-45" style={{ color: textC, letterSpacing: "0.05em", fontWeight: 600 }}>{s.label}</span>
           </div>
