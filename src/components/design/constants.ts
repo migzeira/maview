@@ -54,6 +54,9 @@ export interface DesignTabProps {
 /* ── Reference profiles for phone mockups ─────────── */
 
 export type RefLink = string | { title: string; image?: string };
+export interface RefTestimonial { quote: string; author: string; role?: string; avatar?: string; rating?: number; }
+export interface RefVideo { thumbnail: string; title: string; duration?: string; views?: string; }
+export interface RefBooking { title: string; nextDate: string; slots: string[]; cta: string; }
 export interface ReferenceProfile {
   name: string; username: string; bio: string; avatar: string;
   coverImage?: string;
@@ -68,6 +71,9 @@ export interface ReferenceProfile {
     image?: string;
   }[];
   stats?: { value: string; label: string }[];
+  testimonial?: RefTestimonial;
+  video?: RefVideo;
+  booking?: RefBooking;
 }
 
 const U = (id: string, w = 200, h = 200, crop = "center") =>
@@ -153,7 +159,13 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
       { title: "Mentoria 1:1 · 4 sessões particulares", price: "R$ 1.997", cta: "Agendar diagnóstico",
         image: U("photo-1493225457124-a3eb161ffa5f", 300, 200, "center") },
     ],
-    stats: [{ value: "600+", label: "Shows" }, { value: "4.9", label: "⭐" }, { value: "180k", label: "Streams/mês" }] },
+    stats: [{ value: "600+", label: "Shows" }, { value: "4.9", label: "⭐" }, { value: "180k", label: "Streams/mês" }],
+    video: {
+      thumbnail: U("photo-1571266028243-d220bc56b8b7", 600, 400, "center"),
+      title: "Set ao vivo · Festival XYZ 2024",
+      duration: "12:34",
+      views: "184k",
+    } },
 
   /* 7 — Beleza (Beatriz) — CENTRAL */ { name: "Beatriz Lins", username: "@beatrizlins.glow",
     bio: "Cosmetóloga · Método Glow12 autoral · 18k+ atendimentos · Embaixadora La Roche", verified: true,
@@ -173,7 +185,13 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
       { title: "Sérum Glow Vit C", price: "R$ 187", image: U("photo-1556228720-195a672e8a03", 200, 200, "center") },
       { title: "Kit Skincare Noturno", price: "R$ 297", image: U("photo-1571781926291-c477ebfd024b", 200, 200, "center") },
     ],
-    stats: [{ value: "18k+", label: "Atendidas" }, { value: "4.9", label: "⭐" }, { value: "94%", label: "Recompra" }] },
+    stats: [{ value: "18k+", label: "Atendidas" }, { value: "4.9", label: "⭐" }, { value: "94%", label: "Recompra" }],
+    booking: {
+      title: "Próximas vagas · São Paulo",
+      nextDate: "Sexta · 28 Mar",
+      slots: ["09:00", "11:30", "14:00", "16:30"],
+      cta: "Reservar",
+    } },
 
   /* 8 — Branding (Isabela) */ { name: "Isabela Rios", username: "@isabelarios.brand",
     bio: "Brand Strategist · Ex-AKQA NY · TEDx Speaker · 142 marcas reposicionadas em 8 anos", verified: true,
@@ -189,7 +207,14 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
       { title: "Workshop Posicionamento · ao vivo", price: "R$ 497", cta: "Reservar vaga",
         image: U("photo-1561070791-2526d30994b5", 300, 200, "center") },
     ],
-    stats: [{ value: "142", label: "Marcas" }, { value: "5.0", label: "⭐" }, { value: "Ex-AKQA", label: "NY" }] },
+    stats: [{ value: "142", label: "Marcas" }, { value: "5.0", label: "⭐" }, { value: "Ex-AKQA", label: "NY" }],
+    testimonial: {
+      quote: "A Isabela reposicionou minha marca em 5 dias. Triplicamos o ticket médio em 3 meses.",
+      author: "Marina Castro",
+      role: "CEO @ Casa Castro",
+      avatar: U("photo-1438761681033-6461ffad8d80", 80, 80, "face"),
+      rating: 5,
+    } },
 
   /* 9 — Growth (Vitor) */ { name: "Vitor Meireles", username: "@vitor.growth",
     bio: "Ex-Head of Growth iFood · R$ 50M+ em ads gerenciados · Mentor de 850+ infoprodutores", verified: true,
@@ -207,7 +232,14 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
       { title: "Playbook de Performance · 87 páginas", price: "Grátis", cta: "Baixar PDF",
         image: U("photo-1533174072545-7a4b6ad7a6c3", 300, 200, "center") },
     ],
-    stats: [{ value: "850+", label: "Mentorados" }, { value: "R$50M", label: "em ads" }, { value: "Ex-iFood", label: "Growth" }] },
+    stats: [{ value: "850+", label: "Mentorados" }, { value: "R$50M", label: "em ads" }, { value: "Ex-iFood", label: "Growth" }],
+    testimonial: {
+      quote: "O Vitor transformou meu funil. Saímos de R$30k pra R$280k/mês em 90 dias.",
+      author: "Rafael Mendes",
+      role: "Fundador @ ScaleUp Co",
+      avatar: U("photo-1500648767791-00dcc994a43e", 80, 80, "face"),
+      rating: 5,
+    } },
 
   /* 10 — Moda (Julia) */ { name: "Julia Martins", username: "@julia.moda_premium",
     bio: "Personal Stylist · Consultora L'Officiel Brasil · Atendi Anitta, Manu Gavassi e 200+ celebs",
@@ -264,7 +296,14 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
       { title: "Drenagem Linfática", price: "R$ 290", image: U("photo-1571019613454-1cb2f99b2d8b", 200, 200, "center") },
       { title: "Bioimpedância", price: "R$ 180", image: U("photo-1559757175-5700dde675bc", 200, 200, "center") },
     ],
-    stats: [{ value: "12 anos", label: "Itaim SP" }, { value: "6", label: "Médicos" }, { value: "5.2k", label: "Pacientes" }] },
+    stats: [{ value: "12 anos", label: "Itaim SP" }, { value: "6", label: "Médicos" }, { value: "5.2k", label: "Pacientes" }],
+    testimonial: {
+      quote: "Atendimento humanizado e protocolos sérios. Recuperei minha energia em 6 semanas.",
+      author: "Luiza Camargo",
+      role: "Paciente desde 2023",
+      avatar: U("photo-1487412720507-e7ab37603c6f", 80, 80, "face"),
+      rating: 5,
+    } },
 ];
 
 /* ── Design Packs ─────────────────────────────────── */
@@ -287,7 +326,7 @@ export interface DesignPack {
   /** Header layout style for showcase v6.0 — determines profile hero architecture */
   headerLayoutType?: "big-circle" | "edge-to-edge" | "floating-square" | "split-editorial";
   /** BODY layout — controls product/link composition below header (Stan-style variety) */
-  bodyLayout?: "classic" | "single-hero" | "grid-catalog";
+  bodyLayout?: "classic" | "single-hero" | "grid-catalog" | "testimonial" | "video-hero" | "booking";
   /** Sample content for showcase packs — populated when user has no products */
   sampleProducts?: SampleProduct[];
   sampleLinks?: SampleLink[];
@@ -351,7 +390,7 @@ export const DESIGN_PACKS: DesignPack[] = [
   /* 2 — DJ Full-Bleed Header (Léo) */
   { id: "showcase-dj", label: "DJ", desc: "Full-bleed glass cyber", category: "showcase", refIdx: 6,
     socialIconStyle: "brand", glassCards: true, ctaGlow: "accent", headerLayoutType: "edge-to-edge",
-    edgeGradientIntensity: "minimal", bodyLayout: "classic",
+    edgeGradientIntensity: "minimal", bodyLayout: "video-hero",
     sampleProducts: [
       { title: "Kit de Beats Premium", price: "R$ 297", emoji: "🎵" },
       { title: "Mentoria para DJs", price: "R$ 497", emoji: "🎧" },
@@ -378,7 +417,7 @@ export const DESIGN_PACKS: DesignPack[] = [
 
   /* 3 — Beleza Glass Luxury (Beatriz — CENTRAL) */
   { id: "showcase-beleza", label: "Beleza", desc: "Rosa pastel luxury", category: "showcase", refIdx: 7,
-    socialIconStyle: "brand", glassCards: true, ctaGlow: "accent", headerLayoutType: "floating-square", bodyLayout: "grid-catalog",
+    socialIconStyle: "brand", glassCards: true, ctaGlow: "accent", headerLayoutType: "floating-square", bodyLayout: "booking",
     sampleProducts: [
       { title: "Rotina de Skincare", price: "R$ 80", emoji: "🌸" },
       { title: "Guia do Brilho Natural", price: "R$ 80/mês", emoji: "✨" },
@@ -403,7 +442,7 @@ export const DESIGN_PACKS: DesignPack[] = [
 
   /* 4 — Branding Luxury Cream (Isabela) */
   { id: "showcase-branding", label: "Branding", desc: "Creme minimal premium", category: "showcase", refIdx: 8,
-    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "split-editorial", bodyLayout: "classic",
+    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "split-editorial", bodyLayout: "testimonial",
     sampleProducts: [
       { title: "O Mapa da Marca", price: "R$ 10", emoji: "🗺️" },
       { title: "Sessão de Estratégia", price: "R$ 497", emoji: "💼" },
@@ -428,7 +467,7 @@ export const DESIGN_PACKS: DesignPack[] = [
 
   /* 5 — Growth Tech Maverick Dark (Vitor) */
   { id: "showcase-growth", label: "Growth", desc: "Dark tech maverick", category: "showcase", refIdx: 9,
-    socialIconStyle: "mono", ctaGlow: "blue", headerLayoutType: "big-circle", bodyLayout: "classic",
+    socialIconStyle: "mono", ctaGlow: "blue", headerLayoutType: "big-circle", bodyLayout: "testimonial",
     sampleProducts: [
       { title: "Mentoria Growth 1:1", price: "R$ 997", emoji: "🚀" },
       { title: "Guia de Monetização", price: "Grátis", emoji: "📘" },
@@ -479,7 +518,7 @@ export const DESIGN_PACKS: DesignPack[] = [
 
   /* 7 — Wellness Clínica Serenity */
   { id: "showcase-clinica", label: "Wellness", desc: "Integrative luxury clinic", category: "showcase", refIdx: 12,
-    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "floating-square", bodyLayout: "grid-catalog",
+    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "floating-square", bodyLayout: "testimonial",
     sampleProducts: [
       { title: "Consulta Integrativa", price: "R$ 380", emoji: "🌿" },
       { title: "Tratamento Estético Premium", price: "R$ 890", emoji: "💆" },

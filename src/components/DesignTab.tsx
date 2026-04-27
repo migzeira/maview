@@ -414,8 +414,8 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
                   setActivePackIdx(idx);
                   applyPackWithFeedback(p);
                 }}
-                className={`group relative flex-shrink-0 transition-all duration-300 ${
-                  isActive ? "scale-110" : "scale-100 opacity-60 hover:opacity-100 hover:scale-105"
+                className={`group relative flex-shrink-0 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
+                  isActive ? "scale-110 -translate-y-1" : "scale-100 opacity-55 hover:opacity-100 hover:scale-110 hover:-translate-y-1 hover:rotate-[-2deg]"
                 }`}
                 title={p.label}
                 aria-label={`Aplicar template ${p.label}`}

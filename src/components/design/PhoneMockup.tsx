@@ -106,15 +106,15 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
     </div>
   );
 
-  /* Stats row — Stan-style com hairline separators verticais */
+  /* Stats row — Stan-style com hairline separators + entrada animada (punch stagger) */
   const StatsRow = () => ref.stats && ref.stats.length > 0 ? (
-    <div className="flex items-center justify-center px-3 mt-1.5">
+    <div className="flex items-center justify-center px-3 mt-1.5" key={`stats-${pack.id}-${isActive ? "on" : "off"}`}>
       {ref.stats.map((s, i) => (
         <div key={i} className="flex items-center">
           {i > 0 && (
-            <div className="w-px h-[18px] mx-3" style={{ background: `${textC}15` }} />
+            <div className="w-px h-[18px] mx-3" style={{ background: `${textC}15`, animation: isActive ? `fadeIn 0.4s ease ${0.15 + i * 0.08}s both` : undefined }} />
           )}
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center" style={{ animation: isActive ? `statPunch 0.5s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.08}s both` : undefined }}>
             <span className="text-[11px] font-extrabold leading-none tabular-nums" style={{ color: textC, letterSpacing: "-0.025em" }}>{s.value}</span>
             <span className="text-[7px] leading-none mt-[3px] uppercase opacity-45" style={{ color: textC, letterSpacing: "0.05em", fontWeight: 600 }}>{s.label}</span>
           </div>
@@ -269,6 +269,108 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
           </div>
         </div>
       ))}
+    </div>
+  ) : null;
+
+  /* TESTIMONIAL CARD — depoimento de cliente real (Stan-style social proof) */
+  const renderTestimonial = () => ref.testimonial ? (
+    <div className="overflow-hidden p-3" style={{ borderRadius: 14, ...productCardStyle, boxShadow: cardDepthShadow }}>
+      {/* Stars row */}
+      <div className="flex items-center gap-[1px] mb-1.5">
+        {Array.from({ length: ref.testimonial.rating || 5 }).map((_, i) => (
+          <svg key={i} width="9" height="9" viewBox="0 0 24 24" fill="#fbbf24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+        ))}
+      </div>
+      {/* Quote */}
+      <p className="text-[9.5px] leading-snug italic mb-2 line-clamp-3" style={{ color: textC, fontWeight: 500, letterSpacing: "-0.01em" }}>
+        "{ref.testimonial.quote}"
+      </p>
+      {/* Author */}
+      <div className="flex items-center gap-1.5">
+        {ref.testimonial.avatar && (
+          <img src={ref.testimonial.avatar} alt="" className="w-[20px] h-[20px] rounded-full object-cover flex-shrink-0" crossOrigin="anonymous" loading="lazy" />
+        )}
+        <div className="min-w-0">
+          <p className="text-[8.5px] truncate" style={{ color: textC, fontWeight: 800, letterSpacing: "-0.01em" }}>{ref.testimonial.author}</p>
+          {ref.testimonial.role && (
+            <p className="text-[7.5px] truncate opacity-65" style={{ color: textC, fontWeight: 500 }}>{ref.testimonial.role}</p>
+          )}
+        </div>
+      </div>
+    </div>
+  ) : null;
+
+  /* VIDEO HERO — preview de aula/set/talk com play button (Stan-style content block) */
+  const renderVideoHero = () => ref.video ? (
+    <div className="relative w-full overflow-hidden rounded-[14px]" style={{ height: 145, boxShadow: cardDepthShadow }}>
+      <img src={ref.video.thumbnail} alt="" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" />
+      {/* Dark overlay */}
+      <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.30) 35%, rgba(0,0,0,0.15) 100%)" }} />
+      {/* Play button center */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="w-[44px] h-[44px] rounded-full flex items-center justify-center shadow-2xl" style={{
+          background: "rgba(255,255,255,0.95)",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.4), 0 0 0 8px rgba(255,255,255,0.12)",
+        }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#0a0a0a" style={{ marginLeft: 2 }}><path d="M8 5v14l11-7z"/></svg>
+        </div>
+      </div>
+      {/* Duration badge top-right */}
+      {ref.video.duration && (
+        <div className="absolute top-2 right-2 px-1.5 py-[2px] rounded text-[8px] font-bold tabular-nums" style={{ background: "rgba(0,0,0,0.75)", color: "#fff", backdropFilter: "blur(4px)" }}>
+          {ref.video.duration}
+        </div>
+      )}
+      {/* Title bottom */}
+      <div className="absolute inset-x-0 bottom-0 p-3">
+        <p className="text-[11px] text-white leading-tight line-clamp-1" style={{ fontWeight: 800, letterSpacing: "-0.02em", textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}>
+          {ref.video.title}
+        </p>
+        {ref.video.views && (
+          <p className="text-[8px] text-white/80 mt-0.5 font-medium" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}>
+            ▶ {ref.video.views} views
+          </p>
+        )}
+      </div>
+    </div>
+  ) : null;
+
+  /* BOOKING WIDGET — calendário mini com slots de horário (Stan-style appointment) */
+  const renderBookingWidget = () => ref.booking ? (
+    <div className="overflow-hidden p-3" style={{ borderRadius: 14, ...productCardStyle, boxShadow: cardDepthShadow }}>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-1.5">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+          <p className="text-[9px] font-extrabold uppercase tracking-wider" style={{ color: accent, letterSpacing: "0.06em" }}>Agenda</p>
+        </div>
+        <span className="text-[7.5px] font-semibold opacity-60" style={{ color: textC }}>{ref.booking.title}</span>
+      </div>
+      {/* Date */}
+      <p className="text-[11px] font-extrabold mb-1.5" style={{ color: textC, letterSpacing: "-0.02em" }}>{ref.booking.nextDate}</p>
+      {/* Slots grid 4 cols */}
+      <div className="grid grid-cols-4 gap-1 mb-2">
+        {ref.booking.slots.map((slot, i) => (
+          <div key={i} className="text-center py-1.5 rounded-md tabular-nums" style={{
+            background: i === 0 ? accent : `${accent}10`,
+            color: i === 0 ? (isLight ? "#fff" : bg) : textC,
+            fontSize: 8.5, fontWeight: 700, letterSpacing: "-0.01em",
+          }}>
+            {slot}
+          </div>
+        ))}
+      </div>
+      {/* CTA */}
+      <div className="text-center py-2 rounded-lg text-[10px] font-extrabold" style={{
+        background: ctaGlow === "blue" ? MAVIEW_BLUE : accent,
+        color: ctaGlow === "blue" ? "#fff" : (isLight ? "#fff" : bg),
+        letterSpacing: "-0.01em",
+        boxShadow: ctaGlowShadow,
+      }}>
+        {ref.booking.cta} →
+      </div>
     </div>
   ) : null;
 
@@ -497,6 +599,42 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
                         );
                       })()}
                     </div>
+                  </>
+                );
+              }
+
+              /* TESTIMONIAL: stats / hero / testimonial card / 1 link pill */
+              if (layout === "testimonial") {
+                return (
+                  <>
+                    <StatsRow />
+                    <div className="px-3.5 mt-1.5 mb-1.5">{renderHeroBanner()}</div>
+                    <div className="px-3.5 mb-1.5">{renderTestimonial()}</div>
+                    <div className="px-3.5 mt-auto">{renderLinkPills()}</div>
+                  </>
+                );
+              }
+
+              /* VIDEO-HERO: stats / video preview com play / hero (produto) compacto / link pill */
+              if (layout === "video-hero") {
+                return (
+                  <>
+                    <StatsRow />
+                    <div className="px-3.5 mt-1.5 mb-1.5">{renderVideoHero()}</div>
+                    <div className="px-3.5 mb-1.5">{renderLinkPills()}</div>
+                    <div className="px-3.5 mt-auto">{renderSecondaryCard()}</div>
+                  </>
+                );
+              }
+
+              /* BOOKING: stats / booking widget / hero (produto) / link pill */
+              if (layout === "booking") {
+                return (
+                  <>
+                    <StatsRow />
+                    <div className="px-3.5 mt-1.5 mb-1.5">{renderBookingWidget()}</div>
+                    <div className="px-3.5 mb-1.5">{renderLinkPills()}</div>
+                    <div className="px-3.5 mt-auto">{renderSecondaryCard()}</div>
                   </>
                 );
               }
