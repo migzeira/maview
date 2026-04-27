@@ -326,10 +326,68 @@ const DashboardHome = () => {
       {/* ── Greeting ── */}
       <div className="mb-6" style={{ animation: "fadeSlideUp 0.4s ease both" }}>
         <h1 className="text-2xl md:text-[28px] font-bold text-[hsl(var(--dash-text))] tracking-tight">
-          {getGreeting()}, {displayName.split(" ")[0]}
+          {getGreeting()}, {displayName.split(" ")[0]} 👋
         </h1>
         <p className="text-[hsl(var(--dash-text-muted))] text-[14px] mt-1">{getSubtitle()}</p>
       </div>
+
+      {/* ── WELCOME EMPTY STATE — 3 cards grandes estilo Stan (só quando vitrine vazia) ── */}
+      {health < 30 && (
+        <div className="mb-8" style={{ animation: "fadeSlideUp 0.5s ease 0.1s both" }}>
+          <div className="rounded-3xl bg-gradient-to-br from-primary/8 via-purple-500/5 to-pink-500/8 border border-primary/15 p-6 md:p-8 mb-5">
+            <h2 className="text-[hsl(var(--dash-text))] font-extrabold text-[22px] md:text-[26px] tracking-tight">
+              Bora deixar sua vitrine pronta?
+            </h2>
+            <p className="text-[hsl(var(--dash-text-muted))] text-[14px] mt-1.5">
+              3 passos simples · você sai com tudo configurado em menos de 5 minutos
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+              {/* Card 1: Escolher template */}
+              <Link to="/dashboard/pagina"
+                className="group relative rounded-2xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))] p-5 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                <div className="absolute top-3 right-3 text-[10px] font-bold text-primary/40 group-hover:text-primary transition-colors">1</div>
+                <div className="text-4xl mb-3">📱</div>
+                <h3 className="text-[hsl(var(--dash-text))] font-bold text-[15px] mb-1">Escolher template</h3>
+                <p className="text-[hsl(var(--dash-text-muted))] text-[12px] leading-relaxed mb-4">
+                  8 templates premium prontos. 1 clique aplica layout, cores e fonte.
+                </p>
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary group-hover:gap-2 transition-all">
+                  Começar agora →
+                </span>
+              </Link>
+
+              {/* Card 2: Adicionar produto */}
+              <Link to="/dashboard/pagina"
+                className="group relative rounded-2xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))] p-5 hover:border-emerald-500/40 hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                <div className="absolute top-3 right-3 text-[10px] font-bold text-emerald-500/40 group-hover:text-emerald-500 transition-colors">2</div>
+                <div className="text-4xl mb-3">🎁</div>
+                <h3 className="text-[hsl(var(--dash-text))] font-bold text-[15px] mb-1">Adicionar produto</h3>
+                <p className="text-[hsl(var(--dash-text-muted))] text-[12px] leading-relaxed mb-4">
+                  Curso, e-book, mentoria ou agendamento. 5 campos essenciais e pronto.
+                </p>
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-500 group-hover:gap-2 transition-all">
+                  Adicionar agora →
+                </span>
+              </Link>
+
+              {/* Card 3: IA Maview */}
+              <Link to="/dashboard/ia"
+                className="group relative rounded-2xl bg-gradient-to-br from-fuchsia-500/8 to-purple-500/8 border border-fuchsia-500/20 p-5 hover:border-fuchsia-500/50 hover:shadow-xl hover:shadow-fuchsia-500/15 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                <div className="absolute top-3 right-3 text-[10px] font-bold text-fuchsia-500/40 group-hover:text-fuchsia-500 transition-colors">3</div>
+                <div className="text-4xl mb-3">💬</div>
+                <h3 className="text-[hsl(var(--dash-text))] font-bold text-[15px] mb-1">Perguntar à IA</h3>
+                <p className="text-[hsl(var(--dash-text-muted))] text-[12px] leading-relaxed mb-4">
+                  Bio persuasiva, descrição de produto ou ideia de oferta — em segundos.
+                </p>
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-fuchsia-500 group-hover:gap-2 transition-all">
+                  Conversar →
+                </span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Two-column layout ── */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6" style={{ animation: "fadeSlideUp 0.45s ease 0.05s both" }}>
