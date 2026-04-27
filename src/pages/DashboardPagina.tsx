@@ -2191,8 +2191,8 @@ const DashboardPagina = () => {
         />
       )}
 
-      {/* ── Two-column grid ── (header e ProfileHeroCard removidos: foco 100% nos produtos + preview) */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
+      {/* ── Grid: 2 cols normal, 1 col gigante quando aba "design" (carousel ocupa tela toda Stan-style) ── */}
+      <div className={`grid grid-cols-1 gap-6 ${activeTab !== "design" ? "lg:grid-cols-[1fr_400px]" : ""}`}>
 
         {/* ── LEFT PANEL ── */}
         <div className="min-w-0" ref={leftPanelRef}>
@@ -4224,8 +4224,8 @@ const DashboardPagina = () => {
           </div>
         </div>
 
-        {/* ── RIGHT PANEL: Phone preview (400px) ── */}
-        <div className="hidden lg:block">
+        {/* ── RIGHT PANEL: Phone preview (400px) — escondido na aba design (carousel já é preview) ── */}
+        <div className={`${activeTab === "design" ? "hidden" : "hidden lg:block"}`}>
           <div className="sticky top-8">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[hsl(var(--dash-text-subtle))] text-xs font-medium tracking-wide">

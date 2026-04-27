@@ -334,17 +334,17 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   return (
     <div className="space-y-5">
       {/* ═══ CAROUSEL TEMPLATES — estilo Stan exato: múltiplos phones, centro destacado ─── */}
-      <div className="relative">
-        {/* Stage do carousel — phones absolutos com offset transform */}
-        <div className="relative overflow-hidden" style={{ height: 600 }}>
+      <div className="relative -mx-6 md:-mx-12">
+        {/* Stage AMPLIADO + overflow visível pra ver TODOS os phones — estilo Stan flutuante */}
+        <div className="relative" style={{ height: 620, overflow: "visible" }}>
           <div ref={carouselRef} className="absolute inset-0 flex items-center justify-center">
             {filteredPacks.map((pack, idx) => {
               const offset = idx - activePackIdx;
               const absOffset = Math.abs(offset);
               const visible = absOffset <= 2;
-              /* SEM blur, SEM fade agressivo — apenas posicionamento limpo */
-              const translateX = offset * 250;
-              const scale = absOffset === 0 ? 1 : 0.92;
+              /* Espalhamento Stan-style: 290px entre phones, scale quase paritário (sensação flutuante) */
+              const translateX = offset * 295;
+              const scale = absOffset === 0 ? 1 : 0.96;
               const isJustApplied = justApplied === pack.id;
               return (
                 <div
@@ -360,6 +360,10 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
                     opacity: visible ? 1 : 0,
                     zIndex: 10 - absOffset,
                     pointerEvents: visible ? "auto" : "none",
+                    /* Floating shadow embaixo de cada phone — sensação Stan */
+                    filter: offset === 0
+                      ? "drop-shadow(0 30px 40px rgba(0,0,0,0.15)) drop-shadow(0 12px 20px rgba(0,0,0,0.10))"
+                      : "drop-shadow(0 20px 30px rgba(0,0,0,0.10)) drop-shadow(0 8px 14px rgba(0,0,0,0.06))",
                   }}
                 >
                   <PhoneMockup
