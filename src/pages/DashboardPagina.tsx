@@ -3531,9 +3531,32 @@ const DashboardPagina = () => {
                           className={`flex items-center gap-2 rounded-xl border p-3 transition-all glass-card-hover cursor-grab active:cursor-grabbing ${
                             !display.active ? "opacity-50" : ""
                           } ${isDragging ? "opacity-40 scale-95" : ""} ${isDragOver ? "border-primary/50 bg-primary/5 scale-[1.01]" : ""}`}>
-                          {/* Drag handle */}
-                          <div className="flex-shrink-0 text-[hsl(var(--dash-text-subtle))] hover:text-primary transition-colors">
-                            <GripVertical size={14} />
+                          {/* Reorder controls — setas profissionais ↑↓ (Stan-style) */}
+                          <div className="flex flex-col flex-shrink-0 rounded-lg bg-[hsl(var(--dash-surface-2))]/50 border border-[hsl(var(--dash-border-subtle))] overflow-hidden">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); moveBlock(block.id, "up"); }}
+                              disabled={idx === 0}
+                              className="px-1.5 py-[3px] text-[hsl(var(--dash-text-muted))] hover:text-primary hover:bg-primary/10 active:bg-primary/20 disabled:opacity-25 disabled:cursor-not-allowed transition-all"
+                              title="Mover para cima"
+                              aria-label="Mover bloco para cima"
+                            >
+                              <ChevronUp size={13} strokeWidth={2.5} />
+                            </button>
+                            <div className="h-px bg-[hsl(var(--dash-border-subtle))]" />
+                            <button
+                              onClick={(e) => { e.stopPropagation(); moveBlock(block.id, "down"); }}
+                              disabled={idx === blocks.length - 1}
+                              className="px-1.5 py-[3px] text-[hsl(var(--dash-text-muted))] hover:text-primary hover:bg-primary/10 active:bg-primary/20 disabled:opacity-25 disabled:cursor-not-allowed transition-all"
+                              title="Mover para baixo"
+                              aria-label="Mover bloco para baixo"
+                            >
+                              <ChevronDown size={13} strokeWidth={2.5} />
+                            </button>
+                          </div>
+
+                          {/* Drag handle (sutil, ainda funcional) */}
+                          <div className="flex-shrink-0 text-[hsl(var(--dash-text-subtle))]/60 hover:text-primary transition-colors cursor-grab active:cursor-grabbing" title="Arraste para reordenar">
+                            <GripVertical size={12} />
                           </div>
 
                           {/* Icon */}
@@ -3568,17 +3591,6 @@ const DashboardPagina = () => {
 
                           {/* Actions */}
                           <div className="flex items-center gap-1">
-                            {/* Reorder buttons for non-drag environments */}
-                            <div className="flex flex-col gap-0.5 flex-shrink-0 sm:hidden">
-                              <button onClick={() => moveBlock(block.id, "up")} disabled={idx === 0}
-                                className="p-0.5 rounded text-[hsl(var(--dash-text-subtle))] hover:text-primary transition-colors disabled:opacity-20 disabled:cursor-not-allowed">
-                                <ChevronUp size={12} />
-                              </button>
-                              <button onClick={() => moveBlock(block.id, "down")} disabled={idx === blocks.length - 1}
-                                className="p-0.5 rounded text-[hsl(var(--dash-text-subtle))] hover:text-primary transition-colors disabled:opacity-20 disabled:cursor-not-allowed">
-                                <ChevronDown size={12} />
-                              </button>
-                            </div>
                             <button onClick={() => {
                               if (block.type === "product") {
                                 const p = config.products.find(pr => pr.id === block.refId);
