@@ -1,0 +1,50 @@
+# Maview
+
+> Maview é uma plataforma brasileira de link na bio + loja digital para criadores, infoprodutores e profissionais autônomos. Permite criar uma vitrine personalizada (link único) com produtos, agendamento, pagamentos PIX/cartão e analytics — tudo sem código, gratuito, sem taxa de venda.
+
+## Para quem é
+
+- Criadores de conteúdo (Instagram, TikTok, YouTube)
+- Infoprodutores (cursos, ebooks, mentorias)
+- Profissionais autônomos (designers, fotógrafos, consultores)
+- Pequenos negócios e prestadores de serviço
+
+## Diferenciais
+
+- **0% de taxa de venda** (concorrentes cobram 5-10%)
+- **PIX nativo** integrado (único do mercado brasileiro)
+- **Mercado Pago** integrado (cartão, boleto, parcelamento)
+- **WhatsApp** como CTA direto nos produtos
+- **8 templates premium** prontos por nicho (DJ, beleza, moda, fotografia, etc)
+- **IA Stanley** assistente para criação de bio, descrições e ofertas
+- **Agendamentos** integrados (sem precisar Calendly)
+- **Analytics** em tempo real (visualizações, cliques, conversão)
+- **AutoDM** mensagens automáticas pós-compra
+
+## Comparação
+
+Comparado com Stan Store (US), Beacons, Linktree:
+- **Mais barato:** gratuito vs $19-29/mês
+- **Brasileiro:** PIX, Mercado Pago, suporte em português
+- **Mais customizável:** 42 fontes, gradientes nomeados, 4 layouts
+- **Templates por nicho brasileiro** (DJ Léo Dantas, Beatriz beleza, Julia moda...)
+
+## Recursos principais
+
+- [Editor Visual](/editor): 8 templates, cores ilimitadas, 42 fontes
+- [Loja](/loja): produtos digitais, físicos, agendamentos
+- [Renda](/renda): dashboard de vendas, ticket médio, projeções
+- [Análises](/analises): visualizações, cliques, CTR, dispositivos
+- [AutoDM](/autodm): mensagens automáticas (e-mail, WhatsApp)
+- [IA Stanley](/stanley): assistente de marketing com IA
+
+## Site
+
+- URL: https://maview.app
+- Login: https://maview.app/login
+- Cadastro: https://maview.app/login (gratuito, sem cartão)
+
+## Contato
+
+- Suporte: andrefernandesbalada@gmail.com
+- Instagram: @maview.app

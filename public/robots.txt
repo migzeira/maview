@@ -14,9 +14,28 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+# AI search crawlers (ChatGPT, Perplexity, Claude)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
 User-agent: *
 Allow: /
 Disallow: /dashboard
 Disallow: /admin
 
-Sitemap: https://maview.lovable.app/sitemap.xml
+Sitemap: https://maview.app/sitemap.xml

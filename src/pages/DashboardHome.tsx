@@ -400,38 +400,56 @@ const DashboardHome = () => {
 
           {/* ── Progress card / Celebration card ── */}
           {health === 100 ? (
-            /* ── Celebration: vitrine complete ── */
-            <div className="glass-card rounded-2xl p-5 md:p-6">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
-                  <Trophy size={22} className="text-emerald-500" />
-                </div>
-                <div>
-                  <h2 className="text-[hsl(var(--dash-text))] font-bold text-[16px]">Vitrine 100% completa!</h2>
-                  <p className="text-[hsl(var(--dash-text-muted))] text-[12px] mt-0.5">Agora é hora de compartilhar e crescer</p>
+            /* ── BANNER PUBLICAR GIGANTE — celebração premium quando 100% ── */
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 p-6 md:p-8 shadow-2xl shadow-emerald-500/30">
+              {/* Confetti dots animated bg */}
+              <div className="absolute inset-0 opacity-20" style={{
+                backgroundImage: "radial-gradient(circle, white 1.5px, transparent 1.5px)",
+                backgroundSize: "24px 24px",
+                animation: "fadeSlideUp 8s linear infinite",
+              }} />
+              <div className="relative">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="text-5xl">🎉</div>
+                  <div>
+                    <h2 className="text-white font-extrabold text-[22px] md:text-[28px] tracking-tight leading-none">
+                      Sua loja está PRONTA!
+                    </h2>
+                    <p className="text-white/80 text-[13px] mt-1 font-medium">
+                      Agora é hora de compartilhar e começar a vender
+                    </p>
+                  </div>
                 </div>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {/* URL display GIGANTE */}
+              <div className="relative bg-white/15 backdrop-blur-md border border-white/30 rounded-2xl px-5 py-4 mb-4 mt-2">
+                <p className="text-white/70 text-[10px] font-bold uppercase tracking-wider mb-1">Sua URL pública</p>
+                <p className="text-white text-[18px] md:text-[22px] font-extrabold font-mono tracking-tight">
+                  {profileUrl.replace(/^https?:\/\//, "")}
+                </p>
+              </div>
+              {/* Action buttons */}
+              <div className="relative grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <button onClick={copyLink}
-                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 btn-interactive text-[hsl(var(--dash-text-secondary))]">
-                  <Share2 size={16} className="text-primary" />
-                  <span className="text-[11px] font-medium">{copied ? "Copiado!" : "Copiar link"}</span>
+                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-white/15 backdrop-blur-md border border-white/25 hover:bg-white/25 transition-all text-white">
+                  <Share2 size={18} />
+                  <span className="text-[12px] font-bold">{copied ? "Copiado! ✓" : "Copiar link"}</span>
                 </button>
-                <a href={`https://wa.me/?text=${encodeURIComponent(`Confira minha vitrine: ${profileUrl}`)}`}
+                <a href={`https://wa.me/?text=${encodeURIComponent(`🎉 Acabei de criar minha loja no Maview! Confira: ${profileUrl}`)}`}
                   target="_blank" rel="noopener noreferrer"
-                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 hover:border-emerald-500/40 btn-interactive text-emerald-600">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.75.75 0 00.917.918l4.458-1.495A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.3 0-4.438-.744-6.166-2.006l-.43-.322-2.657.89.89-2.657-.322-.43A9.935 9.935 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
-                  <span className="text-[11px] font-medium">WhatsApp</span>
+                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-white/15 backdrop-blur-md border border-white/25 hover:bg-white/25 transition-all text-white">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.75.75 0 00.917.918l4.458-1.495A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.3 0-4.438-.744-6.166-2.006l-.43-.322-2.657.89.89-2.657-.322-.43A9.935 9.935 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+                  <span className="text-[12px] font-bold">WhatsApp</span>
+                </a>
+                <a href={profileUrl} target="_blank" rel="noopener noreferrer"
+                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-white/15 backdrop-blur-md border border-white/25 hover:bg-white/25 transition-all text-white">
+                  <FileText size={18} />
+                  <span className="text-[12px] font-bold">Ver loja</span>
                 </a>
                 <Link to="/dashboard/analytics"
-                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 btn-interactive text-[hsl(var(--dash-text-secondary))]">
-                  <BarChart3 size={16} className="text-primary" />
-                  <span className="text-[11px] font-medium">Analytics</span>
-                </Link>
-                <Link to="/dashboard/pagina"
-                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 btn-interactive text-[hsl(var(--dash-text-secondary))]">
-                  <FileText size={16} className="text-primary" />
-                  <span className="text-[11px] font-medium">Editar</span>
+                  className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-white/15 backdrop-blur-md border border-white/25 hover:bg-white/25 transition-all text-white">
+                  <BarChart3 size={18} />
+                  <span className="text-[12px] font-bold">Análises</span>
                 </Link>
               </div>
             </div>

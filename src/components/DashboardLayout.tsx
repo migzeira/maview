@@ -7,6 +7,7 @@ import FloatingAIButton from "./FloatingAIButton";
 import AmbientGlow from "./AmbientGlow";
 import NotificationCenter from "./NotificationCenter";
 import StanleyAvatar from "./StanleyAvatar";
+import CommandPalette from "./CommandPalette";
 import {
   Home, FileText, BarChart3, Sparkles, Settings,
   LogOut, ExternalLink, Copy, Check, ChevronLeft, ChevronRight, Menu,
@@ -393,8 +394,27 @@ const DashboardLayout = ({ children }: Props) => {
             )}
           </button>
 
-          {/* Direita: notifications + dark mode + ver vitrine */}
+          {/* Direita: cmd+k hint + notifications + dark mode + ver vitrine */}
           <div className="flex items-center gap-2">
+            {/* Hint Cmd+K (estilo Linear/Notion) */}
+            <button
+              onClick={() => {
+                /* Trigger Cmd+K via keyboard event simulado */
+                const isMac = navigator.platform.toLowerCase().includes("mac");
+                const event = new KeyboardEvent("keydown", {
+                  key: "k",
+                  metaKey: isMac,
+                  ctrlKey: !isMac,
+                  bubbles: true,
+                });
+                window.dispatchEvent(event);
+              }}
+              className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 transition-all text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))]"
+              title="Abrir comandos (Cmd+K)"
+            >
+              <span className="text-[11px] font-medium">Comandos</span>
+              <kbd className="px-1.5 py-0.5 rounded bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border))] text-[10px] font-mono">⌘K</kbd>
+            </button>
             <NotificationCenter />
             <button
               onClick={() => setDarkMode(d => !d)}
@@ -422,6 +442,9 @@ const DashboardLayout = ({ children }: Props) => {
         </main>
         <FloatingAIButton />
       </div>
+
+      {/* Command Palette global — Cmd+K abre de qualquer lugar */}
+      <CommandPalette username={username} />
     </div>
   );
 };
