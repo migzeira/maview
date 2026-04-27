@@ -2191,62 +2191,46 @@ const DashboardPagina = () => {
         />
       )}
 
-      {/* Header */}
-      <div className="mb-5 flex items-start justify-between">
-        <div className="space-y-1">
-          <h1 className="text-2xl md:text-[28px] font-bold text-[hsl(var(--dash-text))] tracking-tight">Minha Vitrine</h1>
-          <p className="text-[hsl(var(--dash-text-muted))] text-[14px] flex items-center gap-2">
-            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${subtitleComplete ? "bg-emerald-400 animate-pulse" : "bg-amber-400 animate-pulse"}`} />
-            {subtitleText}
-          </p>
-        </div>
-        {/* Undo / Redo */}
-        <div className="flex items-center gap-1">
-          <button onClick={handleUndo} disabled={!canUndoConfig}
-            className="p-2 rounded-xl text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] disabled:opacity-30 disabled:cursor-default transition-all"
-            title="Desfazer (Ctrl+Z)"
-            aria-label="Desfazer última alteração">
-            <Undo2 size={16} />
-          </button>
-          <button onClick={handleRedo} disabled={!canRedoConfig}
-            className="p-2 rounded-xl text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] disabled:opacity-30 disabled:cursor-default transition-all"
-            title="Refazer (Ctrl+Y)"
-            aria-label="Refazer alteração">
-            <Redo2 size={16} />
-          </button>
-        </div>
-      </div>
-
-      {/* Profile Hero Card */}
-      <ProfileHeroCard config={config} onUpdate={updateConfig} onEditProfile={() => setActiveTab("perfil")} onHealthAction={handleHealthAction} onCopyToast={showCopyToast} />
-
-      {/* Two-column grid */}
+      {/* ── Two-column grid ── (header e ProfileHeroCard removidos: foco 100% nos produtos + preview) */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
 
         {/* ── LEFT PANEL ── */}
         <div className="min-w-0" ref={leftPanelRef}>
 
-          {/* 3-tab bar */}
-          <div className="flex gap-1 p-1 glass-card rounded-2xl mb-5 overflow-x-auto scrollbar-none">
-            {TABS.map(tab => {
-              const count = tabCounts[tab.id] ?? 0;
-              return (
-                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[13px] font-medium transition-all whitespace-nowrap flex-shrink-0 ${
-                    activeTab === tab.id
-                      ? "bg-white dark:bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text))] shadow-sm border border-[hsl(var(--dash-border-subtle))]"
-                      : "text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))]"
-                  }`}>
-                  {tab.icon}
-                  {tab.label}
-                  {count > 0 && (
-                    <span className="ml-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-primary/10 text-primary leading-none">
-                      {count}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+          {/* Tabs row — protagonista do topo, com undo/redo discretos à direita */}
+          <div className="flex items-center gap-2 mb-5">
+            <div className="flex-1 flex gap-1 p-1 glass-card rounded-2xl overflow-x-auto scrollbar-none">
+              {TABS.map(tab => {
+                const count = tabCounts[tab.id] ?? 0;
+                return (
+                  <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                    className={`flex-1 flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-semibold transition-all whitespace-nowrap ${
+                      activeTab === tab.id
+                        ? "bg-white dark:bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text))] shadow-sm border border-[hsl(var(--dash-border-subtle))]"
+                        : "text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))]"
+                    }`}>
+                    {tab.icon}
+                    {tab.label}
+                    {count > 0 && (
+                      <span className="ml-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-primary/10 text-primary leading-none">
+                        {count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            {/* Undo / Redo (compactos) */}
+            <button onClick={handleUndo} disabled={!canUndoConfig}
+              className="p-2 rounded-xl text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] disabled:opacity-30 disabled:cursor-default transition-all flex-shrink-0"
+              title="Desfazer (Ctrl+Z)" aria-label="Desfazer">
+              <Undo2 size={16} />
+            </button>
+            <button onClick={handleRedo} disabled={!canRedoConfig}
+              className="p-2 rounded-xl text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] disabled:opacity-30 disabled:cursor-default transition-all flex-shrink-0"
+              title="Refazer (Ctrl+Y)" aria-label="Refazer">
+              <Redo2 size={16} />
+            </button>
           </div>
 
           {/* Tab content */}
@@ -2256,13 +2240,13 @@ const DashboardPagina = () => {
             {activeTab === "vitrine" && (
               <div className="space-y-4">
 
-                {/* CTA — abre modal profissional */}
-                <div>
+                {/* CTA — discreto, foco nos produtos */}
+                <div className="flex justify-end">
                   <button
                     onClick={() => setShowAddModal(true)}
-                    className="w-full btn-primary-gradient text-sm font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
+                    className="btn-primary-gradient text-[13px] font-semibold px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition-transform active:scale-[0.97] shadow-sm"
                   >
-                    <Plus size={18} /> Adicionar à Vitrine
+                    <Plus size={15} /> Adicionar
                   </button>
 
                   <Dialog open={showAddModal} onOpenChange={v => { setShowAddModal(v); if (!v) setAiIdeas(null); }}>
@@ -3401,47 +3385,107 @@ const DashboardPagina = () => {
 
                 {/* ── Block list with drag & drop ── */}
                 {blocks.length === 0 && !activeForm ? (
-                  <div className="text-center py-14 space-y-4">
-                    <div className="w-20 h-20 mx-auto rounded-3xl bg-primary/5 flex items-center justify-center">
-                      <Layout size={32} className="text-primary/40" />
+                  /* Empty state PREMIUM com mockup exemplo (estilo Apple/Notion) */
+                  <div className="py-8 space-y-6">
+                    {/* Mockup de exemplo — preview de como vai ficar */}
+                    <div className="relative mx-auto max-w-[360px] p-4 rounded-3xl bg-gradient-to-br from-primary/5 via-fuchsia-500/3 to-purple-500/5 border border-primary/10">
+                      {/* Label "exemplo" */}
+                      <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-[hsl(var(--dash-surface))] border border-primary/30 text-[9px] font-bold text-primary uppercase tracking-wider">
+                        Exemplo
+                      </div>
+                      {/* Block exemplo: produto */}
+                      <div className="flex items-center gap-2.5 p-3 rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))] mb-2 opacity-70">
+                        <GripVertical size={14} className="text-[hsl(var(--dash-text-subtle))] flex-shrink-0" />
+                        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-base flex-shrink-0">📦</div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[12px] font-semibold text-[hsl(var(--dash-text))] truncate">Curso de Marketing Digital</p>
+                          <p className="text-[10px] text-[hsl(var(--dash-text-muted))]">R$ 197</p>
+                        </div>
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-600">PUBLICADO</span>
+                      </div>
+                      {/* Block exemplo: link */}
+                      <div className="flex items-center gap-2.5 p-3 rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))] mb-2 opacity-70">
+                        <GripVertical size={14} className="text-[hsl(var(--dash-text-subtle))] flex-shrink-0" />
+                        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white flex-shrink-0">
+                          <Link2 size={16} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[12px] font-semibold text-[hsl(var(--dash-text))] truncate">Meu Instagram</p>
+                          <p className="text-[10px] text-[hsl(var(--dash-text-muted))]">@seuusuario</p>
+                        </div>
+                      </div>
+                      {/* Block exemplo: depoimento */}
+                      <div className="flex items-center gap-2.5 p-3 rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))] opacity-70">
+                        <GripVertical size={14} className="text-[hsl(var(--dash-text-subtle))] flex-shrink-0" />
+                        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center flex-shrink-0">
+                          <Star size={16} className="text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[12px] font-semibold text-[hsl(var(--dash-text))] truncate">"Mudou meu negócio!"</p>
+                          <p className="text-[10px] text-[hsl(var(--dash-text-muted))]">— Beatriz Lins</p>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-[hsl(var(--dash-text))] font-bold text-[17px]">Monte sua vitrine</h3>
-                      <p className="text-[hsl(var(--dash-text-muted))] text-sm mt-1 max-w-[320px] mx-auto leading-relaxed">
-                        Adicione produtos, links e depoimentos para criar sua página de vendas
+
+                    {/* CTA principal */}
+                    <div className="text-center space-y-1">
+                      <h3 className="text-[hsl(var(--dash-text))] font-extrabold text-[20px]">Adicione seu primeiro bloco</h3>
+                      <p className="text-[hsl(var(--dash-text-muted))] text-[13px] max-w-[340px] mx-auto leading-relaxed">
+                        Produtos, links de redes sociais ou depoimentos. Você pode reordenar a qualquer momento arrastando.
                       </p>
                     </div>
 
                     {/* Quick-start cards */}
-                    <div className="grid grid-cols-2 gap-2 max-w-[340px] mx-auto">
+                    <div className="grid grid-cols-2 gap-2 max-w-[400px] mx-auto">
                       <button onClick={openAddProduct}
-                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-dashed border-[hsl(var(--dash-border))] hover:border-primary/40 hover:bg-primary/5 transition-all group">
-                        <Package size={20} className="text-[hsl(var(--dash-text-muted))] group-hover:text-primary transition-colors" />
-                        <span className="text-[12px] font-medium text-[hsl(var(--dash-text-secondary))]">Produto</span>
+                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-dashed border-[hsl(var(--dash-border))] hover:border-primary/50 hover:bg-primary/5 transition-all group">
+                        <Package size={22} className="text-[hsl(var(--dash-text-muted))] group-hover:text-primary transition-colors" />
+                        <span className="text-[12px] font-semibold text-[hsl(var(--dash-text-secondary))] group-hover:text-primary transition-colors">Produto</span>
                       </button>
                       <button onClick={openAddLink}
-                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-dashed border-[hsl(var(--dash-border))] hover:border-primary/40 hover:bg-primary/5 transition-all group">
-                        <Link2 size={20} className="text-[hsl(var(--dash-text-muted))] group-hover:text-primary transition-colors" />
-                        <span className="text-[12px] font-medium text-[hsl(var(--dash-text-secondary))]">Link</span>
+                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-dashed border-[hsl(var(--dash-border))] hover:border-primary/50 hover:bg-primary/5 transition-all group">
+                        <Link2 size={22} className="text-[hsl(var(--dash-text-muted))] group-hover:text-primary transition-colors" />
+                        <span className="text-[12px] font-semibold text-[hsl(var(--dash-text-secondary))] group-hover:text-primary transition-colors">Link</span>
                       </button>
                       <button onClick={openAddTestimonial}
-                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-dashed border-[hsl(var(--dash-border))] hover:border-primary/40 hover:bg-primary/5 transition-all group">
-                        <Star size={20} className="text-[hsl(var(--dash-text-muted))] group-hover:text-primary transition-colors" />
-                        <span className="text-[12px] font-medium text-[hsl(var(--dash-text-secondary))]">Depoimento</span>
+                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-dashed border-[hsl(var(--dash-border))] hover:border-primary/50 hover:bg-primary/5 transition-all group">
+                        <Star size={22} className="text-[hsl(var(--dash-text-muted))] group-hover:text-primary transition-colors" />
+                        <span className="text-[12px] font-semibold text-[hsl(var(--dash-text-secondary))] group-hover:text-primary transition-colors">Depoimento</span>
                       </button>
                       <button onClick={openAddHeader}
-                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-dashed border-[hsl(var(--dash-border))] hover:border-primary/40 hover:bg-primary/5 transition-all group">
-                        <Type size={20} className="text-[hsl(var(--dash-text-muted))] group-hover:text-primary transition-colors" />
-                        <span className="text-[12px] font-medium text-[hsl(var(--dash-text-secondary))]">Separador</span>
+                        className="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-dashed border-[hsl(var(--dash-border))] hover:border-primary/50 hover:bg-primary/5 transition-all group">
+                        <Type size={22} className="text-[hsl(var(--dash-text-muted))] group-hover:text-primary transition-colors" />
+                        <span className="text-[12px] font-semibold text-[hsl(var(--dash-text-secondary))] group-hover:text-primary transition-colors">Separador</span>
                       </button>
                     </div>
 
-                    <p className="text-[hsl(var(--dash-text-subtle))] text-xs text-center pt-2">
-                      Vitrines com 3+ itens convertem <span className="font-semibold text-primary">4x mais</span>
+                    {/* Stat persuasivo */}
+                    <p className="text-[hsl(var(--dash-text-subtle))] text-[11px] text-center">
+                      💡 Lojas com 3+ blocos convertem <span className="font-bold text-primary">4x mais</span>
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-2">
+                    {/* First-time hint: aparece se user tem 2+ blocks e nunca dismissou */}
+                    {blocks.length >= 2 && localStorage.getItem("maview_drag_hint_dismissed") !== "1" && (
+                      <div className="flex items-center gap-2.5 px-3.5 py-2.5 mb-2 rounded-xl bg-gradient-to-r from-primary/8 to-fuchsia-500/8 border border-primary/15 animate-in slide-in-from-top-2 fade-in duration-300">
+                        <span className="text-base" aria-hidden>💡</span>
+                        <p className="flex-1 text-[12px] text-[hsl(var(--dash-text-secondary))]">
+                          <strong className="text-[hsl(var(--dash-text))]">Dica:</strong> arraste os blocos pelo ícone <GripVertical size={11} className="inline -mt-0.5" /> à esquerda para reordenar. Clique no bloco para editar.
+                        </p>
+                        <button
+                          onClick={() => {
+                            localStorage.setItem("maview_drag_hint_dismissed", "1");
+                            /* Força re-render */
+                            setActiveTab(activeTab);
+                          }}
+                          className="text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] transition-colors flex-shrink-0"
+                          aria-label="Fechar dica"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    )}
                     {blocks.map((block, idx) => {
                       const display = getBlockDisplay(block);
                       if (!display) return null;
