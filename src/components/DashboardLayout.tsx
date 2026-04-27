@@ -6,6 +6,7 @@ import MaviewLogo from "./MaviewLogo";
 import FloatingAIButton from "./FloatingAIButton";
 import AmbientGlow from "./AmbientGlow";
 import NotificationCenter from "./NotificationCenter";
+import StanleyAvatar from "./StanleyAvatar";
 import {
   Home, FileText, BarChart3, Sparkles, Settings,
   LogOut, ExternalLink, Copy, Check, ChevronLeft, ChevronRight, Menu,
@@ -213,11 +214,18 @@ const DashboardLayout = ({ children }: Props) => {
         {active && (
           <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-primary" />
         )}
-        <item.icon
-          size={17}
-          strokeWidth={active ? 2.2 : 1.8}
-          className={`transition-colors flex-shrink-0 ${active ? "text-primary" : "text-[hsl(var(--dash-text-subtle))] group-hover:text-primary/60"}`}
-        />
+        {/* Stanley AI tem mascot exclusivo (estilo Stan que usa avatar do Stanley) */}
+        {item.path === "/dashboard/ia" ? (
+          <div className="flex-shrink-0" style={{ width: 17, height: 17 }}>
+            <StanleyAvatar size="xs" animated />
+          </div>
+        ) : (
+          <item.icon
+            size={17}
+            strokeWidth={active ? 2.2 : 1.8}
+            className={`transition-colors flex-shrink-0 ${active ? "text-primary" : "text-[hsl(var(--dash-text-subtle))] group-hover:text-primary/60"}`}
+          />
+        )}
         {!collapsed && (
           <>
             <span className="flex-1 truncate">{item.label}</span>

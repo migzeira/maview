@@ -130,28 +130,43 @@ const DashboardAutomacoes = () => {
 
   return (
     <div className="max-w-[1100px] mx-auto px-4 md:px-8 py-8 md:py-10 space-y-8 page-enter">
+      {/* Header Apple-style: title + count discreto à esquerda, CTA à direita */}
       <div className="flex items-center justify-between">
         <div className="space-y-1.5">
-          <h1 className="text-2xl md:text-[28px] font-bold text-[hsl(var(--dash-text))] tracking-tight">Automacoes</h1>
-          <p className="text-[hsl(var(--dash-text-muted))] text-[15px]">Configure acoes automaticas para vender no piloto automatico</p>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl md:text-[32px] font-extrabold text-[hsl(var(--dash-text))] tracking-tight">AutoDM</h1>
+            {automations.length > 0 && (
+              <span className="text-[12px] font-semibold text-[hsl(var(--dash-text-subtle))] bg-[hsl(var(--dash-surface-2))] px-2.5 py-1 rounded-full">
+                {automations.filter(a => a.active).length} ativo{automations.filter(a => a.active).length !== 1 ? "s" : ""}
+              </span>
+            )}
+          </div>
+          <p className="text-[hsl(var(--dash-text-muted))] text-[15px]">
+            Mensagens automáticas que respondem por você no Instagram, WhatsApp e e-mail
+          </p>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 btn-primary-gradient text-[13px] px-4 py-2.5 rounded-xl"
+          className="flex items-center gap-2 btn-primary-gradient text-[13px] px-5 py-2.5 rounded-xl shadow-md hover:shadow-lg hover:shadow-primary/20 transition-all active:scale-95"
         >
-          <Plus size={15} /> Nova automacao
+          <Plus size={15} /> Nova mensagem
         </button>
       </div>
 
-      {/* Feature banner */}
-      <div className="glass-card rounded-2xl p-5 flex items-start gap-4 border-l-4 border-l-primary">
-        <div className="w-10 h-10 rounded-xl bg-[hsl(var(--dash-accent))] ring-1 ring-primary/10 flex items-center justify-center flex-shrink-0">
-          <Sparkles size={18} className="text-primary" />
+      {/* Feature banner Apple-clean: gradient suave + Stanley */}
+      <div className="rounded-3xl bg-gradient-to-br from-fuchsia-500/8 via-purple-500/5 to-primary/8 border border-primary/15 p-5 md:p-6 flex items-start gap-4">
+        <div className="flex-shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-fuchsia-500 to-purple-600 flex items-center justify-center shadow-lg shadow-fuchsia-500/30">
+            <Zap size={20} className="text-white" />
+          </div>
         </div>
-        <div>
-          <p className="text-[hsl(var(--dash-text))] text-[13px] font-semibold mb-0.5">Automacoes sao o seu diferencial</p>
+        <div className="flex-1 min-w-0">
+          <p className="text-[hsl(var(--dash-text))] text-[14px] font-bold mb-1">
+            Vendendo enquanto dorme — sem código.
+          </p>
           <p className="text-[hsl(var(--dash-text-secondary))] text-[13px] leading-relaxed">
-            Configure fluxos automaticos de pos-compra, captura de leads e entrega de conteudo. Tudo sem codigo.
+            Quando alguém comprar um produto, deixar lead ou visitar sua página, o Maview executa
+            ações automáticas (envia e-mail, libera conteúdo, redireciona). Você configura uma vez, vende para sempre.
           </p>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { initialLoad, loadLocal, saveWithSync, fetchLeads, fetchOrders } from "@/lib/vitrine-sync";
 import { Link } from "react-router-dom";
+import StanleyAvatar from "@/components/StanleyAvatar";
 import {
   CheckCircle2, Circle, ArrowRight,
   Copy, Check, ExternalLink,
@@ -371,11 +372,13 @@ const DashboardHome = () => {
                 </span>
               </Link>
 
-              {/* Card 3: IA Stanley */}
+              {/* Card 3: IA Stanley com mascot real */}
               <Link to="/dashboard/ia"
                 className="group relative rounded-2xl bg-gradient-to-br from-fuchsia-500/8 to-purple-500/8 border border-fuchsia-500/20 p-5 hover:border-fuchsia-500/50 hover:shadow-xl hover:shadow-fuchsia-500/15 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
                 <div className="absolute top-3 right-3 text-[10px] font-bold text-fuchsia-500/40 group-hover:text-fuchsia-500 transition-colors">3</div>
-                <div className="text-4xl mb-3">✨</div>
+                <div className="mb-3 group-hover:scale-110 transition-transform inline-block">
+                  <StanleyAvatar size="lg" variant="card" animated />
+                </div>
                 <h3 className="text-[hsl(var(--dash-text))] font-bold text-[15px] mb-1">Perguntar ao Stanley</h3>
                 <p className="text-[hsl(var(--dash-text-muted))] text-[12px] leading-relaxed mb-4">
                   Sua IA de marketing. Bio, descrição, oferta — pronto em segundos.

@@ -19,24 +19,24 @@ const DashboardMonetizacao = () => {
 
   return (
     <div className="max-w-[1100px] mx-auto px-4 md:px-8 py-8 md:py-10 space-y-6">
-      {/* Header */}
-      <div className="space-y-1.5">
-        <h1 className="text-2xl md:text-[28px] font-bold text-[hsl(var(--dash-text))] tracking-tight">
-          Monetizacao
+      {/* Header Apple-style: title gigante + tab segmented control */}
+      <div className="space-y-2">
+        <h1 className="text-2xl md:text-[32px] font-extrabold text-[hsl(var(--dash-text))] tracking-tight">
+          Renda
         </h1>
         <p className="text-[hsl(var(--dash-text-muted))] text-[15px]">
-          Gerencie seus produtos, vendas e receita em um so lugar
+          Tudo sobre seus produtos, vendas e receita em um só lugar
         </p>
       </div>
 
-      {/* Tabs */}
+      {/* Tabs — segmented control style Apple */}
       <div className="flex items-center gap-1 p-1 rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))] w-fit">
         {TABS.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
             onClick={() => setActiveTab(id)}
             className={`
-              flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-medium transition-all
+              flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-semibold transition-all
               ${activeTab === id
                 ? "bg-[hsl(var(--dash-accent))] text-primary shadow-sm"
                 : "text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text-secondary))] hover:bg-[hsl(var(--dash-surface-2))]"
