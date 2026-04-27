@@ -333,125 +333,108 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
 
   return (
     <div className="space-y-5">
-      {/* ═══ CAROUSEL TEMPLATES — sem chrome desnecessário, estilo Stan puro ─── */}
+      {/* ═══ CAROUSEL TEMPLATES — estilo Stan exato: múltiplos phones, centro destacado ─── */}
       <div className="relative">
-        {/* Setas flutuantes nas laterais (estilo Stan) — só aparecem em hover desktop */}
-        <button
-          onClick={() => {
-            const nextIdx = (activePackIdx - 1 + filteredPacks.length) % filteredPacks.length;
-            setActivePackIdx(nextIdx);
-            applyPackWithFeedback(filteredPacks[nextIdx]);
-            const card = carouselRef.current?.children[nextIdx] as HTMLElement;
-            if (card) card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-          }}
-          className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-[hsl(var(--dash-surface))]/95 backdrop-blur border border-[hsl(var(--dash-border))] hover:bg-primary hover:text-white hover:border-primary transition-all items-center justify-center shadow-lg"
-          aria-label="Template anterior"
-        >
-          <ChevronLeft size={16} />
-        </button>
-        <button
-          onClick={() => {
-            const nextIdx = (activePackIdx + 1) % filteredPacks.length;
-            setActivePackIdx(nextIdx);
-            applyPackWithFeedback(filteredPacks[nextIdx]);
-            const card = carouselRef.current?.children[nextIdx] as HTMLElement;
-            if (card) card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-          }}
-          className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-[hsl(var(--dash-surface))]/95 backdrop-blur border border-[hsl(var(--dash-border))] hover:bg-primary hover:text-white hover:border-primary transition-all items-center justify-center shadow-lg"
-          aria-label="Próximo template"
-        >
-          <ChevronRight size={16} />
-        </button>
-
-        {/* Único phone ativo — centralizado, sem distração lateral */}
-        <div ref={carouselRef} className="flex justify-center py-4 px-2 min-h-[480px]">
-          {filteredPacks.map((pack, idx) => {
-            if (idx !== activePackIdx) return null; // só renderiza o ativo
-            const isJustApplied = justApplied === pack.id;
-            return (
-              <div
-                key={pack.id}
-                className="relative animate-in fade-in zoom-in-95 duration-300"
-              >
-                <PhoneMockup
-                  pack={pack}
-                  isActive={true}
-                  onClick={() => applyPackWithFeedback(pack)}
-                  liveDesign={d}
-                />
-                {isJustApplied && (
-                  <div className="absolute top-4 right-4 bg-emerald-500 text-white rounded-full px-3 py-1.5 text-[11px] font-bold flex items-center gap-1 animate-in fade-in zoom-in-50 duration-200 shadow-xl">
-                    <Check size={12} /> Aplicado!
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Nome + desc do ativo */}
-        <div className="text-center pb-4 px-4">
-          <p className="text-[22px] font-extrabold text-[hsl(var(--dash-text))] tracking-tight transition-all duration-300" key={`name-${activePackIdx}`}
-             style={{ animation: "fadeSlideUp 0.3s ease both" }}>
-            {filteredPacks[activePackIdx]?.label}
-          </p>
-          <p className="text-[13px] text-[hsl(var(--dash-text-muted))] mt-1 max-w-[340px] mx-auto leading-snug" key={`desc-${activePackIdx}`}
-             style={{ animation: "fadeSlideUp 0.3s ease 0.05s both" }}>
-            {filteredPacks[activePackIdx]?.desc}
-          </p>
-        </div>
-
-        {/* Régua de thumbnails — mini-phones coloridos com a paleta de cada template */}
-        <div className="flex items-center justify-center gap-2.5 pb-2 px-2 overflow-x-auto scrollbar-none">
-          {filteredPacks.map((p, idx) => {
-            const isActive = idx === activePackIdx;
-            const c1 = p.config.design.accentColor || "#7C3AED";
-            const c2 = p.config.design.accentColor2 || c1;
-            return (
-              <button
-                key={p.id}
-                onClick={() => {
-                  setActivePackIdx(idx);
-                  applyPackWithFeedback(p);
-                }}
-                className={`group relative flex-shrink-0 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
-                  isActive ? "scale-110 -translate-y-1" : "scale-100 opacity-55 hover:opacity-100 hover:scale-110 hover:-translate-y-1 hover:rotate-[-2deg]"
-                }`}
-                title={p.label}
-                aria-label={`Aplicar template ${p.label}`}
-              >
-                {/* Mini phone shape com gradient da paleta */}
+        {/* Stage do carousel — phones absolutos com offset transform */}
+        <div className="relative overflow-hidden" style={{ height: 600 }}>
+          <div ref={carouselRef} className="absolute inset-0 flex items-center justify-center">
+            {filteredPacks.map((pack, idx) => {
+              const offset = idx - activePackIdx;
+              const absOffset = Math.abs(offset);
+              const visible = absOffset <= 2;
+              /* Posição: ±220px por offset. Scale e opacity caem nas laterais */
+              const translateX = offset * 230;
+              const scale = absOffset === 0 ? 1 : (absOffset === 1 ? 0.82 : 0.68);
+              const opacity = absOffset === 0 ? 1 : (absOffset === 1 ? 0.55 : 0.22);
+              const blur = absOffset === 0 ? 0 : (absOffset === 1 ? 0.5 : 1.5);
+              const isJustApplied = justApplied === pack.id;
+              return (
                 <div
-                  className={`relative w-[36px] h-[58px] rounded-[10px] overflow-hidden border-2 transition-all ${
-                    isActive ? "border-primary shadow-lg shadow-primary/30" : "border-[hsl(var(--dash-border))]"
-                  }`}
-                  style={{ background: `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)` }}
+                  key={pack.id}
+                  onClick={() => {
+                    if (offset === 0) return;
+                    setActivePackIdx(idx);
+                    applyPackWithFeedback(pack);
+                  }}
+                  className={`absolute transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${offset !== 0 ? "cursor-pointer" : ""}`}
+                  style={{
+                    transform: `translateX(${translateX}px) scale(${scale})`,
+                    opacity: visible ? opacity : 0,
+                    zIndex: 10 - absOffset,
+                    filter: blur > 0 ? `blur(${blur}px)` : undefined,
+                    pointerEvents: visible ? "auto" : "none",
+                  }}
                 >
-                  {/* Notch */}
-                  <div className="absolute top-1 left-1/2 -translate-x-1/2 w-3 h-1 rounded-full bg-black/40" />
-                  {/* Avatar dot */}
-                  <div className="absolute top-3 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-white/40" />
-                  {/* Mini cards */}
-                  <div className="absolute bottom-1.5 left-1.5 right-1.5 space-y-1">
-                    <div className="h-1.5 rounded bg-white/40" />
-                    <div className="h-1.5 rounded bg-white/30" />
-                  </div>
-                  {/* Check ativo */}
-                  {isActive && (
-                    <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center shadow-md">
-                      <Check size={9} className="text-white" strokeWidth={3} />
+                  <PhoneMockup
+                    pack={pack}
+                    isActive={offset === 0}
+                    onClick={() => applyPackWithFeedback(pack)}
+                    liveDesign={offset === 0 ? d : undefined}
+                  />
+                  {isJustApplied && offset === 0 && (
+                    <div className="absolute top-4 right-4 bg-emerald-500 text-white rounded-full px-3 py-1.5 text-[11px] font-bold flex items-center gap-1 animate-in fade-in zoom-in-50 duration-200 shadow-xl">
+                      <Check size={12} /> Aplicado!
                     </div>
                   )}
                 </div>
-                {/* Label embaixo */}
-                <span className={`block text-[9px] font-semibold mt-1 transition-colors ${
-                  isActive ? "text-primary" : "text-[hsl(var(--dash-text-subtle))] group-hover:text-[hsl(var(--dash-text-muted))]"
-                }`}>
-                  {p.label}
-                </span>
-              </button>
-            );
-          })}
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Navegação inferior estilo Stan — chevron + nome + chevron */}
+        <div className="flex items-center justify-center gap-5 pt-2 pb-2">
+          <button
+            onClick={() => {
+              const nextIdx = (activePackIdx - 1 + filteredPacks.length) % filteredPacks.length;
+              setActivePackIdx(nextIdx);
+              applyPackWithFeedback(filteredPacks[nextIdx]);
+            }}
+            className="w-9 h-9 rounded-full flex items-center justify-center text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] transition-all"
+            aria-label="Template anterior"
+          >
+            <ChevronLeft size={18} />
+          </button>
+
+          <div className="text-center min-w-[140px]" key={`name-${activePackIdx}`} style={{ animation: "fadeSlideUp 0.3s ease both" }}>
+            <p className="text-[20px] font-extrabold text-[hsl(var(--dash-text))] tracking-tight leading-none">
+              {filteredPacks[activePackIdx]?.label}
+            </p>
+            <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] mt-1 leading-tight">
+              {filteredPacks[activePackIdx]?.desc}
+            </p>
+          </div>
+
+          <button
+            onClick={() => {
+              const nextIdx = (activePackIdx + 1) % filteredPacks.length;
+              setActivePackIdx(nextIdx);
+              applyPackWithFeedback(filteredPacks[nextIdx]);
+            }}
+            className="w-9 h-9 rounded-full flex items-center justify-center text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] transition-all"
+            aria-label="Próximo template"
+          >
+            <ChevronRight size={18} />
+          </button>
+        </div>
+
+        {/* Dots paginação minimalista (Stan-style) */}
+        <div className="flex items-center justify-center gap-1.5 pb-1">
+          {filteredPacks.map((p, idx) => (
+            <button
+              key={p.id}
+              onClick={() => {
+                setActivePackIdx(idx);
+                applyPackWithFeedback(p);
+              }}
+              className={`transition-all rounded-full ${
+                idx === activePackIdx
+                  ? "w-6 h-1.5 bg-[hsl(var(--dash-text))]"
+                  : "w-1.5 h-1.5 bg-[hsl(var(--dash-border))] hover:bg-[hsl(var(--dash-text-muted))]"
+              }`}
+              aria-label={`Ver template ${p.label}`}
+            />
+          ))}
         </div>
       </div>
 
