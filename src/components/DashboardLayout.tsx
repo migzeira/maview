@@ -23,16 +23,16 @@ interface NavItem {
 }
 
 const NAV_TOP: NavItem[] = [
-  { path: "/dashboard", label: "Home", icon: Home },
+  { path: "/dashboard", label: "Início", icon: Home },
 ];
 
 const NAV_MAIN: NavItem[] = [
-  { path: "/dashboard/pagina", label: "Minha Vitrine", icon: FileText },
-  { path: "/dashboard/monetizacao", label: "Monetizacao", icon: DollarSign },
+  { path: "/dashboard/pagina", label: "Minha Loja", icon: FileText },
+  { path: "/dashboard/monetizacao", label: "Renda", icon: DollarSign },
+  { path: "/dashboard/analytics", label: "Análises", icon: BarChart3 },
   { path: "/dashboard/clientes", label: "Clientes", icon: Users },
-  { path: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
-  { path: "/dashboard/automacoes", label: "Automacoes", icon: Zap },
-  { path: "/dashboard/ia", label: "IA Maview", icon: Sparkles, badge: "Novo" },
+  { path: "/dashboard/automacoes", label: "AutoDM", icon: Zap },
+  { path: "/dashboard/ia", label: "IA Stanley", icon: Sparkles, badge: "Novo" },
 ];
 
 // ── Health calculator (lightweight, from localStorage) ──────────────────────
@@ -259,80 +259,38 @@ const DashboardLayout = ({ children }: Props) => {
         {NAV_MAIN.map((item, i) => renderNavItem(item, i === 0))}
       </nav>
 
-      {/* ── Bottom section: Profile + CTA ── */}
+      {/* ── Bottom section: Settings + Profile (estilo Stan minimalista) ── */}
       {!collapsed && (
-        <div className="px-3 pb-4 pt-2 space-y-3">
-          <div className="dash-divider" />
+        <div className="px-3 pb-3 pt-2 space-y-1">
+          {/* Settings — link discreto (igual Stan) */}
+          <Link
+            to="/dashboard/configuracoes"
+            onClick={() => setMobileOpen(false)}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all group ${
+              location.pathname === "/dashboard/configuracoes"
+                ? "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-accent-fg))]"
+                : "text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text-secondary))] hover:bg-[hsl(var(--dash-surface-2))]"
+            }`}
+          >
+            <Settings size={17} strokeWidth={1.8} className="text-[hsl(var(--dash-text-subtle))] group-hover:text-primary/60 transition-colors" />
+            <span className="flex-1">Configurações</span>
+          </Link>
 
-          {/* Health progress card — engagement trigger */}
-          {health.score < 100 && (
-            <Link to="/dashboard/pagina"
-              className="flex items-center gap-3 px-3 py-3 rounded-xl bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/10 hover:border-primary/25 transition-all group">
-              {healthRing}
-              <div className="flex-1 min-w-0">
-                <p className="text-label font-semibold text-[hsl(var(--dash-text))]">
-                  {health.score < 30 ? "Monte sua página" : health.score < 70 ? "Quase lá!" : "Últimos ajustes"}
-                </p>
-                <p className="text-caption text-[hsl(var(--dash-text-subtle))] truncate">
-                  {health.missing.length > 0
-                    ? `Falta: ${health.missing.slice(0, 2).join(", ")}${health.missing.length > 2 ? "..." : ""}`
-                    : "Finalizando..."
-                  }
-                </p>
-              </div>
-              <ArrowUpRight size={12} className="text-[hsl(var(--dash-text-subtle))] group-hover:text-primary transition-colors flex-shrink-0" />
-            </Link>
-          )}
-
-          {/* Pro upgrade teaser */}
-          <div className="rounded-xl bg-[hsl(var(--dash-text))] p-3.5">
-            <div className="flex items-center gap-1.5 mb-1.5">
-              <Zap size={12} className="text-amber-400" />
-              <span className="text-caption font-bold text-amber-400">Pro</span>
-            </div>
-            <p className="text-[hsl(var(--dash-bg))] text-detail font-semibold mb-1">
-              Domínio próprio + analytics
-            </p>
-            <p className="text-[hsl(var(--dash-bg))]/60 text-caption mb-2.5">
-              Remova "maview.app" do link
-            </p>
-            <button
-              onClick={() => { setProWaitlist(true); localStorage.setItem("maview_pro_waitlist", "1"); }}
-              disabled={proWaitlist}
-              className={`w-full text-label font-semibold py-1.5 rounded-lg transition-colors ${
-                proWaitlist ? "bg-emerald-500 text-white cursor-not-allowed opacity-60" : "bg-primary text-white hover:bg-primary/90"
-              }`}>
-              {proWaitlist ? "✓ Na lista de espera" : "Entrar na lista de espera"}
-            </button>
-          </div>
-
-          {/* Profile mini-card with settings */}
-          <div className="flex items-center gap-2.5 px-2 py-2 rounded-xl hover:bg-[hsl(var(--dash-surface-2))] transition-all">
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-label font-bold flex-shrink-0">
+          {/* Profile mini-card — clica abre menu (Stan style) */}
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-[hsl(var(--dash-surface-2))] transition-all group"
+            title="Clique para sair"
+          >
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-[12px] font-bold flex-shrink-0">
               {initials}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-detail font-semibold text-[hsl(var(--dash-text))] truncate">{displayName}</p>
-              <p className="text-caption text-[hsl(var(--dash-text-subtle))] font-mono truncate">@{username}</p>
+            <div className="flex-1 min-w-0 text-left">
+              <p className="text-[12px] font-semibold text-[hsl(var(--dash-text))] truncate">{displayName}</p>
+              <p className="text-[10px] text-[hsl(var(--dash-text-subtle))] font-mono truncate">@{username}</p>
             </div>
-            <Link
-              to="/dashboard/configuracoes"
-              onClick={() => setMobileOpen(false)}
-              className="p-1.5 rounded-lg text-[hsl(var(--dash-text-subtle))] hover:text-primary hover:bg-primary/10 transition-all flex-shrink-0"
-              title="Configurações"
-              aria-label="Configurações"
-            >
-              <Settings size={14} />
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="p-1.5 rounded-lg text-[hsl(var(--dash-text-subtle))] hover:text-red-400 hover:bg-red-500/10 transition-all flex-shrink-0"
-              title="Sair"
-              aria-label="Sair da conta"
-            >
-              <LogOut size={13} />
-            </button>
-          </div>
+            <LogOut size={13} className="text-[hsl(var(--dash-text-subtle))] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+          </button>
         </div>
       )}
 
