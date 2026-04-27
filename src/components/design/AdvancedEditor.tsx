@@ -414,11 +414,11 @@ function TipografiaSection({ design: d, setDesign }: { design: DesignConfig; set
 export default function AdvancedEditor({ design, setDesign, onOpenProMode }: Props) {
   return (
     <div className="space-y-3">
-      <Accordion icon={<Palette size={16} />} title="Fundo" desc="Sólido, gradient, imagem, efeito animado" defaultOpen>
+      <Accordion icon={<Palette size={16} />} title="Fundo" desc="Sólido, gradient ou padrão">
         <FundoSection design={design} setDesign={setDesign} />
       </Accordion>
 
-      <Accordion icon={<Square size={16} />} title="Cards & Botões" desc="Clean, Glass ou Bold — 1 clique define tudo">
+      <Accordion icon={<Square size={16} />} title="Cards & Botões" desc="Estilo dos cards de produto">
         <CardsSection design={design} setDesign={setDesign} />
       </Accordion>
 
