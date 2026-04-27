@@ -256,10 +256,14 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     updateConfig("design", latest);
     if (pack.config.design.fontHeading) loadFont(pack.config.design.fontHeading);
     if (pack.config.design.fontBody) loadFont(pack.config.design.fontBody);
-    /* Dopamina: feedback visual de "aplicado" */
+  }, [updateConfig]);
+
+  /* Wrapper com feedback visual — usado SÓ no click direto (não no scroll) */
+  const applyPackWithFeedback = useCallback((pack: DesignPack) => {
+    applyPack(pack);
     setJustApplied(pack.id);
     setTimeout(() => setJustApplied(null), 1600);
-  }, [updateConfig]);
+  }, [applyPack]);
 
   /* ─── Auto-detect central card on scroll (estilo Stan natural) ─── */
   useEffect(() => {
@@ -344,8 +348,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
               onClick={() => {
                 const nextIdx = (activePackIdx - 1 + filteredPacks.length) % filteredPacks.length;
                 setActivePackIdx(nextIdx);
-                applyPack(filteredPacks[nextIdx]);
-                /* Scroll suave pra ancorar */
+                applyPackWithFeedback(filteredPacks[nextIdx]); /* CLICK = badge */
                 const card = carouselRef.current?.children[nextIdx] as HTMLElement;
                 if (card) card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
               }}
@@ -358,7 +361,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
               onClick={() => {
                 const nextIdx = (activePackIdx + 1) % filteredPacks.length;
                 setActivePackIdx(nextIdx);
-                applyPack(filteredPacks[nextIdx]);
+                applyPackWithFeedback(filteredPacks[nextIdx]); /* CLICK = badge */
                 const card = carouselRef.current?.children[nextIdx] as HTMLElement;
                 if (card) card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
               }}
@@ -393,7 +396,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
                     isActive={isActive}
                     onClick={() => {
                       setActivePackIdx(idx);
-                      applyPack(pack);
+                      applyPackWithFeedback(pack); /* CLICK = mostra badge */
                       const card = carouselRef.current?.children[idx] as HTMLElement;
                       if (card) card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
                     }}
@@ -420,7 +423,7 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
                 key={p.id}
                 onClick={() => {
                   setActivePackIdx(idx);
-                  applyPack(p);
+                  applyPackWithFeedback(p); /* CLICK em dot = mostra badge */
                   const card = carouselRef.current?.children[idx] as HTMLElement;
                   if (card) card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
                 }}
