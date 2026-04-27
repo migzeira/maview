@@ -2191,62 +2191,46 @@ const DashboardPagina = () => {
         />
       )}
 
-      {/* Header */}
-      <div className="mb-5 flex items-start justify-between">
-        <div className="space-y-1">
-          <h1 className="text-2xl md:text-[28px] font-bold text-[hsl(var(--dash-text))] tracking-tight">Minha Vitrine</h1>
-          <p className="text-[hsl(var(--dash-text-muted))] text-[14px] flex items-center gap-2">
-            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${subtitleComplete ? "bg-emerald-400 animate-pulse" : "bg-amber-400 animate-pulse"}`} />
-            {subtitleText}
-          </p>
-        </div>
-        {/* Undo / Redo */}
-        <div className="flex items-center gap-1">
-          <button onClick={handleUndo} disabled={!canUndoConfig}
-            className="p-2 rounded-xl text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] disabled:opacity-30 disabled:cursor-default transition-all"
-            title="Desfazer (Ctrl+Z)"
-            aria-label="Desfazer última alteração">
-            <Undo2 size={16} />
-          </button>
-          <button onClick={handleRedo} disabled={!canRedoConfig}
-            className="p-2 rounded-xl text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] disabled:opacity-30 disabled:cursor-default transition-all"
-            title="Refazer (Ctrl+Y)"
-            aria-label="Refazer alteração">
-            <Redo2 size={16} />
-          </button>
-        </div>
-      </div>
-
-      {/* Profile Hero Card */}
-      <ProfileHeroCard config={config} onUpdate={updateConfig} onEditProfile={() => setActiveTab("perfil")} onHealthAction={handleHealthAction} onCopyToast={showCopyToast} />
-
-      {/* Two-column grid */}
+      {/* ── Two-column grid ── (header e ProfileHeroCard removidos: foco 100% nos produtos + preview) */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
 
         {/* ── LEFT PANEL ── */}
         <div className="min-w-0" ref={leftPanelRef}>
 
-          {/* 3-tab bar */}
-          <div className="flex gap-1 p-1 glass-card rounded-2xl mb-5 overflow-x-auto scrollbar-none">
-            {TABS.map(tab => {
-              const count = tabCounts[tab.id] ?? 0;
-              return (
-                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[13px] font-medium transition-all whitespace-nowrap flex-shrink-0 ${
-                    activeTab === tab.id
-                      ? "bg-white dark:bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text))] shadow-sm border border-[hsl(var(--dash-border-subtle))]"
-                      : "text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))]"
-                  }`}>
-                  {tab.icon}
-                  {tab.label}
-                  {count > 0 && (
-                    <span className="ml-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-primary/10 text-primary leading-none">
-                      {count}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+          {/* Tabs row — protagonista do topo, com undo/redo discretos à direita */}
+          <div className="flex items-center gap-2 mb-5">
+            <div className="flex-1 flex gap-1 p-1 glass-card rounded-2xl overflow-x-auto scrollbar-none">
+              {TABS.map(tab => {
+                const count = tabCounts[tab.id] ?? 0;
+                return (
+                  <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                    className={`flex-1 flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-semibold transition-all whitespace-nowrap ${
+                      activeTab === tab.id
+                        ? "bg-white dark:bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text))] shadow-sm border border-[hsl(var(--dash-border-subtle))]"
+                        : "text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))]"
+                    }`}>
+                    {tab.icon}
+                    {tab.label}
+                    {count > 0 && (
+                      <span className="ml-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-primary/10 text-primary leading-none">
+                        {count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            {/* Undo / Redo (compactos) */}
+            <button onClick={handleUndo} disabled={!canUndoConfig}
+              className="p-2 rounded-xl text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] disabled:opacity-30 disabled:cursor-default transition-all flex-shrink-0"
+              title="Desfazer (Ctrl+Z)" aria-label="Desfazer">
+              <Undo2 size={16} />
+            </button>
+            <button onClick={handleRedo} disabled={!canRedoConfig}
+              className="p-2 rounded-xl text-[hsl(var(--dash-text-subtle))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] disabled:opacity-30 disabled:cursor-default transition-all flex-shrink-0"
+              title="Refazer (Ctrl+Y)" aria-label="Refazer">
+              <Redo2 size={16} />
+            </button>
           </div>
 
           {/* Tab content */}
@@ -2256,13 +2240,13 @@ const DashboardPagina = () => {
             {activeTab === "vitrine" && (
               <div className="space-y-4">
 
-                {/* CTA — abre modal profissional */}
-                <div>
+                {/* CTA — discreto, foco nos produtos */}
+                <div className="flex justify-end">
                   <button
                     onClick={() => setShowAddModal(true)}
-                    className="w-full btn-primary-gradient text-sm font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
+                    className="btn-primary-gradient text-[13px] font-semibold px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition-transform active:scale-[0.97] shadow-sm"
                   >
-                    <Plus size={18} /> Adicionar à Vitrine
+                    <Plus size={15} /> Adicionar
                   </button>
 
                   <Dialog open={showAddModal} onOpenChange={v => { setShowAddModal(v); if (!v) setAiIdeas(null); }}>
