@@ -300,38 +300,51 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
     </div>
   ) : null;
 
-  /* VIDEO HERO — preview de aula/set/talk com play button (Stan-style content block) */
+  /* VIDEO HERO — frame de vídeo "tocando" estilo YouTube embed (sem play overlay) */
   const renderVideoHero = () => ref.video ? (
-    <div className="relative w-full overflow-hidden rounded-[14px]" style={{ height: 145, boxShadow: cardDepthShadow }}>
+    <div className="relative w-full overflow-hidden rounded-[12px] bg-black" style={{ height: 158, boxShadow: cardDepthShadow }}>
+      {/* Frame do vídeo */}
       <img src={ref.video.thumbnail} alt="" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" />
-      {/* Dark overlay */}
-      <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.30) 35%, rgba(0,0,0,0.15) 100%)" }} />
-      {/* Play button center */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-[44px] h-[44px] rounded-full flex items-center justify-center shadow-2xl" style={{
-          background: "rgba(255,255,255,0.95)",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.4), 0 0 0 8px rgba(255,255,255,0.12)",
-        }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#0a0a0a" style={{ marginLeft: 2 }}><path d="M8 5v14l11-7z"/></svg>
-        </div>
-      </div>
-      {/* Duration badge top-right */}
-      {ref.video.duration && (
-        <div className="absolute top-2 right-2 px-1.5 py-[2px] rounded text-[8px] font-bold tabular-nums" style={{ background: "rgba(0,0,0,0.75)", color: "#fff", backdropFilter: "blur(4px)" }}>
-          {ref.video.duration}
-        </div>
-      )}
-      {/* Title bottom */}
-      <div className="absolute inset-x-0 bottom-0 p-3">
-        <p className="text-[11px] text-white leading-tight line-clamp-1" style={{ fontWeight: 800, letterSpacing: "-0.02em", textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}>
+
+      {/* Title overlay top — aparece SÓ no início do vídeo (estilo YouTube) */}
+      <div className="absolute top-0 inset-x-0 px-3 pt-2 pb-6" style={{
+        background: "linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.20) 60%, transparent 100%)",
+      }}>
+        <p className="text-[10.5px] text-white leading-tight line-clamp-2" style={{ fontWeight: 700, letterSpacing: "-0.015em", textShadow: "0 1px 3px rgba(0,0,0,0.65)" }}>
           {ref.video.title}
         </p>
-        {ref.video.views && (
-          <p className="text-[8px] text-white/80 mt-0.5 font-medium" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}>
-            ▶ {ref.video.views} views
-          </p>
-        )}
       </div>
+
+      {/* YouTube control bar real — estilo player tocando */}
+      <div className="absolute bottom-0 inset-x-0">
+        {/* Progress bar vermelha (parcialmente tocada) */}
+        <div className="relative w-full h-[3px] bg-white/25">
+          <div className="absolute top-0 left-0 h-full" style={{ width: "38%", background: "#FF0000" }} />
+          <div className="absolute top-1/2 -translate-y-1/2 w-[8px] h-[8px] rounded-full bg-[#FF0000] shadow-md" style={{ left: "calc(38% - 4px)" }} />
+        </div>
+        {/* Bottom chrome bar */}
+        <div className="flex items-center justify-between px-2 py-1.5" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.35) 100%)" }}>
+          {/* Left: pause icon (vídeo em reprodução) + tempo */}
+          <div className="flex items-center gap-1.5">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="#fff"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+            <span className="text-[7.5px] text-white font-medium tabular-nums" style={{ letterSpacing: "0.01em" }}>
+              4:42 / {ref.video.duration || "12:34"}
+            </span>
+          </div>
+          {/* Right: YouTube logo */}
+          <div className="flex items-center gap-0.5">
+            <svg width="13" height="9" viewBox="0 0 24 17" fill="#FF0000"><path d="M23.498 2.654a2.99 2.99 0 0 0-2.108-2.117C19.522.04 12 .04 12 .04s-7.522 0-9.39.497A2.99 2.99 0 0 0 .502 2.654C0 4.532 0 8.45 0 8.45s0 3.918.502 5.796a2.99 2.99 0 0 0 2.108 2.117C4.478 16.86 12 16.86 12 16.86s7.522 0 9.39-.497a2.99 2.99 0 0 0 2.108-2.117C24 12.368 24 8.45 24 8.45s0-3.918-.502-5.796z"/><path fill="#fff" d="M9.5 12.18l6.5-3.73-6.5-3.73v7.46z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      {/* Live "ao vivo" indicator (subtle, top-right) — opcional, dá vibe de transmissão */}
+      {ref.video.views && (
+        <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-[2px] rounded" style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+          <span className="text-[7.5px] font-bold text-white" style={{ letterSpacing: "0.04em" }}>{ref.video.views}</span>
+        </div>
+      )}
     </div>
   ) : null;
 

@@ -396,21 +396,22 @@ export const DESIGN_PACKS: DesignPack[] = [
       { title: "Mentoria para DJs", price: "R$ 497", emoji: "🎧" },
     ],
     sampleLinks: [{ title: "Meu kit de beats", type: "spotlight" }, { title: "Agendar sessão", type: "link" }],
-    preview: { bg: "#ec4899", accent: "#ffffff", accent2: "#fbbf24" },
-    config: { theme: "neon-pink", design: {
-      bgType: "gradient", bgGradient: ["#ec4899", "#8b5cf6"], bgGradientDir: "to-br",
+    preview: { bg: "#0a0612", accent: "#ec4899", accent2: "#a855f7" },
+    config: { theme: "pure-black", design: {
+      /* DJ Cyber Dark — fundo deep navy/preto, neon accent só nos detalhes (legível) */
+      bgType: "gradient", bgGradient: ["#0a0612", "#1a0d2e"], bgGradientDir: "to-br",
       buttonShape: "pill", buttonFill: "glass", buttonShadow: "md", buttonRadius: 999,
       /* DJ: Space Grotesk — tipografia tech/cyber estilo Spotify/Beatport */
       fontHeading: "Space Grotesk", fontBody: "Space Grotesk",
-      profileShape: "circle", profileBorder: true, profileBorderColor: "#ffffff",
-      profileGlow: true, profileGlowColor: "#ffffff", profileSize: 80,
-      accentColor: "#ffffff", accentColor2: "#fbbf24",
-      textColor: "#ffffff", subtextColor: "rgba(255,255,255,0.88)",
+      profileShape: "circle", profileBorder: true, profileBorderColor: "#ec4899",
+      profileGlow: true, profileGlowColor: "#ec4899", profileSize: 80,
+      accentColor: "#ec4899", accentColor2: "#a855f7",
+      textColor: "#ffffff", subtextColor: "rgba(255,255,255,0.78)",
       nameColor: "#ffffff", productTitleColor: "#ffffff",
-      priceColor: "#ffffff", originalPriceColor: "rgba(255,255,255,0.55)",
-      descriptionColor: "rgba(255,255,255,0.85)",
-      cardBg: "rgba(255,255,255,0.14)", cardBorder: "rgba(255,255,255,0.22)",
-      textShadow: 1,
+      priceColor: "#ffffff", originalPriceColor: "rgba(255,255,255,0.45)",
+      descriptionColor: "rgba(255,255,255,0.75)",
+      cardBg: "rgba(255,255,255,0.06)", cardBorder: "rgba(236,72,153,0.18)",
+      textShadow: 0,
       heroLayout: "full-cover", productDisplayStyle: "expanded",
     }}
   },
