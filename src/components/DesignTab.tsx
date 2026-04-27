@@ -342,11 +342,9 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
               const offset = idx - activePackIdx;
               const absOffset = Math.abs(offset);
               const visible = absOffset <= 2;
-              /* Posição: ±220px por offset. Scale e opacity caem nas laterais */
-              const translateX = offset * 230;
-              const scale = absOffset === 0 ? 1 : (absOffset === 1 ? 0.82 : 0.68);
-              const opacity = absOffset === 0 ? 1 : (absOffset === 1 ? 0.55 : 0.22);
-              const blur = absOffset === 0 ? 0 : (absOffset === 1 ? 0.5 : 1.5);
+              /* SEM blur, SEM fade agressivo — apenas posicionamento limpo */
+              const translateX = offset * 250;
+              const scale = absOffset === 0 ? 1 : 0.92;
               const isJustApplied = justApplied === pack.id;
               return (
                 <div
@@ -359,9 +357,8 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
                   className={`absolute transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${offset !== 0 ? "cursor-pointer" : ""}`}
                   style={{
                     transform: `translateX(${translateX}px) scale(${scale})`,
-                    opacity: visible ? opacity : 0,
+                    opacity: visible ? 1 : 0,
                     zIndex: 10 - absOffset,
-                    filter: blur > 0 ? `blur(${blur}px)` : undefined,
                     pointerEvents: visible ? "auto" : "none",
                   }}
                 >
