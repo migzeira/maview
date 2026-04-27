@@ -257,46 +257,68 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         </p>
       </div>
 
-      {/* ═══ 1) CAROUSEL DE TEMPLATES PREMIUM — 8 showcase, grandes e chamativos ─── */}
-      <div className="relative rounded-3xl bg-gradient-to-br from-[hsl(var(--dash-surface))] via-[hsl(var(--dash-bg))] to-[hsl(var(--dash-accent))]/30 border border-[hsl(var(--dash-border-subtle))] p-6 overflow-hidden">
-        <div className="flex items-center justify-between mb-4">
+      {/* ═══ 1) CAROUSEL DE TEMPLATES PREMIUM — perspective + snap + dots ─── */}
+      <div className="relative rounded-3xl bg-[hsl(var(--dash-surface))]/40 border border-[hsl(var(--dash-border-subtle))] overflow-hidden">
+        {/* Header minimalista */}
+        <div className="flex items-center justify-between px-6 pt-5 pb-2">
           <div>
-            <h3 className="text-[hsl(var(--dash-text))] font-bold text-[18px] flex items-center gap-2 tracking-tight">
-              <Sparkles size={18} className="text-primary" /> 8 Templates Premium
+            <h3 className="text-[hsl(var(--dash-text))] font-bold text-[16px] flex items-center gap-2 tracking-tight">
+              <Sparkles size={15} className="text-primary" /> 8 Templates Premium
             </h3>
-            <p className="text-[12px] text-[hsl(var(--dash-text-subtle))] mt-0.5">
-              Clique em qualquer um para aplicar · layout + cores + fonte prontos
+            <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] mt-0.5">
+              {filteredPacks[activePackIdx]?.label} · {activePackIdx + 1}/{filteredPacks.length}
             </p>
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => scrollCarousel("left")}
-              className="w-10 h-10 rounded-full bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border))] hover:scale-110 active:scale-90 transition-all flex items-center justify-center shadow-sm"
+              onClick={() => {
+                const nextIdx = (activePackIdx - 1 + filteredPacks.length) % filteredPacks.length;
+                setActivePackIdx(nextIdx);
+                applyPack(filteredPacks[nextIdx]);
+                /* Scroll suave pra ancorar */
+                const card = carouselRef.current?.children[nextIdx] as HTMLElement;
+                if (card) card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+              }}
+              className="w-10 h-10 rounded-full bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border))] hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center shadow-sm hover:shadow-lg hover:shadow-primary/20"
               aria-label="Voltar"
             >
-              <ChevronLeft size={16} />
+              <ChevronLeft size={15} />
             </button>
             <button
-              onClick={() => scrollCarousel("right")}
-              className="w-10 h-10 rounded-full bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border))] hover:scale-110 active:scale-90 transition-all flex items-center justify-center shadow-sm"
+              onClick={() => {
+                const nextIdx = (activePackIdx + 1) % filteredPacks.length;
+                setActivePackIdx(nextIdx);
+                applyPack(filteredPacks[nextIdx]);
+                const card = carouselRef.current?.children[nextIdx] as HTMLElement;
+                if (card) card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+              }}
+              className="w-10 h-10 rounded-full bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border))] hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center shadow-sm hover:shadow-lg hover:shadow-primary/20"
               aria-label="Avançar"
             >
-              <ChevronRight size={16} />
+              <ChevronRight size={15} />
             </button>
           </div>
         </div>
 
-        {/* Template cards — horizontal scroll grande e chamativo */}
+        {/* Template cards — perspective scroll com snap center */}
         <div
           ref={carouselRef}
-          className="flex gap-6 overflow-x-auto pb-6 pt-2 scrollbar-none snap-x snap-mandatory"
-          style={{ scrollPaddingLeft: 24 }}
+          className="flex gap-4 overflow-x-auto pb-4 pt-6 scrollbar-none snap-x snap-mandatory px-[15%]"
+          style={{ perspective: "1200px" }}
         >
           {filteredPacks.map((pack, idx) => {
             const isActive = idx === activePackIdx;
             const isJustApplied = justApplied === pack.id;
             return (
-              <div key={pack.id} className="flex-shrink-0 snap-start">
+              <div
+                key={pack.id}
+                className="flex-shrink-0 snap-center transition-all duration-500 ease-out"
+                style={{
+                  transform: isActive ? "scale(1) translateZ(0)" : "scale(0.85) translateZ(-50px)",
+                  opacity: isActive ? 1 : 0.45,
+                  filter: isActive ? "blur(0px)" : "blur(1px)",
+                }}
+              >
                 <div className={`relative transition-all duration-300 ${isJustApplied ? "animate-in zoom-in-95" : ""}`}>
                   <PhoneMockup
                     pack={pack}
@@ -304,6 +326,8 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
                     onClick={() => {
                       setActivePackIdx(idx);
                       applyPack(pack);
+                      const card = carouselRef.current?.children[idx] as HTMLElement;
+                      if (card) card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
                     }}
                     liveDesign={isActive ? d : undefined}
                   />
@@ -313,17 +337,46 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
                       <Check size={12} /> Aplicado!
                     </div>
                   )}
-                  {/* Nome do template destacado abaixo */}
-                  <div className="mt-3 text-center">
-                    <p className={`text-[14px] font-bold ${isActive ? "text-primary" : "text-[hsl(var(--dash-text))]"}`}>
-                      {pack.label}
-                    </p>
-                    <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] mt-0.5">{pack.desc}</p>
-                  </div>
                 </div>
               </div>
             );
           })}
+        </div>
+
+        {/* Dots de paginação — premium */}
+        <div className="flex items-center justify-center gap-2 pb-5">
+          {filteredPacks.map((p, idx) => {
+            const isActive = idx === activePackIdx;
+            return (
+              <button
+                key={p.id}
+                onClick={() => {
+                  setActivePackIdx(idx);
+                  applyPack(p);
+                  const card = carouselRef.current?.children[idx] as HTMLElement;
+                  if (card) card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+                }}
+                className={`transition-all duration-300 rounded-full ${
+                  isActive
+                    ? "w-8 h-2 bg-primary shadow-md shadow-primary/40"
+                    : "w-2 h-2 bg-[hsl(var(--dash-border))] hover:bg-[hsl(var(--dash-text-muted))]"
+                }`}
+                aria-label={`Ver template ${p.label}`}
+              />
+            );
+          })}
+        </div>
+
+        {/* Nome + descrição do ATIVO — animado */}
+        <div className="text-center pb-6 px-6">
+          <p className="text-[16px] font-bold text-[hsl(var(--dash-text))] transition-all duration-300" key={`name-${activePackIdx}`}
+             style={{ animation: "fadeSlideUp 0.3s ease both" }}>
+            {filteredPacks[activePackIdx]?.label}
+          </p>
+          <p className="text-[12px] text-[hsl(var(--dash-text-subtle))] mt-0.5" key={`desc-${activePackIdx}`}
+             style={{ animation: "fadeSlideUp 0.3s ease 0.05s both" }}>
+            {filteredPacks[activePackIdx]?.desc}
+          </p>
         </div>
       </div>
 
