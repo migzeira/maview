@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Bot, Send, Sparkles, RotateCcw, Copy, Check,
+  Send, Sparkles, RotateCcw, Copy, Check,
   FileText, ShoppingBag, Image, Hash, User, Lightbulb,
   ChevronDown, ChevronUp,
 } from "lucide-react";
+import StanleyAvatar from "@/components/StanleyAvatar";
 
 /* ─── Types ─────────────────────────────────────────────────── */
 interface Message {
@@ -175,16 +176,19 @@ const DashboardIA = () => {
   return (
     <div className="max-w-[1100px] mx-auto px-4 md:px-8 py-8 md:py-10">
 
-      {/* ── Header ── */}
-      <div className="mb-6">
-        <div className="flex items-center gap-3 mb-1">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-fuchsia-500 to-purple-600 flex items-center justify-center">
-            <Bot size={20} className="text-white" />
+      {/* ── Header com Stanley mascot premium ── */}
+      <div className="mb-7 flex items-center gap-4">
+        <StanleyAvatar size="xl" variant="card" animated />
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-[28px] md:text-[32px] font-extrabold text-[hsl(var(--dash-text))] tracking-tight">Stanley</h1>
+            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              Online
+            </span>
           </div>
-          <div>
-            <h1 className="text-[22px] font-extrabold text-[hsl(var(--dash-text))] tracking-tight">IA Maview</h1>
-            <p className="text-[hsl(var(--dash-text-subtle))] text-xs">Seu assistente de criação e vendas</p>
-          </div>
+          <p className="text-[hsl(var(--dash-text-muted))] text-[14px] mt-0.5">
+            Sua IA de marketing e vendas · Criação de bio, produtos, ofertas e ideias
+          </p>
         </div>
       </div>
 
@@ -248,14 +252,12 @@ const DashboardIA = () => {
           <div className="flex items-center justify-between px-5 py-3.5 border-b border-[hsl(var(--dash-border-subtle))] flex-shrink-0">
             <div className="flex items-center gap-2.5">
               <div className="relative">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-fuchsia-500 to-purple-600 flex items-center justify-center">
-                  <Bot size={14} className="text-white" />
-                </div>
+                <StanleyAvatar size="md" variant="glow" />
                 <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-white" />
               </div>
               <div>
-                <p className="text-[13px] font-semibold text-[hsl(var(--dash-text))]">IA Maview</p>
-                <p className="text-[11px] text-emerald-500 font-medium">Online</p>
+                <p className="text-[13px] font-semibold text-[hsl(var(--dash-text))]">Stanley</p>
+                <p className="text-[11px] text-emerald-500 font-medium">Online · IA do Maview</p>
               </div>
             </div>
             {messages.length > 0 && (
@@ -272,13 +274,11 @@ const DashboardIA = () => {
           <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center gap-4 py-8">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-fuchsia-100 to-purple-100 flex items-center justify-center">
-                  <Bot size={28} className="text-fuchsia-500" />
-                </div>
+                <StanleyAvatar size="xl" variant="glow" animated />
                 <div>
-                  <p className="text-[hsl(var(--dash-text))] font-semibold text-[16px]">Olá! Sou a IA Maview 👋</p>
-                  <p className="text-[hsl(var(--dash-text-muted))] text-[13px] mt-1 max-w-[300px]">
-                    Posso criar bios, descrições de produtos, planos de conteúdo e muito mais. Use os templates ou escreva sua pergunta!
+                  <p className="text-[hsl(var(--dash-text))] font-bold text-[18px]">Oi, eu sou o Stanley 👋</p>
+                  <p className="text-[hsl(var(--dash-text-muted))] text-[13px] mt-1.5 max-w-[340px] leading-relaxed">
+                    Sua IA de marketing pessoal. Posso criar bio, descrição de produto, plano de conteúdo, ideias de oferta e muito mais. <strong>O que vamos atacar hoje?</strong>
                   </p>
                 </div>
                 <div className="flex flex-wrap justify-center gap-2 mt-2">
@@ -296,14 +296,16 @@ const DashboardIA = () => {
             ) : (
               messages.map((msg, i) => (
                 <div key={i} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                  {/* Avatar */}
-                  <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold ${
-                    msg.role === "user"
-                      ? "bg-gradient-to-br from-primary to-secondary text-white"
-                      : "bg-gradient-to-br from-fuchsia-500 to-purple-600 text-white"
-                  }`}>
-                    {msg.role === "user" ? "U" : <Bot size={14} />}
-                  </div>
+                  {/* Avatar — Stanley para assistant, U para user */}
+                  {msg.role === "assistant" ? (
+                    <div className="flex-shrink-0">
+                      <StanleyAvatar size="md" variant="glow" />
+                    </div>
+                  ) : (
+                    <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold bg-gradient-to-br from-primary to-secondary text-white">
+                      U
+                    </div>
+                  )}
 
                   {/* Bubble */}
                   <div className={`max-w-[75%] group`}>
@@ -330,11 +332,11 @@ const DashboardIA = () => {
               ))
             )}
 
-            {/* Loading bubble */}
+            {/* Loading bubble — Stanley pisca enquanto pensa */}
             {loading && (
               <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-fuchsia-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-                  <Bot size={14} className="text-white" />
+                <div className="flex-shrink-0">
+                  <StanleyAvatar size="md" variant="glow" animated />
                 </div>
                 <div className="px-4 py-3 rounded-2xl rounded-tl-sm bg-[hsl(var(--dash-surface-2))] border border-[hsl(var(--dash-border-subtle))]">
                   <div className="flex gap-1.5 items-center h-4">

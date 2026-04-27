@@ -198,11 +198,13 @@ const DashboardAnalytics = () => {
 
   return (
     <div className="max-w-[1100px] mx-auto px-4 md:px-8 py-8 md:py-10 space-y-6 page-enter">
-      {/* Header */}
+      {/* Header Apple-style: title gigante + subtitle */}
       <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h1 className="text-2xl md:text-[28px] font-bold text-[hsl(var(--dash-text))] tracking-tight">Analytics</h1>
-          <p className="text-[hsl(var(--dash-text-muted))] text-[14px]">Acompanhe o desempenho da sua vitrine</p>
+        <div className="space-y-1.5">
+          <h1 className="text-2xl md:text-[32px] font-extrabold text-[hsl(var(--dash-text))] tracking-tight">Análises</h1>
+          <p className="text-[hsl(var(--dash-text-muted))] text-[15px]">
+            Visualizações, cliques e conversão da sua loja em tempo real
+          </p>
         </div>
         {/* Period selector + Export */}
         <div className="flex items-center gap-2">

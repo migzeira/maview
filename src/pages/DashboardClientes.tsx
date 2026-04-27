@@ -157,14 +157,23 @@ const DashboardClientes = () => {
 
   return (
     <div className="max-w-[1100px] mx-auto px-4 md:px-8 py-8 md:py-10 space-y-6 page-enter">
-      {/* Header */}
+      {/* Header Apple-style: title gigante + contador inline + export */}
       <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h1 className="text-2xl md:text-[28px] font-bold text-[hsl(var(--dash-text))] tracking-tight">Clientes</h1>
-          <p className="text-[hsl(var(--dash-text-muted))] text-[14px]">Gerencie sua base de leads e compradores</p>
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl md:text-[32px] font-extrabold text-[hsl(var(--dash-text))] tracking-tight">Clientes</h1>
+            {stats.total > 0 && (
+              <span className="text-[12px] font-semibold text-[hsl(var(--dash-text-subtle))] bg-[hsl(var(--dash-surface-2))] px-2.5 py-1 rounded-full">
+                {stats.total} {stats.total === 1 ? "contato" : "contatos"}
+              </span>
+            )}
+          </div>
+          <p className="text-[hsl(var(--dash-text-muted))] text-[15px]">
+            Sua base de leads, compradores e seguidores em um só lugar
+          </p>
         </div>
         {filtered.length > 0 && (
-          <button onClick={handleExport} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 text-[13px] text-[hsl(var(--dash-text-secondary))] font-medium transition-all">
+          <button onClick={handleExport} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[hsl(var(--dash-surface))] border border-[hsl(var(--dash-border-subtle))] hover:border-primary/30 hover:shadow-md text-[13px] text-[hsl(var(--dash-text-secondary))] font-semibold transition-all">
             <Download size={14} /> Exportar CSV
           </button>
         )}
