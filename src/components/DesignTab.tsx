@@ -298,33 +298,12 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   const accent2 = d.accentColor2 || currentTheme.accent2 || "#ffffff";
 
   return (
-    <div className="space-y-6 pb-24">
-      {/* ═══ BANNER DE STATUS DA VITRINE ─── */}
-      <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
-        dirty
-          ? "bg-amber-500/10 border-amber-500/30"
-          : saveSuccess
-            ? "bg-emerald-500/10 border-emerald-500/30"
-            : "bg-emerald-500/5 border-emerald-500/20"
-      }`}>
-        <div className={`w-2 h-2 rounded-full ${dirty ? "bg-amber-500 animate-pulse" : "bg-emerald-500"}`} />
-        <div className="flex-1">
-          <p className={`text-[13px] font-semibold ${dirty ? "text-amber-600" : "text-emerald-600"}`}>
-            {dirty ? "Alterações não salvas" : saveSuccess ? "Alterações salvas com sucesso" : "Sua vitrine está LIVE"}
-          </p>
-          <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] mt-0.5">
-            {dirty
-              ? "Clique em \"Salvar\" no rodapé para publicar as mudanças"
-              : "Todas as alterações já aparecem na sua página pública"}
-          </p>
-        </div>
-      </div>
-
-      {/* ═══ HEADER ─── */}
+    <div className="space-y-5">
+      {/* ═══ HEADER limpo (estilo Stan) ─── */}
       <div>
-        <h2 className="text-[hsl(var(--dash-text))] font-bold text-[24px] tracking-tight">Escolha seu estilo</h2>
-        <p className="text-[hsl(var(--dash-text-subtle))] text-[13px] mt-1">
-          8 templates premium prontos · 1 clique aplica tudo (cor + fonte + layout)
+        <h2 className="text-[hsl(var(--dash-text))] font-bold text-[22px] tracking-tight">Editar Design</h2>
+        <p className="text-[hsl(var(--dash-text-subtle))] text-[13px] mt-0.5">
+          Escolha um template, ajuste cores e fonte. Mudanças aparecem em tempo real.
         </p>
       </div>
 
@@ -371,11 +350,10 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
           </div>
         </div>
 
-        {/* Template cards — perspective scroll com snap center */}
+        {/* Template cards — Stan-style: muitos visíveis, suave fade nos laterais */}
         <div
           ref={carouselRef}
-          className="flex gap-4 overflow-x-auto pb-4 pt-6 scrollbar-none snap-x snap-mandatory px-[15%]"
-          style={{ perspective: "1200px" }}
+          className="flex gap-3 overflow-x-auto pb-4 pt-4 scrollbar-none snap-x snap-mandatory px-6"
         >
           {filteredPacks.map((pack, idx) => {
             const isActive = idx === activePackIdx;
@@ -383,11 +361,10 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
             return (
               <div
                 key={pack.id}
-                className="flex-shrink-0 snap-center transition-all duration-500 ease-out"
+                className="flex-shrink-0 snap-center transition-all duration-300 ease-out"
                 style={{
-                  transform: isActive ? "scale(1) translateZ(0)" : "scale(0.85) translateZ(-50px)",
-                  opacity: isActive ? 1 : 0.45,
-                  filter: isActive ? "blur(0px)" : "blur(1px)",
+                  transform: isActive ? "scale(1)" : "scale(0.92)",
+                  opacity: isActive ? 1 : 0.6,
                 }}
               >
                 <div className={`relative transition-all duration-300 ${isJustApplied ? "animate-in zoom-in-95" : ""}`}>
@@ -451,72 +428,56 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         </div>
       </div>
 
-      {/* ═══ 2) CORES — 2 chips com popover ─── */}
+      {/* ═══ 2) CORES + FONTE — numa única linha (estilo Stan) ─── */}
       <div className="rounded-3xl bg-[hsl(var(--dash-surface))]/60 border border-[hsl(var(--dash-border-subtle))] p-5">
-        <h3 className="text-[hsl(var(--dash-text))] font-semibold text-[14px] mb-3">Cores</h3>
-        <div className="flex items-center gap-5">
-          <ColorChip
-            label="Cor principal"
-            value={accent}
-            onChange={v => setDesign("accentColor", v)}
-            swatches={BRAND_SWATCHES}
-          />
-          <ColorChip
-            label="Cor secundária"
-            value={accent2}
-            onChange={v => setDesign("accentColor2", v)}
-            swatches={BRAND_SWATCHES}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-5 items-end">
+          {/* Cores — 2 chips à esquerda */}
+          <div>
+            <p className="text-[11px] font-semibold text-[hsl(var(--dash-text-muted))] mb-2 uppercase tracking-wider">Cores</p>
+            <div className="flex items-center gap-3">
+              <ColorChip label="" value={accent} onChange={v => setDesign("accentColor", v)} swatches={BRAND_SWATCHES} />
+              <ColorChip label="" value={accent2} onChange={v => setDesign("accentColor2", v)} swatches={BRAND_SWATCHES} />
+            </div>
+          </div>
+          {/* Fonte — dropdown à direita ocupa espaço restante */}
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold text-[hsl(var(--dash-text-muted))] mb-2 uppercase tracking-wider">Fonte</p>
+            <FontPicker
+              value={d.fontHeading || "Inter"}
+              onChange={(font) => {
+                loadFont(font);
+                setDesign("fontHeading", font);
+                setDesign("fontBody", font);
+              }}
+            />
+          </div>
         </div>
       </div>
 
-      {/* ═══ 3) FONTE — dropdown customizado com cada fonte na sua própria tipografia ─── */}
-      <div className="rounded-3xl bg-[hsl(var(--dash-surface))]/60 border border-[hsl(var(--dash-border-subtle))] p-5">
-        <h3 className="text-[hsl(var(--dash-text))] font-semibold text-[14px] mb-3">Fonte</h3>
-        <FontPicker
-          value={d.fontHeading || "Inter"}
-          onChange={(font) => {
-            loadFont(font);
-            setDesign("fontHeading", font);
-            setDesign("fontBody", font);
-          }}
-        />
-      </div>
-
-      {/* ═══ 4) ACCORDION AVANÇADO — todo o poder escondido ─── */}
-      <div className="rounded-3xl bg-[hsl(var(--dash-surface))]/60 border border-[hsl(var(--dash-border-subtle))] overflow-hidden">
+      {/* ═══ Personalizar avançado — link discreto (estilo Stan) ─── */}
+      <div className="flex items-center justify-center pt-2">
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="w-full flex items-center justify-between px-5 py-4 hover:bg-[hsl(var(--dash-accent))]/30 transition-colors"
+          className="flex items-center gap-2 text-[12px] font-medium text-[hsl(var(--dash-text-muted))] hover:text-primary transition-colors group"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-              ⚙️
-            </div>
-            <div className="text-left">
-              <p className="text-[hsl(var(--dash-text))] font-semibold text-[13px]">Personalizar avançado</p>
-              <p className="text-[hsl(var(--dash-text-subtle))] text-[11px] mt-0.5">
-                Background, efeitos, formas, sombras, tipografia dupla, cores detalhadas...
-              </p>
-            </div>
-          </div>
+          <span>⚙️ Personalizar mais</span>
           <ChevronDown
-            size={18}
-            className="text-[hsl(var(--dash-text-subtle))] transition-transform"
+            size={12}
+            className="transition-transform group-hover:translate-y-0.5"
             style={{ transform: showAdvanced ? "rotate(180deg)" : "rotate(0deg)" }}
           />
         </button>
-
-        {showAdvanced && (
-          <div className="border-t border-[hsl(var(--dash-border-subtle))] p-4 animate-in slide-in-from-top-4 duration-300 bg-[hsl(var(--dash-bg))]/30">
-            <AdvancedEditor
-              design={d}
-              setDesign={setDesign}
-              onOpenProMode={() => setProModeOpen(true)}
-            />
-          </div>
-        )}
       </div>
+
+      {showAdvanced && (
+        <div className="rounded-2xl bg-[hsl(var(--dash-bg))]/40 border border-[hsl(var(--dash-border-subtle))] p-4 animate-in slide-in-from-top-2 fade-in duration-300">
+          <AdvancedEditor
+            design={d}
+            setDesign={setDesign}
+            onOpenProMode={() => setProModeOpen(true)}
+          />
+        </div>
+      )}
 
       {/* Modo Pro: Drawer/Sheet com TODO o poder do AdvancedContent original (50+ controles) */}
       <AdvancedDrawer
@@ -538,47 +499,29 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
         </p>
       </div>
 
-      {/* ═══ RODAPÉ FIXO CANCEL/SAVE (estilo Stan Store) ═══ */}
-      <div className="fixed bottom-0 left-0 right-0 md:left-[260px] z-40 bg-[hsl(var(--dash-surface))]/95 backdrop-blur-xl border-t border-[hsl(var(--dash-border))] px-6 py-3.5 flex items-center justify-between gap-3 shadow-2xl">
-        <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] flex items-center gap-2">
-          {dirty ? (
-            <>
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-              Você tem alterações não salvas
-            </>
-          ) : (
-            <>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              Tudo sincronizado
-            </>
-          )}
-        </p>
-        <div className="flex items-center gap-2">
+      {/* ═══ Cancel/Save BOTTOM-RIGHT discreto (idêntico Stan) — só aparece quando dirty ═══ */}
+      {dirty && (
+        <div className="fixed bottom-6 right-6 z-40 flex items-center gap-2 bg-[hsl(var(--dash-surface))]/95 backdrop-blur-xl border border-[hsl(var(--dash-border))] rounded-2xl px-3 py-2 shadow-2xl animate-in slide-in-from-bottom-4 fade-in duration-300">
           <button
             onClick={handleCancel}
-            disabled={!dirty}
-            className={`px-5 py-2.5 rounded-xl font-semibold text-[13px] transition-all ${
-              dirty
-                ? "bg-[hsl(var(--dash-surface-2))] text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-accent))] active:scale-95"
-                : "bg-transparent text-[hsl(var(--dash-text-subtle))] cursor-not-allowed opacity-50"
-            }`}
+            className="px-4 py-2 rounded-xl font-semibold text-[12px] text-[hsl(var(--dash-text-muted))] hover:text-[hsl(var(--dash-text))] hover:bg-[hsl(var(--dash-surface-2))] active:scale-95 transition-all"
           >
             Cancelar
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
-            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-[13px] transition-all shadow-lg ${
+            className={`flex items-center gap-1.5 px-5 py-2 rounded-xl font-semibold text-[12px] transition-all shadow-md ${
               saveSuccess
                 ? "bg-emerald-500 text-white"
-                : "bg-primary text-primary-foreground hover:scale-105 active:scale-95 hover:shadow-primary/30"
+                : "bg-primary text-primary-foreground hover:scale-105 active:scale-95"
             }`}
           >
-            {saving ? <Loader2 size={14} className="animate-spin" /> : saveSuccess ? <Check size={14} /> : <Save size={14} />}
+            {saving ? <Loader2 size={12} className="animate-spin" /> : saveSuccess ? <Check size={12} /> : <Save size={12} />}
             {saving ? "Salvando..." : saveSuccess ? "Salvo!" : "Salvar"}
           </button>
         </div>
-      </div>
+      )}
     </div>
   );
 }
