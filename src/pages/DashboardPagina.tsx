@@ -2357,6 +2357,39 @@ const DashboardPagina = () => {
                       </div>
                     )}
 
+                    {/* ═══ INDICADOR DE PROGRESSO — 5 campos essenciais ═══ */}
+                    {(() => {
+                      const filled = [
+                        !!(productForm.images?.length || productForm.emoji),  // 1. Imagem ou emoji
+                        !!productForm.title,                                  // 2. Título
+                        !!productForm.description,                            // 3. Descrição (opcional, conta se preenchida)
+                        !!productForm.price,                                  // 4. Preço (opcional)
+                        !!productForm.url,                                    // 5. Link/ação
+                      ].filter(Boolean).length;
+                      const isComplete = filled >= 3; // 3 obrigatórios pra produto válido
+                      return (
+                        <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-[hsl(var(--dash-surface-2))]/50 border border-[hsl(var(--dash-border-subtle))]">
+                          <div className="flex items-center gap-2">
+                            <div className="flex gap-0.5">
+                              {[0, 1, 2, 3, 4].map(i => (
+                                <div key={i} className={`h-1.5 w-5 rounded-full transition-all ${
+                                  i < filled ? "bg-primary" : "bg-[hsl(var(--dash-border))]"
+                                }`} />
+                              ))}
+                            </div>
+                            <p className="text-[11px] font-medium text-[hsl(var(--dash-text-muted))]">
+                              <span className={`font-bold ${isComplete ? "text-emerald-500" : "text-primary"}`}>{filled}/5</span> campos essenciais
+                            </p>
+                          </div>
+                          {isComplete && (
+                            <span className="text-[10px] font-bold text-emerald-500 flex items-center gap-1">
+                              <Check size={10} /> Pronto pra publicar
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })()}
+
                     {/* ═══ MEDIA: photos + video + gif ═══ */}
                     <input ref={productImageInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={handleProductImageUpload} />
                     <input ref={productVideoInputRef} type="file" accept="video/*" className="hidden" onChange={handleProductVideoUpload} />
