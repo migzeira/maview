@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, Palette, Square, User as UserIcon, Type, Image as ImageIcon, Layers, Settings2, Circle, Hexagon } from "lucide-react";
+import { ChevronDown, Palette, Square, User as UserIcon, Type, Layers, Settings2, Circle, Hexagon } from "lucide-react";
 import type { DesignConfig, BgType, ProfileShape, ButtonShape, ButtonFill, ButtonShadow, GradientDir } from "./constants";
 import { SOLID_COLORS, GRADIENT_PRESETS, BG_PATTERNS } from "./constants";
 import { ColorPicker } from "./utils";
@@ -87,7 +87,6 @@ function FundoSection({ design: d, setDesign }: { design: DesignConfig; setDesig
   const bgTypes: { id: BgType; label: string; icon: React.ReactNode }[] = [
     { id: "solid", label: "Sólido", icon: <div className="w-full h-full" style={{ background: "#6366f1" }} /> },
     { id: "gradient", label: "Gradient", icon: <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #f093fb, #f5576c)" }} /> },
-    { id: "image", label: "Imagem", icon: <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-900"><ImageIcon size={20} className="text-white/60" /></div> },
     { id: "pattern", label: "Padrão", icon: <div className="w-full h-full bg-slate-800" style={{ backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.2) 1px, transparent 1px)", backgroundSize: "8px 8px" }} /> },
   ];
 
@@ -166,11 +165,6 @@ function FundoSection({ design: d, setDesign }: { design: DesignConfig; setDesig
         </div>
       )}
 
-      {d.bgType === "image" && (
-        <p className="text-[11px] text-[hsl(var(--dash-text-subtle))] bg-[hsl(var(--dash-accent))]/30 rounded-lg px-3 py-2.5">
-          Upload de imagem disponível no <strong>Modo Pro</strong> (botão no final desta seção).
-        </p>
-      )}
     </div>
   );
 }
