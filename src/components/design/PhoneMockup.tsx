@@ -106,13 +106,18 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
     </div>
   );
 
-  /* Stats row */
+  /* Stats row — Stan-style com hairline separators verticais */
   const StatsRow = () => ref.stats && ref.stats.length > 0 ? (
-    <div className="flex justify-center gap-4 px-2 mt-1.5">
+    <div className="flex items-center justify-center px-3 mt-1.5">
       {ref.stats.map((s, i) => (
-        <div key={i} className="flex flex-col items-center">
-          <span className="text-[11px] font-extrabold leading-none" style={{ color: textC, letterSpacing: "-0.02em" }}>{s.value}</span>
-          <span className="text-[7px] leading-none mt-[2px] font-light opacity-55" style={{ color: textC, letterSpacing: "0.02em" }}>{s.label}</span>
+        <div key={i} className="flex items-center">
+          {i > 0 && (
+            <div className="w-px h-[18px] mx-3" style={{ background: `${textC}15` }} />
+          )}
+          <div className="flex flex-col items-center">
+            <span className="text-[11px] font-extrabold leading-none tabular-nums" style={{ color: textC, letterSpacing: "-0.025em" }}>{s.value}</span>
+            <span className="text-[7px] leading-none mt-[3px] uppercase opacity-45" style={{ color: textC, letterSpacing: "0.05em", fontWeight: 600 }}>{s.label}</span>
+          </div>
         </div>
       ))}
     </div>
@@ -134,6 +139,11 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
     background: dd.cardBg || `${accent}08`,
     border: `1px solid ${dd.cardBorder || `${accent}14`}`,
   };
+
+  /* Multi-layer depth shadow — Stan/Apple style refinement */
+  const cardDepthShadow = isLight
+    ? "0 1px 2px rgba(15,23,42,0.04), 0 4px 12px rgba(15,23,42,0.05), 0 12px 32px rgba(15,23,42,0.06)"
+    : "0 1px 2px rgba(0,0,0,0.20), 0 4px 12px rgba(0,0,0,0.25), 0 12px 32px rgba(0,0,0,0.30)";
 
   /* Hero banner — primary product with full-bleed image + pill CTA */
   const heroProduct = ref.products[0];
@@ -171,7 +181,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
     </div>
   ) : null;
   const renderHeroBanner = () => heroProduct ? (
-    <div className="relative w-full overflow-hidden rounded-[12px]" style={{ height: 135 }}>
+    <div className="relative w-full overflow-hidden rounded-[14px]" style={{ height: 135, boxShadow: cardDepthShadow }}>
       {heroProduct.image ? (
         <img src={heroProduct.image} alt="" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" />
       ) : (
@@ -180,15 +190,15 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
       <div className="absolute inset-0" style={{
         background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.50) 25%, rgba(0,0,0,0.15) 55%, transparent 80%)",
       }} />
-      <div className="absolute inset-x-0 bottom-0 p-2.5 flex items-end justify-between gap-2">
+      <div className="absolute inset-x-0 bottom-0 p-3 flex items-end justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <p className="text-[11px] text-white leading-tight" style={{ fontWeight: 700, letterSpacing: "-0.01em", textShadow: "0 2px 8px rgba(0,0,0,0.4)" }}>
+          <p className="text-[11.5px] text-white leading-[1.15] line-clamp-2" style={{ fontWeight: 800, letterSpacing: "-0.02em", textShadow: "0 2px 8px rgba(0,0,0,0.55)" }}>
             {heroProduct.title}
           </p>
-          <div className="flex items-center gap-1 mt-0.5">
-            <span className="text-[9.5px] font-bold text-white" style={{ textShadow: "0 1px 4px rgba(0,0,0,0.4)" }}>{heroProduct.price}</span>
-            {heroProduct.originalPrice && <span className="text-[8px] line-through opacity-60 text-white font-light">{heroProduct.originalPrice}</span>}
-            {heroProduct.discount && <span className="text-[6.5px] font-extrabold px-1 py-[1px] rounded-[3px]" style={{ background: "rgba(255,255,255,0.25)", color: "#fff" }}>{heroProduct.discount}</span>}
+          <div className="flex items-center gap-1.5 mt-1">
+            <span className="text-[10.5px] font-extrabold text-white tabular-nums" style={{ letterSpacing: "-0.03em", textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}>{heroProduct.price}</span>
+            {heroProduct.originalPrice && <span className="text-[8.5px] line-through opacity-55 text-white font-medium tabular-nums">{heroProduct.originalPrice}</span>}
+            {heroProduct.discount && <span className="text-[7.5px] font-extrabold px-1.5 py-[2px] rounded-[4px] tracking-wider" style={{ background: "rgba(255,255,255,0.22)", color: "#fff", backdropFilter: "blur(8px)" }}>{heroProduct.discount}</span>}
           </div>
         </div>
         {heroProduct.cta && (
@@ -208,7 +218,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
 
   /* Secondary product — large row card */
   const renderSecondaryCard = () => secondaryProduct ? (
-    <div className="overflow-hidden" style={{ borderRadius: 14, ...productCardStyle }}>
+    <div className="overflow-hidden" style={{ borderRadius: 14, ...productCardStyle, boxShadow: cardDepthShadow }}>
       <div className="flex items-center gap-2 p-2">
         {secondaryProduct.image ? (
           <img src={secondaryProduct.image} alt="" className="w-[44px] h-[44px] rounded-[9px] object-cover flex-shrink-0" crossOrigin="anonymous" loading="lazy" />
@@ -216,10 +226,10 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
           <div className="w-[44px] h-[44px] rounded-[9px] flex-shrink-0" style={{ background: `${accent}15` }} />
         )}
         <div className="flex-1 min-w-0">
-          <p className="text-[9.5px] truncate leading-tight" style={{ color: textC, fontWeight: 800, letterSpacing: "-0.01em" }}>{secondaryProduct.title}</p>
-          <div className="flex items-center gap-1 mt-[2px]">
-            <span className="text-[9px] font-extrabold" style={{ color: textC }}>{secondaryProduct.price}</span>
-            {secondaryProduct.originalPrice && <span className="text-[7.5px] line-through opacity-45 font-light" style={{ color: textC }}>{secondaryProduct.originalPrice}</span>}
+          <p className="text-[10px] truncate leading-tight" style={{ color: textC, fontWeight: 800, letterSpacing: "-0.018em" }}>{secondaryProduct.title}</p>
+          <div className="flex items-center gap-1.5 mt-[3px]">
+            <span className="text-[9.5px] font-extrabold tabular-nums" style={{ color: textC, letterSpacing: "-0.025em" }}>{secondaryProduct.price}</span>
+            {secondaryProduct.originalPrice && <span className="text-[8px] line-through opacity-45 font-medium tabular-nums" style={{ color: textC }}>{secondaryProduct.originalPrice}</span>}
           </div>
         </div>
         {secondaryProduct.cta && (

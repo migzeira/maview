@@ -303,7 +303,8 @@ export const DESIGN_PACKS: DesignPack[] = [
     config: { theme: "white", design: {
       bgType: "solid", bgColor: "#ffffff",
       buttonShape: "rounded", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 12,
-      fontHeading: "Plus Jakarta Sans", fontBody: "Plus Jakarta Sans",
+      /* Fotografia: Inter editorial, peso fino — estilo Vogue/Kinfolk */
+      fontHeading: "Inter", fontBody: "Inter",
       profileShape: "circle", profileBorder: false, profileSize: 84,
       accentColor: "#1a1a1a", accentColor2: "#737373",
       textColor: "#0a0a0a", subtextColor: "#737373",
@@ -327,7 +328,8 @@ export const DESIGN_PACKS: DesignPack[] = [
     config: { theme: "white", design: {
       bgType: "solid", bgColor: "#ffffff",
       buttonShape: "rounded", buttonFill: "solid", buttonShadow: "md", buttonRadius: 12,
-      fontHeading: "Plus Jakarta Sans", fontBody: "Plus Jakarta Sans",
+      /* Finanças: Manrope — wealth-tech moderna estilo Brex/Mercury */
+      fontHeading: "Manrope", fontBody: "Manrope",
       profileShape: "circle", profileBorder: true, profileBorderColor: "#1E5BFF", profileGlow: true, profileGlowColor: "#1E5BFF",
       profileSize: 96,
       accentColor: "#1E5BFF", accentColor2: "#4A8DFF",
@@ -353,7 +355,8 @@ export const DESIGN_PACKS: DesignPack[] = [
     config: { theme: "neon-pink", design: {
       bgType: "gradient", bgGradient: ["#ec4899", "#8b5cf6"], bgGradientDir: "to-br",
       buttonShape: "pill", buttonFill: "glass", buttonShadow: "md", buttonRadius: 999,
-      fontHeading: "Plus Jakarta Sans", fontBody: "Plus Jakarta Sans",
+      /* DJ: Space Grotesk — tipografia tech/cyber estilo Spotify/Beatport */
+      fontHeading: "Space Grotesk", fontBody: "Space Grotesk",
       profileShape: "circle", profileBorder: true, profileBorderColor: "#ffffff",
       profileGlow: true, profileGlowColor: "#ffffff", profileSize: 80,
       accentColor: "#ffffff", accentColor2: "#fbbf24",
@@ -379,7 +382,8 @@ export const DESIGN_PACKS: DesignPack[] = [
     config: { theme: "rose", design: {
       bgType: "solid", bgColor: "#fce7f3",
       buttonShape: "soft", buttonFill: "solid", buttonShadow: "md", buttonRadius: 14,
-      fontHeading: "Plus Jakarta Sans", fontBody: "Plus Jakarta Sans",
+      /* Beleza: DM Serif Display título elegante + Inter body — luxury feminino */
+      fontHeading: "DM Serif Display", fontBody: "Inter",
       profileShape: "circle", profileBorder: false, profileSize: 80,
       accentColor: "#be185d", accentColor2: "#d4a373",
       textColor: "#1a1a1a", subtextColor: "#78716c",
@@ -403,7 +407,8 @@ export const DESIGN_PACKS: DesignPack[] = [
     config: { theme: "cream", design: {
       bgType: "solid", bgColor: "#faf5ef",
       buttonShape: "rounded", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 10,
-      fontHeading: "Cormorant Garamond", fontBody: "Plus Jakarta Sans",
+      /* Branding: Cormorant editorial + Inter body — agência design top */
+      fontHeading: "Cormorant Garamond", fontBody: "Inter",
       profileShape: "circle", profileBorder: false, profileSize: 84,
       accentColor: "#1a1a1a", accentColor2: "#78350f",
       textColor: "#1a1a1a", subtextColor: "#78716c",
@@ -427,7 +432,8 @@ export const DESIGN_PACKS: DesignPack[] = [
     config: { theme: "pure-black", design: {
       bgType: "solid", bgColor: "#050607",
       buttonShape: "rounded", buttonFill: "solid", buttonShadow: "glow", buttonRadius: 12,
-      fontHeading: "Plus Jakarta Sans", fontBody: "Plus Jakarta Sans",
+      /* Growth: Space Grotesk — tech maverick estilo Vercel/Linear */
+      fontHeading: "Space Grotesk", fontBody: "Space Grotesk",
       profileShape: "circle", profileBorder: false, profileSize: 80,
       accentColor: "#ffffff", accentColor2: "#1E5BFF",
       textColor: "#ffffff", subtextColor: "#C9CED6",
@@ -452,7 +458,8 @@ export const DESIGN_PACKS: DesignPack[] = [
       bgType: "gradient", bgGradient: ["#fdf6ec", "#f5e9d4"], bgGradientDir: "to-br",
       bgColor: "#fdf6ec",
       buttonShape: "pill", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 999,
-      fontHeading: "Cormorant Garamond", fontBody: "Plus Jakarta Sans",
+      /* Moda: Playfair Display editorial + Inter body — Vogue/Harper's Bazaar */
+      fontHeading: "Playfair Display", fontBody: "Inter",
       profileShape: "circle", profileBorder: false, profileSize: 84,
       accentColor: "#1a1a1a", accentColor2: "#d4a574",
       textColor: "#1a1a1a", subtextColor: "#78716c",
@@ -476,7 +483,8 @@ export const DESIGN_PACKS: DesignPack[] = [
     config: { theme: "forest", design: {
       bgType: "solid", bgColor: "#e8f0e4",
       buttonShape: "soft", buttonFill: "solid", buttonShadow: "sm", buttonRadius: 10,
-      fontHeading: "Cormorant Garamond", fontBody: "Plus Jakarta Sans",
+      /* Wellness: Lora humanista + Inter body — clínica Itaim/Jardins */
+      fontHeading: "Lora", fontBody: "Inter",
       profileShape: "circle", profileBorder: false, profileSize: 84,
       accentColor: "#15803d", accentColor2: "#a7a381",
       textColor: "#1a2e1a", subtextColor: "#52594a",

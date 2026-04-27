@@ -223,6 +223,16 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   /* Foco 100% nos 8 templates premium (showcase) — sem categorias, sem distração */
   const filteredPacks = DESIGN_PACKS.filter(p => p.category === "showcase");
 
+  /* Pre-load TODAS as fontes dos templates pra preview ficar fiel imediatamente */
+  useEffect(() => {
+    const fonts = new Set<string>();
+    filteredPacks.forEach(p => {
+      if (p.config.design.fontHeading) fonts.add(p.config.design.fontHeading);
+      if (p.config.design.fontBody) fonts.add(p.config.design.fontBody);
+    });
+    fonts.forEach(f => { if (f !== "Inter") loadFont(f); });
+  }, [filteredPacks]);
+
   /* ── Aplicar pack (mesma lógica do OLD, zero perda) ── */
   const applyPack = useCallback((pack: DesignPack) => {
     updateConfig("theme", pack.config.theme);
