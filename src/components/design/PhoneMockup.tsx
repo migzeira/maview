@@ -138,6 +138,23 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
   /* Hero banner — primary product with full-bleed image + pill CTA */
   const heroProduct = ref.products[0];
   const secondaryProduct = ref.products[1];
+  /* Links como pills clicáveis (Linktree-style) — entre hero e secondary, máx 2 */
+  const linkPills = (ref.links || []).slice(0, 2);
+  const renderLinkPills = () => linkPills.length > 0 ? (
+    <div className="space-y-[5px]">
+      {linkPills.map((linkText, i) => (
+        <div key={i} className="flex items-center justify-between gap-1.5 px-3 py-[7px]" style={{
+          ...productCardStyle,
+          borderRadius: dd.buttonShape === "pill" ? 999 : (dd.buttonShape === "square" ? 4 : 12),
+        }}>
+          <span className="text-[9px] truncate flex-1" style={{ color: textC, fontWeight: 700, letterSpacing: "-0.005em" }}>
+            {linkText.replace(/\s*→\s*$/, "")}
+          </span>
+          <span className="text-[10px] flex-shrink-0" style={{ color: accent, fontWeight: 800 }}>→</span>
+        </div>
+      ))}
+    </div>
+  ) : null;
   const renderHeroBanner = () => heroProduct ? (
     <div className="relative w-full overflow-hidden rounded-[12px]" style={{ height: 135 }}>
       {heroProduct.image ? (
@@ -366,6 +383,11 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
             {/* ═══ HERO BANNER — primary product ═══ */}
             <div className="px-3.5 mt-1.5 mb-1.5">
               {renderHeroBanner()}
+            </div>
+
+            {/* ═══ LINK PILLS — entre hero e secondary (Linktree-style) ═══ */}
+            <div className="px-3.5 mb-1.5">
+              {renderLinkPills()}
             </div>
 
             {/* ═══ SECONDARY — large row card ═══ */}

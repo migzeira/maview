@@ -125,7 +125,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     bio: "Estratégia e liberdade financeira 💰", verified: true,
     avatar: U("photo-1472099645785-5658abf4ff4e", 400, 500, "face"),
     socials: ["yt", "li", "ig"],
-    links: ["Consultoria VIP →", "Baixar guia grátis →"],
+    links: ["📊 Análise de carteira grátis", "💎 Newsletter VIP semanal"],
     products: [
       { title: "Consultoria VIP", price: "R$ 497", cta: "Quero agora",
         image: U("photo-1563013544-824ae1b704d3", 600, 400, "center") },
@@ -139,7 +139,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     bio: "Transformando eventos em experiências 🎧", verified: true,
     avatar: U("photo-1539571696357-5a69c17a67c6", 400, 500, "face"),
     socials: ["tt", "ig", "yt", "li"],
-    links: ["Kit de Beats", "Mentoria para DJs"],
+    links: ["🎧 Beat pack grátis essa semana", "🎤 Aula experimental sem custo"],
     products: [
       { title: "Kit de Beats Premium", price: "R$ 297", cta: "Baixar Pack",
         image: U("photo-1516280440614-37939bbacd81", 600, 400, "center") },
@@ -153,7 +153,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     avatar: U("photo-1494790108377-be9c29b29330", 500, 600, "face"),
     coverImage: U("photo-1522337360788-8b13dee7a37e", 600, 400, "center"),
     socials: ["pin", "ig", "tt", "li"],
-    links: ["Natural Glow Guide", "Rotina de Skincare"],
+    links: ["✨ Quiz: descubra seu skincare", "🌸 Newsletter beauty semanal"],
     products: [
       { title: "Natural Glow Guide", price: "R$ 80/mês", cta: "Inscrever-se",
         image: U("photo-1556228453-efd6c1ff04f6", 600, 400, "center") },
@@ -167,7 +167,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     bio: "Branding e posicionamento premium ✨", verified: true,
     avatar: U("photo-1573496359142-b8d87734a5a2", 400, 500, "face"),
     socials: ["ig", "pin", "tt", "li"],
-    links: ["The Brand Blueprint", "Sessão de Estratégia"],
+    links: ["📐 Auditoria de marca grátis", "💌 Conteúdo semanal de branding"],
     products: [
       { title: "The Brand Blueprint", price: "R$ 10", originalPrice: "R$ 20",
         cta: "Agendar",
@@ -182,7 +182,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     avatar: U("photo-1531427186611-ecfd6d936c79", 500, 600, "face"),
     coverImage: U("photo-1531427186611-ecfd6d936c79", 600, 400, "center"),
     socials: ["yt", "ig", "tt", "li"],
-    links: ["Mentoria Growth", "Guia grátis"],
+    links: ["🚀 Diagnóstico de tráfego grátis", "📈 Case studies dos top alunos"],
     products: [
       { title: "Mentoria Growth 1:1", price: "R$ 997", originalPrice: "R$ 1997",
         cta: "Mentoria VIP",
@@ -198,7 +198,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     avatar: U("photo-1488426862026-3ee34a7d66df", 500, 600, "face"),
     coverImage: U("photo-1529626455594-4ff0802cfb7e", 600, 400, "center"),
     socials: ["ig", "pin", "tt", "li"],
-    links: ["Análise de Coloração", "Mentoria Online"],
+    links: ["🎨 Teste de estilo grátis", "👗 Lookbook da temporada"],
     products: [
       { title: "Análise de Coloração Pessoal", price: "R$ 297", cta: "Comprar",
         image: U("photo-1522335789203-aabd1fc54bc9", 600, 400, "center") },
@@ -212,7 +212,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     verified: true,
     avatar: U("photo-1507003211169-0a1dd7228f2d", 500, 600, "face"),
     socials: ["ig", "pin", "tt", "li"],
-    links: ["Ensaio Corporativo", "Guia de Luz Natural"],
+    links: ["📸 Portfolio completo aqui", "🎁 Presets gratuitos pra editar"],
     products: [
       { title: "Ensaio Corporativo", price: "R$ 497", cta: "Ver Portfolio",
         image: U("photo-1519085360753-af0119f7cbe7", 600, 400, "center") },
@@ -226,7 +226,7 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     verified: true,
     avatar: U("photo-1559839734-2b71ea197ec2", 500, 600, "face"),
     socials: ["ig", "pin", "yt", "li"],
-    links: ["Consulta Integrativa", "Tratamento Premium"],
+    links: ["🌿 Quiz: qual tratamento ideal", "📞 Falar com especialista agora"],
     products: [
       { title: "Consulta Integrativa", price: "R$ 380", cta: "Falar com Especialista",
         image: U("photo-1544367567-0f2fcb009e0b", 600, 400, "center") },
