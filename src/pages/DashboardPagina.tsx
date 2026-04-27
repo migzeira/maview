@@ -14,6 +14,7 @@ import { initialLoad, saveWithSync, forceSaveNow, onSyncStatus, uploadImage, ret
 import { useHistory } from "@/hooks/useHistory";
 import DesignTab from "@/components/DesignTab";
 import OnboardingWizard from "@/components/OnboardingWizard";
+import FirstPublishCelebration, { shouldShowFirstPublish } from "@/components/FirstPublishCelebration";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Undo2, Redo2 } from "lucide-react";
 
@@ -483,6 +484,7 @@ const DashboardPagina = () => {
 
   // Onboarding
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   // Undo/Redo history
   const configHistoryRef = useRef<VitrineConfig[]>([]);
@@ -1067,6 +1069,10 @@ const DashboardPagina = () => {
   const completeOnboarding = () => {
     setShowOnboarding(false);
     setConfigAndSave(prev => ({ ...prev, onboardingDone: true }));
+    /* Trigger celebração da primeira publicação se ainda não foi mostrada */
+    if (shouldShowFirstPublish()) {
+      setTimeout(() => setShowCelebration(true), 600);
+    }
   };
 
   const leftPanelRef = useRef<HTMLDivElement>(null);
@@ -2163,6 +2169,15 @@ const DashboardPagina = () => {
             } catch (e) { console.error("Pack apply failed:", e); }
           }}
           onComplete={completeOnboarding}
+        />
+      )}
+
+      {/* ═══════════════ CELEBRAÇÃO DA PRIMEIRA PUBLICAÇÃO ═══════════════ */}
+      {showCelebration && (
+        <FirstPublishCelebration
+          username={config.username}
+          displayName={config.displayName}
+          onClose={() => setShowCelebration(false)}
         />
       )}
 
