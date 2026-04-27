@@ -514,35 +514,39 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
             {headerType === "edge-to-edge" && (
               <div className="w-full flex-shrink-0 relative overflow-hidden" style={{ height: 180 }}>
                 <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center 15%" }} crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
-                {/* Gradient com intensidade configurável por pack (minimal vs normal) */}
+                {/* Gradient — para light templates, fundo SÓLIDO atrás do texto pra garantir legibilidade */}
                 <div className="absolute inset-0" style={{
                   background: pack.edgeGradientIntensity === "minimal"
-                    /* MINIMAL: só uma sombra escura mínima nos últimos 8-10% para legibilidade do texto */
+                    /* MINIMAL: sombra escura mínima nos últimos 8-10% (só DJ) */
                     ? `linear-gradient(to top, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0.18) 10%, rgba(0,0,0,0.05) 18%, transparent 28%)`
-                    /* NORMAL: gradient equilibrado padrão */
-                    : `linear-gradient(to top, ${bg} 0%, ${bg}E8 15%, ${bg}80 30%, ${bg}25 42%, transparent 52%)`,
+                    : isLight
+                      /* LIGHT: bg SÓLIDO embaixo (40%) pra texto preto sempre legível */
+                      ? `linear-gradient(to top, ${bg} 0%, ${bg} 38%, ${bg}EE 50%, ${bg}80 62%, ${bg}30 72%, transparent 80%)`
+                      /* DARK: gradient equilibrado padrão */
+                      : `linear-gradient(to top, ${bg} 0%, ${bg}E8 15%, ${bg}80 30%, ${bg}25 42%, transparent 52%)`,
                 }} />
-                <div className="absolute bottom-2.5 left-3.5 right-3.5 flex flex-col items-center text-center">
+                <div className="absolute bottom-3 left-3.5 right-3.5 flex flex-col items-center text-center">
                   {(() => {
                     const isMinimalPack = pack.edgeGradientIntensity === "minimal";
-                    /* Drop-shadow LIMPO profissional (sem outline amador) — sombra suave com profundidade */
                     const cleanShadow = "0 2px 10px rgba(0,0,0,0.55), 0 1px 3px rgba(0,0,0,0.40)";
                     return (<>
                       <p className="text-[17px] leading-[1.02]" style={{
                         color: isMinimalPack ? "#fff" : (isLight ? textC : "#fff"),
-                        textShadow: isMinimalPack ? cleanShadow : (isLight ? "0 1px 2px rgba(255,255,255,0.4)" : "0 2px 10px rgba(0,0,0,0.55)"),
+                        /* SEM text-shadow em light (cria blur invisível). Em dark, mantém pra legibilidade. */
+                        textShadow: isMinimalPack ? cleanShadow : (isLight ? "none" : "0 2px 10px rgba(0,0,0,0.55)"),
                         fontWeight: 900, letterSpacing: "-0.025em",
                       }}>{ref.name}<VerifiedBadge /></p>
                       <p className="text-[10px] mt-0.5" style={{
                         color: isMinimalPack ? "#fff" : accent,
-                        textShadow: isMinimalPack ? cleanShadow : (isLight ? "0 1px 1px rgba(255,255,255,0.3)" : "0 1px 3px rgba(0,0,0,0.35)"),
+                        textShadow: isMinimalPack ? cleanShadow : (isLight ? "none" : "0 1px 3px rgba(0,0,0,0.35)"),
                         fontWeight: 800, letterSpacing: "0.02em"
                       }}>{ref.username}</p>
                       <p className="text-[9px] leading-[1.35] mt-1 line-clamp-2 px-1" style={{
                         color: isMinimalPack ? "#fff" : (isLight ? textC : "rgba(255,255,255,0.95)"),
                         textShadow: isMinimalPack ? cleanShadow : (isLight ? "none" : "0 1px 3px rgba(0,0,0,0.45)"),
-                        fontWeight: 700,
-                        opacity: isMinimalPack ? 1 : (isLight ? 0.88 : 1)
+                        fontWeight: 600,
+                        /* Light: 100% opaque pra contraste máximo. Dark: full visible. */
+                        opacity: 1,
                       }}>{ref.bio}</p>
                       <div className="mt-1.5"><SocialPills size="small" centered whiteGlass={isMinimalPack} /></div>
                     </>);
