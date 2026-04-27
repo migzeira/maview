@@ -26,15 +26,40 @@ import type { DesignPack } from "./design/constants";
    Parece Stan Store + Beacons, com o poder do Maview escondido.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ─── ColorChip: chip clicável com popover color picker ─── */
+/* ─── Recent colors persistidas em localStorage (estilo Stan) ─── */
+const RECENT_COLORS_KEY = "maview_recent_colors";
+function getRecentColors(): string[] {
+  try {
+    const raw = localStorage.getItem(RECENT_COLORS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+function pushRecentColor(color: string) {
+  try {
+    const current = getRecentColors().filter(c => c !== color);
+    const next = [color, ...current].slice(0, 6);
+    localStorage.setItem(RECENT_COLORS_KEY, JSON.stringify(next));
+  } catch { /* ignore */ }
+}
+
+/* ─── ColorChip: chip clicável com popover color picker + recent colors ─── */
 function ColorChip({ value, onChange, label, swatches }: {
   value: string; onChange: (v: string) => void; label: string; swatches: string[];
 }) {
   const [open, setOpen] = useState(false);
   const [hex, setHex] = useState(value);
+  const [recents, setRecents] = useState<string[]>([]);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => { setHex(value); }, [value]);
+  useEffect(() => { if (open) setRecents(getRecentColors()); }, [open]);
+
+  /* Wrapper que salva no histórico ao trocar cor */
+  const applyColor = (c: string) => {
+    setHex(c);
+    onChange(c);
+    pushRecentColor(c);
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -75,7 +100,7 @@ function ColorChip({ value, onChange, label, swatches }: {
                 onChange={e => {
                   const v = e.target.value;
                   setHex(v);
-                  if (/^#[0-9A-Fa-f]{6}$/.test(v)) onChange(v);
+                  if (/^#[0-9A-Fa-f]{6}$/.test(v)) { onChange(v); pushRecentColor(v); }
                 }}
                 className="w-full px-2 py-1.5 rounded-lg bg-[hsl(var(--dash-bg))] border border-[hsl(var(--dash-border))] text-[12px] font-mono uppercase focus:outline-none focus:ring-2 focus:ring-primary/40"
                 placeholder="#FF66B2"
@@ -88,25 +113,51 @@ function ColorChip({ value, onChange, label, swatches }: {
             <input
               type="color"
               value={value}
-              onChange={e => { setHex(e.target.value); onChange(e.target.value); }}
+              onChange={e => applyColor(e.target.value)}
               className="w-full h-10 rounded-lg cursor-pointer border border-[hsl(var(--dash-border))]"
             />
           </div>
 
-          {/* Swatches rápidos */}
-          <div className="grid grid-cols-6 gap-2">
-            {swatches.map(c => (
-              <button
-                key={c}
-                onClick={() => { setHex(c); onChange(c); }}
-                className="w-full aspect-square rounded-lg transition-all hover:scale-110 active:scale-95"
-                style={{
-                  background: c,
-                  boxShadow: value === c ? `0 0 0 2px hsl(var(--primary))` : `0 1px 3px rgba(0,0,0,0.15)`,
-                }}
-                aria-label={`Cor ${c}`}
-              />
-            ))}
+          {/* Recent colors (estilo Stan) — só mostra se tiver alguma */}
+          {recents.length > 0 && (
+            <div className="mb-3">
+              <p className="text-[9px] font-bold uppercase tracking-wider text-[hsl(var(--dash-text-subtle))] mb-1.5">Recentes</p>
+              <div className="flex gap-1.5 flex-wrap">
+                {recents.map(c => (
+                  <button
+                    key={`recent-${c}`}
+                    onClick={() => applyColor(c)}
+                    className="w-7 h-7 rounded-lg transition-all hover:scale-110 active:scale-95"
+                    style={{
+                      background: c,
+                      boxShadow: value === c ? `0 0 0 2px hsl(var(--primary))` : `0 1px 3px rgba(0,0,0,0.15)`,
+                    }}
+                    aria-label={`Cor recente ${c}`}
+                    title={c}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Swatches premium curados */}
+          <div>
+            <p className="text-[9px] font-bold uppercase tracking-wider text-[hsl(var(--dash-text-subtle))] mb-1.5">Paleta</p>
+            <div className="grid grid-cols-6 gap-2">
+              {swatches.map(c => (
+                <button
+                  key={c}
+                  onClick={() => applyColor(c)}
+                  className="w-full aspect-square rounded-lg transition-all hover:scale-110 active:scale-95"
+                  style={{
+                    background: c,
+                    boxShadow: value === c ? `0 0 0 2px hsl(var(--primary))` : `0 1px 3px rgba(0,0,0,0.15)`,
+                  }}
+                  aria-label={`Cor ${c}`}
+                  title={c}
+                />
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -114,10 +165,19 @@ function ColorChip({ value, onChange, label, swatches }: {
   );
 }
 
-/* ─── SwatchRecommended: paletas sugeridas baseadas em vibes ─── */
+/* ─── BRAND_SWATCHES: 12 cores premium curadas (estilo Stan) ───
+   Organizadas em ordem de uso: vibrantes mais usadas → neutras */
 const BRAND_SWATCHES = [
-  "#ec4899", "#8b5cf6", "#6366f1", "#3b82f6", "#06b6d4", "#10b981",
-  "#f59e0b", "#ef4444", "#14b8a6", "#a855f7", "#d946ef", "#0a0a0a",
+  /* Roxos/rosas (premium creator) */
+  "#a855f7", "#ec4899", "#d946ef",
+  /* Azuis (tech/trust) */
+  "#6366f1", "#3b82f6", "#0ea5e9",
+  /* Verdes/turquesa (saúde/wellness) */
+  "#10b981", "#14b8a6", "#06b6d4",
+  /* Quentes (energia/marketing) */
+  "#f59e0b", "#ef4444",
+  /* Neutro (pro/luxo) */
+  "#0a0a0a",
 ];
 
 /* ─── Main DesignTab v2 ─── */

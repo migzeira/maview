@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ChevronDown, Palette, Square, User as UserIcon, Type, Layers, Settings2, Circle, Hexagon } from "lucide-react";
 import type { DesignConfig, BgType, ProfileShape, ButtonShape, ButtonFill, ButtonShadow, GradientDir } from "./constants";
-import { SOLID_COLORS, GRADIENT_PRESETS, BG_PATTERNS } from "./constants";
+import { SOLID_COLORS, BG_PATTERNS } from "./constants";
 import { ColorPicker } from "./utils";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -127,21 +127,44 @@ function FundoSection({ design: d, setDesign }: { design: DesignConfig; setDesig
             <ColorPicker value={d.bgGradient?.[0] || "#667eea"} onChange={v => setDesign("bgGradient", [v, d.bgGradient?.[1] || "#764ba2"])} label="Cor 1" />
             <ColorPicker value={d.bgGradient?.[1] || "#764ba2"} onChange={v => setDesign("bgGradient", [d.bgGradient?.[0] || "#667eea", v])} label="Cor 2" />
           </div>
-          <p className="text-[10px] font-medium text-[hsl(var(--dash-text-subtle))]">Presets prontos</p>
-          <div className="grid grid-cols-6 gap-1.5">
-            {GRADIENT_PRESETS.slice(0, 18).map(([c1, c2], i) => (
-              <button key={i} onClick={() => setDesign("bgGradient", [c1, c2])}
-                className="w-full aspect-square rounded-lg ring-1 ring-[hsl(var(--dash-border))] hover:scale-110 transition-all"
-                style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }} />
-            ))}
+          <p className="text-[10px] font-medium text-[hsl(var(--dash-text-subtle))]">Presets curados</p>
+          {/* Gradient presets NOMEADOS — Stan-like memorável */}
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { name: "Royal", c1: "#667eea", c2: "#764ba2" },
+              { name: "Sunset", c1: "#f093fb", c2: "#f5576c" },
+              { name: "Ocean", c1: "#4facfe", c2: "#00f2fe" },
+              { name: "Mint", c1: "#43e97b", c2: "#38f9d7" },
+              { name: "Peach", c1: "#fa709a", c2: "#fee140" },
+              { name: "Lavender", c1: "#a18cd1", c2: "#fbc2eb" },
+              { name: "Honey", c1: "#f6d365", c2: "#fda085" },
+              { name: "Aurora", c1: "#c471f5", c2: "#fa71cd" },
+              { name: "Neon", c1: "#7f00ff", c2: "#e100ff" },
+              { name: "Midnight", c1: "#0f0c29", c2: "#302b63" },
+              { name: "Crimson", c1: "#200122", c2: "#6f0000" },
+              { name: "Forest", c1: "#11998e", c2: "#38ef7d" },
+            ].map(g => {
+              const isActive = d.bgGradient?.[0] === g.c1 && d.bgGradient?.[1] === g.c2;
+              return (
+                <button key={g.name}
+                  onClick={() => setDesign("bgGradient", [g.c1, g.c2])}
+                  className="relative group">
+                  <div className={`w-full aspect-square rounded-lg transition-all hover:scale-105 ${isActive ? "ring-2 ring-primary shadow-lg" : "ring-1 ring-[hsl(var(--dash-border))]"}`}
+                    style={{ background: `linear-gradient(135deg, ${g.c1}, ${g.c2})` }} />
+                  <p className={`text-[9px] font-bold mt-1 text-center transition-colors ${isActive ? "text-primary" : "text-[hsl(var(--dash-text-muted))]"}`}>
+                    {g.name}
+                  </p>
+                </button>
+              );
+            })}
           </div>
           <div>
             <p className="text-[10px] font-medium text-[hsl(var(--dash-text-subtle))] mb-1.5">Direção</p>
             <div className="grid grid-cols-4 gap-1.5">
               {(["to-b", "to-br", "to-r", "radial"] as GradientDir[]).map(dir => (
                 <button key={dir} onClick={() => setDesign("bgGradientDir", dir)}
-                  className={`py-1.5 rounded-lg text-[10px] font-medium ${d.bgGradientDir === dir ? "bg-primary/15 text-primary" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))]"}`}>
-                  {dir === "to-b" ? "↓" : dir === "to-br" ? "↘" : dir === "to-r" ? "→" : "◎ Radial"}
+                  className={`py-1.5 rounded-lg text-[10px] font-medium ${d.bgGradientDir === dir ? "bg-primary/15 text-primary ring-1 ring-primary/30" : "bg-[hsl(var(--dash-accent))] text-[hsl(var(--dash-text-muted))] hover:ring-1 hover:ring-primary/20"}`}>
+                  {dir === "to-b" ? "↓ Vertical" : dir === "to-br" ? "↘ Diagonal" : dir === "to-r" ? "→ Horizontal" : "◎ Radial"}
                 </button>
               ))}
             </div>
