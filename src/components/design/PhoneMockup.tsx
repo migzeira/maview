@@ -216,6 +216,62 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
     </div>
   ) : null;
 
+  /* HERO XL — versão gigante para layout "single-hero" (portfolio/lookbook focus) */
+  const renderHeroXL = () => heroProduct ? (
+    <div className="relative w-full overflow-hidden rounded-[16px]" style={{ height: 220, boxShadow: cardDepthShadow }}>
+      {heroProduct.image ? (
+        <img src={heroProduct.image} alt="" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" />
+      ) : (
+        <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${accent}40, ${accent2}50)` }} />
+      )}
+      <div className="absolute inset-0" style={{
+        background: "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 30%, rgba(0,0,0,0.10) 65%, transparent 85%)",
+      }} />
+      <div className="absolute inset-x-0 bottom-0 p-4">
+        <p className="text-[14px] text-white leading-[1.1] line-clamp-2 mb-1.5" style={{ fontWeight: 800, letterSpacing: "-0.025em", textShadow: "0 2px 12px rgba(0,0,0,0.6)" }}>
+          {heroProduct.title}
+        </p>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-[13px] font-extrabold text-white tabular-nums" style={{ letterSpacing: "-0.03em", textShadow: "0 1px 4px rgba(0,0,0,0.55)" }}>{heroProduct.price}</span>
+            {heroProduct.originalPrice && <span className="text-[10px] line-through opacity-55 text-white font-medium tabular-nums">{heroProduct.originalPrice}</span>}
+          </div>
+          {heroProduct.cta && (
+            <div className="px-3.5 py-[7px] rounded-full text-[10px] font-extrabold whitespace-nowrap" style={{
+              background: ctaGlow === "blue" ? MAVIEW_BLUE : "rgba(255,255,255,0.97)",
+              color: ctaGlow === "blue" ? "#fff" : "#0a0a0a",
+              backdropFilter: "blur(10px)",
+              letterSpacing: "-0.005em",
+              boxShadow: ctaGlowShadow,
+            }}>
+              {heroProduct.cta}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  ) : null;
+
+  /* PRODUCT GRID 2x2 — para layout "grid-catalog" (catálogo de produtos) */
+  const gridProducts = ref.products.slice(2, 6);
+  const renderProductGrid = () => gridProducts.length > 0 ? (
+    <div className="grid grid-cols-2 gap-1.5">
+      {gridProducts.slice(0, 4).map((p, i) => (
+        <div key={i} className="overflow-hidden" style={{ borderRadius: 10, ...productCardStyle, boxShadow: cardDepthShadow }}>
+          {p.image ? (
+            <img src={p.image} alt="" className="w-full h-[58px] object-cover" crossOrigin="anonymous" loading="lazy" />
+          ) : (
+            <div className="w-full h-[58px]" style={{ background: `${accent}20` }} />
+          )}
+          <div className="px-2 py-1.5">
+            <p className="text-[8.5px] truncate leading-tight" style={{ color: textC, fontWeight: 700, letterSpacing: "-0.015em" }}>{p.title}</p>
+            <p className="text-[8.5px] mt-[2px] tabular-nums" style={{ color: textC, fontWeight: 800, letterSpacing: "-0.025em" }}>{p.price}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  ) : null;
+
   /* Secondary product — large row card */
   const renderSecondaryCard = () => secondaryProduct ? (
     <div className="overflow-hidden" style={{ borderRadius: 14, ...productCardStyle, boxShadow: cardDepthShadow }}>
@@ -402,23 +458,59 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
               </>
             )}
 
-            {/* ═══ STATS — snug below header ═══ */}
-            <StatsRow />
+            {/* ═══ BODY LAYOUT VARIETY — composição muda por nicho (Stan-style) ═══ */}
+            {(() => {
+              const layout = pack.bodyLayout || "classic";
 
-            {/* ═══ HERO BANNER — primary product ═══ */}
-            <div className="px-3.5 mt-1.5 mb-1.5">
-              {renderHeroBanner()}
-            </div>
+              /* SINGLE-HERO: portfolio focus — hero gigante + 2 link pills, sem secondary */
+              if (layout === "single-hero") {
+                return (
+                  <>
+                    <StatsRow />
+                    <div className="px-3.5 mt-2">{renderHeroXL()}</div>
+                    <div className="px-3.5 mt-auto pb-1">{renderLinkPills()}</div>
+                  </>
+                );
+              }
 
-            {/* ═══ LINK PILLS — entre hero e secondary (Linktree-style) ═══ */}
-            <div className="px-3.5 mb-1.5">
-              {renderLinkPills()}
-            </div>
+              /* GRID-CATALOG: hero compacto + grid 2x2 de produtos + 1 link pill no fim */
+              if (layout === "grid-catalog") {
+                return (
+                  <>
+                    <StatsRow />
+                    <div className="px-3.5 mt-1.5 mb-1.5">{renderHeroBanner()}</div>
+                    <div className="px-3.5 mb-1.5">{renderProductGrid()}</div>
+                    <div className="px-3.5 mt-auto">
+                      {linkPills.length > 0 && (() => {
+                        const link = typeof linkPills[0] === "string" ? { title: (linkPills[0] as string).replace(/\s*→\s*$/, ""), image: undefined } : (linkPills[0] as { title: string; image?: string });
+                        const radius = dd.buttonShape === "pill" ? 999 : (dd.buttonShape === "square" ? 6 : 12);
+                        return (
+                          <div className="flex items-center gap-2 pr-2.5 pl-1 py-1 overflow-hidden" style={{ ...productCardStyle, borderRadius: radius }}>
+                            {link.image ? (
+                              <img src={link.image} alt="" className="w-[28px] h-[28px] flex-shrink-0 object-cover" style={{ borderRadius: Math.max(4, radius - 6) }} crossOrigin="anonymous" loading="lazy" />
+                            ) : (
+                              <div className="w-[28px] h-[28px] flex-shrink-0" style={{ background: `${accent}20`, borderRadius: Math.max(4, radius - 6) }} />
+                            )}
+                            <span className="text-[9px] truncate flex-1" style={{ color: textC, fontWeight: 700, letterSpacing: "-0.005em" }}>{link.title.replace(/^(\p{Emoji}\s*)/u, "")}</span>
+                            <span className="text-[10px] flex-shrink-0" style={{ color: accent, fontWeight: 800 }}>→</span>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  </>
+                );
+              }
 
-            {/* ═══ SECONDARY — large row card ═══ */}
-            <div className="px-3.5 mt-auto">
-              {renderSecondaryCard()}
-            </div>
+              /* CLASSIC (default): stats / hero / link pills / secondary */
+              return (
+                <>
+                  <StatsRow />
+                  <div className="px-3.5 mt-1.5 mb-1.5">{renderHeroBanner()}</div>
+                  <div className="px-3.5 mb-1.5">{renderLinkPills()}</div>
+                  <div className="px-3.5 mt-auto">{renderSecondaryCard()}</div>
+                </>
+              );
+            })()}
           </div>
 
           {/* ── Home indicator (iOS) ── */}

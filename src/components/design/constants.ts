@@ -170,6 +170,8 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
         image: U("photo-1556228453-efd6c1ff04f6", 600, 400, "center") },
       { title: "Consulta presencial · São Paulo", price: "R$ 280", cta: "Agendar",
         image: U("photo-1570172619644-dfd03ed5d881", 300, 200, "center") },
+      { title: "Sérum Glow Vit C", price: "R$ 187", image: U("photo-1556228720-195a672e8a03", 200, 200, "center") },
+      { title: "Kit Skincare Noturno", price: "R$ 297", image: U("photo-1571781926291-c477ebfd024b", 200, 200, "center") },
     ],
     stats: [{ value: "18k+", label: "Atendidas" }, { value: "4.9", label: "⭐" }, { value: "94%", label: "Recompra" }] },
 
@@ -259,6 +261,8 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
       { title: "Protocolo Longevity · 12 sessões HBOT", price: "R$ 8.900", originalPrice: "R$ 12.000",
         cta: "Agendar avaliação",
         image: U("photo-1540555700478-4be289fbecef", 300, 200, "center") },
+      { title: "Drenagem Linfática", price: "R$ 290", image: U("photo-1571019613454-1cb2f99b2d8b", 200, 200, "center") },
+      { title: "Bioimpedância", price: "R$ 180", image: U("photo-1559757175-5700dde675bc", 200, 200, "center") },
     ],
     stats: [{ value: "12 anos", label: "Itaim SP" }, { value: "6", label: "Médicos" }, { value: "5.2k", label: "Pacientes" }] },
 ];
@@ -282,6 +286,8 @@ export interface DesignPack {
   ctaGlow?: "accent" | "blue" | "none";
   /** Header layout style for showcase v6.0 — determines profile hero architecture */
   headerLayoutType?: "big-circle" | "edge-to-edge" | "floating-square" | "split-editorial";
+  /** BODY layout — controls product/link composition below header (Stan-style variety) */
+  bodyLayout?: "classic" | "single-hero" | "grid-catalog";
   /** Sample content for showcase packs — populated when user has no products */
   sampleProducts?: SampleProduct[];
   sampleLinks?: SampleLink[];
@@ -293,7 +299,7 @@ export const DESIGN_PACKS: DesignPack[] = [
 
   /* 0 — Fotografia Edge-to-Edge (Lucas) */
   { id: "showcase-fotografia", label: "Fotografia", desc: "Crisp portfolio clean", category: "showcase", refIdx: 11,
-    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "edge-to-edge",
+    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "edge-to-edge", bodyLayout: "single-hero",
     sampleProducts: [
       { title: "Ensaio Corporativo", price: "R$ 497", emoji: "📸" },
       { title: "Guia de Luz Natural", price: "R$ 97", emoji: "📖" },
@@ -318,7 +324,7 @@ export const DESIGN_PACKS: DesignPack[] = [
 
   /* 1 — Finanças Royal Blue (Mateus) */
   { id: "showcase-financas", label: "Finanças", desc: "Wealth management tech", category: "showcase", refIdx: 5,
-    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "big-circle",
+    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "big-circle", bodyLayout: "classic",
     sampleProducts: [
       { title: "Consultoria VIP", price: "R$ 497", emoji: "📊" },
       { title: "Guia de Investimentos", price: "R$ 60", emoji: "📗" },
@@ -345,7 +351,7 @@ export const DESIGN_PACKS: DesignPack[] = [
   /* 2 — DJ Full-Bleed Header (Léo) */
   { id: "showcase-dj", label: "DJ", desc: "Full-bleed glass cyber", category: "showcase", refIdx: 6,
     socialIconStyle: "brand", glassCards: true, ctaGlow: "accent", headerLayoutType: "edge-to-edge",
-    edgeGradientIntensity: "minimal",
+    edgeGradientIntensity: "minimal", bodyLayout: "classic",
     sampleProducts: [
       { title: "Kit de Beats Premium", price: "R$ 297", emoji: "🎵" },
       { title: "Mentoria para DJs", price: "R$ 497", emoji: "🎧" },
@@ -372,7 +378,7 @@ export const DESIGN_PACKS: DesignPack[] = [
 
   /* 3 — Beleza Glass Luxury (Beatriz — CENTRAL) */
   { id: "showcase-beleza", label: "Beleza", desc: "Rosa pastel luxury", category: "showcase", refIdx: 7,
-    socialIconStyle: "brand", glassCards: true, ctaGlow: "accent", headerLayoutType: "floating-square",
+    socialIconStyle: "brand", glassCards: true, ctaGlow: "accent", headerLayoutType: "floating-square", bodyLayout: "grid-catalog",
     sampleProducts: [
       { title: "Rotina de Skincare", price: "R$ 80", emoji: "🌸" },
       { title: "Guia do Brilho Natural", price: "R$ 80/mês", emoji: "✨" },
@@ -397,7 +403,7 @@ export const DESIGN_PACKS: DesignPack[] = [
 
   /* 4 — Branding Luxury Cream (Isabela) */
   { id: "showcase-branding", label: "Branding", desc: "Creme minimal premium", category: "showcase", refIdx: 8,
-    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "split-editorial",
+    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "split-editorial", bodyLayout: "classic",
     sampleProducts: [
       { title: "O Mapa da Marca", price: "R$ 10", emoji: "🗺️" },
       { title: "Sessão de Estratégia", price: "R$ 497", emoji: "💼" },
@@ -422,7 +428,7 @@ export const DESIGN_PACKS: DesignPack[] = [
 
   /* 5 — Growth Tech Maverick Dark (Vitor) */
   { id: "showcase-growth", label: "Growth", desc: "Dark tech maverick", category: "showcase", refIdx: 9,
-    socialIconStyle: "mono", ctaGlow: "blue", headerLayoutType: "big-circle",
+    socialIconStyle: "mono", ctaGlow: "blue", headerLayoutType: "big-circle", bodyLayout: "classic",
     sampleProducts: [
       { title: "Mentoria Growth 1:1", price: "R$ 997", emoji: "🚀" },
       { title: "Guia de Monetização", price: "Grátis", emoji: "📘" },
@@ -447,7 +453,7 @@ export const DESIGN_PACKS: DesignPack[] = [
 
   /* 6 — Moda Luxury Editorial (Julia) */
   { id: "showcase-moda", label: "Moda", desc: "Luxury editorial autoral", category: "showcase", refIdx: 10,
-    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "split-editorial",
+    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "split-editorial", bodyLayout: "single-hero",
     sampleProducts: [
       { title: "Análise de Coloração Pessoal", price: "R$ 297", emoji: "🎨" },
       { title: "Mentoria de Imagem Online", price: "R$ 497", emoji: "👗" },
@@ -473,7 +479,7 @@ export const DESIGN_PACKS: DesignPack[] = [
 
   /* 7 — Wellness Clínica Serenity */
   { id: "showcase-clinica", label: "Wellness", desc: "Integrative luxury clinic", category: "showcase", refIdx: 12,
-    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "floating-square",
+    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "floating-square", bodyLayout: "grid-catalog",
     sampleProducts: [
       { title: "Consulta Integrativa", price: "R$ 380", emoji: "🌿" },
       { title: "Tratamento Estético Premium", price: "R$ 890", emoji: "💆" },
