@@ -2133,7 +2133,7 @@ const DashboardPagina = () => {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-8">
+    <div className={`mx-auto px-4 md:px-8 py-8 ${activeTab === "design" ? "max-w-[1500px]" : "max-w-[1200px]"}`}>
 
       {/* Purple copy toast */}
       <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-2 px-5 py-2.5 rounded-full shadow-lg transition-all duration-300 pointer-events-none ${copyToastVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3"}`}
@@ -4222,8 +4222,8 @@ const DashboardPagina = () => {
           </div>
         </div>
 
-        {/* ── RIGHT PANEL: Phone preview (340px) ── */}
-        <div className="hidden lg:block">
+        {/* ── RIGHT PANEL: Phone preview (340px) — pushed right via translate em wide screens ── */}
+        <div className="hidden lg:block lg:translate-x-8 xl:translate-x-16 2xl:translate-x-24">
           <div className="sticky top-8">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[hsl(var(--dash-text-subtle))] text-xs font-medium tracking-wide">
