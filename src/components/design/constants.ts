@@ -161,21 +161,24 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
 
   /* 6 — DJ (Léo) */ { name: "Léo Dantas", username: "@leodantas.dj",
     bio: "Resident Green Valley · Top 50 Brasil EDM 2024 · 600+ shows pelo país", verified: true,
-    avatar: U("photo-1539571696357-5a69c17a67c6", 400, 500, "face"),
+    /* Avatar: DJ atrás da pickup (imagem comprovada Unsplash) */
+    avatar: U("photo-1571266028243-d220bc56b8b7", 400, 500, "center"),
     socials: ["tt", "ig", "yt", "li"],
     links: [
-      { title: "Sample pack exclusivo · grátis", image: U("photo-1493225457124-a3eb161ffa5f", 80, 80, "center") },
-      { title: "Próximas datas e ingressos", image: U("photo-1571266028243-d220bc56b8b7", 80, 80, "center") },
+      /* Cada link com sua própria imagem temática única */
+      { title: "Sample pack exclusivo · grátis", image: U("photo-1487180144351-b8472da7d491", 80, 80, "center") },
+      { title: "Próximas datas e ingressos", image: U("photo-1429962714451-bb934ecdc4ec", 80, 80, "center") },
     ],
     products: [
       { title: "DJ Method · curso completo de produção", price: "R$ 1.297", cta: "Quero o curso",
         image: U("photo-1516280440614-37939bbacd81", 600, 400, "center") },
       { title: "Mentoria 1:1 · 4 sessões particulares", price: "R$ 1.997", cta: "Agendar diagnóstico",
-        image: U("photo-1493225457124-a3eb161ffa5f", 300, 200, "center") },
+        image: U("photo-1598653222000-6b7b7a552625", 300, 200, "center") },
     ],
     stats: [{ value: "600+", label: "Shows" }, { value: "4.9", label: "⭐" }, { value: "180k", label: "Streams/mês" }],
     video: {
-      thumbnail: U("photo-1571266028243-d220bc56b8b7", 600, 400, "center"),
+      /* Festival crowd shot — distinct from link images */
+      thumbnail: U("photo-1492684223066-81342ee5ff30", 600, 400, "center"),
       title: "Set ao vivo · Festival XYZ 2024",
       duration: "12:34",
       views: "184k",
@@ -303,13 +306,14 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     portfolio: {
       title: "Trabalhos selecionados",
       cta: "Ver portfolio completo",
+      /* Faces aleatórias e únicas — diferentes dos avatars/testimonials usados no resto do app */
       images: [
-        U("photo-1519085360753-af0119f7cbe7", 200, 200, "center"),
-        U("photo-1488426862026-3ee34a7d66df", 200, 200, "center"),
-        U("photo-1507003211169-0a1dd7228f2d", 200, 200, "center"),
-        U("photo-1494790108377-be9c29b29330", 200, 200, "center"),
-        U("photo-1438761681033-6461ffad8d80", 200, 200, "center"),
-        U("photo-1500648767791-00dcc994a43e", 200, 200, "center"),
+        U("photo-1573497019940-1c28c88b4f3e", 200, 200, "center"),
+        U("photo-1633332755192-727a05c4013d", 200, 200, "center"),
+        U("photo-1531746020798-e6953c6e8e04", 200, 200, "center"),
+        U("photo-1521119989659-a83eee488004", 200, 200, "center"),
+        U("photo-1545996124-0501ebae84d0", 200, 200, "center"),
+        U("photo-1611432579699-484f7990b127", 200, 200, "center"),
       ],
     } },
 
