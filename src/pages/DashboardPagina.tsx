@@ -1398,10 +1398,8 @@ const DashboardPagina = () => {
           </div>
         </div>
 
-        {/* Dynamic Island */}
-        <div className="flex justify-center pb-3 flex-shrink-0">
-          <div className="w-[88px] h-[26px] rounded-full bg-black" />
-        </div>
+        {/* Sem dynamic island — iPhone clean estilo Stan */}
+        <div className="pb-2 flex-shrink-0" />
 
         {/* Image/effect overlay (darkening) — must stay inside the phone frame */}
         {(d.bgType === "image" || d.bgType === "video" || d.bgType === "pattern" || d.bgType === "effect") && (d.bgOverlay ?? 0) > 0 && (
@@ -2191,8 +2189,8 @@ const DashboardPagina = () => {
         />
       )}
 
-      {/* ── Grid: 2 cols normal, 1 col gigante quando aba "design" (carousel ocupa tela toda Stan-style) ── */}
-      <div className={`grid grid-cols-1 gap-6 ${activeTab !== "design" ? "lg:grid-cols-[1fr_400px]" : ""}`}>
+      {/* ── Two-column grid: tabs+conteúdo + preview iPhone fixo à direita (sempre visível) ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
 
         {/* ── LEFT PANEL ── */}
         <div className="min-w-0" ref={leftPanelRef}>
@@ -4224,8 +4222,8 @@ const DashboardPagina = () => {
           </div>
         </div>
 
-        {/* ── RIGHT PANEL: Phone preview (400px) — escondido na aba design (carousel já é preview) ── */}
-        <div className={`${activeTab === "design" ? "hidden" : "hidden lg:block"}`}>
+        {/* ── RIGHT PANEL: Phone preview (400px) — sempre visível pra ver mudanças em real-time ── */}
+        <div className="hidden lg:block">
           <div className="sticky top-8">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[hsl(var(--dash-text-subtle))] text-xs font-medium tracking-wide">

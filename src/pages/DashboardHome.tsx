@@ -692,10 +692,8 @@ const DashboardHome = () => {
                   </div>
                 </div>
 
-                {/* Dynamic Island */}
-                <div className="flex justify-center pb-3 flex-shrink-0">
-                  <div className="w-[88px] h-[26px] rounded-full bg-black" />
-                </div>
+                {/* Sem dynamic island — preview clean */}
+                <div className="pb-2 flex-shrink-0" />
 
                 {/* Scrollable screen content */}
                 <div className="flex-1 overflow-y-auto relative" style={{ fontFamily: `'${pFontB}', sans-serif` }}>
