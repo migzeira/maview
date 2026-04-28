@@ -1380,7 +1380,7 @@ const DashboardPagina = () => {
   })();
 
   const phonePreview = (
-    <div className="relative mx-auto" style={{ width: 360 }}>
+    <div className="relative mx-auto" style={{ width: 320 }}>
       <div className="rounded-[3rem] border-[4px] border-[hsl(var(--dash-text))] overflow-hidden shadow-2xl flex flex-col relative"
         style={{ aspectRatio: "9/18", ...previewBgStyle }}>
         {/* Status bar */}
@@ -2189,8 +2189,8 @@ const DashboardPagina = () => {
         />
       )}
 
-      {/* ── Two-column grid: gap GRANDE pra preview não invadir efeito flutuante do carousel ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 lg:gap-24">
+      {/* ── Two-column grid: preview 340px com gap-12, carousel respira na esquerda ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 lg:gap-12">
 
         {/* ── LEFT PANEL ── */}
         <div className="min-w-0" ref={leftPanelRef}>
@@ -4222,8 +4222,8 @@ const DashboardPagina = () => {
           </div>
         </div>
 
-        {/* ── RIGHT PANEL: Phone preview (400px) — translate-x pra afastar do carousel ── */}
-        <div className="hidden lg:block lg:translate-x-6 xl:translate-x-12">
+        {/* ── RIGHT PANEL: Phone preview (340px) ── */}
+        <div className="hidden lg:block">
           <div className="sticky top-8">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[hsl(var(--dash-text-subtle))] text-xs font-medium tracking-wide">

@@ -334,10 +334,10 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
   return (
     <div className="space-y-5">
       {/* ═══ CAROUSEL TEMPLATES — estilo Stan exato: múltiplos phones, centro destacado ─── */}
-      <div className="relative -ml-3 md:-ml-6 mr-0">
-        {/* Stage flutuante Stan-style — 5 phones visíveis com floating shadow */}
-        <div className="relative" style={{ height: 620, overflow: "visible" }}>
-          <div ref={carouselRef} className="absolute inset-0 flex items-center justify-center">
+      <div className="relative mx-auto" style={{ maxWidth: "100%" }}>
+        {/* Stage flutuante centralizado, scale 80% pra caber 5 phones sem cortar */}
+        <div className="relative" style={{ height: 540, overflow: "visible" }}>
+          <div ref={carouselRef} className="absolute inset-0 flex items-center justify-center" style={{ transform: "scale(0.82)" }}>
             {filteredPacks.map((pack, idx) => {
               const offset = idx - activePackIdx;
               const absOffset = Math.abs(offset);
