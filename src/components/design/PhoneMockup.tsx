@@ -426,6 +426,112 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
     </div>
   ) : null;
 
+  /* PORTFOLIO GRID — 3-col grid de fotos signature do fotógrafo (Stan-style image gallery) */
+  const renderPortfolioGrid = () => ref.portfolio ? (
+    <div className="overflow-hidden p-2.5" style={{ borderRadius: 14, ...productCardStyle, boxShadow: cardDepthShadow }}>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-[9px] font-extrabold uppercase tracking-wider" style={{ color: accent, letterSpacing: "0.06em" }}>
+          {ref.portfolio.title || "Portfolio"}
+        </p>
+        <span className="text-[8px] font-semibold opacity-50" style={{ color: textC }}>{ref.portfolio.images.length} obras</span>
+      </div>
+      <div className="grid grid-cols-3 gap-1">
+        {ref.portfolio.images.slice(0, 6).map((img, i) => (
+          <div key={i} className="relative overflow-hidden" style={{ aspectRatio: "1/1", borderRadius: 6, background: `linear-gradient(135deg, ${accent}30, ${accent2 || accent}40)` }}>
+            <img src={img} alt="" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
+          </div>
+        ))}
+      </div>
+      {ref.portfolio.cta && (
+        <div className="text-center mt-2 py-1.5 rounded-md text-[9px] font-extrabold" style={{
+          background: ctaGlow === "blue" ? MAVIEW_BLUE : accent,
+          color: ctaGlow === "blue" ? "#fff" : (isLight ? "#fff" : bg),
+          letterSpacing: "-0.005em",
+          boxShadow: ctaGlowShadow,
+        }}>
+          {ref.portfolio.cta} →
+        </div>
+      )}
+    </div>
+  ) : null;
+
+  /* CHART CARD — mini line chart com KPI (Stan-style data viz) */
+  const renderChartCard = () => ref.chart ? (() => {
+    const c = ref.chart;
+    const max = Math.max(...c.values);
+    const min = Math.min(...c.values);
+    const range = max - min || 1;
+    const w = 200, h = 50;
+    const step = w / (c.values.length - 1);
+    const path = c.values.map((v, i) => {
+      const x = i * step;
+      const y = h - ((v - min) / range) * h;
+      return `${i === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`;
+    }).join(" ");
+    const areaPath = `${path} L ${w} ${h} L 0 ${h} Z`;
+    const trendColor = c.positive !== false ? "#10b981" : "#ef4444";
+    return (
+      <div className="overflow-hidden p-3" style={{ borderRadius: 14, ...productCardStyle, boxShadow: cardDepthShadow }}>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-1">
+          <p className="text-[9px] font-extrabold uppercase tracking-wider" style={{ color: accent, letterSpacing: "0.06em" }}>
+            {c.title}
+          </p>
+          {c.period && <span className="text-[7.5px] font-semibold opacity-50" style={{ color: textC }}>{c.period}</span>}
+        </div>
+        {/* Big metric */}
+        <div className="flex items-baseline gap-2 mb-2">
+          <span className="text-[20px] font-extrabold tabular-nums leading-none" style={{ color: trendColor, letterSpacing: "-0.03em" }}>{c.metric}</span>
+          <span className="text-[9px] font-semibold tabular-nums" style={{ color: textC, opacity: 0.7, letterSpacing: "-0.01em" }}>{c.change}</span>
+        </div>
+        {/* Mini chart */}
+        <svg viewBox={`0 0 ${w} ${h}`} className="w-full" style={{ height: 50 }} preserveAspectRatio="none">
+          <defs>
+            <linearGradient id={`chartGrad-${pack.id}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={trendColor} stopOpacity="0.3" />
+              <stop offset="100%" stopColor={trendColor} stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path d={areaPath} fill={`url(#chartGrad-${pack.id})`} />
+          <path d={path} stroke={trendColor} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          {/* Last point dot */}
+          <circle cx={w} cy={h - ((c.values[c.values.length - 1] - min) / range) * h} r="3" fill={trendColor} />
+          <circle cx={w} cy={h - ((c.values[c.values.length - 1] - min) / range) * h} r="6" fill={trendColor} fillOpacity="0.25" />
+        </svg>
+      </div>
+    );
+  })() : null;
+
+  /* LOOKBOOK SCROLL — fashion-style horizontal scroll de looks (Stan editorial) */
+  const renderLookbookScroll = () => ref.lookbook ? (
+    <div className="overflow-hidden">
+      <div className="flex items-center justify-between mb-2 px-1">
+        <p className="text-[9px] font-extrabold uppercase tracking-wider" style={{ color: accent, letterSpacing: "0.06em" }}>
+          {ref.lookbook.title || "Lookbook"}
+        </p>
+        <span className="text-[8px] font-semibold opacity-50" style={{ color: textC }}>{ref.lookbook.images.length} looks</span>
+      </div>
+      <div className="flex gap-1.5 overflow-x-auto scrollbar-none -mx-3.5 px-3.5 pb-1">
+        {ref.lookbook.images.map((look, i) => (
+          <div key={i} className="relative flex-shrink-0 overflow-hidden" style={{
+            width: 78, height: 116,
+            borderRadius: 8,
+            background: `linear-gradient(135deg, ${accent}30, ${accent2 || accent}40)`,
+            boxShadow: cardDepthShadow,
+          }}>
+            <img src={look.src} alt="" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 50%)" }} />
+            {look.label && (
+              <p className="absolute bottom-1.5 left-1.5 right-1.5 text-[8px] font-extrabold text-white leading-tight" style={{ letterSpacing: "-0.01em", textShadow: "0 1px 3px rgba(0,0,0,0.6)" }}>
+                {look.label}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  ) : null;
+
   /* Secondary product — large row card */
   const renderSecondaryCard = () => secondaryProduct ? (
     <div className="overflow-hidden" style={{ borderRadius: 14, ...productCardStyle, boxShadow: cardDepthShadow }}>
@@ -690,6 +796,42 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
                     <StatsRow />
                     <div className="px-3.5 mt-1.5 mb-1.5">{renderBookingWidget()}</div>
                     <div className="px-3.5 mb-1.5">{renderLinkPills()}</div>
+                    <div className="px-3.5 mt-auto">{renderSecondaryCard()}</div>
+                  </>
+                );
+              }
+
+              /* PORTFOLIO-GRID: stats / hero compacto / grid 3-col de fotos / link */
+              if (layout === "portfolio-grid") {
+                return (
+                  <>
+                    <StatsRow />
+                    <div className="px-3.5 mt-1.5 mb-1.5">{renderHeroBanner()}</div>
+                    <div className="px-3.5 mb-1.5">{renderPortfolioGrid()}</div>
+                    <div className="px-3.5 mt-auto">{renderLinkPills()}</div>
+                  </>
+                );
+              }
+
+              /* METRICS-CHART: stats / chart com KPI + linha / hero / link */
+              if (layout === "metrics-chart") {
+                return (
+                  <>
+                    <StatsRow />
+                    <div className="px-3.5 mt-1.5 mb-1.5">{renderChartCard()}</div>
+                    <div className="px-3.5 mb-1.5">{renderHeroBanner()}</div>
+                    <div className="px-3.5 mt-auto">{renderLinkPills()}</div>
+                  </>
+                );
+              }
+
+              /* LOOKBOOK-SCROLL: stats / hero / scroll horizontal de looks / secondary */
+              if (layout === "lookbook-scroll") {
+                return (
+                  <>
+                    <StatsRow />
+                    <div className="px-3.5 mt-1.5 mb-1.5">{renderHeroBanner()}</div>
+                    <div className="px-3.5 mb-1.5">{renderLookbookScroll()}</div>
                     <div className="px-3.5 mt-auto">{renderSecondaryCard()}</div>
                   </>
                 );

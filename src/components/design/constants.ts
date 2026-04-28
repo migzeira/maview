@@ -57,6 +57,9 @@ export type RefLink = string | { title: string; image?: string };
 export interface RefTestimonial { quote: string; author: string; role?: string; avatar?: string; rating?: number; }
 export interface RefVideo { thumbnail: string; title: string; duration?: string; views?: string; }
 export interface RefBooking { title: string; nextDate: string; slots: string[]; cta: string; }
+export interface RefPortfolio { title?: string; images: string[]; cta?: string; }
+export interface RefChart { title: string; metric: string; change: string; period?: string; values: number[]; positive?: boolean; }
+export interface RefLookbook { title?: string; images: { src: string; label?: string }[]; }
 export interface ReferenceProfile {
   name: string; username: string; bio: string; avatar: string;
   coverImage?: string;
@@ -74,6 +77,9 @@ export interface ReferenceProfile {
   testimonial?: RefTestimonial;
   video?: RefVideo;
   booking?: RefBooking;
+  portfolio?: RefPortfolio;
+  chart?: RefChart;
+  lookbook?: RefLookbook;
 }
 
 const U = (id: string, w = 200, h = 200, crop = "center") =>
@@ -143,7 +149,15 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
         cta: "Baixar",
         image: U("photo-1579621970588-a35d0e7ab9b6", 300, 200, "center") },
     ],
-    stats: [{ value: "R$420M", label: "Sob gestão" }, { value: "4.9", label: "⭐" }, { value: "850+", label: "Clientes" }] },
+    stats: [{ value: "R$420M", label: "Sob gestão" }, { value: "4.9", label: "⭐" }, { value: "850+", label: "Clientes" }],
+    chart: {
+      title: "Carteira recomendada",
+      metric: "+24,8%",
+      change: "+R$ 84.320",
+      period: "12 meses · YTD",
+      values: [42, 48, 45, 56, 60, 58, 68, 72, 78, 82, 88, 96],
+      positive: true,
+    } },
 
   /* 6 — DJ (Léo) */ { name: "Léo Dantas", username: "@leodantas.dj",
     bio: "Resident Green Valley · Top 50 Brasil EDM 2024 · 600+ shows pelo país", verified: true,
@@ -258,7 +272,16 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
         cta: "Garantir vaga",
         image: U("photo-1490481651871-ab68de25d43d", 300, 200, "center") },
     ],
-    stats: [{ value: "200+", label: "Celebs" }, { value: "L'Officiel", label: "Colab" }, { value: "12 anos", label: "estrada" }] },
+    stats: [{ value: "200+", label: "Celebs" }, { value: "L'Officiel", label: "Colab" }, { value: "12 anos", label: "estrada" }],
+    lookbook: {
+      title: "Lookbook · Outono / Inverno 2024",
+      images: [
+        { src: U("photo-1490481651871-ab68de25d43d", 240, 360, "center"), label: "Casual chic" },
+        { src: U("photo-1529626455594-4ff0802cfb7e", 240, 360, "center"), label: "Power dressing" },
+        { src: U("photo-1488426862026-3ee34a7d66df", 240, 360, "center"), label: "Black tie" },
+        { src: U("photo-1522335789203-aabd1fc54bc9", 240, 360, "center"), label: "Smart casual" },
+      ],
+    } },
 
   /* 11 — Fotografia (Lucas) */ { name: "Lucas Pereira", username: "@lucas.perfil_critico",
     bio: "Premiado WPPI 2023 · Capa Vogue Brasil · Branding shoot para Stone, Nubank e Magalu",
@@ -276,7 +299,19 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
         cta: "Inscrever-se",
         image: U("photo-1513151233558-d860c5398176", 300, 200, "center") },
     ],
-    stats: [{ value: "WPPI", label: "premiado" }, { value: "320+", label: "Branding" }, { value: "Vogue", label: "publicado" }] },
+    stats: [{ value: "WPPI", label: "premiado" }, { value: "320+", label: "Branding" }, { value: "Vogue", label: "publicado" }],
+    portfolio: {
+      title: "Trabalhos selecionados",
+      cta: "Ver portfolio completo",
+      images: [
+        U("photo-1519085360753-af0119f7cbe7", 200, 200, "center"),
+        U("photo-1488426862026-3ee34a7d66df", 200, 200, "center"),
+        U("photo-1507003211169-0a1dd7228f2d", 200, 200, "center"),
+        U("photo-1494790108377-be9c29b29330", 200, 200, "center"),
+        U("photo-1438761681033-6461ffad8d80", 200, 200, "center"),
+        U("photo-1500648767791-00dcc994a43e", 200, 200, "center"),
+      ],
+    } },
 
   /* 12 — Wellness (Clínica Serenity) */ { name: "Clínica Serenity", username: "@clinica.serenity_estetica",
     bio: "Pioneiros em HBOT e Ozonioterapia · Equipe com 6 médicos CRM · 12 anos · Itaim Bibi SP",
@@ -326,7 +361,7 @@ export interface DesignPack {
   /** Header layout style for showcase v6.0 — determines profile hero architecture */
   headerLayoutType?: "big-circle" | "edge-to-edge" | "floating-square" | "split-editorial";
   /** BODY layout — controls product/link composition below header (Stan-style variety) */
-  bodyLayout?: "classic" | "single-hero" | "grid-catalog" | "testimonial" | "video-hero" | "booking";
+  bodyLayout?: "classic" | "single-hero" | "grid-catalog" | "testimonial" | "video-hero" | "booking" | "portfolio-grid" | "metrics-chart" | "lookbook-scroll";
   /** Sample content for showcase packs — populated when user has no products */
   sampleProducts?: SampleProduct[];
   sampleLinks?: SampleLink[];
@@ -338,7 +373,7 @@ export const DESIGN_PACKS: DesignPack[] = [
 
   /* 0 — Fotografia Edge-to-Edge (Lucas) */
   { id: "showcase-fotografia", label: "Fotografia", desc: "Crisp portfolio clean", category: "showcase", refIdx: 11,
-    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "edge-to-edge", bodyLayout: "single-hero",
+    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "edge-to-edge", bodyLayout: "portfolio-grid",
     sampleProducts: [
       { title: "Ensaio Corporativo", price: "R$ 497", emoji: "📸" },
       { title: "Guia de Luz Natural", price: "R$ 97", emoji: "📖" },
@@ -363,7 +398,7 @@ export const DESIGN_PACKS: DesignPack[] = [
 
   /* 1 — Finanças Royal Blue (Mateus) */
   { id: "showcase-financas", label: "Finanças", desc: "Wealth management tech", category: "showcase", refIdx: 5,
-    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "big-circle", bodyLayout: "classic",
+    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "big-circle", bodyLayout: "metrics-chart",
     sampleProducts: [
       { title: "Consultoria VIP", price: "R$ 497", emoji: "📊" },
       { title: "Guia de Investimentos", price: "R$ 60", emoji: "📗" },
@@ -493,7 +528,7 @@ export const DESIGN_PACKS: DesignPack[] = [
 
   /* 6 — Moda Luxury Editorial (Julia) */
   { id: "showcase-moda", label: "Moda", desc: "Luxury editorial autoral", category: "showcase", refIdx: 10,
-    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "split-editorial", bodyLayout: "single-hero",
+    socialIconStyle: "mono", ctaGlow: "accent", headerLayoutType: "split-editorial", bodyLayout: "lookbook-scroll",
     sampleProducts: [
       { title: "Análise de Coloração Pessoal", price: "R$ 297", emoji: "🎨" },
       { title: "Mentoria de Imagem Online", price: "R$ 497", emoji: "👗" },
