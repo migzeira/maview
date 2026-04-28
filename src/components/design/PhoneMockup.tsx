@@ -199,7 +199,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
       background: `linear-gradient(135deg, ${accent}, ${accent2 || accent})`,
     }}>
       {heroProduct.image && (
-        <img src={heroProduct.image} alt="" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
+        <img src={heroProduct.image} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: "center 30%" }} crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
       )}
       <div className="absolute inset-0" style={{
         background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.50) 25%, rgba(0,0,0,0.15) 55%, transparent 80%)",
@@ -238,7 +238,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
       background: `linear-gradient(135deg, ${accent}, ${accent2 || accent})`,
     }}>
       {heroProduct.image && (
-        <img src={heroProduct.image} alt="" className="absolute inset-0 w-full h-full object-cover" crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
+        <img src={heroProduct.image} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: "center 25%" }} crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
       )}
       <div className="absolute inset-0" style={{
         background: "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 30%, rgba(0,0,0,0.10) 65%, transparent 85%)",

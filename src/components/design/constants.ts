@@ -161,8 +161,8 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
 
   /* 6 — DJ (Léo) */ { name: "Léo Dantas", username: "@leodantas.dj",
     bio: "Resident Green Valley · Top 50 Brasil EDM 2024 · 600+ shows pelo país", verified: true,
-    /* Avatar: DJ atrás da pickup (imagem comprovada Unsplash) */
-    avatar: U("photo-1571266028243-d220bc56b8b7", 400, 500, "center"),
+    /* Avatar Léo — restaurado retrato com crop=faces pra garantir centralização do rosto */
+    avatar: U("photo-1531891437562-4301cf35b7e4", 400, 500, "faces"),
     socials: ["tt", "ig", "yt", "li"],
     links: [
       /* Cada link com sua própria imagem temática única */
@@ -297,23 +297,23 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
     ],
     products: [
       { title: "Ensaio Executive Branding · 4h estúdio", price: "R$ 2.890", cta: "Reservar data",
-        image: U("photo-1519085360753-af0119f7cbe7", 600, 400, "center") },
+        image: U("photo-1519085360753-af0119f7cbe7", 600, 400, "faces") },
       { title: "Curso Retrato Profissional · 8 semanas", price: "R$ 1.297", originalPrice: "R$ 1.997",
         cta: "Inscrever-se",
-        image: U("photo-1513151233558-d860c5398176", 300, 200, "center") },
+        image: U("photo-1513151233558-d860c5398176", 300, 200, "faces") },
     ],
     stats: [{ value: "WPPI", label: "premiado" }, { value: "320+", label: "Branding" }, { value: "Vogue", label: "publicado" }],
     portfolio: {
       title: "Trabalhos selecionados",
       cta: "Ver portfolio completo",
-      /* Faces aleatórias e únicas — diferentes dos avatars/testimonials usados no resto do app */
+      /* Mix portfolio profissional: portraits + paisagens icônicas + arquitetura */
       images: [
-        U("photo-1573497019940-1c28c88b4f3e", 200, 200, "center"),
-        U("photo-1633332755192-727a05c4013d", 200, 200, "center"),
-        U("photo-1531746020798-e6953c6e8e04", 200, 200, "center"),
-        U("photo-1521119989659-a83eee488004", 200, 200, "center"),
-        U("photo-1545996124-0501ebae84d0", 200, 200, "center"),
-        U("photo-1611432579699-484f7990b127", 200, 200, "center"),
+        U("photo-1473580044384-7ba9967e16a0", 200, 200, "center"),  /* Grand Canyon */
+        U("photo-1531366936337-7c912a4589a7", 200, 200, "center"),  /* Aurora Boreal */
+        U("photo-1573497019940-1c28c88b4f3e", 200, 200, "faces"),    /* Portrait pro */
+        U("photo-1464822759023-fed622ff2c3b", 200, 200, "center"),  /* Montanhas alpinas */
+        U("photo-1519741497674-611481863552", 200, 200, "center"),  /* Casamento */
+        U("photo-1507525428034-b723cf961d3e", 200, 200, "center"),  /* Praia tropical */
       ],
     } },
 
