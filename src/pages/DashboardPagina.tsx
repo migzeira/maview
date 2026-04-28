@@ -2189,8 +2189,8 @@ const DashboardPagina = () => {
         />
       )}
 
-      {/* ── Two-column grid: tabs+conteúdo + preview iPhone fixo à direita (gap maior pra não bater no carousel) ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 lg:gap-14">
+      {/* ── Two-column grid: gap GRANDE pra preview não invadir efeito flutuante do carousel ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 lg:gap-24">
 
         {/* ── LEFT PANEL ── */}
         <div className="min-w-0" ref={leftPanelRef}>
@@ -4222,8 +4222,8 @@ const DashboardPagina = () => {
           </div>
         </div>
 
-        {/* ── RIGHT PANEL: Phone preview (400px) — sempre visível pra ver mudanças em real-time ── */}
-        <div className="hidden lg:block">
+        {/* ── RIGHT PANEL: Phone preview (400px) — translate-x pra afastar do carousel ── */}
+        <div className="hidden lg:block lg:translate-x-6 xl:translate-x-12">
           <div className="sticky top-8">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[hsl(var(--dash-text-subtle))] text-xs font-medium tracking-wide">
