@@ -335,11 +335,16 @@ export default function DesignTab({ config, themes, defaultDesign, updateConfig,
     <div className="space-y-5">
       {/* ═══ CAROUSEL TEMPLATES — estilo Stan exato: múltiplos phones, centro destacado ─── */}
       <div className="relative mx-auto" style={{ maxWidth: "100%" }}>
-        {/* Stage flutuante centralizado, scale 92% pra ficar maior e legível */}
-        <div className="relative" style={{ height: 600, overflow: "visible" }}>
-          <div ref={carouselRef} className="absolute inset-0 flex items-center justify-center" style={{ transform: "scale(0.92)" }}>
+        {/* Stage flutuante centralizado, scale 96% — carousel CIRCULAR (sem espaço vazio nas pontas) */}
+        <div className="relative" style={{ height: 620, overflow: "visible" }}>
+          <div ref={carouselRef} className="absolute inset-0 flex items-center justify-center" style={{ transform: "scale(0.96)" }}>
             {filteredPacks.map((pack, idx) => {
-              const offset = idx - activePackIdx;
+              /* Offset CIRCULAR — escolhe a distância mais curta (loop infinito) */
+              const len = filteredPacks.length;
+              const rawOffset = idx - activePackIdx;
+              let offset = rawOffset;
+              if (offset > len / 2) offset -= len;
+              if (offset < -len / 2) offset += len;
               const absOffset = Math.abs(offset);
               /* 5 templates visíveis: centro + 2 cada lado (Stan-style) */
               const visible = absOffset <= 2;
