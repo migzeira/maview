@@ -73,10 +73,12 @@ export function extractColorsFromImage(imgSrc: string): Promise<{ dominant: stri
 }
 
 export function loadFont(fontName: string) {
+  if (!fontName || fontName === "Inter") return; /* Inter já preloaded no app */
   const id = `gfont-${fontName.replace(/\s+/g, "-")}`;
   if (document.getElementById(id)) return;
   const link = document.createElement("link"); link.id = id; link.rel = "stylesheet";
-  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@400;500;600;700&display=swap`;
+  /* Pesos completos (300-900) — alinhado com loadGoogleFont em profile-theme.ts */
+  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@300;400;500;600;700;800;900&display=swap`;
   document.head.appendChild(link);
 }
 

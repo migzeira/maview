@@ -48,6 +48,9 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
   const subC = dd.subtextColor || (isLight ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.55)");
   const btnR = dd.buttonShape === "pill" ? "999px" : dd.buttonShape === "square" ? "3px" : "8px";
   const cardR = dd.buttonShape === "pill" ? "12px" : dd.buttonShape === "square" ? "4px" : "10px";
+  /* Tipografia — fontHeading pra títulos, fontBody pro corpo (idêntico ao Profile.tsx) */
+  const headingFF = `"${dd.fontHeading || "Inter"}", sans-serif`;
+  const bodyFF = `"${dd.fontBody || dd.fontHeading || "Inter"}", sans-serif`;
 
   /* Luxury tokens */
   const MAVIEW_BLUE = "#1E5BFF";
@@ -203,7 +206,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
       }} />
       <div className="absolute inset-x-0 bottom-0 p-3 flex items-end justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <p className="text-[11.5px] text-white leading-[1.15] line-clamp-2" style={{ fontWeight: 800, letterSpacing: "-0.02em", textShadow: "0 2px 8px rgba(0,0,0,0.55)" }}>
+          <p className="text-[11.5px] text-white leading-[1.15] line-clamp-2" style={{ fontFamily: headingFF, fontWeight: 800, letterSpacing: "-0.02em", textShadow: "0 2px 8px rgba(0,0,0,0.55)" }}>
             {heroProduct.title}
           </p>
           <div className="flex items-center gap-1.5 mt-1">
@@ -241,7 +244,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
         background: "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 30%, rgba(0,0,0,0.10) 65%, transparent 85%)",
       }} />
       <div className="absolute inset-x-0 bottom-0 p-4">
-        <p className="text-[14px] text-white leading-[1.1] line-clamp-2 mb-1.5" style={{ fontWeight: 800, letterSpacing: "-0.025em", textShadow: "0 2px 12px rgba(0,0,0,0.6)" }}>
+        <p className="text-[14px] text-white leading-[1.1] line-clamp-2 mb-1.5" style={{ fontFamily: headingFF, fontWeight: 800, letterSpacing: "-0.025em", textShadow: "0 2px 12px rgba(0,0,0,0.6)" }}>
           {heroProduct.title}
         </p>
         <div className="flex items-center justify-between gap-2">
@@ -343,7 +346,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
 
       {/* Title — protagonista (centro vertical, bigger, dramatic) */}
       <div className="absolute top-2.5 left-2.5 right-16 z-10">
-        <p className="text-[12px] text-white leading-[1.15] line-clamp-2" style={{ fontWeight: 800, letterSpacing: "-0.025em", textShadow: "0 2px 10px rgba(0,0,0,0.85), 0 1px 3px rgba(0,0,0,0.7)" }}>
+        <p className="text-[12px] text-white leading-[1.15] line-clamp-2" style={{ fontFamily: headingFF, fontWeight: 800, letterSpacing: "-0.025em", textShadow: "0 2px 10px rgba(0,0,0,0.85), 0 1px 3px rgba(0,0,0,0.7)" }}>
           {ref.video.title}
         </p>
         {ref.video.views && (
@@ -542,7 +545,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
           <div className="w-[44px] h-[44px] rounded-[9px] flex-shrink-0" style={{ background: `${accent}15` }} />
         )}
         <div className="flex-1 min-w-0">
-          <p className="text-[10px] truncate leading-tight" style={{ color: textC, fontWeight: 800, letterSpacing: "-0.018em" }}>{secondaryProduct.title}</p>
+          <p className="text-[10px] truncate leading-tight" style={{ fontFamily: headingFF, color: textC, fontWeight: 800, letterSpacing: "-0.018em" }}>{secondaryProduct.title}</p>
           <div className="flex items-center gap-1.5 mt-[3px]">
             <span className="text-[9.5px] font-extrabold tabular-nums" style={{ color: textC, letterSpacing: "-0.025em" }}>{secondaryProduct.price}</span>
             {secondaryProduct.originalPrice && <span className="text-[8px] line-through opacity-45 font-medium tabular-nums" style={{ color: textC }}>{secondaryProduct.originalPrice}</span>}
@@ -601,7 +604,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
           </div>
 
           {/* ── Content — Maximalist UI v6.0 ── */}
-          <div className="relative flex flex-col h-full pt-[22px] pb-3" style={{ fontFamily: `"${dd.fontHeading || "Plus Jakarta Sans"}", sans-serif` }}>
+          <div className="relative flex flex-col h-full pt-[22px] pb-3" style={{ fontFamily: bodyFF }}>
 
             {/* ═══ HEADER: Big_Circle_Master (Mateus, Vitor) ═══ */}
             {headerType === "big-circle" && (
@@ -615,11 +618,11 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
                     <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center top" }} crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
                   </div>
                 </div>
-                <p className="text-[16px] leading-[1.05] mt-1.5 text-center" style={{ color: textC, fontWeight: 800, letterSpacing: "-0.02em" }}>
+                <p className="text-[16px] leading-[1.05] mt-1.5 text-center" style={{ fontFamily: headingFF, color: textC, fontWeight: 800, letterSpacing: "-0.02em" }}>
                   {ref.name}<VerifiedBadge />
                 </p>
                 <p className="text-[9px] text-center mt-[1px]" style={{ color: accent, fontWeight: 600, letterSpacing: "0.02em" }}>{ref.username}</p>
-                <p className="text-[8.5px] leading-[1.3] text-center mt-0.5 line-clamp-2 px-2" style={{ color: textC, fontWeight: 500, opacity: 0.88 }}>{ref.bio}</p>
+                <p className="text-[8.5px] leading-[1.3] text-center mt-0.5 line-clamp-2 px-2" style={{ fontFamily: bodyFF, color: textC, fontWeight: 500, opacity: 0.88 }}>{ref.bio}</p>
                 <div className="mt-1.5"><SocialPills size="small" centered /></div>
               </div>
             )}
@@ -645,6 +648,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
                     const cleanShadow = "0 2px 10px rgba(0,0,0,0.55), 0 1px 3px rgba(0,0,0,0.40)";
                     return (<>
                       <p className="text-[17px] leading-[1.02]" style={{
+                        fontFamily: headingFF,
                         color: isMinimalPack ? "#fff" : (isLight ? textC : "#fff"),
                         /* SEM text-shadow em light (cria blur invisível). Em dark, mantém pra legibilidade. */
                         textShadow: isMinimalPack ? cleanShadow : (isLight ? "none" : "0 2px 10px rgba(0,0,0,0.55)"),
@@ -656,6 +660,7 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
                         fontWeight: 800, letterSpacing: "0.02em"
                       }}>{ref.username}</p>
                       <p className="text-[9px] leading-[1.35] mt-1 line-clamp-2 px-1" style={{
+                        fontFamily: bodyFF,
                         color: isMinimalPack ? "#fff" : (isLight ? textC : "rgba(255,255,255,0.95)"),
                         textShadow: isMinimalPack ? cleanShadow : (isLight ? "none" : "0 1px 3px rgba(0,0,0,0.45)"),
                         fontWeight: 600,
@@ -678,11 +683,11 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
                 }}>
                   <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center top" }} crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
                 </div>
-                <p className="text-[18px] leading-[1.02] mt-2 text-center" style={{ color: textC, fontWeight: 600, letterSpacing: "-0.02em" }}>
+                <p className="text-[18px] leading-[1.02] mt-2 text-center" style={{ fontFamily: headingFF, color: textC, fontWeight: 600, letterSpacing: "-0.02em" }}>
                   {ref.name}<VerifiedBadge />
                 </p>
                 <p className="text-[9px] text-center mt-[1px]" style={{ color: accent, fontWeight: 600, letterSpacing: "0.02em" }}>{ref.username}</p>
-                <p className="text-[8.5px] leading-[1.3] text-center mt-0.5 line-clamp-2 px-2" style={{ color: textC, fontWeight: 500, opacity: 0.88 }}>{ref.bio}</p>
+                <p className="text-[8.5px] leading-[1.3] text-center mt-0.5 line-clamp-2 px-2" style={{ fontFamily: bodyFF, color: textC, fontWeight: 500, opacity: 0.88 }}>{ref.bio}</p>
                 <div className="mt-1.5"><SocialPills size="small" centered /></div>
               </div>
             )}
@@ -694,11 +699,11 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
                   <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center center" }} crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
                 </div>
                 <div className="w-[55%] flex flex-col justify-center px-2.5">
-                  <p className="text-[14px] leading-[1.05]" style={{ color: textC, fontWeight: 700, letterSpacing: "-0.02em" }}>
+                  <p className="text-[14px] leading-[1.05]" style={{ fontFamily: headingFF, color: textC, fontWeight: 700, letterSpacing: "-0.02em" }}>
                     {ref.name}<VerifiedBadge />
                   </p>
                   <p className="text-[8.5px] mt-0.5" style={{ color: accent, fontWeight: 600, letterSpacing: "0.02em" }}>{ref.username}</p>
-                  <p className="text-[8.5px] leading-[1.3] mt-1 line-clamp-3" style={{ color: textC, fontWeight: 500, opacity: 0.88 }}>{ref.bio}</p>
+                  <p className="text-[8.5px] leading-[1.3] mt-1 line-clamp-3" style={{ fontFamily: bodyFF, color: textC, fontWeight: 500, opacity: 0.88 }}>{ref.bio}</p>
                   <div className="mt-1.5"><SocialPills size="small" /></div>
                 </div>
               </div>
@@ -713,11 +718,11 @@ export function PhoneMockup({ pack, isActive, onClick, liveDesign }: { pack: Des
                 }}>
                   <img src={displayAvatar} alt="" className="w-full h-full object-cover" style={{ objectPosition: "center top" }} crossOrigin="anonymous" loading="lazy" onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "0"; }} />
                 </div>
-                <p className="text-[15px] leading-tight text-center mb-1" style={{ color: dd.nameColor || textC, fontWeight: 800, letterSpacing: "-0.02em" }}>
+                <p className="text-[15px] leading-tight text-center mb-1" style={{ fontFamily: headingFF, color: dd.nameColor || textC, fontWeight: 800, letterSpacing: "-0.02em" }}>
                   {ref.name}<VerifiedBadge />
                 </p>
                 <p className="text-[8px] text-center mb-1" style={{ color: accent, letterSpacing: "0.03em" }}>{ref.username}</p>
-                <p className="text-[8.5px] leading-snug text-center mb-1.5 px-4 line-clamp-2" style={{ color: textC, fontWeight: 500, opacity: 0.88 }}>{ref.bio}</p>
+                <p className="text-[8.5px] leading-snug text-center mb-1.5 px-4 line-clamp-2" style={{ fontFamily: bodyFF, color: textC, fontWeight: 500, opacity: 0.88 }}>{ref.bio}</p>
                 <div className="flex justify-center"><SocialPills size="small" /></div>
               </>
             )}
