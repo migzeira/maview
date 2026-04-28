@@ -2189,8 +2189,8 @@ const DashboardPagina = () => {
         />
       )}
 
-      {/* ── Two-column grid: tabs+conteúdo + preview iPhone fixo à direita (sempre visível) ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
+      {/* ── Two-column grid: tabs+conteúdo + preview iPhone fixo à direita (gap maior pra não bater no carousel) ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 lg:gap-14">
 
         {/* ── LEFT PANEL ── */}
         <div className="min-w-0" ref={leftPanelRef}>
