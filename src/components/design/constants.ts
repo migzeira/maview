@@ -161,8 +161,8 @@ export const REFERENCE_PROFILES: ReferenceProfile[] = [
 
   /* 6 — DJ (Léo) */ { name: "Léo Dantas", username: "@leodantas.dj",
     bio: "Resident Green Valley · Top 50 Brasil EDM 2024 · 600+ shows pelo país", verified: true,
-    /* Avatar Léo — restaurado retrato com crop=faces pra garantir centralização do rosto */
-    avatar: U("photo-1531891437562-4301cf35b7e4", 400, 500, "faces"),
+    /* Avatar Léo — ID original comprovadamente válido (estava funcionando antes das mudanças) */
+    avatar: U("photo-1539571696357-5a69c17a67c6", 400, 500, "face"),
     socials: ["tt", "ig", "yt", "li"],
     links: [
       /* Cada link com sua própria imagem temática única */
