@@ -4222,8 +4222,8 @@ const DashboardPagina = () => {
           </div>
         </div>
 
-        {/* ── RIGHT PANEL: Phone preview (340px) — pushed right via translate em wide screens ── */}
-        <div className="hidden lg:block lg:translate-x-8 xl:translate-x-16 2xl:translate-x-24">
+        {/* ── RIGHT PANEL: Phone preview (340px) — translate sutil pra não esbarrar nos templates ── */}
+        <div className="hidden lg:block lg:translate-x-2 xl:translate-x-4 2xl:translate-x-8">
           <div className="sticky top-8">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[hsl(var(--dash-text-subtle))] text-xs font-medium tracking-wide">
